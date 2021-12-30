@@ -1,0 +1,10 @@
+/var/log/pandora*.log {
+	daily
+	missingok
+	rotate 14
+	compress
+	delaycompress
+	notifempty
+	copytruncate
+	su root root
+}
