@@ -40,12 +40,28 @@ def shutdown_cache(storage_directory: Optional[Path]=None):
     print('Redis cache database shutdown.')
 
 
+def launch_storage(storage_directory: Optional[Path]=None):
+    if not storage_directory:
+        storage_directory = get_homedir()
+    if not check_running('storage'):
+        Popen(["./run_redis.sh"], cwd=(storage_directory / 'storage'))
+
+
+def shutdown_storage(storage_directory: Optional[Path]=None):
+    if not storage_directory:
+        storage_directory = get_homedir()
+    r = Redis(unix_socket_path=get_socket_path('storage'))
+    r.shutdown(save=True)
+    print('Redis storage database shutdown.')
+
+
 def launch_all():
     launch_cache()
+    launch_storage()
 
 
 def check_all(stop: bool=False):
-    backends: Dict[str, bool] = {'cache': False}
+    backends: Dict[str, bool] = {'cache': False, 'storage': False}
     while True:
         for db_name in backends.keys():
             try:
@@ -68,6 +84,7 @@ def check_all(stop: bool=False):
 
 def stop_all():
     shutdown_cache()
+    shutdown_storage()
 
 
 def main():

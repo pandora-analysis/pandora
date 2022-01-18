@@ -1,0 +1,98 @@
+roles:
+  - name: admin
+    description: "Admin is normally allowed to execute every action"
+    can_submit_file: true
+    can_read_analysis: true
+    can_download_images: true
+    can_download_pdf: true
+    can_download_text: true
+    can_download_zip: true
+    can_refresh_analysis: true
+    can_rescan_file: true
+    can_notify_cert: true
+    can_share_analysis: true
+    can_delete_file: true
+    can_list_own_tasks: true
+    can_list_all_tasks: true
+    can_search_file_name: true
+    can_search_file_hash: true
+    can_list_observables: true
+    can_update_observable: true
+    can_insert_observable: true
+    can_list_users: true
+    can_list_roles: true
+    can_update_role: true
+    can_list_stats: true
+
+
+  - name: owner
+    description: "Owner is the current task owner, the one who has submitted the file, a same user can be owner for a given task and reader (or other) for another task."
+    can_submit_file: true
+    can_read_analysis: true
+    can_download_images: true
+    can_download_pdf: true
+    can_download_text: true
+    can_download_zip: false
+    can_refresh_analysis: true
+    can_rescan_file: true
+    can_notify_cert: true
+    can_share_analysis: true
+    can_delete_file: false
+    can_list_own_tasks: true
+    can_list_all_tasks: false
+    can_search_file_name: false
+    can_search_file_hash: true
+    can_list_observables: false
+    can_update_observable: false
+    can_insert_observable: false
+    can_list_users: false
+    can_list_roles: false
+    can_update_role: false
+
+  - name: reader
+    description: "Reader is a current task reader, he has not submitted the file, but someone gave him a read-access."
+    can_submit_file: true
+    can_read_analysis: true
+    can_download_images: true
+    can_download_pdf: true
+    can_download_text: true
+    can_download_zip: false
+    can_refresh_analysis: true
+    can_rescan_file: true
+    can_notify_cert: true
+    can_share_analysis: true
+    can_delete_file: false
+    can_list_own_tasks: true
+    can_list_all_tasks: false
+    can_search_file_name: false
+    can_search_file_hash: true
+    can_list_observables: false
+    can_update_observable: false
+    can_insert_observable: false
+    can_list_users: false
+    can_list_roles: false
+    can_update_role: false
+
+  - name: other
+    description: "Other is a user which has normally no access to current task."
+    can_submit_file: true
+    can_read_analysis: false
+    can_download_images: false
+    can_download_pdf: false
+    can_download_text: false
+    can_download_zip: false
+    can_refresh_analysis: false
+    can_rescan_file: false
+    can_notify_cert: false
+    can_share_analysis: false
+    can_delete_file: false
+    can_list_own_tasks: true
+    can_list_all_tasks: false
+    can_search_file_name: false
+    can_search_file_hash: true
+    can_list_observables: false
+    can_update_observable: false
+    can_insert_observable: false
+    can_list_users: false
+    can_list_roles: false
+    can_update_role: false

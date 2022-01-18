@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Pandora - Admin
+{% endblock %}
+
+{% block content %}
+    {% if current_user.is_admin %}
+    <div class="card text-center mx-auto" style="width:350px">
+        <div class="card-header">
+            Hello {{ current_user.name }} !
+        </div>
+        <div class="list-group">
+          {% if current_user.role.can(action.list_observables) %}
+            <a href="{{ url_for('api_observables') }}" class="list-group-item list-group-item-action">See observables</a>
+          {% endif %}
+          {% if current_user.role.can(action.list_tasks) %}
+            <a href="{{ url_for('api_tasks') }}" class="list-group-item list-group-item-action">See tasks</a>
+          {% endif %}
+          {% if current_user.role.can(action.list_users) %}
+            <a href="{{ url_for('api_users') }}" class="list-group-item list-group-item-action">See users</a>
+          {% endif %}
+          {% if current_user.role.can(action.list_roles) %}
+            <a href="{{ url_for('api_roles') }}" class="list-group-item list-group-item-action">See roles</a>
+          {% endif %}
+          {% if current_user.role.can(action.list_stats) %}
+            <a href="{{ url_for('api_stats') }}" class="list-group-item list-group-item-action">See statistics</a>
+          {% endif %}
+          <a href="{{ url_for('api_logout') }}" class="list-group-item list-group-item-action">Logout</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="mx-auto" style="width:350px">
+        <h3 class="text-center">Pandora Administration</h3>
+        <form id="loginForm" method="POST" action="{{ url_for('api_admin_submit') }}">
+          {% if error is not none %}
+            <div class="form-group alert alert-danger">{{ error }}</div>
+          {% endif %}
+          <div class="mb-3">
+              <label for="loginUsername" class="form-label">Username</label>
+              <input type="text" class="form-control" id="loginUsername" name="username" placeholder="Enter username" size="50" autofocus>
+          </div>
+          <div class="mb-3">
+              <label for="loginPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Enter Password" size="50">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          </div>
+          <div class="mb-3 form-check">
+              <label class="form-check-label" for="loginRemeber">Remember me</label>
+              <input type="checkbox" class="form-check-input" id="loginRemeber">
+          </div>
+          <button type="submit" form="loginForm" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+    {% endif %}
+{% endblock %}

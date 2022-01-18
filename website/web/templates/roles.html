@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Pandora - roles
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='js/role.js') }}"></script>
+  <script>
+      var role = new Role("{{ csrf_token() }}", "{{ api.url_for(api_resource, action='update') }}", "{{ api.url_for(api_resource, action='reload') }}");
+  </script>
+{% endblock %}
+
+{% block content %}
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th class="text-nowrap">Name</th>
+        {% for key in action.__members__.keys() %}
+        <th class="text-center">{{ key }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+
+    <tbody>
+    {% for role in roles %}
+      <tr id="row-{{ role.name }}">
+        <th class="text-nowrap" scope="row" title="{{ role.description }}">{{ role.name.name }}</th>
+        {% for action, perm in role.actions.items() %}
+        <td class="text-center">
+            <span class="badge bg-success {% if not perm %} d-none {% endif %}"
+                  id="true-{{ role.name.name }}-{{ action.name }}" onclick="role.update('{{ role.name.name }}', '{{ action.name }}', 0)">
+                TRUE
+            </span>
+            <span class="badge bg-danger{% if perm %} d-none {% endif %}"
+                  id="false-{{ role.name.name }}-{{ action.name }}" onclick="role.update('{{ role.name.name }}', '{{ action.name }}', 1)">
+                FALSE
+            </span>
+        </td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="text-center">
+    <button class="btn btn-primary" onclick="role.reload()">Reload roles from config file</button>
+  </div>
+{% endblock %}
+
+
