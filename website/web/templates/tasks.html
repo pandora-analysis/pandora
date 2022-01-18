@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_icon %}
+
+{% block title %}
+    My analyses
+{% endblock %}
+
+{% block content %}
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Owner</th>
+        <th style="width:15%">Date</th>
+        <th style="width:5%;text-align:center">Status</th>
+        <th>Name</th>
+        <th>SHA256</th>
+        <th colspan="3"></th>
+      </tr>
+    </thead>
+
+    <tbody>
+    {% for task in tasks %}
+      <tr id="row-{{ task.rid }}">
+        <td>{{ task.rid }}</td>
+        <td>{{ task.user.name }}</td>
+        <td>{{ moment(task.save_date).format('lll') }}</td>
+        <td style="text-align:center">
+          <span class="img-thumbnail small-status-flag status-flag-{{ task.status.name.lower() }}">
+            {% if task.status == status.ERROR %}
+              {{ render_icon('exclamation-octagon') }}
+            {% elif task.status == status.ALERT %}
+              {{ render_icon('x-circle') }}
+            {% elif task.status == status.WARN %}
+            {{ render_icon('exclamation-triangle') }}
+            {% elif task.status == status.OKAY %}
+            {{ render_icon('check-circle') }}
+            {% else %}
+              {{ render_icon('question') }}
+            {% endif %}
+          </span>
+        </td>
+        <td>{{ render_icon(task.file.icon) }}<b>{{ task.file.original_filename }}</b></td>
+        <td>{{ task.file.sha256 }}</td>
+        <td>
+          <a href="{{ url_for('api_analysis', task_id=task.rid) }}">
+            <span class="btn btn-primary btn-xs btn-table">See report</span>
+          </a>
+        </td>
+        <td>
+        {% if current_user.is_admin %}
+          {% if task.file.deleted %}
+            <span class="btn btn-default btn-xs btn-table">File deleted</span>
+          {% else %}
+            <span id="delete-{{ task.rid }}" class="btn btn-danger btn-xs btn-table" onclick="javascript:deleteFile($(this).attr('data-url'), $(this).attr('data-uid'))"
+                  data-url="{{ api.url_for(api_resource, task_id=task.rid, action='delete') }}" data-uid="{{ task.file_id }}">
+                Delete file
+            </span>
+          {% endif %}
+        {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if current_user.is_admin %}
+  <script>
+      function deleteFile(url, uid) {
+          if (! confirm("Are you sure you want to delete this file ? That action is irreversible !")) {
+              return false;
+          }
+          fetch(url, {
+            method: "POST",
+            headers: {
+              "X-CSRF-Token": "{{ csrf_token() }}"
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success === false) {
+              throw new Error(data.error);
+            }
+            $(`[data-uid=${uid}]`).attr("onclick", "").toggleClass("btn-default btn-danger").html('File deleted');
+          })
+          .catch((error) => {
+            alert("An error has occurred while removing file : " + error);
+          });
+      };
+  </script>
+  {% endif %}
+
+{% endblock %}
+
+

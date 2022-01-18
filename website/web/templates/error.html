@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Pandora - Error
+{% endblock %}
+
+{% block content %}
+  <div class="text-center">
+    <div class="card" style="display:inline-block;width:350px">
+      <div class="card-header">
+        Error {{ status }}
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">This page is not available.</h5>
+        <p class="card-text">
+            This page is not available.
+            Maybe you are not allowed to see this content.
+            Please contact our webmaster in case of problem.
+        </p>
+        <button class="btn btn-danger" type="button" onclick="history.back()">
+            Previous page
+        </button>
+        <button class="btn btn-primary" type="button" onclick="document.location.href = '{{ url_for('api_root') }}'">
+            Home page
+        </button>
+      </div>
+    </div>
+  </div>
+{% endblock %}

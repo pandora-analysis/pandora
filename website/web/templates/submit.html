@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block styles %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/dropzone.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div>
+      <p class="name" data-dz-name></p>
+      <strong class="error text-danger" data-dz-errormessage></strong>
+  </div>
+  <div class="col-md-2"></div>
+    <div class="col-md-8" id="dropzone">
+     <p class="size" data-dz-size></p>
+     <div class="dz-message" data-dz-message>
+       <h2>Drop suspicious file here...</h2>
+     </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-2"></div>
+    <div class="text-right col-md-8">
+      <button class="btn btn-primary" onclick="$('#workers-selection').toggleClass('d-none');">Advanced</button>
+    </div>
+  </div>
+  <div class="row d-none" id="workers-selection">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th scope="col">Module</th>
+            <th scope="col">Enable?</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for worker in workers %}
+          {% if worker.replicas > 0 and worker.module != "extractor" %}
+          <tr>
+            <td>{{ worker.web_name }}</td>
+            <td><input type="checkbox" name="{{ worker.module }}" checked/></td>
+          </tr>
+          {% endif %}
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/lib/dropzone-min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/submit.js') }}"></script>
+<script type="text/javascript">
+  $("div#dropzone").dropzone({
+    url: "{{ api.url_for(api_resource) }}",
+    headers: {"X-CSRF-Token": "{{ csrf_token() }}"},
+    paramName: "file",
+    maxFilesize: {{ max_file_size }}, // MB
+    sending: function(file, xhr, formData) {
+      formData.append("workersDisabled", getDisabledWorkers());
+    },
+    success: function(file, answer){
+      window.location = `/analysis/${answer.taskId}`;
+    },
+    error: function(file, answer) {
+      alert(`An error has occurred while submitting file : ${answer.error}`);
+    }
+  });
+</script>
+{% endblock %}

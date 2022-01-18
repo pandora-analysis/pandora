@@ -18,12 +18,28 @@ python = "^3.8"
 redis = {version = "^4.1.0", extras = ["hiredis"]}
 flask-restx = "^0.5.1"
 gunicorn = "^20.1.0"
+Flask-Session = "^0.4.0"
+Flask-Moment = "^1.0.2"
+Flask-Login = "^0.5.0"
+Bootstrap-Flask = "^2.0.1"
+PyYAML = "^6.0"
+Flask-WTF = "^1.0.0"
+validators = "^0.18.2"
+python-magic = "^0.4.24"
+exif = "^1.3.4"
+PyMuPDF = "^1.19.4"
+requests = "^2.27.1"
+textract = "^1.6.4"
+PyExifTool = "^0.4.11"
+eml-parser = "^1.17.0"
 
 [tool.poetry.dev-dependencies]
-ipython = "^7.30.1"
-mypy = "^0.930"
+ipython = "^8.0.1"
+mypy = "^0.931"
 types-setuptools = "^57.4.4"
-types-redis = "^4.1.1"
+types-redis = "^4.1.10"
+types-PyYAML = "^6.0.3"
+types-requests = "^2.27.7"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

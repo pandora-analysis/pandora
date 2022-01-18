@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Pandora - observables
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='js/observable.js') }}"></script>
+  <script>
+      var observable = new Observable("{{ csrf_token() }}", "{{ api.url_for(api_resource, action='insert') }}", "{{ api.url_for(api_resource, action='update') }}");
+  </script>
+{% endblock %}
+
+{% block content %}
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th style="width:30%" scope="col">Type</th>
+        <th style="width:50%" scope="col">Indicator</th>
+        <th style="width:20%" scope="col">Allowlist</th>
+      </tr>
+    </thead>
+
+    <span id="insertError" class="alert alert-danger d-none" style="padding:8px 10px;position:relative;top:7px">
+      <span id="insertErrorInner"></span>
+    </span>
+    <tbody>
+      <tr class="bg-info">
+        <td>
+          <form id="insertForm" onsubmit="return observable.insert()">
+            <button type="submit" class="btn btn-primary" id="insertSubmit">Add observable</button>
+          </form>
+        </td>
+        <td>
+          <input type="text" id="insertAddress" form="insertForm" placeholder="Address" required>
+        </td>
+        <td>
+          <div class="btn-group btn-toggle" onclick="$(this).find('.btn').toggleClass('btn-primary');$('#insertallowlist').val(1-$('#insertallowlist').val())">
+            <button class="btn">Suspicious</button>
+            <button class="btn btn-primary">Safe</button>
+            <input type="hidden" id="insertallowlist" value="1" required>
+          </div>
+        </td>
+      </tr>
+
+      {% for observable in observables %}
+      <tr class="row-observable" id="row-{{ observable.id }}">
+        <td>{{ observable.type_observable.name }}</td>
+        <td><b>{{ observable.address }}</b></td>
+        <td class="text-left">
+          <span id="okay-{{ observable.address }}" class="img-thumbnail small-status-flag status-flag-okay {% if not observable.allowlist %}d-none{% endif %}"
+                onclick="observable.update('{{ observable.address }}', 0)" style="width:150px">
+               safe
+          </span>
+          <span id="warn-{{ observable.address }}" class="img-thumbnail small-status-flag status-flag-warn {% if observable.allowlist %}d-none{% endif %}"
+                onclick="observable.update('{{ observable.address }}', 1)" style="width:150px">
+              suspicious
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+

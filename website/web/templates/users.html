@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Pandora - users
+{% endblock %}
+
+{% block content %}
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Name</th>
+        <th scope="col">Admin</th>
+        <th scope="col">First seen</th>
+        <th scope="col">Last seen</th>
+        <th scope="col">Last Used IP</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for user in users %}
+      <tr id="row-{{ user.session_id }}">
+        <td>{{ user.session_id }}</td>
+        <td>{{ user.name }}</td>
+        <td>
+        {% if user.is_admin %}
+          <span class="badge bg-success">TRUE</span>
+        {% else %}
+          <span class="badge bg-danger">FALSE</span>
+        {% endif %}
+        </td>
+        <td>{{ moment(user.first_seen).format('lll') }}</td>
+        <td>{{ moment(user.last_seen).format('lll') }}</td>
+        <td>
+        {% if user.last_ip is none %}
+          <span class="badge bg-light text-dark">NULL</span>
+        {% else %}
+          {{ user.last_ip }}
+        {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+
