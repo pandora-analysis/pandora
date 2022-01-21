@@ -20,7 +20,7 @@ flask-restx = "^0.5.1"
 gunicorn = "^20.1.0"
 
 [tool.poetry.dev-dependencies]
-ipython = "^7.30.1"
+ipython = "^7.31.1"
 mypy = "^0.930"
 types-setuptools = "^57.4.4"
 types-redis = "^4.1.1"
