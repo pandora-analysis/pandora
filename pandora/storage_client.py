@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import operator
+
 from typing import Optional, Dict, List, Union
 
 from redis import ConnectionPool, Redis
@@ -44,6 +46,7 @@ class Storage():
                 to_pop.append(session_id)
         if to_pop:
             self.storage.srem('users', *to_pop)
+        users.sort(key=operator.itemgetter('last_seen'), reverse=True)
         return users
 
     # ##############
@@ -116,4 +119,5 @@ class Storage():
         tasks = []
         for rid in self.storage.smembers('tasks'):
             tasks.append(self.storage.hgetall(f'tasks:{rid}'))
+        tasks.sort(key=operator.itemgetter('save_date'), reverse=True)
         return tasks

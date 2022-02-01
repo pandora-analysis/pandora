@@ -53,9 +53,13 @@ class Task:
         if submitted_file:
             self.file = submitted_file
             self.file_id = self.file.uuid
+            self.save_date = self.file.save_date
         elif file_id:
             self.file_id = file_id
             self.file = File(**self.storage.get_file(file_id))
+            self.save_date = self.file.save_date
+        else:
+            self.save_date = save_date
 
         if user:
             self.user = user
@@ -63,7 +67,6 @@ class Task:
             user = self.storage.get_user(user_id)
             if user:
                 self.user = User(**user)
-        self.save_date = save_date
         self.observables: List[Observable] = []
         self.reports = reports or dict()
         self.parent = parent
@@ -93,7 +96,8 @@ class Task:
             'origin_id': self.origin.rid if self.origin else None,
             'file_id': self.file.uuid if self.file else None,
             'user_id': self.user.get_id(),
-            'status': self.status.name
+            'status': self.status.name,
+            'save_date': self.save_date.isoformat()
         }.items() if v is not None}
 
     @property
