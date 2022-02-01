@@ -7,7 +7,7 @@ import sys
 import traceback
 
 from datetime import datetime
-from functools import cached_property, cache
+from functools import cached_property, lru_cache
 from io import BytesIO
 from pathlib import Path
 from typing import Optional, List, Union, Dict, cast, Set
@@ -18,6 +18,7 @@ import exiftool  # type: ignore
 import fitz  # type: ignore
 import magic
 import textract  # type: ignore
+from weasyprint import HTML  # type: ignore
 
 from eml_parser import EmlParser
 
@@ -27,7 +28,7 @@ from .storage_client import Storage
 from .text_parser import TextParser
 
 
-@cache
+@lru_cache
 def dirty_load_unoconverter():
     sys.path.append('/usr/lib/python3/dist-packages')
     module = importlib.import_module('unoserver.converter')
@@ -82,7 +83,7 @@ class File:
         'DOC': {'.doc', '.docx', '.odt'},
         'EML': {'.eml'},
         'EXE': {'.exe', '.dll'},
-        'HTM': {'.html', '.html', '.xht', '.xhtml'},
+        'HTM': {'.htm', '.html', '.html', '.xht', '.xhtml'},
         'IMG': {'.png', '.gif', '.bmp', '.jpg', '.jpeg', '.ico'},
         'JSC': {'.js'},
         'MSG': {'.msg'},
@@ -132,7 +133,7 @@ class File:
         'XLS': 'MS Excel document',
     }
     OLETOOLS_TYPES: Set[str] = {'DOC', 'PPT', 'RTF', 'XLS'}
-    UNOCONV_TYPES: Set[str] = {'CSS', 'DOC', 'HTM', 'JSC', 'PPT', 'RTF', 'TXT', 'XLS'}
+    UNOCONV_TYPES: Set[str] = {'CSS', 'DOC', 'JSC', 'PPT', 'RTF', 'TXT', 'XLS'}
     FOLDER_MODE = 0o2775
     FILE_MODE = 0o0664
     SUBPROCESS_TIMEOUT: int = 30
@@ -209,21 +210,42 @@ class File:
         if self.is_unoconv_concerned:
             converter = dirty_load_unoconverter().UnoConverter()
             converter.convert(self.path, outpath=f'{self.path}.pdf')
+        elif self.is_html:
+            # FIXME: it will fetch 3rd parties resources if present in the HTML doc
+            html = HTML(self.path)
+            html.write_pdf(f'{self.path}.pdf')
+        elif self.is_eml:
+            # get all content -> make it a PDF
+            if 'body' in self.eml_data:
+                for i, body_part in enumerate(self.eml_data['body']):
+                    if self.MIME_TYPE_EQUAL.get(body_part['content_type']):
+                        body_part_type = self.MIME_TYPE_EQUAL[body_part['content_type']][0]
+                        if body_part_type == 'HTM':
+                            html = HTML(string=body_part['content'])
+                            html.write_pdf(f'{self.path}_body_{i}.pdf')
+                        elif body_part_type == 'TXT':
+                            converter = dirty_load_unoconverter().UnoConverter()
+                            converter.convert(indata=body_part['content'].encode(), outpath=f'{self.path}_body_{i}.pdf')
+                        else:
+                            print('Unexpected body type:', body_part_type)
 
     def make_previews(self) -> None:
         if self.is_pdf:
-            to_convert = self.path
-        elif self.is_unoconv_concerned:
-            to_convert = Path(f'{self.path}.pdf')
+            to_convert = [self.path]
+        elif self.is_unoconv_concerned or self.is_html:
+            to_convert = [Path(f'{self.path}.pdf')]
+        elif self.eml_data:
+            to_convert = list(self.directory.glob(f'{self.path.name}_body_*.pdf'))
         else:
             return None
 
-        doc = fitz.open(to_convert)
-        digits = len(str(doc.page_count))
-        for page in doc:
-            pix = page.get_pixmap()
-            img_name = self.directory / f"preview-{page.number:0{digits}}.png"
-            pix.save(img_name)
+        for i, p in enumerate(to_convert):
+            doc = fitz.open(p)
+            digits = len(str(doc.page_count))
+            for page in doc:
+                pix = page.get_pixmap()
+                img_name = self.directory / f"preview-{i}-{page.number:0{digits}}.png"
+                pix.save(img_name)
 
     @property
     def previews(self) -> List[Path]:
@@ -394,7 +416,7 @@ class File:
         :return: text content
         """
         try:
-            if self.type == 'HTM':
+            if self.is_html or self.is_eml or self.is_txt:
                 return self.data.getvalue().decode(errors='replace')
             else:
                 # Use of textract module for all file types
@@ -425,8 +447,6 @@ class File:
         self.converted = True
         """
         # TODO
-        # * UNOCONV_TYPES -> PDF
-        # * copy pdf to new name ??
         # * email MSG format to EML, store EML as is if already in this format, just decode
         # * email content: convert to pdf and then to images, especially if HTML. Uses imgkit (?)
         # * if image, store as image for preview => make a new file instead for safety reason
@@ -446,7 +466,7 @@ class File:
 
         # Try to extract eml|msg observables
         try:
-            if self.eml_data:
+            if self.is_eml:
                 for value in self.eml_data['body'][0]['content']:
                     parsed += value
                 parsed += ' '
@@ -478,9 +498,7 @@ class File:
         return links
 
     @cached_property
-    def eml_data(self) -> Optional[Dict]:
-        if not self.is_eml:
-            return None
+    def eml_data(self) -> Dict:
         ep = EmlParser(include_raw_body=True, include_attachment_data=True)
         return ep.decode_email(eml_file=self.path)
 

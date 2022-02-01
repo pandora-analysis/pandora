@@ -376,12 +376,13 @@
                       </td>
                     </tr>
 
-                    {% if current_user.role.can('download_text') and task.file.text %}
+                    {% if current_user.role.can(action.download_text) and task.file.eml_data.body %}
                     <tr id="eml-body">
                       <th>Body</th>
-                      <td class="img-hover">
-                        <img class="img-thumbnail" width="50%" data-src="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='txt') }}"
-                             src="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='txt') }}" alt="BODY">
+                      <td>
+                        {%for body in task.file.eml_data.body %}
+                        <pre>{{body.content}}</pre>
+                        {% endfor %}
                       </td>
                     </tr>
                     {% endif %}
@@ -389,9 +390,9 @@
                   {% endif %}
 
                   <!-- Image preview -->
-                  {% if current_user.role.can('download_images') %}
+                  {% if current_user.role.can(action.download_images) %}
                   <div>
-                    <div class="row {% if task.file.eml_data or not task.file.previews %} d-none {% endif %}" id="contentAvailable">
+                    <div class="row {% if not task.file.previews %} d-none {% endif %}" id="contentAvailable">
                     {% if task.file.previews %}
                       {% for idx in range(task.file.previews|length) %}
                       <div class="col-md-4">
