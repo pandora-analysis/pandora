@@ -132,6 +132,7 @@ class ApiSubmit(Resource):
         submitted_file.save(filepath)
 
         file = File(path=filepath, uuid=uuid, original_filename=submitted_file.filename)
+        file.convert()
         file.make_previews()
         file.store()
 

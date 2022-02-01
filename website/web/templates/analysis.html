@@ -423,13 +423,8 @@
               </div>
 
               <div class="row">
-                <div class="col-md-8">
-                  <div class="img-hover">
-                    <a href="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='txt') }}" target="_blank">
-                        <img class="img-thumbnail" width="70%" data-src="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='txt') }}"
-                             src="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='txt') }}" alt="TXT">
-                    </a>
-                  </div>
+                <div class="col-md-12">
+                  <pre>{{task.file.text}}</pre>
                 </div>
               </div>
             </div>

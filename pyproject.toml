@@ -32,6 +32,7 @@ requests = "^2.27.1"
 textract = "^1.6.4"
 PyExifTool = "^0.4.11"
 eml-parser = "^1.17.0"
+unoserver = "^1.1"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.0.1"

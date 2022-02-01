@@ -1055,6 +1055,17 @@ devenv = ["black", "pyroma", "pytest-cov", "zest.releaser"]
 test = ["pytest-mock (>=3.3)", "pytest (>=4.3)"]
 
 [[package]]
+name = "unoserver"
+version = "1.1"
+description = "A server for file conversions with Libre Office"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+devenv = ["black", "flake8", "pyroma", "pytest", "pytest-cov", "zest.releaser"]
+
+[[package]]
 name = "urllib3"
 version = "1.26.8"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -1154,7 +1165,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "315b468374cbae7a83b2079d132d943662fc2ad0a0a5f9db974a967286080d32"
+content-hash = "bc90a6ded28c51e1c32cda0d63192a19db65f802e975a166b0e1dd9d7a445c5f"
 
 [metadata.files]
 aniso8601 = [
@@ -1848,6 +1859,10 @@ tzdata = [
 tzlocal = [
     {file = "tzlocal-4.1-py3-none-any.whl", hash = "sha256:28ba8d9fcb6c9a782d6e0078b4f6627af1ea26aeaa32b4eab5324abc7df4149f"},
     {file = "tzlocal-4.1.tar.gz", hash = "sha256:0f28015ac68a5c067210400a9197fc5d36ba9bc3f8eaf1da3cbd59acdfed9e09"},
+]
+unoserver = [
+    {file = "unoserver-1.1-py3-none-any.whl", hash = "sha256:30ed6e2318962c9cb40b0dc9272c848435394d5c1242e29d9280366476a57939"},
+    {file = "unoserver-1.1.tar.gz", hash = "sha256:2614fa4f3d780c15c182c827ef502df48157c4f48ce8456a8ea00c49357d1d60"},
 ]
 urllib3 = [
     {file = "urllib3-1.26.8-py2.py3-none-any.whl", hash = "sha256:000ca7f471a233c2251c6c7023ee85305721bfdf18621ebff4fd17a8653427ed"},

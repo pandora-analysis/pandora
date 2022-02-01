@@ -1,11 +1,13 @@
 import hashlib
+import importlib
 import os
 import re
 import shutil
+import sys
 import traceback
 
 from datetime import datetime
-from functools import cached_property
+from functools import cached_property, cache
 from io import BytesIO
 from pathlib import Path
 from typing import Optional, List, Union, Dict, cast, Set
@@ -23,6 +25,14 @@ from .default import get_config
 from .helpers import make_bool, make_bool_for_redis
 from .storage_client import Storage
 from .text_parser import TextParser
+
+
+@cache
+def dirty_load_unoconverter():
+    sys.path.append('/usr/lib/python3/dist-packages')
+    module = importlib.import_module('unoserver.converter')
+    sys.path.pop()
+    return module
 
 
 class File:
@@ -194,15 +204,26 @@ class File:
     def store(self) -> None:
         self.storage.set_file(self.to_dict)
 
-    def make_previews(self) -> None:
+    def convert(self) -> None:
         # NOTE: For images uploaded by user, re-create them so the images downloaded from the web are safe(r)
+        if self.is_unoconv_concerned:
+            converter = dirty_load_unoconverter().UnoConverter()
+            converter.convert(self.path, outpath=f'{self.path}.pdf')
+
+    def make_previews(self) -> None:
         if self.is_pdf:
-            doc = fitz.open(self.path)
-            digits = len(str(doc.page_count))
-            for page in doc:
-                pix = page.get_pixmap()
-                img_name = self.directory / f"preview-{page.number:0{digits}}.png"
-                pix.save(img_name)
+            to_convert = self.path
+        elif self.is_unoconv_concerned:
+            to_convert = Path(f'{self.path}.pdf')
+        else:
+            return None
+
+        doc = fitz.open(to_convert)
+        digits = len(str(doc.page_count))
+        for page in doc:
+            pix = page.get_pixmap()
+            img_name = self.directory / f"preview-{page.number:0{digits}}.png"
+            pix.save(img_name)
 
     @property
     def previews(self) -> List[Path]:
@@ -370,7 +391,7 @@ class File:
     def text(self) -> str:
         """
         Property to get file text content.
-        :return (str): text content
+        :return: text content
         """
         try:
             if self.type == 'HTM':
@@ -392,7 +413,7 @@ class File:
             self.error_trace = f'{e}\n{traceback.format_exc()}'
         return ''
 
-    def convert(self, force: bool=False):
+    def convert_bkp(self, force: bool=False):
         """
         Convert file in image and save it in tasks folder.
         :param (bool) force: if True do convert even if it is already done

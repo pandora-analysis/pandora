@@ -7,6 +7,7 @@ import traceback
 
 from collections import defaultdict
 from datetime import datetime
+from io import BytesIO
 
 import flask_session  # type: ignore
 import flask_moment  # type: ignore
@@ -210,7 +211,8 @@ def api_task_download(task_id, source, seed=None, idx=None):
 
     if source == 'txt' and flask_login.current_user.role.can(Action.download_text):
         assert task.file.text, 'text content not available'
-        return send_file(task.file.data, mimetype=task.file.mime_type)
+        print(f'{task.file.path.name}.txt')
+        return send_file(BytesIO(task.file.text.encode()), download_name=f'{task.file.path.name}.txt', mimetype='plain/text')
 
     if source == 'zip' and flask_login.current_user.role.can(Action.download_zip):
         if task.file.zip_name is None:
