@@ -169,9 +169,8 @@ class Pandora():
 
     def add_seed(self, task: Task, time: Optional[str]=None) -> Tuple[str, Optional[int]]:
         seed = secrets.token_urlsafe()
-        expire = None
-        if time:
-            expire = expire_in_sec(time)
+        expire = expire_in_sec(time)
+        if expire:
             self.redis.setex(name=f'seed:{seed}', time=expire, value=task.rid)
         else:
             self.redis.set(name=f'seed:{seed}', value=task.rid)
