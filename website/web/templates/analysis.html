@@ -332,6 +332,66 @@
               <!-- Content preview -->
               <div class="row">
                 <div class="col-md-12" style="margin-bottom:50px">
+                  {% if task.file.is_msg and task.file.msg_data %}
+                  <!--  MSG Details -->
+                  <table class="table table-hover table-bordered"
+                         id="msgContent">
+                    <tr>
+                      <th style="width:20%">Date</th>
+                      <td id="msg-date">
+                      {% if task.file.msg_data.date %}
+                        {{ task.file.msg_data.date }}
+                      {% endif %}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>From</th>
+                      <td id="msg-from">
+                        {{ task.file.msg_data.sender }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>To</th>
+                      <td id="msg-to">
+                        {{ task.file.msg_data.to }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Subject</th>
+                      <td id="msg-subject">
+                        {{ task.file.msg_data.subject }}
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <th>Hops</th>
+                      <td id="msg-hops">
+                      {% if task.file.msg_data.header.received %}
+                      {% for received in task.file.msg_data.header.received %}
+                        {% if 'from' in received %}
+                          <span>{{ received.from[0] }}</span> <small class="text-muted">{{ received.from[1] }}</small><br/>
+                        {% endif %}
+                      {% endfor %}
+                      {% endif %}
+                      </td>
+                    </tr>
+
+                    {% if current_user.role.can(action.download_text) and (task.file.msg_data.body or task.file.msg_data.htmlBody) %}
+                    <tr id="msg-body">
+                      <th>Body</th>
+                      <td>
+                        {% if task.file.msg_data.body %}
+                        <pre> {{ task.file.msg_data.body }} </pre>
+                        {% endif %}
+                        {% if task.file.msg_data.htmlBody %}
+                        <pre> {{ task.file.msg_data.htmlBody }} </pre>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% endif %}
+                  </table>
+                  {% endif %}
+
                   {% if task.file.is_eml and task.file.eml_data %}
                   <!--  EML Details -->
                   <table class="table table-hover table-bordered"

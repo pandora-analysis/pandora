@@ -1,0 +1,93 @@
+workers:
+  - module: clamav
+    class: ClamAVWorker
+    table: report_clamav
+    web_name: ClamAV
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    socket_path: /var/run/clamav/clamd.ctl
+
+  - module: msodde
+    class: MsoddeWorker
+    table: report_msodde
+    web_name: MSODDE
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    bin_path: /opt/pandora/venv/bin/msodde
+
+  - module: yara
+    class: YaraWorker
+    table: report_yara
+    web_name: YARA Rules
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    rules_path: /opt/pandora/rules
+
+  - module: olevba
+    class: OlevbaWorker
+    table: report_olevba
+    web_name: OLEVBA
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+
+  - module: rtfobj
+    class: RtfobjWorker
+    table: report_rtfobj
+    web_name: RTFObj
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    bin_path: /opt/pandora/venv/bin/rtfobj
+
+  - module: peepdf
+    class: PeepdfWorker
+    table: report_peepdf
+    web_name: PeePDF
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    bin_path: frozen
+
+  - module: vt
+    class: VTWorker
+    table: report_vt
+    web_name: Virus Total
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    api_endpoint: https://www.virustotal.com/vtapi/v2/file/report
+    api_key: <VTAPIKEY>
+
+  - module: extractor
+    class: ExtWorker
+    table: report_extractor
+    web_name: Extractor
+    cache: null
+    timeout: 3m
+    replicas: 3
+    max_files: 15
+
+  - module: irma
+    class: IrmaWorker
+    table: report_irma
+    web_name: IRMA
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    api_endpoint: https://irma.cert-ag.com/api/v3
+    verify: false
+    archive_max_files: 15
+    analyse_extracted_files: false
+
+  - module: mb
+    class: MBWorker
+    table: report_mb
+    web_name: MalwareBazaar
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    api_endpoint: https://mb-api.abuse.ch/api/v1/

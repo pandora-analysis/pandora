@@ -34,6 +34,7 @@ PyExifTool = "^0.4.11"
 eml-parser = "^1.17.0"
 unoserver = "^1.1"
 weasyprint = "^54.1"
+extract-msg = "^0.29"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.0.1"

@@ -21,6 +21,7 @@ import textract  # type: ignore
 from weasyprint import HTML  # type: ignore
 
 from eml_parser import EmlParser
+from extract_msg import openMsg, Message
 
 from .default import get_config
 from .helpers import make_bool, make_bool_for_redis
@@ -210,11 +211,21 @@ class File:
         if self.is_unoconv_concerned:
             converter = dirty_load_unoconverter().UnoConverter()
             converter.convert(self.path, outpath=f'{self.path}.pdf')
-        elif self.is_html:
+
+        if self.is_html:
             # FIXME: it will fetch 3rd parties resources if present in the HTML doc
             html = HTML(self.path)
             html.write_pdf(f'{self.path}.pdf')
-        elif self.is_eml:
+
+        if self.is_msg:
+            if self.msg_data.body:
+                converter = dirty_load_unoconverter().UnoConverter()
+                converter.convert(indata=self.msg_data.body.encode(), outpath=f'{self.path}_body_txt.pdf')
+            if self.msg_data.htmlBody:
+                html = HTML(file_obj=BytesIO(self.msg_data.htmlBody))
+                html.write_pdf(f'{self.path}_body_html.pdf')
+
+        if self.is_eml:
             # get all content -> make it a PDF
             if 'body' in self.eml_data:
                 for i, body_part in enumerate(self.eml_data['body']):
@@ -235,6 +246,8 @@ class File:
         elif self.is_unoconv_concerned or self.is_html:
             to_convert = [Path(f'{self.path}.pdf')]
         elif self.eml_data:
+            to_convert = list(self.directory.glob(f'{self.path.name}_body_*.pdf'))
+        elif self.msg_data and self.msg_data.body:
             to_convert = list(self.directory.glob(f'{self.path.name}_body_*.pdf'))
         else:
             return None
@@ -447,13 +460,8 @@ class File:
         self.converted = True
         """
         # TODO
-        # * email MSG format to EML, store EML as is if already in this format, just decode
-        # * email content: convert to pdf and then to images, especially if HTML. Uses imgkit (?)
         # * if image, store as image for preview => make a new file instead for safety reason
-        # * pdf to png (done in make preview)
         # * pdf -> png -> pdf to have a safe thing to dl
-        # * text to png
-        # 8 compress all images to zip (done elsewhere)
 
     @property
     def links(self) -> Set[str]:
@@ -501,6 +509,14 @@ class File:
     def eml_data(self) -> Dict:
         ep = EmlParser(include_raw_body=True, include_attachment_data=True)
         return ep.decode_email(eml_file=self.path)
+
+    @cached_property
+    def msg_data(self) -> Message:
+        # NOTE: the msg file can be other things than a message.
+        # See https://github.com/TeamMsgExtractor/msg-extractor/blob/master/extract_msg/utils.py
+        msg = openMsg(self.path)
+        assert isinstance(msg, Message), f'msg file must be a message, other formats are not supported yet. Type: {type(msg)}'
+        return msg
 
     @cached_property
     def metadata(self) -> Dict[str, str]:
