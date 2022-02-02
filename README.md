@@ -15,6 +15,7 @@ this directory. See [this guide](https://www.lookyloo.eu/docs/main/install-looky
 From the directory you just cloned, run:
 
 ```bash
+sudo apt install python3-pip libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0
 poetry install
 ```
 

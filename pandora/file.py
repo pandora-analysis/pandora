@@ -18,10 +18,10 @@ import exiftool  # type: ignore
 import fitz  # type: ignore
 import magic
 import textract  # type: ignore
-from weasyprint import HTML  # type: ignore
+from weasyprint import HTML, default_url_fetcher  # type: ignore
 
 from eml_parser import EmlParser
-from extract_msg import openMsg, Message
+from extract_msg import openMsg, Message  # type: ignore
 
 from .default import get_config
 from .helpers import make_bool, make_bool_for_redis
@@ -35,6 +35,20 @@ def dirty_load_unoconverter():
     module = importlib.import_module('unoserver.converter')
     sys.path.pop()
     return module
+
+
+def html_to_pdf(source: Union[str, bytes, Path], dest: str) -> None:
+
+    def disable_fetch_weasyprint(url: str, timeout=10, ssl_context=None):
+        raise ValueError(f'Fetching is disabled, ignoring: {url}')
+
+    if isinstance(source, str):
+        html = HTML(string=source, url_fetcher=default_url_fetcher if get_config('generic', 'weasyprint_fetch_ressources') else disable_fetch_weasyprint)
+    elif isinstance(source, bytes):
+        html = HTML(file_obj=BytesIO(source), url_fetcher=default_url_fetcher if get_config('generic', 'weasyprint_fetch_ressources') else disable_fetch_weasyprint)
+    elif isinstance(source, Path):
+        html = HTML(source, url_fetcher=default_url_fetcher if get_config('generic', 'weasyprint_fetch_ressources') else disable_fetch_weasyprint)
+    html.write_pdf(dest)
 
 
 class File:
@@ -213,27 +227,23 @@ class File:
             converter.convert(self.path, outpath=f'{self.path}.pdf')
 
         if self.is_html:
-            # FIXME: it will fetch 3rd parties resources if present in the HTML doc
-            html = HTML(self.path)
-            html.write_pdf(f'{self.path}.pdf')
+            html_to_pdf(self.path, f'{self.path}.pdf')
 
-        if self.is_msg:
+        if self.msg_data:
             if self.msg_data.body:
                 converter = dirty_load_unoconverter().UnoConverter()
                 converter.convert(indata=self.msg_data.body.encode(), outpath=f'{self.path}_body_txt.pdf')
             if self.msg_data.htmlBody:
-                html = HTML(file_obj=BytesIO(self.msg_data.htmlBody))
-                html.write_pdf(f'{self.path}_body_html.pdf')
+                html_to_pdf(self.msg_data.htmlBody, f'{self.path}_body_html.pdf')
 
-        if self.is_eml:
+        if self.eml_data:
             # get all content -> make it a PDF
             if 'body' in self.eml_data:
                 for i, body_part in enumerate(self.eml_data['body']):
                     if self.MIME_TYPE_EQUAL.get(body_part['content_type']):
                         body_part_type = self.MIME_TYPE_EQUAL[body_part['content_type']][0]
                         if body_part_type == 'HTM':
-                            html = HTML(string=body_part['content'])
-                            html.write_pdf(f'{self.path}_body_{i}.pdf')
+                            html_to_pdf(body_part['content'], f'{self.path}_body_{i}.pdf')
                         elif body_part_type == 'TXT':
                             converter = dirty_load_unoconverter().UnoConverter()
                             converter.convert(indata=body_part['content'].encode(), outpath=f'{self.path}_body_{i}.pdf')
@@ -474,7 +484,7 @@ class File:
 
         # Try to extract eml|msg observables
         try:
-            if self.is_eml:
+            if self.eml_data:
                 for value in self.eml_data['body'][0]['content']:
                     parsed += value
                 parsed += ' '
@@ -506,14 +516,18 @@ class File:
         return links
 
     @cached_property
-    def eml_data(self) -> Dict:
+    def eml_data(self) -> Optional[Dict]:
+        if not self.is_eml:
+            return None
         ep = EmlParser(include_raw_body=True, include_attachment_data=True)
         return ep.decode_email(eml_file=self.path)
 
     @cached_property
-    def msg_data(self) -> Message:
+    def msg_data(self) -> Optional[Message]:
         # NOTE: the msg file can be other things than a message.
         # See https://github.com/TeamMsgExtractor/msg-extractor/blob/master/extract_msg/utils.py
+        if not self.is_msg:
+            return None
         msg = openMsg(self.path)
         assert isinstance(msg, Message), f'msg file must be a message, other formats are not supported yet. Type: {type(msg)}'
         return msg
