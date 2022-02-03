@@ -12,6 +12,7 @@
         "to": ["Investigation Team <investigation_unit@myorg.local>"],
         "from": "Lookyloo <lookyloo@myorg.local>"
     },
+    "weasyprint_fetch_ressources": false,
     "systemd_service_name": "pandora",
     "_notes": {
         "loglevel": "(lookyloo) Can be one of the value listed here: https://docs.python.org/3/library/logging.html#levels",
@@ -22,6 +23,7 @@
         "max_file_size": "Maximum file size, in bytes. Default: 100Mb.",
         "users": "Admin acount(s). Format: {username: password}",
         "email": "Email configuration",
+        "weasyprint_fetch_ressources": "If true, weasyprint will fetch resources linked in HTML content",
         "systemd_service_name": "(Optional) Name of the systemd service if your project has one."
     }
 }

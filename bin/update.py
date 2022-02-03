@@ -87,6 +87,10 @@ def main():
     keep_going(args.yes)
     run_command(f'poetry run {(Path("tools") / "validate_config_files.py").as_posix()} --update')
 
+    print('* Update third party dependencies for the website.')
+    keep_going(args.yes)
+    run_command(f'poetry run {(Path("tools") / "3rdparty.py").as_posix()}')
+
     print('* Restarting')
     keep_going(args.yes)
     if platform.system() == 'Windows':

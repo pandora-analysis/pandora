@@ -11,6 +11,7 @@ stop = "bin.stop:main"
 update = "bin.update:main"
 shutdown = "bin.shutdown:main"
 run_backend = "bin.run_backend:main"
+unoserver_launcher = "bin.unoserver_launcher:main"
 start_website = "bin.start_website:main"
 
 [tool.poetry.dependencies]

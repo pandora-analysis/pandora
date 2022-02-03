@@ -15,9 +15,13 @@ this directory. See [this guide](https://www.lookyloo.eu/docs/main/install-looky
 From the directory you just cloned, run:
 
 ```bash
-sudo apt install python3-pip libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0
+sudo apt install libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0  # For HTML -> PDF
+sudo apt install libreoffice-base-nogui libreoffice-calc-nogui libreoffice-draw-nogui libreoffice-impress-nogui libreoffice-math-nogui libreoffice-writer-nogui  # For Office -> PDF
 poetry install
 ```
+
+Note: on Ubuntu 20.04, libreoffice-nogui cannot be installed due to some dependencies issues.
+
 
 Initialize the `.env` file:
 
