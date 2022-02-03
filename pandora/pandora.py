@@ -136,17 +136,13 @@ class Pandora():
         seed, expire = self.add_seed(task)
         return task.rid, seed
 
-    def get_tasks(self, user: Optional[User]=None):
-        # FIXME: doesn't show all the tasks as admin.
+    def get_tasks(self, user: User):
         tasks = []
         for task in self.storage.get_tasks():
             _task = Task(**task)
-            if user:
-                if not hasattr(_task, 'user'):
-                    continue
-                if user.get_id() == _task.user.get_id():
-                    tasks.append(_task)
-            else:
+            if not hasattr(_task, 'user'):
+                continue
+            if user.get_id() == _task.user.get_id() or user.is_admin:
                 tasks.append(_task)
         return tasks
 
