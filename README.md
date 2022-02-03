@@ -17,6 +17,7 @@ From the directory you just cloned, run:
 ```bash
 sudo apt install libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0  # For HTML -> PDF
 sudo apt install libreoffice-base-nogui libreoffice-calc-nogui libreoffice-draw-nogui libreoffice-impress-nogui libreoffice-math-nogui libreoffice-writer-nogui  # For Office -> PDF
+sudo apt install exiftool  # for extracting exif information
 poetry install
 ```
 
