@@ -24,6 +24,7 @@ from eml_parser import EmlParser
 from extract_msg import openMsg, Message  # type: ignore
 
 from .default import get_config
+from .exceptions import Unsupported
 from .helpers import make_bool, make_bool_for_redis
 from .storage_client import Storage
 from .text_parser import TextParser
@@ -264,6 +265,8 @@ class File:
 
         for i, p in enumerate(to_convert):
             doc = fitz.open(p)
+            if doc.needs_pass:
+                raise Unsupported("The PDF is password protected, this feature isn't supported yet.")
             digits = len(str(doc.page_count))
             for page in doc:
                 pix = page.get_pixmap()

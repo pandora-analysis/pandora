@@ -131,10 +131,13 @@ class ApiSubmit(Resource):
         filepath = directory / filename
         submitted_file.save(filepath)
 
-        file = File(path=filepath, uuid=uuid, original_filename=submitted_file.filename)
-        file.convert()
-        file.make_previews()
-        file.store()
+        try:
+            file = File(path=filepath, uuid=uuid, original_filename=submitted_file.filename)
+            file.convert()
+            file.make_previews()
+            file.store()
+        except Exception as e:
+            return {'success': False, 'error': str(e)}, 400
 
         disabled_workers = request.form["workersDisabled"].split(",") if request.form.get("workersDisabled") else []
         task = Task(submitted_file=file, user=flask_login.current_user, disabled_workers=disabled_workers)
