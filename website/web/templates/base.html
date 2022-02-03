@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
 
-    {{ moment.include_moment() }}
+    {{ moment.include_moment(local_js='static/js/lib/moment-with-locales.min.js', sri=None) }}
     {% block styles %}
     <!-- Included stylesheets -->
     {{ bootstrap.load_css() }}

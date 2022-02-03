@@ -7,6 +7,7 @@ from pandora.default import get_homedir, safe_create_dir
 
 jquery_version = "3.6.0"
 dropzone_version = "6.0.0-beta.1"
+moments_version = "2.29.1"
 
 
 if __name__ == '__main__':
@@ -19,6 +20,11 @@ if __name__ == '__main__':
     with (dest_dir_js / 'jquery.min.js').open('wb') as f:
         f.write(jquery.content)
         print(f'Downloaded jquery v{jquery_version}.')
+
+    moments = requests.get(f'https://cdnjs.cloudflare.com/ajax/libs/moment.js/{moments_version}/moment-with-locales.min.js')
+    with (dest_dir_js / 'moment-with-locales.min.js').open('wb') as f:
+        f.write(moments.content)
+        print(f'Downloaded moments v{moments_version}.')
 
     dropzone_js = requests.get(f'https://unpkg.com/dropzone@{dropzone_version}/dist/dropzone-min.js')
     with (dest_dir_js / 'dropzone-min.js').open('wb') as f:
