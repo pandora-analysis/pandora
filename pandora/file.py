@@ -52,6 +52,18 @@ def html_to_pdf(source: Union[str, bytes, Path], dest: str) -> None:
     html.write_pdf(dest)
 
 
+def office_to_pdf(source: Union[Path, bytes], dest: str) -> None:
+    converter = dirty_load_unoconverter().UnoConverter()
+    try:
+        if isinstance(source, Path):
+            converter.convert(source, outpath=dest)
+        elif isinstance(source, bytes):
+            converter.convert(indata=source, outpath=dest)
+    except AttributeError:
+        # Happens when the file is password protected, might be happening on other occasions
+        raise Unsupported("The Office document is probably password protected, this feature isn't supported yet.")
+
+
 class File:
     MIME_TYPE_EQUAL: Dict[str, List[str]] = {
         'application/zip': ['ARC', 'zip'],
@@ -224,16 +236,15 @@ class File:
     def convert(self) -> None:
         # NOTE: For images uploaded by user, re-create them so the images downloaded from the web are safe(r)
         if self.is_unoconv_concerned:
-            converter = dirty_load_unoconverter().UnoConverter()
-            converter.convert(self.path, outpath=f'{self.path}.pdf')
+            office_to_pdf(self.path, f'{self.path}.pdf')
 
         if self.is_html:
             html_to_pdf(self.path, f'{self.path}.pdf')
 
         if self.msg_data:
             if self.msg_data.body:
-                converter = dirty_load_unoconverter().UnoConverter()
-                converter.convert(indata=self.msg_data.body.encode(), outpath=f'{self.path}_body_txt.pdf')
+                office_to_pdf(self.msg_data.body.encode(), f'{self.path}_body_txt.pdf')
+
             if self.msg_data.htmlBody:
                 html_to_pdf(self.msg_data.htmlBody, f'{self.path}_body_html.pdf')
 

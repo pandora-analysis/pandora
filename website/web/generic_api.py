@@ -11,7 +11,7 @@ import flask_login  # type: ignore
 from flask_restx import Namespace, Resource  # type: ignore
 from werkzeug.utils import secure_filename
 
-from pandora.default import get_homedir, safe_create_dir, get_config
+from pandora.default import get_homedir, safe_create_dir, get_config, PandoraException
 from pandora.pandora import Pandora
 from pandora.observable import Observable
 from pandora.file import File
@@ -136,7 +136,7 @@ class ApiSubmit(Resource):
             file.convert()
             file.make_previews()
             file.store()
-        except Exception as e:
+        except PandoraException as e:
             return {'success': False, 'error': str(e)}, 400
 
         disabled_workers = request.form["workersDisabled"].split(",") if request.form.get("workersDisabled") else []
