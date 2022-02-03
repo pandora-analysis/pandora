@@ -44,15 +44,16 @@
         <td>{{ task.file.sha256 }}</td>
         <td>
           <a href="{{ url_for('api_analysis', task_id=task.rid) }}">
-            <span class="btn btn-primary btn-xs btn-table">See report</span>
+            <span class="btn btn-primary btn-xs btn-table" style="white-space: nowrap;">See report</span>
           </a>
         </td>
         <td>
         {% if current_user.is_admin %}
           {% if task.file.deleted %}
-            <span class="btn btn-default btn-xs btn-table">File deleted</span>
+            <span class="btn btn-default btn-xs btn-table" style="white-space: nowrap;">File deleted</span>
           {% else %}
-            <span id="delete-{{ task.rid }}" class="btn btn-danger btn-xs btn-table" onclick="javascript:deleteFile($(this).attr('data-url'), $(this).attr('data-uid'))"
+            <span id="delete-{{ task.rid }}" class="btn btn-danger btn-xs btn-table" style="white-space: nowrap;"
+                  onclick="javascript:deleteFile($(this).attr('data-url'), $(this).attr('data-uid'))"
                   data-url="{{ api.url_for(api_resource, task_id=task.rid, action='delete') }}" data-uid="{{ task.file_id }}">
                 Delete file
             </span>
