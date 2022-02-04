@@ -234,9 +234,13 @@ class File:
         self.storage.set_file(self.to_dict)
 
     def convert(self) -> None:
-        # NOTE: For images uploaded by user, re-create them so the images downloaded from the web are safe(r)
         if self.is_unoconv_concerned:
             office_to_pdf(self.path, f'{self.path}.pdf')
+
+        if self.is_image:
+            image = Image.open(self.path)
+            im = image.convert('RGB')
+            im.save(f'{self.path}.pdf')
 
         if self.is_html:
             html_to_pdf(self.path, f'{self.path}.pdf')
@@ -265,7 +269,7 @@ class File:
     def make_previews(self) -> None:
         if self.is_pdf:
             to_convert = [self.path]
-        elif self.is_unoconv_concerned or self.is_html:
+        elif self.is_unoconv_concerned or self.is_html or self.is_image:
             to_convert = [Path(f'{self.path}.pdf')]
         elif self.eml_data:
             to_convert = list(self.directory.glob(f'{self.path.name}_body_*.pdf'))
