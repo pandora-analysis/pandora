@@ -17,6 +17,7 @@ import exif  # type: ignore
 import exiftool  # type: ignore
 import fitz  # type: ignore
 import magic
+from PIL import Image, ImageDraw, ImageFont
 import textract  # type: ignore
 from weasyprint import HTML, default_url_fetcher  # type: ignore
 
@@ -471,6 +472,30 @@ class File:
             self.error = 'Text conversion error'
             self.error_trace = f'{e}\n{traceback.format_exc()}'
         return ''
+
+    @cached_property
+    def text_preview(self) -> BytesIO:
+        max_width = 1200
+        max_height = 1200
+        try:
+            font = ImageFont.truetype("truetype/freefont/FreeMono.ttf", 12, encoding="utf-8")
+            text_width, text_height = font.getsize_multiline(self.text)
+            out = Image.new("L", (text_width if text_width < max_width else max_width,
+                                  text_height if text_height < max_height else max_height), 255)
+            d = ImageDraw.Draw(out)
+            d.multiline_text((10, 10), self.text, font=font, fill=0)
+            to_return = BytesIO()
+            out.save(to_return, 'PNG')
+            to_return.seek(0)
+        except Exception:
+            # Cannot build preview
+            out = Image.new("L", (200, 20), 255)
+            d = ImageDraw.Draw(out)
+            d.multiline_text((5, 5), "Unable to generate text preview.", fill=0)
+            to_return = BytesIO()
+            out.save(to_return, 'PNG')
+            to_return.seek(0)
+        return to_return
 
     def convert_bkp(self, force: bool=False):
         """

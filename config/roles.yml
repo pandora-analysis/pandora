@@ -6,6 +6,7 @@ roles:
     can_download_images: true
     can_download_pdf: true
     can_download_text: true
+    can_see_text_preview: true
     can_download_zip: true
     can_refresh_analysis: true
     can_rescan_file: true
@@ -32,6 +33,7 @@ roles:
     can_download_images: true
     can_download_pdf: true
     can_download_text: true
+    can_see_text_preview: true
     can_download_zip: false
     can_refresh_analysis: true
     can_rescan_file: true
@@ -56,6 +58,7 @@ roles:
     can_download_images: true
     can_download_pdf: true
     can_download_text: true
+    can_see_text_preview: true
     can_download_zip: false
     can_refresh_analysis: true
     can_rescan_file: true
@@ -80,6 +83,7 @@ roles:
     can_download_images: false
     can_download_pdf: false
     can_download_text: false
+    can_see_text_preview: true
     can_download_zip: false
     can_refresh_analysis: false
     can_rescan_file: false

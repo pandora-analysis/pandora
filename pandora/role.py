@@ -21,6 +21,7 @@ class Action(Enum):
     download_images = auto()
     download_pdf = auto()
     download_text = auto()
+    see_text_preview = auto()
     download_zip = auto()
     refresh_analysis = auto()
     rescan_file = auto()

@@ -190,7 +190,7 @@ def api_analysis(task_id, seed=None):
 @app.route('/task-download/<task_id>/<source>/<int:idx>', methods=['GET'], strict_slashes=False)
 @html_answer
 def api_task_download(task_id, source, seed=None, idx=None):
-    assert source in ('img', 'pdf', 'txt', 'zip'), f"unexpected source '{source}'"
+    assert source in ('img', 'pdf', 'txt', 'zip', 'txt_preview'), f"unexpected source '{source}'"
     task = pandora.get_task(task_id=task_id)
     assert task is not None, 'analysis not found'
     task.seed = seed
@@ -211,8 +211,10 @@ def api_task_download(task_id, source, seed=None, idx=None):
 
     if source == 'txt' and flask_login.current_user.role.can(Action.download_text):
         assert task.file.text, 'text content not available'
-        print(f'{task.file.path.name}.txt')
         return send_file(BytesIO(task.file.text.encode()), download_name=f'{task.file.path.name}.txt', mimetype='plain/text')
+
+    if source == 'txt_preview' and flask_login.current_user.role.can(Action.see_text_preview):
+        return send_file(task.file.text_preview, download_name=f'{task.file.path.name}.png', mimetype='image/png')
 
     if source == 'zip' and flask_login.current_user.role.can(Action.download_zip):
         if task.file.zip_name is None:

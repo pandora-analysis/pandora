@@ -223,6 +223,15 @@
                       type="button" role="tab"
                       aria-controls="content-preview" aria-selected="true">Content preview</button>
             </li>
+            {% if current_user.role.can(action.see_text_preview) %}
+            <li role="presentation" class="nav-item {% if not task.file.text %} d-none {% endif %}">
+              <button class="nav-link"
+                      data-bs-toggle="tab"
+                      data-bs-target="#text-preview-content"
+                      type="button" role="tab"
+                      aria-controls="text-preview-content" aria-selected=false">Text Preview</button>
+            </li>
+            {% endif %}
             {% if current_user.role.can(action.download_text) %}
             <li role="presentation" class="nav-item {% if not task.file.text %} d-none {% endif %}">
               <button class="nav-link"
@@ -441,6 +450,28 @@
                 </div>
               </div>
             </div>
+
+            <!-- Text Preview -->
+            {% if task.file.text and current_user.role.can(action.see_text_preview) %}
+            <div role="tabpanel" class="tab-pane" id="text-preview-content">
+              <div class="row" style="margin-bottom:30px">
+                <div class="col-md-8">
+                  <h3>Text preview</h3>
+                </div>
+              </div>
+
+              <div class="row">
+                <div>The text content can be huge, only display a part of it.</div>
+                <div class="col-md-12">
+                  <div class="img-hover">
+                    <a href="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='txt_preview') }}" target="_blank">
+                      <img class="img-thumbnail" width="70%" src="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='txt_preview') }}">
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
 
             <!-- Text content -->
             {% if current_user.role.can('download_text') and task.file.text %}
