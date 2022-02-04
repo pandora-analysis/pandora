@@ -265,6 +265,7 @@ def api_logout():
     assert flask_login.current_user.is_admin, 'forbidden'
     flask_login.logout_user()
     flask_login.current_user.name = None
+    session.clear()
     return redirect(url_for('api_root'), 302)
 
 
