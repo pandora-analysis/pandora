@@ -16,7 +16,7 @@ from zipfile import ZipFile
 import exiftool  # type: ignore
 import fitz  # type: ignore
 import magic
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont  # type: ignore
 import textract  # type: ignore
 from weasyprint import HTML, default_url_fetcher  # type: ignore
 
