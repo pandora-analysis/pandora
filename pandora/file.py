@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Optional, List, Union, Dict, cast, Set
 from zipfile import ZipFile
 
-import exif  # type: ignore
 import exiftool  # type: ignore
 import fitz  # type: ignore
 import magic
@@ -577,23 +576,16 @@ class File:
         Get file metadata.
         :return (dict): metadata
         """
-        if self.is_image:
-            exif_image = exif.image(self.data)
-            if exif_image.has_exif:
-                return exif_image.get_all()
-            return {}
-        else:
-            metadata: Dict[str, str] = {}
-            # FIXME: need binary - https://pypi.org/project/PyExifTool/
-            with exiftool.ExifTool() as et:
-                for key, value in et.get_metadata_batch([self.path])[0].items():
-                    if any(key.lower().startswith(word) for word in ('sourcefile', 'exiftool:', 'file:')):
-                        continue
-                    key = key.split(':')[-1]
-                    key = re.sub(r"([A-Z]+)([A-Z][a-z])", r'\1 \2', key)
-                    key = re.sub(r"([a-z\d])([A-Z])", r'\1 \2', key)
-                    self.metadata[key] = value
-            return metadata
+        metadata: Dict[str, str] = {}
+        with exiftool.ExifTool() as et:
+            for key, value in et.get_metadata_batch([str(self.path)])[0].items():
+                if any(key.lower().startswith(word) for word in ('sourcefile', 'exiftool:', 'file:')):
+                    continue
+                key = key.split(':')[-1]
+                key = re.sub(r"([A-Z]+)([A-Z][a-z])", r'\1 \2', key)
+                key = re.sub(r"([a-z\d])([A-Z])", r'\1 \2', key)
+                metadata[key] = value
+        return metadata
 
     @property
     def icon(self) -> Optional[str]:
