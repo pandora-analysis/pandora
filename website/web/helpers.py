@@ -38,7 +38,7 @@ def get_secret_key() -> bytes:
 def update_user_role(pandora, task):
     if flask_login.current_user.is_admin:
         flask_login.current_user.role = pandora.get_role(role_name=RoleName.admin)
-    elif task.user.get_id() == flask_login.current_user.get_id():
+    elif hasattr(task, 'user') and task.user.get_id() == flask_login.current_user.get_id():
         flask_login.current_user.role = pandora.get_role(role_name=RoleName.owner)
     elif task.seed is not None:
         authorized_rid = pandora.check_seed(task.seed)
