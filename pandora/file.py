@@ -23,7 +23,7 @@ from weasyprint import HTML, default_url_fetcher  # type: ignore
 from eml_parser import EmlParser
 from extract_msg import openMsg, Message  # type: ignore
 
-from .default import get_config, get_homedir
+from .default import get_config
 from .exceptions import Unsupported
 from .helpers import make_bool, make_bool_for_redis
 from .storage_client import Storage
@@ -478,42 +478,34 @@ class File:
 
     @cached_property
     def text_preview(self) -> BytesIO:
-        max_width = 1200
-        max_height = 1200
+        max_width = 2000
+        max_height = 5000
         try:
-            font = ImageFont.truetype(str(get_homedir() / 'website' / 'web' / 'static' / 'font' / 'lib' / 'Ligconsolata-Regular.ttf'), 12, encoding="utf-8")
-            text_width, text_height = font.getsize_multiline(self.text)
+            font = ImageFont.load_default()
+            text_width = 0
+            lines = self.text.splitlines()
+            for line in lines:
+                w, text_height = font.getsize(line.encode('latin-1', 'ignore'))
+                if w > text_width:
+                    text_width = w
+            text_height = text_height * len(lines)
             out = Image.new("L", (text_width if text_width < max_width else max_width,
                                   text_height if text_height < max_height else max_height), 255)
             d = ImageDraw.Draw(out)
-            d.multiline_text((10, 10), self.text, font=font, fill=0)
+            d.text((10, 10), self.text.encode('latin-1', 'ignore'), font=font, fill=0)
             to_return = BytesIO()
-            out.save(to_return, 'PNG')
+            out.save(to_return, 'PNG', optimize=True)
             to_return.seek(0)
-        except Exception:
+        except Exception as e:
+            print(e)
             # Cannot build preview
-            out = Image.new("L", (200, 20), 255)
+            out = Image.new("L", (500, 50), 255)
             d = ImageDraw.Draw(out)
-            d.multiline_text((5, 5), "Unable to generate text preview.", fill=0)
+            d.multiline_text((5, 5), f"Unable to generate text preview:\n{e}", fill=0)
             to_return = BytesIO()
-            out.save(to_return, 'PNG')
+            out.save(to_return, 'PNG', optimize=True)
             to_return.seek(0)
         return to_return
-
-    def convert_bkp(self, force: bool=False):
-        """
-        Convert file in image and save it in tasks folder.
-        :param (bool) force: if True do convert even if it is already done
-        """
-        pass
-        """
-        if not force and self.converted:
-            return
-        self.converted = True
-        """
-        # TODO
-        # * if image, store as image for preview => make a new file instead for safety reason
-        # * pdf -> png -> pdf to have a safe thing to dl
 
     @property
     def links(self) -> Set[str]:

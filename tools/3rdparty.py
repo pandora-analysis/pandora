@@ -38,9 +38,4 @@ if __name__ == '__main__':
         f.write(dropzone_css.content)
         print(f'Downloaded dropzone css v{dropzone_version}')
 
-    inconsolata = requests.get('https://github.com/google/fonts/blob/main/ofl/inconsolata/static/Ligconsolata-Regular.ttf?raw=true')
-    with (dest_dir_font / 'Ligconsolata-Regular.ttf').open('wb') as f:
-        f.write(inconsolata.content)
-        print('Downloaded inconsolata')
-
     print('All 3rd party modules for the website were downloaded.')
