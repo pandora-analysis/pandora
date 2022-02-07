@@ -23,7 +23,7 @@ from weasyprint import HTML, default_url_fetcher  # type: ignore
 from eml_parser import EmlParser
 from extract_msg import openMsg, Message  # type: ignore
 
-from .default import get_config
+from .default import get_config, get_homedir
 from .exceptions import Unsupported
 from .helpers import make_bool, make_bool_for_redis
 from .storage_client import Storage
@@ -481,7 +481,7 @@ class File:
         max_width = 1200
         max_height = 1200
         try:
-            font = ImageFont.truetype("truetype/freefont/FreeMono.ttf", 12, encoding="utf-8")
+            font = ImageFont.truetype(str(get_homedir() / 'website' / 'web' / 'static' / 'font' / 'lib' / 'Ligconsolata-Regular.ttf'), 12, encoding="utf-8")
             text_width, text_height = font.getsize_multiline(self.text)
             out = Image.new("L", (text_width if text_width < max_width else max_width,
                                   text_height if text_height < max_height else max_height), 255)
