@@ -2,7 +2,7 @@
 {% from 'bootstrap5/utils.html' import render_icon %}
 
 {% block title %}
-    Pandora - Analysis of {{ task.file.client_name }}
+    Pandora - Analysis of {{ task.file.original_filename }}
 {% endblock %}
 
 {% block scripts %}
@@ -50,14 +50,24 @@
       <div class="col-md-6">
         <!-- Overall header -->
         <div class="row">
-          <div class="col-md-8">
-            <div id="overall-label" style="float:left;width:45%"><h1>Overall Result<br/></h1></div>
+          <div class="col-md-7">
+            <div id="overall-label"><h1>Overall Result<br/></h1></div>
           </div>
+          {% if current_user.role.can('share_analysis') %}
+          <div class="col">
+          <button type="button" class="btn btn-primary" style="margin:5px"
+                  data-bs-toggle="modal" data-bs-target="#shareModal">
+              Share analysis
+          </button>
+          </div>
+          {% endif %}
 
-          {% if current_user.role.can(['rescan_file', 'share_analysis', 'notify_cert', 'delete_file'], 'or') %}
-          <div class="col-md-4">
-            <div class="dropdown" style="margin:20px">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuActions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          {% if current_user.role.can(['rescan_file', 'notify_cert', 'delete_file'], 'or') %}
+          <div class="col">
+            <div class="dropdown" style="margin:5px">
+              <button class="btn btn-secondary dropdown-toggle" type="button"
+                      id="dropdownMenuActions" data-bs-toggle="dropdown"
+                      aria-haspopup="true" aria-expanded="true">
                 Actions ... <span class="caret"></span>
               </button>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenuActions">
@@ -75,13 +85,6 @@
                     Alert Administrator
                   </a>
                 </li>
-              {% endif %}
-              {% if current_user.role.can('share_analysis') %}
-                  <li>
-                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#shareModal">
-                      Share analysis
-                    </a>
-                  </li>
               {% endif %}
               {% if current_user.role.can('delete_file') and not task.file.deleted %}
                   <li id="deleteButton">
