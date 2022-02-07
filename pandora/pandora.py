@@ -140,9 +140,7 @@ class Pandora():
         tasks = []
         for task in self.storage.get_tasks():
             _task = Task(**task)
-            if not hasattr(_task, 'user'):
-                continue
-            if user.get_id() == _task.user.get_id() or user.is_admin:
+            if user.is_admin or (hasattr(_task, 'user') and user.get_id() == _task.user.get_id()):
                 tasks.append(_task)
         return tasks
 

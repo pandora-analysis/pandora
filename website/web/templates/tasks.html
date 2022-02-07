@@ -23,7 +23,12 @@
     {% for task in tasks %}
       <tr id="row-{{ task.rid }}">
         <td>{{ task.rid }}</td>
-        <td>{{ task.user.name }}</td>
+        <td>{% if task.user %}
+              {{ task.user.name }}
+            {% else %}
+                {{ task.user_id }}
+            {% endif %}
+        </td>
         <td>{{ moment(task.save_date).format('lll') }}</td>
         <td style="text-align:center">
           <span class="img-thumbnail small-status-flag status-flag-{{ task.status.name.lower() }}">

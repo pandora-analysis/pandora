@@ -95,7 +95,7 @@ class Task:
             'parent_id': self.parent.rid if self.parent else None,
             'origin_id': self.origin.rid if self.origin else None,
             'file_id': self.file.uuid if self.file else None,
-            'user_id': self.user.get_id(),
+            'user_id': self.user.get_id() if hasattr(self, 'user') else None,
             'status': self.status.name,
             'save_date': self.save_date.isoformat()
         }.items() if v is not None}
