@@ -309,11 +309,13 @@ class File:
         return self.path.parent
 
     @cached_property
-    def data(self) -> BytesIO:
+    def data(self) -> Optional[BytesIO]:
         """
         Property to get file content in binary format.
         :return (bytes|None): file content or None if file is not reachable
         """
+        if not self.path.exists():
+            return None
         with self.path.open('rb') as f:
             return BytesIO(f.read(get_config('generic', 'max_file_size')))
 
@@ -346,9 +348,9 @@ class File:
         Property to get hexadecimal form of file content MD5 signature.
         :return (str|None): hexadecimal string or None if file is not reachable
         """
-        if self._md5 is None:
+        if self._md5 is None and self.data:
             self._md5 = hashlib.md5(self.data.getvalue()).hexdigest() if self.data is not None else None
-        return self._md5
+        return self._md5 if self._md5 else ''
 
     @md5.setter
     def md5(self, value: str):
@@ -360,9 +362,9 @@ class File:
         Property to get hexadecimal form of file content SHA1 signature.
         :return (str): hexadecimal string or None if file is not reachable
         """
-        if self._sha1 is None:
+        if self._sha1 is None and self.data:
             self._sha1 = hashlib.sha1(self.data.getvalue()).hexdigest() if self.data is not None else None
-        return self._sha1
+        return self._sha1 if self._sha1 else ''
 
     @sha1.setter
     def sha1(self, value: str):
@@ -374,9 +376,9 @@ class File:
         Property to get hexadecimal form of file content SHA256 signature.
         :return (str): hexadecimal string or None if file is not reachable
         """
-        if self._sha256 is None:
+        if self._sha256 is None and self.data:
             self._sha256 = hashlib.sha256(self.data.getvalue()).hexdigest() if self.data is not None else None
-        return self._sha256
+        return self._sha256 if self._sha256 else ''
 
     @sha256.setter
     def sha256(self, value: str):
@@ -384,7 +386,10 @@ class File:
 
     @cached_property
     def mime_type(self) -> str:
-        return magic.from_buffer(self.data.getvalue(), mime=True)
+        if self.data:
+            return magic.from_buffer(self.data.getvalue(), mime=True)
+        else:
+            return ''
 
     def delete(self) -> None:
         """
@@ -458,7 +463,9 @@ class File:
         """
         try:
             if self.is_html or self.is_eml or self.is_txt:
-                return self.data.getvalue().decode(errors='replace')
+                if self.data:
+                    return self.data.getvalue().decode(errors='replace')
+                return ''
             else:
                 # Use of textract module for all file types
                 return textract.process(self.path, extension=self._extension_for_textract).decode(errors='replace')
@@ -573,6 +580,8 @@ class File:
         :return (dict): metadata
         """
         metadata: Dict[str, str] = {}
+        if not self.path.exists():
+            return {}
         with exiftool.ExifTool() as et:
             for key, value in et.get_metadata_batch([str(self.path)])[0].items():
                 if any(key.lower().startswith(word) for word in ('sourcefile', 'exiftool:', 'file:')):
