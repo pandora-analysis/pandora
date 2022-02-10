@@ -70,7 +70,7 @@ Analysis.prototype.refreshTabs = function () {
         })
         .then(response => response.text())
         .then(text => {
-          document.getElementById("contentAvailable").innerHTML= text;
+          document.getElementById("previews_images").innerHTML= text;
         })
 
     }

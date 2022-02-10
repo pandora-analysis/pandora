@@ -413,17 +413,10 @@
                     <tr id="email-body">
                       <th>Body</th>
                       <td>
-                      {% if task.file.previews %}
-                        {% for idx in range(task.file.previews|length) %}
-                        <div class="col-md-4">
-                          <div class="img-hover">
-                            <a href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}" target="_blank">
-                              <img class="img-thumbnail" width="70%" src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}">
-                            </a>
-                          </div>
+                        <div class="row preview-done d-none" id="previews_images"></div>
+                        <div class="row preview-wait">
+                          <div class="img-thumbnail small-status-flag status-flag-error">Content preview is not available</div>
                         </div>
-                        {% endfor %}
-                      {% endif %}
                       </td>
                     </tr>
                     {% endif %}
@@ -431,8 +424,8 @@
 
                   <!-- Image preview -->
                   {% elif current_user.role.can(action.download_images) %}
-                    <div class="row preview-done d-none" id="contentAvailable"></div>
-                    <div class="row preview-wait {% if task.file.eml_data %} d-none {% endif %}" id="contentNotAvailable">
+                    <div class="row preview-done d-none" id="previews_images"></div>
+                    <div class="row preview-wait">
                       <div class="img-thumbnail small-status-flag status-flag-error">Content preview is not available</div>
                     </div>
                   {% endif %}
