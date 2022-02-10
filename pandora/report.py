@@ -4,48 +4,41 @@ from .helpers import Status
 
 
 class Report:
-    def __init__(self, task, worker, **kwargs):
+    def __init__(self, task_uuid: str, worker_name: str, **kwargs):
         """
         Generate module report.
-        :param (Task) task: object Task
-        :param (BaseWorker) worker: object inherited from BaseWorker class
         :param kwargs: arguments to set in this report
         """
-        self.task = task
-        self.worker = worker
-        self.status = Status.WAITING
+        self.task_uuid = task_uuid
+        self.worker_name = worker_name
+        if 'status' in kwargs:
+            self.status = Status[kwargs.pop('status')]
+        else:
+            self.status = Status.WAITING
         for k, v in kwargs.items():
+            if k in ['task_uuid', 'worker_name']:
+                continue
+            print(k, v)
             setattr(self, k, v)
 
     @property
     def to_dict(self):
-        return {
-            'status': self.status,
+        return {k: v for k, v in {
+            'task_uuid': self.task_uuid,
+            'worker_name': self.worker_name,
+            'status': self.status.name,
             'duration': self.duration,
-            'is_done': self.is_done,
             'cache': getattr(self, 'cache', None),
             'start_date': getattr(self, 'start_date', None),
             'end_date': getattr(self, 'end_date', None),
             'error': getattr(self, 'error', None),
             'error_trace': getattr(self, 'error_trace', None),
-            'details': {key: self.display_attr(key) for key in self.details},
-        }
+            'details': json.dumps({key: self.display_attr(key) for key in self.details}) if self.details else None,
+        }.items() if v is not None}
 
     @property
     def is_done(self):
-        return self.status not in (Status.WAITING, Status.RUNNING)
-
-    @staticmethod
-    def get_model(models, name):
-        """
-        Find model in list with given name.
-        :param (list) models: list of Model objects
-        :param (str) name: name of Model to search
-        :return (Model): Model object
-        """
-        for model in models:
-            if model.name == name:
-                return model
+        return self.status not in (Status.WAITING, Status.RUNNING, Status.DEACTIVATE)
 
     def display_attr(self, attr):
         """
@@ -76,16 +69,12 @@ class Report:
         end = getattr(self, 'end_date', None)
         if start and end:
             return 1 + int((end - start).total_seconds())
-
-    @property
-    def db_keys(self):
-        excluded_keys = ('worker', 'task', 'web_name')
-        return [key for key in self.__dict__ if not key.startswith('_') and key not in excluded_keys]
+        return None
 
     @property
     def details(self):
         excluded_keys = (
-            'worker', 'task', 'cache', 'status', 'start_date', 'end_date', 'error', 'error_trace', 'web_name'
+            'worker_name', 'task_uuid', 'cache', 'status', 'start_date', 'end_date', 'error', 'error_trace', 'web_name'
         )
         return [key for key in self.__dict__ if not key.startswith('_') and key not in excluded_keys]
 

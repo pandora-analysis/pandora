@@ -112,12 +112,22 @@ class Storage():
         return self.storage.hgetall(f'tasks:{task_id}')
 
     def set_task(self, task: Dict[str, str]):
-        self.storage.hmset(f'tasks:{task["rid"]}', task)
-        self.storage.sadd('tasks', task["rid"])
+        self.storage.hmset(f'tasks:{task["uuid"]}', task)
+        self.storage.sadd('tasks', task["uuid"])
 
     def get_tasks(self) -> List[Dict[str, str]]:
         tasks = []
-        for rid in self.storage.smembers('tasks'):
-            tasks.append(self.storage.hgetall(f'tasks:{rid}'))
+        for uuid in self.storage.smembers('tasks'):
+            tasks.append(self.storage.hgetall(f'tasks:{uuid}'))
         tasks.sort(key=operator.itemgetter('save_date'), reverse=True)
         return tasks
+
+    # ##############
+
+    # #### Report ####
+
+    def get_report(self, task_uuid: str, worker_name: str) -> Dict[str, str]:
+        return self.storage.hgetall(f'reports:{task_uuid}-{worker_name}')
+
+    def set_report(self, report: Dict[str, str]):
+        self.storage.hmset(f'reports:{report["task_uuid"]}-{report["worker_name"]}', report)

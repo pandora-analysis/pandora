@@ -13,7 +13,7 @@
 
     $(document).ready(function () {
       analysis.refresher = setInterval(function() {
-        analysis.refresh("{{ api.url_for(api_resource, task_id=task.rid, seed=task.seed, action='refresh') }}");
+        analysis.refresh("{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='refresh') }}");
       }, 1000);
     });
   </script>
@@ -36,7 +36,7 @@
         <div class="alert alert-warning {% if not task.file.deleted %} d-none {% endif %}" id="alertDeleted" role="alert">
           <strong>Deleted File! </strong> File and previews are no more available. Only stats are displayed
         </div>
-        <div class="alert alert-info {% if task.done %} d-none {% endif %}" id="alertPending" role="alert">
+        <div class="alert alert-info {% if task.workers_done %} d-none {% endif %}" id="alertPending" role="alert">
           <strong>Pending Task! </strong> Data will be available soon...
         </div>
         <div class="alert alert-error {% if task.status != 'ERROR' %} d-none {% endif %}" id="alertFailed" role="alert">
@@ -74,7 +74,7 @@
               {% if current_user.role.can('rescan_file') and not task.file.deleted %}
                 <li>
                   <a class="dropdown-item" href="#" onclick="javascript:analysis.rescan($(this).attr('data-url'))"
-                     data-url="{{ api.url_for(api_resource, task_id=task.rid, seed=task.seed, action='rescan') }}">
+                     data-url="{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='rescan') }}">
                     Rescan file
                   </a>
                 </li>
@@ -89,7 +89,7 @@
               {% if current_user.role.can('delete_file') and not task.file.deleted %}
                   <li id="deleteButton">
                     <a class="dropdown-item" href="#" onclick="javascript:analysis.deleteFile($(this).attr('data-url'))"
-                       data-url="{{ api.url_for(api_resource, task_id=task.rid, seed=task.seed, action='delete') }}">
+                       data-url="{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='delete') }}">
                       Delete file
                     </a>
                   </li>
@@ -161,7 +161,7 @@
                 <tr>
                   <th>Extracted from</th>
                   <td>{{ render_icon(task.file.icon) }}{{ task.parent.file.original_filename }}
-                    <a href="{{ url_for('api_analysis', task_id=task.parent.rid, seed=task.seed) }}"><span class="btn btn-default btn-sm pull-right">See report</span></a>
+                    <a href="{{ url_for('api_analysis', task_id=task.parent.rid, seed=seed) }}"><span class="btn btn-default btn-sm pull-right">See report</span></a>
                   </td>
                 </tr>
               {% endif %}
@@ -301,7 +301,7 @@
                       {% if current_user.role.can(action.download_pdf) and task.file.is_pdf %}
                       <!-- TODO: also allow PDF export from office docs, not implemented yet -->
                       <li><a class="dropdown-item"
-                             href="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='pdf') }}"
+                             href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='pdf') }}"
                              title="Download pdf">
                           PDF File
                         </a>
@@ -310,7 +310,7 @@
 
                       {% if current_user.role.can(action.download_images) and task.file.previews %}
                       <li><a class="dropdown-item"
-                             href="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='img') }}"
+                             href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img') }}"
                              title="Download images">
                           Images
                         </a>
@@ -318,7 +318,7 @@
                       {% endif %}
                       {% if current_user.role.can(action.download_text) and task.file.text %}
                       <li><a class="dropdown-item"
-                             href="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='txt') }}"
+                             href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt') }}"
                              title="Download text">
                           Text
                         </a>
@@ -329,7 +329,7 @@
                       <!-- TODO: not implemented yet -->
                       <li role="separator" class="divider"></li>
                       <li><a class="dropdown-item"
-                           href="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='zip') }}"
+                           href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='zip') }}"
                            title="Download protected zip file containing sample (password is {{ zip_pass }})">
                          Zip encrypted sample (pw:{{ zip_pass }})
                         </a>
@@ -417,8 +417,8 @@
                         {% for idx in range(task.file.previews|length) %}
                         <div class="col-md-4">
                           <div class="img-hover">
-                            <a href="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='img', idx=idx) }}" target="_blank">
-                              <img class="img-thumbnail" width="70%" src="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='img', idx=idx) }}">
+                            <a href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}" target="_blank">
+                              <img class="img-thumbnail" width="70%" src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}">
                             </a>
                           </div>
                         </div>
@@ -431,49 +431,40 @@
 
                   <!-- Image preview -->
                   {% elif current_user.role.can(action.download_images) %}
-                  <div>
-                    <div class="row {% if not task.file.previews %} d-none {% endif %}" id="contentAvailable">
-                    {% if task.file.previews %}
-                      {% for idx in range(task.file.previews|length) %}
-                      <div class="col-md-4">
-                        <div class="img-hover">
-                          <a href="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='img', idx=idx) }}" target="_blank">
-                            <img class="img-thumbnail" width="70%" src="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='img', idx=idx) }}">
-                          </a>
-                        </div>
-                      </div>
-                      {% endfor %}
-                    {% endif %}
-                    </div>
-                    <div class="row {% if task.file.eml_data or task.file.previews %} d-none {% endif %}" id="contentNotAvailable">
+                    <div class="row preview-done d-none" id="contentAvailable"></div>
+                    <div class="row preview-wait {% if task.file.eml_data %} d-none {% endif %}" id="contentNotAvailable">
                       <div class="img-thumbnail small-status-flag status-flag-error">Content preview is not available</div>
                     </div>
-                  </div>
                   {% endif %}
                 </div>
               </div>
             </div>
 
-            <!-- Text Preview -->
-            {% if task.file.text and current_user.role.can(action.see_text_preview) %}
-            <div role="tabpanel" class="tab-pane" id="text-preview-content">
-              <div class="row" style="margin-bottom:30px">
-                <div class="col-md-8">
-                  <h3>Text preview</h3>
-                </div>
-              </div>
-
-              <div class="row">
-                <div>The text content can be huge, only display a part of it.</div>
-                <div class="col-md-12">
-                  <div class="img-hover">
-                    <a href="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='txt_preview') }}" target="_blank">
-                      <img class="img-thumbnail" width="70%" src="{{ url_for('api_task_download', task_id=task.rid, seed=task.seed, source='txt_preview') }}">
-                    </a>
+            {% if current_user.role.can(action.see_text_preview) %}
+              {% if task.file.text %}
+              <!-- Text Preview -->
+              <div role="tabpanel" class="tab-pane" id="text-preview-content">
+                <div class="row" style="margin-bottom:30px">
+                  <div class="col-md-8">
+                    <h3>Text preview</h3>
                   </div>
                 </div>
+
+                <div class="row d-none preview-done">
+                  <div>The text content can be huge, only display a part of it.</div>
+                  <div class="col-md-12">
+                    <div class="img-hover">
+                      <a href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt_preview') }}" target="_blank">
+                        <img class="img-thumbnail" width="70%" src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt_preview') }}">
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="row preview-wait">
+                  <div>Creating preview, please wait...</div>
+                </div>
               </div>
-            </div>
+              {% endif %}
             {% endif %}
 
             <!-- Text content -->
@@ -580,12 +571,12 @@
                     <th>Status</th>
                   </tr>
                   {% for extracted_task in task.extracted_tasks %}
-                  <tr id="extractedTaskRow-{{ extracted_task.rid }}">
+                  <tr id="extractedTaskRow-{{ extracted_task.uuid }}">
                     <td>
                       {{ moment(extracted_task.save_date).format('L LT [UTC]Z') }}
                     </td>
                     <td>
-                      <a href="{{ url_for('api_analysis', task_id=extracted_task.rid, seed=task.seed) }}">
+                      <a href="{{ url_for('api_analysis', task_id=extracted_task.uuid, seed=seed) }}">
                         {{ render_icon(task.file.icon) }}
                         <span>{{ extracted_task.file.original_filename }}</span>
                       </a>
@@ -598,7 +589,7 @@
                         {{ render_icon('x-circle') }}
                         {% elif extracted_task.status == status.WARN %}
                         {{ render_icon('exclamation-triangle') }}
-                        {% elif extracted_task.status == status.OKAY %}
+                        {% elif extracted_task.status == status.SUCCESS %}
                         {{ render_icon('check-circle') }}
                         {% else %}
                         {{ render_icon('question') }}
@@ -627,12 +618,12 @@
                     <th>Status</th>
                   </tr>
                   {% for linked_task in task.linked_tasks %}
-                  <tr class="{% if linked_task.rid == task.rid %}active{% endif %}" id="linkedTaskRow-{{ linked_task.rid }}">
+                  <tr class="{% if linked_task.uuid == task.uuid %}active{% endif %}" id="linkedTaskRow-{{ linked_task.uuid }}">
                     <td>
                       {{ moment(linked_task.save_date).format('L LT [UTC]Z') }}
                     </td>
                     <td>
-                      <a href="{{ url_for('api_analysis', task_id=linked_task.rid) }}">
+                      <a href="{{ url_for('api_analysis', task_id=linked_task.uuid) }}">
                         {{ render_icon(task.file.icon) }}
                         {{ linked_task.file.client_name }}
                       </a>
@@ -645,7 +636,7 @@
                         {{ render_icon('x-circle') }}
                         {% elif linked_task.status == status.WARN %}
                         {{ render_icon('exclamation-triangle') }}
-                        {% elif linked_task.status == status.OKAY %}
+                        {% elif linked_task.status == status.SUCCESS %}
                         {{ render_icon('check-circle') }}
                         {% else %}
                         {{ render_icon('question') }}
@@ -667,7 +658,7 @@
   {% if current_user.role.can('notify_cert') %}
     <div id="notifyModal" class="modal fade" role="dialog">
       <div class="modal-dialog">
-        <form id="notifyForm" class="form-horizontal" action="{{ api.url_for(api_resource, task_id=task.rid, seed=task.seed, action='notify') }}"
+        <form id="notifyForm" class="form-horizontal" action="{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='notify') }}"
               onsubmit="return analysis.notify($(this).attr('action'))">
           <div class="modal-content">
             <div class="modal-header">
@@ -712,7 +703,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form id="shareForm" class="form-horizontal" action="{{ api.url_for(api_resource, task_id=task.rid, seed=task.seed, action='share') }}"
+              <form id="shareForm" class="form-horizontal" action="{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='share') }}"
                   onsubmit="return analysis.share($(this).attr('action'))">
               <div class="row">
                 <div class="col-md-8"><span><b>URL Validity (set to 0 for seed to be persistent) : </b></span></div>

@@ -133,17 +133,15 @@ class ApiSubmit(Resource):
 
         try:
             file = File(path=filepath, uuid=uuid, original_filename=submitted_file.filename)
-            file.convert()
-            file.make_previews()
             file.store()
         except PandoraException as e:
             return {'success': False, 'error': str(e)}, 400
 
         disabled_workers = request.form["workersDisabled"].split(",") if request.form.get("workersDisabled") else []
         task = Task(submitted_file=file, user=flask_login.current_user, disabled_workers=disabled_workers)
-        task_id, seed = pandora.enqueue_task(task)
         task.store
-        return {'success': True, 'taskId': task_id}
+        pandora.enqueue_task(task)
+        return {'success': True, 'taskId': task.uuid}
 
 
 @api.route('/task-action/<task_id>/<action>',
@@ -155,8 +153,7 @@ class ApiTaskAction(Resource):
         assert action in ('refresh', 'share', 'notify', 'rescan', 'delete'), f"unexpected action '{action}'"
         task = pandora.get_task(task_id=task_id)
         assert task is not None, 'analysis not found'
-        task.seed = seed
-        update_user_role(pandora, task)
+        update_user_role(pandora, task, seed)
 
         if action == 'refresh' and flask_login.current_user.role.can(Action.refresh_analysis):
             # task.reports = mysql.get_task_reports(task=task, config=get_config())
@@ -164,13 +161,15 @@ class ApiTaskAction(Resource):
             # task.linked_tasks = mysql.get_tasks(linked_with=task, user=flask_login.current_user)
             task.file.store
             task.store
-            return {'success': True, 'task': task.to_dict, 'file': task.file.to_web}
+            return {'success': True, 'task': task.to_dict, 'workers_done': task.workers_done,
+                    'seed': seed, 'workers_status': task.workers_status,
+                    'file': task.file.to_web}
 
         if action == 'share' and flask_login.current_user.role.can(Action.share_analysis):
             data: Dict[str, str] = request.get_json()  # type: ignore
             assert 'validity' in data, "missing mandatory argument 'validity'"
             seed, expire = pandora.add_seed(task, data['validity'])
-            link = url_for('api_analysis', task_id=task.rid, seed=seed)
+            link = url_for('api_analysis', task_id=task.uuid, seed=seed)
             return {'success': True, 'seed': seed, 'lifetime': expire, 'link': link}
 
         if action == 'notify' and flask_login.current_user.role.can(Action.notify_cert):
@@ -179,7 +178,7 @@ class ApiTaskAction(Resource):
             assert 'message' in data, "missing mandatory argument 'message'"
             message = '\n'.join([
                 f'-- Message from {data["email"]} --',
-                f'-- Page {url_for("api_analysis", task_id=task.rid, seed=seed)} --',
+                f'-- Page {url_for("api_analysis", task_id=task.uuid, seed=seed)} --',
                 '',
                 data['message']
             ])
@@ -190,12 +189,25 @@ class ApiTaskAction(Resource):
             assert sent, "an error has occurred when trying to send message"
             return {'success': True}
 
-        if action == 'rescan' and flask_login.current_user.role.can('rescan_file'):
-            new_task = Task(submitted_file=task.file, user=flask_login.current_user)
-            task_id, seed = pandora.enqueue_task(new_task)
+        if action == 'rescan' and flask_login.current_user.role.can(Action.rescan_file):
+            # Here we create a brand new task.
+            uuid = str(uuid4())
+            directory = get_homedir() / 'tasks' / uuid
+            safe_create_dir(directory)
+            new_filepath = directory / task.file.path.name
+            with new_filepath.open('wb') as f:
+                f.write(task.file.data.getvalue())
+
+            try:
+                file = File(path=new_filepath, uuid=uuid, original_filename=task.file.original_filename)
+                file.store()
+            except PandoraException as e:
+                return {'success': False, 'error': str(e)}, 400
+            new_task = Task(submitted_file=file, user=flask_login.current_user, disabled_workers=task.disabled_workers)
             new_task.store
-            link = url_for('api_analysis', task_id=new_task.rid)
-            return {'success': True, 'task_id': new_task.rid, 'link': link}
+            task_id = pandora.enqueue_task(new_task)
+            link = url_for('api_analysis', task_id=new_task.uuid)
+            return {'success': True, 'task_id': new_task.uuid, 'link': link}
 
         if action == 'delete' and flask_login.current_user.role.can(Action.delete_file):
             task.file.delete()

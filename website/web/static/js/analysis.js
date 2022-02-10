@@ -10,7 +10,7 @@ Analysis.prototype.refreshStatus = function () {
     if (this.task.status === 'DELETED') {
         $("#alertDeleted").removeClass("d-none");
     }
-    if (! this.task.done) {
+    if (! this.workers_done) {
         $("#alertPending").removeClass("d-none");
     }
     if (this.task.status === "ERROR") {
@@ -18,19 +18,18 @@ Analysis.prototype.refreshStatus = function () {
     }
 
     // Refresh status icon and message
-    $(".overall-status-flag").each(function( index, element ){
+    $("#taskStatusIcon").each(function( index, element ){
       $(this).addClass("d-none");
     })
     $(`.status-flag-${this.task.status.toLowerCase()}`).removeClass("d-none");
     $("#taskStatusMessage").find(".alert").addClass("d-none");
     if (this.task.status === "ERROR") {
-        $("#alertError").removeClass("d-none");
-        $("#taskStatusMessage").find(".alert-error").removeClass("d-none");
+        $("#alertError").removeClass("d-none")("#taskStatusMessage").find(".alert-error").removeClass("d-none");
     } else if (this.task.status === "ALERT") {
         $("#taskStatusMessage").find(".alert-danger").removeClass("d-none");
     } else if (this.task.status === "WARN") {
         $("#taskStatusMessage").find(".alert-warning").removeClass("d-none");
-    } else if (this.task.status === "OKAY") {
+    } else if (this.task.status === "SUCCESS") {
         $("#taskStatusMessage").find(".alert-success").removeClass("d-none");
     } else {
         $("#taskStatusMessage").find(".alert-info").removeClass("d-none");
@@ -50,7 +49,31 @@ Analysis.prototype.refreshReports = function () {
 Analysis.prototype.refreshTabs = function () {
     let originTask = this.task;
     let file = this.file;
-    let originSeed = this.task.seed != null ? "/seed-"+this.task.seed : "";
+
+    if (this.workers_status.preview) {
+        $('.preview-wait').each(function(index, element) {
+          $(this).addClass("d-none");
+        })
+        $('.preview-done').each(function(index, element) {
+          $(this).removeClass("d-none");
+        })
+        previews_url = `/previews/${this.task.uuid}`
+        if (this.seed) {
+            previews_url = `${previews_url}/seed-${this.seed}`
+        }
+
+        fetch(previews_url, {
+          method: "GET",
+          headers: {
+            "X-CSRF-Token": this.CSRFToken
+          }
+        })
+        .then(response => response.text())
+        .then(text => {
+          document.getElementById("contentAvailable").innerHTML= text;
+        })
+
+    }
 
     if (originTask.observables) {
         // TODO: get html blocks from flask
@@ -66,7 +89,7 @@ Analysis.prototype.refreshTabs = function () {
 };
 
 Analysis.prototype.refreshHTML = function () {
-    if (this.task.done && (!this.task.extracted_tasks || this.task.extracted_tasks.every(function(task) { return task.done }))) {
+    if (this.workers_done && (!this.task.extracted_tasks || this.task.extracted_tasks.every(function(task) { return task.done }))) {
         clearInterval(this.refresher);
     }
     this.refreshStatus();
@@ -87,7 +110,10 @@ Analysis.prototype.refresh = function (url) {
       throw new Error(data.error);
     }
     analysis.task = data.task;
+    analysis.seed = data.seed;
     analysis.file = data.file;
+    analysis.workers_done = data.workers_done;
+    analysis.workers_status = data.workers_status;
     analysis.refreshHTML();
   })
   .catch((error) => {

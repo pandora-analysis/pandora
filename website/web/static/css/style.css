@@ -46,7 +46,7 @@ a, *[onclick], *[title] {
   background-color:#ec971f !important;
 }
 
-.status-flag-okay {
+.status-flag-success {
   background-color:#449d44 !important;
 }
 

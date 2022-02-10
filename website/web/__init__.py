@@ -8,6 +8,7 @@ import traceback
 from collections import defaultdict
 from datetime import datetime
 from io import BytesIO
+from typing import Optional
 
 import flask_session  # type: ignore
 import flask_moment  # type: ignore
@@ -76,7 +77,7 @@ status_icons = defaultdict(default_icon, {
     Status.ERROR: 'exclamation-octagon',
     Status.ALERT: 'x-circle',
     Status.WARN: 'exclamation-triangle',
-    Status.OKAY: 'check-circle'
+    Status.SUCCESS: 'check-circle'
 })
 
 
@@ -156,7 +157,7 @@ def api_submit_page():
 
     return render_template(
         'submit.html', error=request.args.get('error', ''),
-        max_file_size=app.config['MAX_CONTENT_PATH'] // 10 ** 6, workers=workers(),
+        max_file_size=app.config['MAX_CONTENT_PATH'] // 10 ** 6, workers=workers().values(),
         api=api,
         api_resource=ApiSubmit
     )
@@ -168,20 +169,18 @@ def api_submit_page():
 def api_analysis(task_id, seed=None):
     task = pandora.get_task(task_id=task_id)
     assert task is not None, 'analysis not found'
-    task.seed = seed
-    update_user_role(pandora, task)
+    update_user_role(pandora, task, seed)
 
     assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
 
     # task.reports = pandora.get_task_reports(task=task)
     # task.linked_tasks = pandora.get_related_tasks(linked_with=task, user=flask_login.current_user)
     # task.extracted_tasks = pandora.get_related_tasks(extracted_from=task, user=flask_login.current_user)
-    task.reports = []
     task.linked_tasks = []
     task.extracted_tasks = []
 
     # return render_template('analysis.html', task=task, zip_pass=setting.ZIP_PASS)
-    return render_template('analysis.html', task=task, api=api, api_resource=ApiTaskAction)
+    return render_template('analysis.html', task=task, seed=seed, api=api, api_resource=ApiTaskAction)
 
 
 @app.route('/task-download/<task_id>/seed-<seed>/<source>', methods=['GET'], strict_slashes=False)
@@ -193,8 +192,7 @@ def api_task_download(task_id, source, seed=None, idx=None):
     assert source in ('img', 'pdf', 'txt', 'zip', 'txt_preview'), f"unexpected source '{source}'"
     task = pandora.get_task(task_id=task_id)
     assert task is not None, 'analysis not found'
-    task.seed = seed
-    update_user_role(pandora, task)
+    update_user_role(pandora, task, seed)
 
     if source == 'img' and flask_login.current_user.role.can(Action.download_images):
         if not task.file.previews:
@@ -318,6 +316,17 @@ def api_roles():
 def api_stats():
     assert flask_login.current_user.role.can(Action.list_stats), 'forbidden'
     return render_template('stats.html')
+
+
+@app.route('/previews/<task_id>', methods=['GET'], strict_slashes=False)
+@app.route('/previews/<task_id>/seed-<seed>', methods=['GET'], strict_slashes=False)
+@html_answer
+def html_previews(task_id: str, seed: Optional[str]=None):
+    task = pandora.get_task(task_id=task_id)
+    assert task is not None, 'analysis not found'
+    update_user_role(pandora, task, seed)
+    assert flask_login.current_user.role.can(Action.download_images), 'forbidden'
+    return render_template('previews.html', task=task, seed=seed)
 
 
 # NOTE: this one must be at the end, it adds a route to / that will break the default one.

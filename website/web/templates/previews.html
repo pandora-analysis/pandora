@@ -1,0 +1,9 @@
+{% for idx in range(task.file.previews|length) %}
+<div class="col-md-4">
+  <div class="img-hover">
+    <a href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}" target="_blank">
+      <img class="img-thumbnail" width="70%" src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}">
+    </a>
+  </div>
+</div>
+{% endfor %}

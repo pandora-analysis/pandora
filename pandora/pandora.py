@@ -96,7 +96,8 @@ class Pandora():
         t = self.storage.get_task(task_id)
         if not t:
             raise Exception(f'Unknown task ID: "{task_id}"')
-        return Task(**t)
+        # FIXME: get rid of that typing ignore
+        return Task(**t)  # type: ignore
 
     """
     def get_task_reports(self, task_id: str) -> List[Report]:
@@ -120,26 +121,23 @@ class Pandora():
         _file.save()
         return self.enqueue_task(_file, user, disabled_workers)
     """
-    def enqueue_task(self, task: Task):
+    def enqueue_task(self, task: Task) -> str:
         """
         Enqueue a task for processing.
         """
         fields = {
-            'fid': task.file.uuid,
-            'uid': task.user.get_id(),
-            'pid': task.parent.rid if task.parent is not None else 0,
-            'oid': task.origin.rid if task.origin is not None else 0,
-            'disabled_workers': json.dumps(task.disabled_workers),
-            'filename': task.file.original_filename
+            'task_uuid': task.uuid,
+            'disabled_workers': json.dumps(task.disabled_workers)
         }
-        task.rid = self.redis.xadd(name='tasks_queue', fields=fields, id='*', maxlen=get_config('generic', 'tasks_max_len'))
-        seed, expire = self.add_seed(task)
-        return task.rid, seed
+        self.redis.xadd(name='tasks_queue', fields=fields, id='*',
+                        maxlen=get_config('generic', 'tasks_max_len'))
+        return task.uuid
 
     def get_tasks(self, user: User):
         tasks = []
         for task in self.storage.get_tasks():
-            _task = Task(**task)
+            # FIXME: get rid of that typing ignore
+            _task = Task(**task)  # type: ignore
             if user.is_admin or (hasattr(_task, 'user') and user.get_id() == _task.user.get_id()):
                 tasks.append(_task)
         return tasks
@@ -158,15 +156,15 @@ class Pandora():
 
     # #### Seed ####
     def check_seed(self, seed: str):
-        rid = self.redis.get(f'seed:{seed}')
-        return rid if rid is not None else None
+        uuid = self.redis.get(f'seed:{seed}')
+        return uuid if uuid is not None else None
 
     def add_seed(self, task: Task, time: Optional[str]=None) -> Tuple[str, Optional[int]]:
         seed = secrets.token_urlsafe()
         expire = expire_in_sec(time)
         if expire:
-            self.redis.setex(name=f'seed:{seed}', time=expire, value=task.rid)
+            self.redis.setex(name=f'seed:{seed}', time=expire, value=task.uuid)
         else:
-            self.redis.set(name=f'seed:{seed}', value=task.rid)
+            self.redis.set(name=f'seed:{seed}', value=task.uuid)
         return seed, expire
     # ##############

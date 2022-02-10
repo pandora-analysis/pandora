@@ -21,8 +21,8 @@
 
     <tbody>
     {% for task in tasks %}
-      <tr id="row-{{ task.rid }}">
-        <td>{{ task.rid }}</td>
+      <tr id="row-{{ task.uuid }}">
+        <td>{{ task.uuid }}</td>
         <td>{% if task.user %}
               {{ task.user.name }}
             {% else %}
@@ -38,7 +38,7 @@
               {{ render_icon('x-circle') }}
             {% elif task.status == status.WARN %}
             {{ render_icon('exclamation-triangle') }}
-            {% elif task.status == status.OKAY %}
+            {% elif task.status == status.SUCCESS %}
             {{ render_icon('check-circle') }}
             {% else %}
               {{ render_icon('question') }}
@@ -48,7 +48,7 @@
         <td>{{ render_icon(task.file.icon) }}<b>{{ task.file.original_filename }}</b></td>
         <td>{{ task.file.sha256 }}</td>
         <td>
-          <a href="{{ url_for('api_analysis', task_id=task.rid) }}">
+          <a href="{{ url_for('api_analysis', task_id=task.uuid) }}">
             <span class="btn btn-primary btn-xs btn-table" style="white-space: nowrap;">See report</span>
           </a>
         </td>
@@ -57,9 +57,9 @@
           {% if task.file.deleted %}
             <span class="btn btn-default btn-xs btn-table" style="white-space: nowrap;">File deleted</span>
           {% else %}
-            <span id="delete-{{ task.rid }}" class="btn btn-danger btn-xs btn-table" style="white-space: nowrap;"
+            <span id="delete-{{ task.uuid }}" class="btn btn-danger btn-xs btn-table" style="white-space: nowrap;"
                   onclick="javascript:deleteFile($(this).attr('data-url'), $(this).attr('data-uid'))"
-                  data-url="{{ api.url_for(api_resource, task_id=task.rid, action='delete') }}" data-uid="{{ task.file_id }}">
+                  data-url="{{ api.url_for(api_resource, task_id=task.uuid, action='delete') }}" data-uid="{{ task.file_id }}">
                 Delete file
             </span>
           {% endif %}

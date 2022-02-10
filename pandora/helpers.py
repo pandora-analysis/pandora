@@ -18,7 +18,7 @@ from .role import Role
 class Status(Enum):
     WAITING = auto()
     RUNNING = auto()
-    OKAY = auto()
+    SUCCESS = auto()
     WARN = auto()
     ALERT = auto()
     ERROR = auto()
@@ -55,10 +55,10 @@ def roles_from_config() -> Dict[str, Role]:
 
 
 @lru_cache(64)
-def workers() -> Dict[str, Any]:
+def workers() -> Dict[str, Dict[str, Any]]:
     with (get_homedir() / 'config' / 'workers.yml').open() as config_file:
         config = yaml.safe_load(config_file.read())
-    return config['workers']
+    return {worker['module']: worker for worker in config['workers']}
 
 
 def make_bool(value: Optional[Union[bool, int, str]]) -> bool:

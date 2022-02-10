@@ -1,52 +1,54 @@
 from typing import Dict, Any, Optional, Union, List, overload
+from uuid import uuid4
 
 from .file import File
 from .user import User
-from .helpers import Status
+from .helpers import Status, workers
 from .observable import TaskObservable, Observable
 from .report import Report
 from .storage_client import Storage
-
-# TODO: replace rid (redis stream ID) by a UUID.
 
 
 class Task:
 
     @overload
-    def __init__(self, rid: Optional[str]=None, submitted_file: Optional[File]=None,
-                 user=None, user_id=None, save_date=None, reports=None,
+    def __init__(self, uuid: Optional[str]=None, submitted_file: Optional[File]=None,
+                 user=None, user_id=None, save_date=None,
                  parent=None, origin=None, status: Optional[Union[str, Status]]=None,
-                 done=False, seed=None,
+                 done: bool=False,
                  disabled_workers=[]):
         ...
 
     @overload
-    def __init__(self, rid: Optional[str]=None, file_id: Optional[str]=None,
-                 user=None, user_id=None, save_date=None, reports=None,
+    def __init__(self, uuid: Optional[str]=None, file_id: Optional[str]=None,
+                 user=None, user_id=None, save_date=None,
                  parent=None, origin=None, status: Optional[Union[str, Status]]=None,
-                 done=False, seed=None,
+                 done: bool=False,
                  disabled_workers=[]):
         ...
 
-    def __init__(self, rid=None, submitted_file=None, file_id=None,
-                 user=None, user_id=None, save_date=None, reports=None,
+    def __init__(self, uuid=None, submitted_file=None, file_id=None,
+                 user=None, user_id=None, save_date=None,
                  parent=None, origin=None, status=None,
-                 done=False, seed=None,
+                 done=False,
                  disabled_workers=[]):
         """
         Generate a Task object.
-        :param rid: redis id - returned by xadd, this is the stream ID
+        :param uuid: Unique identifier of the task.
         :param file: File object
         :param user: User object
         :param save_date: task save date
-        :param reports: dict in this way {module name => report object}
         :param parent: parent task if file has been extracted
         :param origin: origin task if file has been extracted (can be parent or grand-parent, ...)
-        :param seed: random string to share analysis page
         """
         self.storage = Storage()
 
-        self.rid = rid
+        if uuid:
+            # Loading existing task
+            self.uuid = uuid
+        else:
+            # New task
+            self.uuid = str(uuid4())
 
         assert submitted_file is not None or file_id is not None, 'submitted_file or file_id is required'
 
@@ -67,18 +69,17 @@ class Task:
             user = self.storage.get_user(user_id)
             if user:
                 self.user = User(**user)
+
         self.observables: List[Observable] = []
-        self.reports = reports or dict()
         self.parent = parent
         self.origin = origin
         if isinstance(status, Status):
-            self.status = status
+            self._status = status
         elif isinstance(status, str):
-            self.status = Status[status]
+            self._status = Status[status]
         else:
-            self.status = Status.WAITING
+            self._status = Status.WAITING
         self.done = done
-        self.seed = seed
         self.linked_tasks = None
         self.extracted_tasks = None
         self.disabled_workers = disabled_workers
@@ -90,10 +91,9 @@ class Task:
     @property
     def to_dict(self) -> Dict[str, Any]:
         return {k: v for k, v in {
-            'rid': self.rid,
-            'seed': self.seed,
-            'parent_id': self.parent.rid if self.parent else None,
-            'origin_id': self.origin.rid if self.origin else None,
+            'uuid': self.uuid,
+            'parent_id': self.parent.uuid if self.parent else None,
+            'origin_id': self.origin.uuid if self.origin else None,
             'file_id': self.file.uuid if self.file else None,
             'user_id': self.user.get_id() if hasattr(self, 'user') else None,
             'status': self.status.name,
@@ -104,73 +104,55 @@ class Task:
     def store(self):
         self.storage.set_task(self.to_dict)
 
-    def get_report(self, worker):
-        """
-        Get report for given module.
-        :param (BaseWorker) worker: object inherited from BaseWorker class
-        :return (Report): report corresponding
-        """
-        return self.reports.get(worker.module)
+    @property
+    def reports(self) -> Dict[str, Report]:
+        to_return: Dict[str, Report] = {}
+        for worker_name in workers():
+            if worker_name in self.disabled_workers:
+                continue
+            stored_report = self.storage.get_report(task_uuid=self.uuid, worker_name=worker_name)
+            if stored_report:
+                report = Report(**stored_report)
+            else:
+                report = Report(self.uuid, worker_name)
+            to_return[worker_name] = report
+        return to_return
 
-    def set_report(self, worker, status, **kwargs):
-        """
-        Set report for given module and status.
-        :param (BaseWorker) worker: object inherited from BaseWorker class
-        :param (str) status: status
-        :param (mapping) kwargs: arguments to set in report
-        :return (Report): corresponding Report object
-        """
-        report = Report(self, worker=worker, status=status, **kwargs)
-        self.reports[worker.module] = report
-        return report
+    @property
+    def workers_done(self) -> bool:
+        for report_name, report in self.reports.items():
+            if not report.is_done:
+                return False
+        return True
 
-    def set_report_disable(self, worker, **kwargs):
-        """
-        Set report with status DEACTIVATE.
-        :param (BaseWorker) worker: object inherited from BaseWorker class
-        :param kwargs: arguments to set in report
-        """
-        return self.set_report(worker=worker, status=Status.DEACTIVATE, **kwargs)
+    @property
+    def workers_status(self) -> Dict[str, bool]:
+        to_return: Dict[str, bool] = {}
+        for report_name, report in self.reports.items():
+            to_return[report_name] = report.is_done
+        return to_return
 
-    def set_report_running(self, worker, **kwargs):
-        """
-        Set report with status RUNNING.
-        :param (BaseWorker) worker: object inherited from BaseWorker class
-        :param kwargs: arguments to set in report
-        """
-        return self.set_report(worker=worker, status=Status.RUNNING, **kwargs)
+    @property
+    def status(self) -> Status:
+        if self._status in [Status.DELETED, Status.ERROR, Status.ALERT, Status.WARN, Status.SUCCESS]:
+            # If the status was set to any of these values, the reports finished
+            return self._status
+        elif self.workers_done:
+            # All the workers are done, return success/error
+            for report_name, report in self.reports.items():
+                if report.status != Status.SUCCESS:
+                    self._status = report.status
+                    return self._status
+            self._status = Status.SUCCESS
+            return self._status
+        else:
+            # At least one worker isn't done yet
+            self._status = Status.WAITING
+            return self._status
 
-    def set_report_okay(self, worker, **kwargs):
-        """
-        Set report with status OKAY.
-        :param (BaseWorker) worker: object inherited from BaseWorker class
-        :param kwargs: arguments to set in report
-        """
-        return self.set_report(worker=worker, status=Status.OKAY, **kwargs)
-
-    def set_report_warn(self, worker, **kwargs):
-        """
-        Set report with status WARN.
-        :param (BaseWorker) worker: object inherited from BaseWorker class
-        :param kwargs: arguments to set in report
-        """
-        self.set_report(worker=worker, status=Status.WARN, **kwargs)
-
-    def set_report_alert(self, worker, **kwargs):
-        """
-        Set report with status WARN.
-        :param (BaseWorker) worker: object inherited from BaseWorker class
-        :param kwargs: arguments to set in report
-        """
-        return self.set_report(worker=worker, status=Status.ALERT, **kwargs)
-
-    def set_report_error(self, worker, **kwargs):
-        """
-        Set report with status ERROR.
-        :param (BaseWorker) worker: object inherited from BaseWorker class
-        :param kwargs: arguments to set in report
-        """
-        return self.set_report(worker=worker, status=Status.ERROR, **kwargs)
+    @status.setter
+    def status(self, _status: Status):
+        self._status = _status
 
     def set_observables(self, links):
         """
@@ -180,4 +162,4 @@ class Task:
         self.observables = TaskObservable.get_observables(links)
 
     def __str__(self):
-        return f'<rid: {self.rid} - file: {self.file}>'
+        return f'<uuid: {self.uuid} - file: {self.file}>'

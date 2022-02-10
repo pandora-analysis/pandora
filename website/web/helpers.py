@@ -35,13 +35,13 @@ def get_secret_key() -> bytes:
         return f.read()
 
 
-def update_user_role(pandora, task):
+def update_user_role(pandora, task, seed: Optional[str]=None):
     if flask_login.current_user.is_admin:
         flask_login.current_user.role = pandora.get_role(role_name=RoleName.admin)
     elif hasattr(task, 'user') and task.user.get_id() == flask_login.current_user.get_id():
         flask_login.current_user.role = pandora.get_role(role_name=RoleName.owner)
-    elif task.seed is not None:
-        authorized_rid = pandora.check_seed(task.seed)
+    elif seed is not None:
+        authorized_rid = pandora.check_seed(seed)
         if authorized_rid == task.rid:
             flask_login.current_user.role = pandora.get_role(role_name=RoleName.reader)
         elif task.origin and authorized_rid == task.origin.rid:

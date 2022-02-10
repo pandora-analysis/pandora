@@ -98,6 +98,8 @@ class File:
         'application/javascript': ['JSC', 'js'],
         'text/javascript': ['JSC', 'js'],
         'text/plain': ['TXT', 'txt'],
+        'text/xml': ['TXT', 'xml'],
+        'text/x-php': ['TXT', 'php'],
         'application/vnd.ms-excel': ['XLS', 'xls'],
         'application/vnd.oasis.opendocument.spreadsheet': ['XLS', 'xls'],
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['XLS', 'xlsx']
