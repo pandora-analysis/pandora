@@ -24,7 +24,7 @@ Analysis.prototype.refreshStatus = function () {
     $(`.status-flag-${this.task.status.toLowerCase()}`).removeClass("d-none");
     $("#taskStatusMessage").find(".alert").addClass("d-none");
     if (this.task.status === "ERROR") {
-        $("#alertError").removeClass("d-none")("#taskStatusMessage").find(".alert-error").removeClass("d-none");
+        $("#taskStatusMessage").find(".alert-error").removeClass("d-none");
     } else if (this.task.status === "ALERT") {
         $("#taskStatusMessage").find(".alert-danger").removeClass("d-none");
     } else if (this.task.status === "WARN") {
@@ -77,8 +77,13 @@ Analysis.prototype.refreshTabs = function () {
 
     for (const [worker_name, worker_done] of Object.entries(this.workers_status)){
         if (worker_name == 'preview' || !worker_done) {
-            continue
+            continue;
         };
+        if (document.getElementById(worker_name)){
+            // Worker results already in page, skip.
+            continue;
+        }
+
         worker_url = `/workers_results_html/${this.task.uuid}/${worker_name}`
         if (this.seed) {
             worker_url = `${worker_url}/seed-${this.seed}`

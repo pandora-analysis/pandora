@@ -131,6 +131,7 @@ class BaseWorker(multiprocessing.Process):
                     self.logger.error(e)
                     report.status = Status.ERROR
                 except Exception as e:
+                    # TODO: bubble up the error to the user (if safe, may want to do that on a module by module basis)
                     err = f'{repr(e)}\n{traceback.format_exc()}'
                     self.logger.error(f'unknown error during analysis : {err}')
                     report.status = Status.ERROR

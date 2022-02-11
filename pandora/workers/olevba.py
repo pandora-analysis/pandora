@@ -31,7 +31,6 @@ class OleVBA(BaseWorker):
             analysis = vba_parser.analyze_macros()
             if analysis:
                 for type_, keyword, description in analysis:
-                    print(type_, keyword, description)
                     if type_.upper() == 'SUSPICIOUS' and keyword.upper() != 'HEX STRINGS':
                         suspicious.append(description)
                     elif type_.upper() == 'IOC':
