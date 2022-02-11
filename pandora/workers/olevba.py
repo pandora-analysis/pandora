@@ -1,4 +1,4 @@
-from oletools import olevba
+from oletools import olevba  # type: ignore
 
 from ..helpers import Status
 from ..task import Task
@@ -40,12 +40,12 @@ class OleVBA(BaseWorker):
             # Set suspicious and boundsheets in report
             if suspicious:
                 report.status = Status.ALERT
-                report.suspicious = suspicious
+                report.suspicious = suspicious  # type: ignore
                 if boundsheets:
-                    report.boundsheets = boundsheets
+                    report.boundsheets = boundsheets  # type: ignore
             elif boundsheets:
                 report.status = Status.WARN
-                report.boundsheets = boundsheets
+                report.boundsheets = boundsheets  # type: ignore
 
             # TODO: Add observables in task
             # if observables:

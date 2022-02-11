@@ -7,7 +7,7 @@ from .helpers import Status
 
 class Report:
     def __init__(self, task_uuid: str, worker_name: str, status: Optional[str]= None,
-                 details: Optional[Dict[str, str]]=None):
+                 details: Optional[str]=None):
         """
         Generate module report.
         :param kwargs: arguments to set in this report

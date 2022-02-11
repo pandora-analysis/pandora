@@ -178,4 +178,4 @@ class Pandora():
         if not r:
             raise Exception(f'Unknown Report ID: "{task_id}-{worker_name}"')
         # FIXME: get rid of that typing ignore
-        return Report(**r)  # type: ignore
+        return Report(**r)
