@@ -1,4 +1,9 @@
 workers:
+  - module: olevba
+    class: OleVBA
+    cache: 1h
+    timeout: 1m
+    replicas: 2
   - module: preview
     class: Preview
     cache: 1h

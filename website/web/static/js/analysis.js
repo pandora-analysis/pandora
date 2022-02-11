@@ -29,7 +29,7 @@ Analysis.prototype.refreshStatus = function () {
         $("#taskStatusMessage").find(".alert-danger").removeClass("d-none");
     } else if (this.task.status === "WARN") {
         $("#taskStatusMessage").find(".alert-warning").removeClass("d-none");
-    } else if (this.task.status === "SUCCESS") {
+    } else if (this.task.status === "OKAY") {
         $("#taskStatusMessage").find(".alert-success").removeClass("d-none");
     } else {
         $("#taskStatusMessage").find(".alert-info").removeClass("d-none");
@@ -73,6 +73,27 @@ Analysis.prototype.refreshTabs = function () {
           document.getElementById("previews_images").innerHTML= text;
         })
 
+    }
+
+    for (const [worker_name, worker_done] of Object.entries(this.workers_status)){
+        if (worker_name == 'preview' || !worker_done) {
+            continue
+        };
+        worker_url = `/workers_results_html/${this.task.uuid}/${worker_name}`
+        if (this.seed) {
+            worker_url = `${worker_url}/seed-${this.seed}`
+        }
+        fetch(worker_url, {
+          method: "GET",
+          headers: {
+            "X-CSRF-Token": this.CSRFToken
+          }
+        })
+        .then(response => response.text())
+        .then(text => {
+            const workers_results = document.getElementById("workers_results");
+            workers_results.insertAdjacentHTML('beforeend', text);
+        })
     }
 
     if (originTask.observables) {

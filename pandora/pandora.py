@@ -14,7 +14,7 @@ from .default import get_config, get_socket_path
 from .helpers import roles_from_config, allowlist_default, expire_in_sec
 # from .file import File
 from .observable import TaskObservable, Observable
-# from .report import Report
+from .report import Report
 from .role import Role, RoleName
 from .task import Task
 from .user import User
@@ -155,6 +155,7 @@ class Pandora():
     # ##############
 
     # #### Seed ####
+
     def check_seed(self, seed: str):
         uuid = self.redis.get(f'seed:{seed}')
         return uuid if uuid is not None else None
@@ -167,4 +168,14 @@ class Pandora():
         else:
             self.redis.set(name=f'seed:{seed}', value=task.uuid)
         return seed, expire
+
     # ##############
+
+    # #### Report ####
+
+    def get_report(self, task_id: str, worker_name: str) -> Report:
+        r = self.storage.get_report(task_id, worker_name)
+        if not r:
+            raise Exception(f'Unknown Report ID: "{task_id}-{worker_name}"')
+        # FIXME: get rid of that typing ignore
+        return Report(**r)  # type: ignore

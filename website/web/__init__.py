@@ -19,6 +19,7 @@ from flask import (Flask, request, session, abort, render_template,
                    redirect, send_file, url_for)
 from flask_restx import Api  # type: ignore
 from flask_bootstrap import Bootstrap5  # type: ignore
+from jinja2.exceptions import TemplateNotFound
 from werkzeug.security import check_password_hash
 
 from pandora.default import get_config
@@ -77,7 +78,7 @@ status_icons = defaultdict(default_icon, {
     Status.ERROR: 'exclamation-octagon',
     Status.ALERT: 'x-circle',
     Status.WARN: 'exclamation-triangle',
-    Status.SUCCESS: 'check-circle'
+    Status.OKAY: 'check-circle'
 })
 
 
@@ -327,6 +328,21 @@ def html_previews(task_id: str, seed: Optional[str]=None):
     update_user_role(pandora, task, seed)
     assert flask_login.current_user.role.can(Action.download_images), 'forbidden'
     return render_template('previews.html', task=task, seed=seed)
+
+
+@app.route('/workers_results_html/<task_id>/<worker_name>', methods=['GET'], strict_slashes=False)
+@app.route('/workers_results_html/<task_id>/<worker_name>/seed-<seed>', methods=['GET'], strict_slashes=False)
+@html_answer
+def html_workers_result(task_id: str, worker_name: str, seed: Optional[str]=None):
+    task = pandora.get_task(task_id=task_id)
+    assert task is not None, 'analysis not found'
+    update_user_role(pandora, task, seed)
+    assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
+    report = pandora.get_report(task_id, worker_name)
+    try:
+        return render_template(f'{worker_name}.html', task=task, seed=seed, report=report)
+    except TemplateNotFound:
+        return render_template('default_worker.html', worker_name=worker_name, rtask=task, seed=seed, report=report)
 
 
 # NOTE: this one must be at the end, it adds a route to / that will break the default one.

@@ -41,10 +41,10 @@ def update_user_role(pandora, task, seed: Optional[str]=None):
     elif hasattr(task, 'user') and task.user.get_id() == flask_login.current_user.get_id():
         flask_login.current_user.role = pandora.get_role(role_name=RoleName.owner)
     elif seed is not None:
-        authorized_rid = pandora.check_seed(seed)
-        if authorized_rid == task.rid:
+        authorized_uuid = pandora.check_seed(seed)
+        if authorized_uuid == task.uuid:
             flask_login.current_user.role = pandora.get_role(role_name=RoleName.reader)
-        elif task.origin and authorized_rid == task.origin.rid:
+        elif task.origin and authorized_uuid == task.origin.uuid:
             flask_login.current_user.role = pandora.get_role(role_name=RoleName.reader)
     else:
         flask_login.current_user.role = pandora.get_role(role_name=RoleName.other)

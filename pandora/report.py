@@ -1,25 +1,26 @@
 import json
 
+from typing import Optional, Dict
+
 from .helpers import Status
 
 
 class Report:
-    def __init__(self, task_uuid: str, worker_name: str, **kwargs):
+    def __init__(self, task_uuid: str, worker_name: str, status: Optional[str]= None,
+                 details: Optional[Dict[str, str]]=None):
         """
         Generate module report.
         :param kwargs: arguments to set in this report
         """
         self.task_uuid = task_uuid
         self.worker_name = worker_name
-        if 'status' in kwargs:
-            self.status = Status[kwargs.pop('status')]
+        if status:
+            self.status = Status[status]
         else:
             self.status = Status.WAITING
-        for k, v in kwargs.items():
-            if k in ['task_uuid', 'worker_name']:
-                continue
-            print(k, v)
-            setattr(self, k, v)
+        if details:
+            for k, v in json.loads(details).items():
+                setattr(self, k, v)
 
     @property
     def to_dict(self):
@@ -72,15 +73,15 @@ class Report:
         return None
 
     @property
-    def details(self):
+    def details(self) -> Dict[str, str]:
         excluded_keys = (
             'worker_name', 'task_uuid', 'cache', 'status', 'start_date', 'end_date', 'error', 'error_trace', 'web_name'
         )
-        return [key for key in self.__dict__ if not key.startswith('_') and key not in excluded_keys]
+        return {key: value for key, value in self.__dict__.items() if not key.startswith('_') and key not in excluded_keys}
 
     def __str__(self):
         return ', '.join([
             f'{key}={value}'
             for key, value in self.__dict__.items()
-            if not key.startswith('_') and key not in ('worker', 'task')
+            if not key.startswith('_') and key not in ('worker_name', 'task_uuid')
         ])

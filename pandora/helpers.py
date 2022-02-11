@@ -18,7 +18,7 @@ from .role import Role
 class Status(Enum):
     WAITING = auto()
     RUNNING = auto()
-    SUCCESS = auto()
+    OKAY = auto()
     WARN = auto()
     ALERT = auto()
     ERROR = auto()

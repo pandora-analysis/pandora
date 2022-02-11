@@ -11,8 +11,8 @@
       <tr>
         <th>Id</th>
         <th>Owner</th>
-        <th style="width:15%">Date</th>
-        <th style="width:5%;text-align:center">Status</th>
+        <th style="width:200px">Date</th>
+        <th style="width:20px;text-align:center">Status</th>
         <th>Name</th>
         <th>SHA256</th>
         <th colspan="3"></th>
@@ -23,7 +23,7 @@
     {% for task in tasks %}
       <tr id="row-{{ task.uuid }}">
         <td>{{ task.uuid }}</td>
-        <td>{% if task.user %}
+        <td>{% if task.user and task.user.name %}
               {{ task.user.name }}
             {% else %}
                 {{ task.user_id }}
@@ -38,7 +38,7 @@
               {{ render_icon('x-circle') }}
             {% elif task.status == status.WARN %}
             {{ render_icon('exclamation-triangle') }}
-            {% elif task.status == status.SUCCESS %}
+            {% elif task.status == status.OKAY %}
             {{ render_icon('check-circle') }}
             {% else %}
               {{ render_icon('question') }}

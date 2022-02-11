@@ -134,16 +134,16 @@ class Task:
 
     @property
     def status(self) -> Status:
-        if self._status in [Status.DELETED, Status.ERROR, Status.ALERT, Status.WARN, Status.SUCCESS]:
+        if self._status in [Status.DELETED, Status.ERROR, Status.ALERT, Status.WARN, Status.OKAY]:
             # If the status was set to any of these values, the reports finished
             return self._status
         elif self.workers_done:
             # All the workers are done, return success/error
             for report_name, report in self.reports.items():
-                if report.status != Status.SUCCESS:
+                if report.status != Status.OKAY:
                     self._status = report.status
                     return self._status
-            self._status = Status.SUCCESS
+            self._status = Status.OKAY
             return self._status
         else:
             # At least one worker isn't done yet
