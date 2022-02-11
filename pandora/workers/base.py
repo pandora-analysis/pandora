@@ -135,11 +135,10 @@ class BaseWorker(multiprocessing.Process):
                     self.logger.error(f'unknown error during analysis : {err}')
                     report.status = Status.ERROR
                 else:
-                    # NOTE: we probably need to enter that bloc even if there is an exception
-                    #       otherwise the app will never know the worker failed and keep retrying
                     if report.status == Status.RUNNING:
-                        # Only change to success if the analyis didn't change it.
+                        # Only change to success if the analysis didn't change it.
                         report.status = Status.OKAY
+                finally:
                     self.storage.set_report(report.to_dict)
                     self.logger.debug(f'Done with task {task_uuid}.')
 
