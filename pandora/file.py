@@ -11,6 +11,7 @@ from functools import cached_property, lru_cache
 from io import BytesIO
 from pathlib import Path
 from typing import Optional, List, Union, Dict, cast, Set
+from uuid import uuid4
 from zipfile import ZipFile
 
 import exiftool  # type: ignore
@@ -174,7 +175,13 @@ class File:
         'ascii'
     ]
 
-    def __init__(self, path: Union[Path, str], uuid: str, original_filename: str, *,
+    @classmethod
+    def new_file(cls, filepath: Path, filename: str) -> 'File':
+        file = cls(filepath, original_filename=filename)
+        file.store()
+        return file
+
+    def __init__(self, path: Union[Path, str], original_filename: str, uuid: Optional[str]=None, *,
                  save_date: Optional[Union[str, datetime]]=None,
                  md5: Optional[str]=None, sha1: Optional[str]=None, sha256: Optional[str]=None,
                  size: Optional[Union[int, str]]=None,
@@ -182,7 +189,7 @@ class File:
         """
         Generate File object.
         :param path: absolute file path
-        :param uuid: uuid based on file MD5
+        :param uuid: file uuid
         :param original_filename: original filename as uploaded
         :param save_date: file save date
         :param md5: MD5 signature of file content
@@ -199,7 +206,10 @@ class File:
         else:
             self.path = path
 
-        self.uuid: str = uuid
+        if not uuid:
+            self.uuid = str(uuid4())
+        else:
+            self.uuid = uuid
         self.original_filename: str = original_filename
         self.deleted: bool = make_bool(deleted)
 
@@ -506,7 +516,6 @@ class File:
             out.save(to_return, 'PNG', optimize=True)
             to_return.seek(0)
         except Exception as e:
-            print(e)
             # Cannot build preview
             out = Image.new("L", (500, 50), 255)
             d = ImageDraw.Draw(out)

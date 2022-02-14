@@ -3,18 +3,16 @@
 import functools
 import traceback
 
+from io import BytesIO
 from typing import Dict
-from uuid import uuid4
 
 from flask import request, url_for
 import flask_login  # type: ignore
 from flask_restx import Namespace, Resource  # type: ignore
-from werkzeug.utils import secure_filename
 
-from pandora.default import get_homedir, safe_create_dir, get_config, PandoraException
+from pandora.default import get_config, PandoraException
 from pandora.pandora import Pandora
 from pandora.observable import Observable
-from pandora.file import File
 from pandora.mail import Mail
 from pandora.role import Action
 from pandora.task import Task
@@ -124,22 +122,14 @@ class ApiSubmit(Resource):
         submitted_file = request.files['file']
         assert submitted_file.filename, 'file required'
 
-        uuid = str(uuid4())
-        filename = secure_filename(submitted_file.filename)
-        directory = get_homedir() / 'tasks' / uuid
-        safe_create_dir(directory)
-        filepath = directory / filename
-        submitted_file.save(filepath)
-
+        file_bytes = BytesIO(submitted_file.read())
+        disabled_workers = request.form["workersDisabled"].split(",") if request.form.get("workersDisabled") else []
         try:
-            file = File(path=filepath, uuid=uuid, original_filename=submitted_file.filename)
-            file.store()
+            task = Task.new_task(flask_login.current_user, sample=file_bytes,
+                                 filename=submitted_file.filename,
+                                 disabled_workers=disabled_workers)
         except PandoraException as e:
             return {'success': False, 'error': str(e)}, 400
-
-        disabled_workers = request.form["workersDisabled"].split(",") if request.form.get("workersDisabled") else []
-        task = Task(submitted_file=file, user=flask_login.current_user, disabled_workers=disabled_workers)
-        task.store
         pandora.enqueue_task(task)
         return {'success': True, 'taskId': task.uuid}
 
@@ -159,8 +149,7 @@ class ApiTaskAction(Resource):
             # task.reports = mysql.get_task_reports(task=task, config=get_config())
             # task.extracted_tasks = mysql.get_tasks(extracted_from=task, user=flask_login.current_user)
             # task.linked_tasks = mysql.get_tasks(linked_with=task, user=flask_login.current_user)
-            task.file.store
-            task.store
+            # task.store()
             return {'success': True, 'task': task.to_dict, 'workers_done': task.workers_done,
                     'seed': seed, 'workers_status': task.workers_status,
                     'file': task.file.to_web}
@@ -191,21 +180,14 @@ class ApiTaskAction(Resource):
 
         if action == 'rescan' and flask_login.current_user.role.can(Action.rescan_file):
             # Here we create a brand new task.
-            uuid = str(uuid4())
-            directory = get_homedir() / 'tasks' / uuid
-            safe_create_dir(directory)
-            new_filepath = directory / task.file.path.name
-            with new_filepath.open('wb') as f:
-                f.write(task.file.data.getvalue())
-
             try:
-                file = File(path=new_filepath, uuid=uuid, original_filename=task.file.original_filename)
-                file.store()
+                new_task = Task.new_task(flask_login.current_user,
+                                         sample=task.file.data,
+                                         filename=task.file.original_filename,
+                                         disabled_workers=task.disabled_workers)
             except PandoraException as e:
                 return {'success': False, 'error': str(e)}, 400
-            new_task = Task(submitted_file=file, user=flask_login.current_user, disabled_workers=task.disabled_workers)
-            new_task.store
-            task_id = pandora.enqueue_task(new_task)
+            pandora.enqueue_task(new_task)
             link = url_for('api_analysis', task_id=new_task.uuid)
             return {'success': True, 'task_id': new_task.uuid, 'link': link}
 

@@ -1,6 +1,10 @@
+from io import BytesIO
 from typing import Dict, Any, Optional, Union, List, overload
 from uuid import uuid4
 
+from werkzeug.utils import secure_filename
+
+from .default import get_homedir, safe_create_dir
 from .file import File
 from .user import User
 from .helpers import Status, workers
@@ -11,10 +15,27 @@ from .storage_client import Storage
 
 class Task:
 
+    @classmethod
+    def new_task(cls, user, sample: BytesIO, filename: str, disabled_workers: List[str],
+                 parent: Optional['Task']=None) -> 'Task':
+        task_uuid = str(uuid4())
+        directory = get_homedir() / 'tasks' / task_uuid
+        safe_create_dir(directory)
+        filepath = directory / secure_filename(filename)
+        with filepath.open('wb') as _f:
+            _f.write(sample.getvalue())
+
+        file = File.new_file(filepath, filename=filename)
+
+        task = cls(uuid=task_uuid, submitted_file=file, disabled_workers=disabled_workers,
+                   user=user, parent=parent)
+        task.store()
+        return task
+
     @overload
     def __init__(self, uuid: Optional[str]=None, submitted_file: Optional[File]=None,
                  user=None, user_id=None, save_date=None,
-                 parent=None, origin=None, status: Optional[Union[str, Status]]=None,
+                 parent=None, parent_id=None, origin=None, status: Optional[Union[str, Status]]=None,
                  done: bool=False,
                  disabled_workers=[]):
         ...
@@ -22,14 +43,14 @@ class Task:
     @overload
     def __init__(self, uuid: Optional[str]=None, file_id: Optional[str]=None,
                  user=None, user_id=None, save_date=None,
-                 parent=None, origin=None, status: Optional[Union[str, Status]]=None,
+                 parent=None, parent_id=None, origin=None, status: Optional[Union[str, Status]]=None,
                  done: bool=False,
                  disabled_workers=[]):
         ...
 
     def __init__(self, uuid=None, submitted_file=None, file_id=None,
                  user=None, user_id=None, save_date=None,
-                 parent=None, origin=None, status=None,
+                 parent=None, parent_id=None, origin=None, status=None,
                  done=False,
                  disabled_workers=[]):
         """
@@ -71,7 +92,13 @@ class Task:
                 self.user = User(**user)
 
         self.observables: List[Observable] = []
-        self.parent = parent
+        if parent:
+            self.parent = parent
+        elif parent_id:
+            parent_task = self.storage.get_task(parent_id)
+            if parent_task:
+                self.parent = Task(**parent_task)
+
         self.origin = origin
         if isinstance(status, Status):
             self._status = status
@@ -92,7 +119,7 @@ class Task:
     def to_dict(self) -> Dict[str, Any]:
         return {k: v for k, v in {
             'uuid': self.uuid,
-            'parent_id': self.parent.uuid if self.parent else None,
+            'parent_id': self.parent.uuid if hasattr(self, 'parent') else None,
             'origin_id': self.origin.uuid if self.origin else None,
             'file_id': self.file.uuid if self.file else None,
             'user_id': self.user.get_id() if hasattr(self, 'user') else None,
@@ -100,7 +127,6 @@ class Task:
             'save_date': self.save_date.isoformat()
         }.items() if v is not None}
 
-    @property
     def store(self):
         self.storage.set_task(self.to_dict)
 

@@ -1,4 +1,9 @@
 workers:
+  - module: extractor
+    class: Extractor
+    cache: 1h
+    timeout: 1m
+    replicas: 5
   - module: olevba
     class: OleVBA
     cache: 1h
