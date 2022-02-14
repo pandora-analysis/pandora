@@ -97,7 +97,7 @@ class Task:
         elif parent_id:
             parent_task = self.storage.get_task(parent_id)
             if parent_task:
-                self.parent = Task(**parent_task)
+                self.parent = Task(**parent_task)  # type: ignore
 
         self.origin = origin
         if isinstance(status, Status):
