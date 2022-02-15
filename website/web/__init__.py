@@ -325,7 +325,8 @@ def html_previews(task_id: str, seed: Optional[str]=None):
     assert task is not None, 'analysis not found'
     update_user_role(pandora, task, seed)
     assert flask_login.current_user.role.can(Action.download_images), 'forbidden'
-    return render_template('previews.html', task=task, seed=seed)
+    report = pandora.get_report(task_id, 'preview')
+    return render_template('previews.html', task=task, seed=seed, report=report)
 
 
 @app.route('/workers_results_html/<task_id>/<worker_name>', methods=['GET'], strict_slashes=False)

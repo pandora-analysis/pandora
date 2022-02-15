@@ -70,13 +70,13 @@ Analysis.prototype.refreshTabs = function () {
         })
         .then(response => response.text())
         .then(text => {
-          document.getElementById("previews_images").innerHTML= text;
+          document.getElementById("previews_images").innerHTML=text;
         })
 
     }
 
     for (const [worker_name, worker_done] of Object.entries(this.workers_status)){
-        if (worker_name == 'preview' || !worker_done) {
+        if (!worker_done) {
             continue;
         };
         if (document.getElementById(worker_name)){
