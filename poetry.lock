@@ -664,6 +664,19 @@ format = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validat
 format_nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3986-validator (>0.1.0)", "uri-template", "webcolors (>=1.11)"]
 
 [[package]]
+name = "lark-parser"
+version = "0.12.0"
+description = "a modern parsing library"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+atomic_cache = ["atomicwrites"]
+nearley = ["js2py"]
+regex = ["regex"]
+
+[[package]]
 name = "lxml"
 version = "4.7.1"
 description = "Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API."
@@ -1107,6 +1120,14 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7"
 tzdata = {version = "*", markers = "python_version >= \"3.6\""}
 
 [[package]]
+name = "pyxlsb2"
+version = "0.0.8"
+description = "Excel 2007+ Binary Workbook (xlsb) parser"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pyyaml"
 version = "6.0"
 description = "YAML parser and emitter for Python"
@@ -1167,6 +1188,14 @@ urllib3 = ">=1.21.1,<1.27"
 [package.extras]
 socks = ["PySocks (>=1.5.6,!=1.5.7)", "win-inet-pton"]
 use_chardet_on_py3 = ["chardet (>=3.0.2,<5)"]
+
+[[package]]
+name = "roman"
+version = "3.3"
+description = "Integer to Roman numerals converter"
+category = "main"
+optional = false
+python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
 
 [[package]]
 name = "six"
@@ -1370,6 +1399,14 @@ python-versions = ">=3.7"
 devenv = ["black", "flake8", "pyroma", "pytest", "pytest-cov", "zest.releaser"]
 
 [[package]]
+name = "untangle"
+version = "1.1.1"
+description = "Convert XML documents into Python objects"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "urllib3"
 version = "1.26.8"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -1477,9 +1514,36 @@ MarkupSafe = "*"
 email = ["email-validator"]
 
 [[package]]
+name = "xlmmacrodeobfuscator"
+version = "0.2.5"
+description = "XLMMacroDeobfuscator is an XLM Emulation engine written in Python 3, designed to analyze and deobfuscate malicious XLM macros, also known as Excel 4.0 macros, contained in MS Excel files (XLS, XLSM, and XLSB)."
+category = "main"
+optional = false
+python-versions = ">=3.4"
+
+[package.dependencies]
+lark-parser = "*"
+msoffcrypto-tool = "*"
+pyxlsb2 = "*"
+roman = "*"
+untangle = "1.1.1"
+xlrd2 = "*"
+
+[package.extras]
+secure = ["defusedxml"]
+
+[[package]]
 name = "xlrd"
 version = "1.2.0"
 description = "Library for developers to extract data from Microsoft Excel (tm) spreadsheet files"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[[package]]
+name = "xlrd2"
+version = "1.3.4"
+description = "Library for developers to extract data from Microsoft Excel legacy spreadsheet files (xls)"
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
@@ -1515,7 +1579,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "22340f11fec238678f77a1535af5951073c886103de5a45a68188360dabe2707"
+content-hash = "61fcca6d00609efd1661a52dae7074b0a9a5cdb3a6701790b4f1228b31a7687a"
 
 [metadata.files]
 aniso8601 = [
@@ -1944,6 +2008,10 @@ jinja2 = [
 jsonschema = [
     {file = "jsonschema-4.4.0-py3-none-any.whl", hash = "sha256:77281a1f71684953ee8b3d488371b162419767973789272434bbc3f29d9c8823"},
     {file = "jsonschema-4.4.0.tar.gz", hash = "sha256:636694eb41b3535ed608fe04129f26542b59ed99808b4f688aa32dcf55317a83"},
+]
+lark-parser = [
+    {file = "lark-parser-0.12.0.tar.gz", hash = "sha256:15967db1f1214013dca65b1180745047b9be457d73da224fcda3d9dd4e96a138"},
+    {file = "lark_parser-0.12.0-py2.py3-none-any.whl", hash = "sha256:0eaf30cb5ba787fe404d73a7d6e61df97b21d5a63ac26c5008c78a494373c675"},
 ]
 lxml = [
     {file = "lxml-4.7.1-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:d546431636edb1d6a608b348dd58cc9841b81f4116745857b6cb9f8dadb2725f"},
@@ -2416,6 +2484,10 @@ pytz-deprecation-shim = [
     {file = "pytz_deprecation_shim-0.1.0.post0-py2.py3-none-any.whl", hash = "sha256:8314c9692a636c8eb3bda879b9f119e350e93223ae83e70e80c31675a0fdc1a6"},
     {file = "pytz_deprecation_shim-0.1.0.post0.tar.gz", hash = "sha256:af097bae1b616dde5c5744441e2ddc69e74dfdcb0c263129610d85b87445a59d"},
 ]
+pyxlsb2 = [
+    {file = "pyxlsb2-0.0.8-py3-none-any.whl", hash = "sha256:72f46cea74113879b2167a34da3a6eaedccf8d462caf9ee8ed3a15e58f1f5621"},
+    {file = "pyxlsb2-0.0.8.tar.gz", hash = "sha256:a4700e31ccae2e6fbc5b77d8be7c84c158a5c6608115b615597cb622281ddde0"},
+]
 pyyaml = [
     {file = "PyYAML-6.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d4db7c7aef085872ef65a8fd7d6d09a14ae91f691dec3e87ee5ee0539d516f53"},
     {file = "PyYAML-6.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:9df7ed3b3d2e0ecfe09e14741b857df43adb5a3ddadc919a2d94fbdf78fea53c"},
@@ -2551,6 +2623,10 @@ requests = [
     {file = "requests-2.27.1-py2.py3-none-any.whl", hash = "sha256:f22fa1e554c9ddfd16e6e41ac79759e17be9e492b3587efa038054674760e72d"},
     {file = "requests-2.27.1.tar.gz", hash = "sha256:68d7c56fd5a8999887728ef304a6d12edc7be74f1cfa47714fc8b414525c9a61"},
 ]
+roman = [
+    {file = "roman-3.3-py2.py3-none-any.whl", hash = "sha256:c2a1f14ab47373aecc141edbcdd66595949c9d0ed932fe76bd547df1b55f7278"},
+    {file = "roman-3.3.tar.gz", hash = "sha256:2c46ac8db827d34e4fa9ccc0577e7f0b0d84f16ffe112351bd4f1ec2eb12d73f"},
+]
 six = [
     {file = "six-1.12.0-py2.py3-none-any.whl", hash = "sha256:3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c"},
     {file = "six-1.12.0.tar.gz", hash = "sha256:d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73"},
@@ -2624,6 +2700,9 @@ tzlocal = [
 unoserver = [
     {file = "unoserver-1.1-py3-none-any.whl", hash = "sha256:30ed6e2318962c9cb40b0dc9272c848435394d5c1242e29d9280366476a57939"},
     {file = "unoserver-1.1.tar.gz", hash = "sha256:2614fa4f3d780c15c182c827ef502df48157c4f48ce8456a8ea00c49357d1d60"},
+]
+untangle = [
+    {file = "untangle-1.1.1.tar.gz", hash = "sha256:e7cfa1ad57707e6b74cfea8b9fc50f7cbe9bbaf18401cc9d72192002bcd80bcb"},
 ]
 urllib3 = [
     {file = "urllib3-1.26.8-py2.py3-none-any.whl", hash = "sha256:000ca7f471a233c2251c6c7023ee85305721bfdf18621ebff4fd17a8653427ed"},
@@ -2709,9 +2788,17 @@ wtforms = [
     {file = "WTForms-3.0.1-py3-none-any.whl", hash = "sha256:837f2f0e0ca79481b92884962b914eba4e72b7a2daaf1f939c890ed0124b834b"},
     {file = "WTForms-3.0.1.tar.gz", hash = "sha256:6b351bbb12dd58af57ffef05bc78425d08d1914e0fd68ee14143b7ade023c5bc"},
 ]
+xlmmacrodeobfuscator = [
+    {file = "XLMMacroDeobfuscator-0.2.5-py3-none-any.whl", hash = "sha256:5e6bf9fd777c20d4ad4cfdab885906a7bc65d6d39d732644567f2fa665f34e37"},
+    {file = "XLMMacroDeobfuscator-0.2.5.tar.gz", hash = "sha256:fdee926d56895d0519869f2e6c50206cb0d39d14ae860c57293e0dac261b7f85"},
+]
 xlrd = [
     {file = "xlrd-1.2.0-py2.py3-none-any.whl", hash = "sha256:e551fb498759fa3a5384a94ccd4c3c02eb7c00ea424426e212ac0c57be9dfbde"},
     {file = "xlrd-1.2.0.tar.gz", hash = "sha256:546eb36cee8db40c3eaa46c351e67ffee6eeb5fa2650b71bc4c758a29a1b29b2"},
+]
+xlrd2 = [
+    {file = "xlrd2-1.3.4-py2.py3-none-any.whl", hash = "sha256:88147c56883ad0e789af13dd8e1affcaf74ace91a251fd1737299347a5d8dd05"},
+    {file = "xlrd2-1.3.4.tar.gz", hash = "sha256:1f6fcd61b696608faaff92c7c14f70995de26b6c45c4463485ffb8105c902750"},
 ]
 xlsxwriter = [
     {file = "XlsxWriter-3.0.2-py3-none-any.whl", hash = "sha256:1aa65166697c42284e82f5bf9a33c2e913341eeef2b262019c3f5b5334768765"},

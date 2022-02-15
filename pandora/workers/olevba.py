@@ -39,12 +39,12 @@ class OleVBA(BaseWorker):
             # Set suspicious and boundsheets in report
             if suspicious:
                 report.status = Status.ALERT
-                report.suspicious = suspicious  # type: ignore
+                report.add_details('suspicious', suspicious)
                 if boundsheets:
-                    report.boundsheets = boundsheets  # type: ignore
+                    report.add_details('boundsheets', boundsheets)
             elif boundsheets:
                 report.status = Status.WARN
-                report.boundsheets = boundsheets  # type: ignore
+                report.add_details('boundsheets', boundsheets)
 
             # TODO: Add observables in task
             # if observables:

@@ -23,6 +23,11 @@ workers:
     cache: 1h
     timeout: 1m
     replicas: 2
+  - module: xmldeobfuscator
+    class: XLMMacroDeobfuscator
+    cache: 1h
+    timeout: 1m
+    replicas: 2
   - module: preview
     class: Preview
     cache: 1h
