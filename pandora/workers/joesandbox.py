@@ -23,6 +23,7 @@ class JoeSandboxWorker(BaseWorker):
         super().__init__(module, name, cache, timeout, loglevel, **options)
         if not self.apikey:
             self.status = Status.DEACTIVATE
+            return
 
         self.joesb = JoeSandbox(apikey=self.apikey, apiurl=self.apiurl,
                                 accept_tac=True)
