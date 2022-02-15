@@ -6,13 +6,13 @@ import hashlib
 import json
 
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Union, Any
 
 from pandora.default import get_homedir
 
 
-def sri_for_dir(directory: Path) -> Dict[str, Dict]:
-    to_return = {}
+def sri_for_dir(directory: Path) -> Dict[str, Any]:
+    to_return: Dict[str, Any] = {}
     for entry in directory.iterdir():
         if entry.is_dir():
             sris = sri_for_dir(entry)

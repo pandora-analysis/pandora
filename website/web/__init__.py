@@ -90,7 +90,7 @@ def inject_enums():
 
 
 def get_sri(directory: str, filename: str) -> str:
-    sha512 = functools.reduce(operator.getitem, directory.split('/'), sri_load())[filename]
+    sha512 = functools.reduce(operator.getitem, directory.split('/'), sri_load())[filename]  # type: ignore
     return f'sha512-{sha512}'
 
 
