@@ -19,6 +19,7 @@ from ..task import Task
 
 
 class BaseWorker(multiprocessing.Process):
+    status: Status = Status.OKAY
 
     def __init__(self, module: str, name: str, cache: str, timeout: str,
                  loglevel: int=logging.DEBUG, **options):
@@ -51,6 +52,9 @@ class BaseWorker(multiprocessing.Process):
 
         self.cache = expire_in_sec(cache)
         self.timeout = expire_in_sec(timeout)
+
+        for key, value in options.items():
+            setattr(self, key, value)
 
     @property
     def redis(self):
@@ -122,10 +126,14 @@ class BaseWorker(multiprocessing.Process):
                 report = Report(task.uuid, self.module)
 
                 try:
-                    report.status = Status.RUNNING
+                    if self.status == Status.DEACTIVATE:
+                        report.status = Status.DEACTIVATE
+                    else:
+                        report.status = Status.RUNNING
                     self.storage.set_report(report.to_dict)
-                    with self._timeout_context():
-                        self.analyse(task, report)
+                    if not self.status == Status.DEACTIVATE:
+                        with self._timeout_context():
+                            self.analyse(task, report)
                 except TimeoutError:
                     e = f'timeout on analyse call after {self.timeout}s'
                     self.logger.error(e)

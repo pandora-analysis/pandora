@@ -179,6 +179,10 @@ class Task:
             # All the workers are done, return success/error
             for report_name, report in self.reports.items():
                 # TODO: define order of importance, return highest status code.
+                # NOTE: when a report is Status.DEACTIVATED, it means the module is deactivated
+                #       it has no impact on the general status of the task
+                if report.status == Status.DEACTIVATE:
+                    continue
                 if report.status != Status.OKAY:
                     self._status = report.status
                     return self._status

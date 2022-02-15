@@ -39,6 +39,7 @@ extract-msg = "^0.29"
 Pillow = "^9.0.1"
 oletools = "^0.60"
 py7zr = "^0.17.4"
+jbxapi = "^3.17.2"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.0.1"

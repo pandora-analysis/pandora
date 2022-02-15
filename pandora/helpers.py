@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import logging
 import re
 
 from datetime import timedelta
@@ -12,6 +13,8 @@ import yaml
 
 from .default import get_homedir
 from .role import Role
+
+logger = logging.getLogger('Helpers')
 
 
 @unique
@@ -56,7 +59,12 @@ def roles_from_config() -> Dict[str, Role]:
 
 @lru_cache(64)
 def workers() -> Dict[str, Dict[str, Any]]:
-    with (get_homedir() / 'config' / 'workers.yml').open() as config_file:
+    worker_config_file = get_homedir() / 'config' / 'workers.yml'
+    if not worker_config_file.exists():
+        logger.warning(f'Workers config file ({worker_config_file}) does not exists, falling back to default.')
+        worker_config_file = get_homedir() / 'config' / 'workers.yml.sample'
+
+    with worker_config_file.open() as config_file:
         config = yaml.safe_load(config_file.read())
     return {worker['module']: worker for worker in config['workers']}
 

@@ -1,6 +1,6 @@
 import json
 
-from typing import Optional, Dict
+from typing import Optional, Dict, Any
 
 from .helpers import Status
 
@@ -20,7 +20,7 @@ class Report:
             self.status = Status.WAITING
         if details:
             for k, v in json.loads(details).items():
-                setattr(self, k, v)
+                setattr(self, k, json.loads(v))
 
     @property
     def to_dict(self):
@@ -34,12 +34,12 @@ class Report:
             'end_date': getattr(self, 'end_date', None),
             'error': getattr(self, 'error', None),
             'error_trace': getattr(self, 'error_trace', None),
-            'details': json.dumps({key: self.display_attr(key) for key in self.details}) if self.details else None,
+            'details': json.dumps({key: json.dumps(value) for key, value in self.details.items()}) if self.details else None,
         }.items() if v is not None}
 
     @property
     def is_done(self):
-        return self.status not in (Status.WAITING, Status.RUNNING, Status.DEACTIVATE)
+        return self.status not in (Status.WAITING, Status.RUNNING)
 
     def display_attr(self, attr):
         """
@@ -52,7 +52,7 @@ class Report:
             return None
         if isinstance(value, bytes):
             value = json.loads(value.decode())
-            if isinstance(value, list):
+            if isinstance(value, (list, set)):
                 return '\n'.join(value)
             elif isinstance(value, dict):
                 return '\n'.join([f'{k}: {v}' for k, v in value.items()])
@@ -78,6 +78,11 @@ class Report:
             'worker_name', 'task_uuid', 'cache', 'status', 'start_date', 'end_date', 'error', 'error_trace', 'web_name'
         )
         return {key: value for key, value in self.__dict__.items() if not key.startswith('_') and key not in excluded_keys}
+
+    def add_details(self, details_name: str, details: Any):
+        if isinstance(details, set):
+            details = list(details)
+        setattr(self, details_name, details)
 
     def __str__(self):
         return ', '.join([
