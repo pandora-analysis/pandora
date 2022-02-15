@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import logging
+import requests
+import traceback
+
+from urllib.parse import urljoin
+
+from ..helpers import Status
+from ..task import Task
+from ..report import Report
+
+from .base import BaseWorker
+
+
+class HybridAnalysis(BaseWorker):
+
+    apikey: str
+    apiurl: str
+
+    def __init__(self, module: str, name: str, cache: str, timeout: str,
+                 loglevel: int=logging.DEBUG, **options):
+        super().__init__(module, name, cache, timeout, loglevel, **options)
+        if not self.apikey:
+            self.status = Status.DEACTIVATE
+            return
+
+        self._session = requests.Session()
+        self._session.headers.update(
+            {'api-key': self.apikey,
+             'user-agent': 'Pandora',
+             'accept': 'application/json',
+             'Content-Type': 'application/x-www-form-urlencoded'  # This is wrong, but the API wants it.
+             }
+        )
+        try:
+            response = self._session.get(urljoin(self.apiurl, 'key/current'))
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            self.logger.warning(e)
+            self.status = Status.DEACTIVATE
+
+    def analyse(self, task: Task, report: Report):
+        try:
+            self.logger.debug(f'analysing file {task.file.path}...')
+            data = {'hash': task.file.sha256}
+            response = self._session.post(urljoin(self.apiurl, 'search/hash'), data=data)
+            response.raise_for_status()
+            result = response.json()
+
+            malicious = []
+            for entries in result:
+                if entries['verdict'] == 'malicious':
+                    report.status = Status.ALERT
+                    malicious.append(entries['vx_family'])
+            if malicious:
+                report.add_details('malicious', set(malicious))
+        except requests.exceptions.HTTPError as e:
+            err = f'{repr(e)}\n{traceback.format_exc()}'
+            self.logger.error(f'unknown error during analysis : {err}')
+            report.status = Status.ERROR

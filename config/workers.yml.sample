@@ -1,4 +1,11 @@
 workers:
+  - module: hybridanalysis
+    class: HybridAnalysis
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    apiurl: 'https://www.hybrid-analysis.com/api/v2/'
+    apikey: ''
   - module: joesandbox
     class: JoeSandboxWorker
     cache: 1h
