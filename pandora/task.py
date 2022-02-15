@@ -1,22 +1,24 @@
+import json
+
 from io import BytesIO
-from typing import Dict, Any, Optional, Union, List, overload
+from typing import Dict, Any, Optional, List, overload
 from uuid import uuid4
 
 from werkzeug.utils import secure_filename
 
 from .default import get_homedir, safe_create_dir
 from .file import File
-from .user import User
 from .helpers import Status, workers
 from .observable import TaskObservable, Observable
 from .report import Report
 from .storage_client import Storage
+from .user import User
 
 
 class Task:
 
     @classmethod
-    def new_task(cls, user, sample: BytesIO, filename: str, disabled_workers: List[str],
+    def new_task(cls, user: User, sample: BytesIO, filename: str, disabled_workers: List[str],
                  parent: Optional['Task']=None) -> 'Task':
         task_uuid = str(uuid4())
         directory = get_homedir() / 'tasks' / task_uuid
@@ -33,25 +35,29 @@ class Task:
         return task
 
     @overload
-    def __init__(self, uuid: Optional[str]=None, submitted_file: Optional[File]=None,
-                 user=None, user_id=None, save_date=None,
-                 parent=None, parent_id=None, origin=None, status: Optional[Union[str, Status]]=None,
+    def __init__(self, uuid: str, submitted_file: File,
+                 user: User,
+                 parent: Optional['Task']=None,
+                 status: Optional[Status]=None,
                  done: bool=False,
-                 disabled_workers=[]):
+                 disabled_workers: List[str]=[]):
+        '''With python classes'''
         ...
 
     @overload
-    def __init__(self, uuid: Optional[str]=None, file_id: Optional[str]=None,
-                 user=None, user_id=None, save_date=None,
-                 parent=None, parent_id=None, origin=None, status: Optional[Union[str, Status]]=None,
+    def __init__(self, uuid: str, file_id: str, user_id: str, save_date: str,
+                 parent_id: Optional[str]=None,
+                 status: Optional[str]=None,
                  done: bool=False,
-                 disabled_workers=[]):
+                 disabled_workers: Optional[str]=None):
+        '''From redis'''
         ...
 
-    def __init__(self, uuid=None, submitted_file=None, file_id=None,
+    def __init__(self, uuid,
+                 submitted_file=None, file_id=None,
                  user=None, user_id=None, save_date=None,
-                 parent=None, parent_id=None, origin=None, status=None,
-                 done=False,
+                 parent=None, parent_id=None,
+                 status=None, done=False,
                  disabled_workers=[]):
         """
         Generate a Task object.
@@ -60,7 +66,6 @@ class Task:
         :param user: User object
         :param save_date: task save date
         :param parent: parent task if file has been extracted
-        :param origin: origin task if file has been extracted (can be parent or grand-parent, ...)
         """
         self.storage = Storage()
 
@@ -75,10 +80,8 @@ class Task:
 
         if submitted_file:
             self.file = submitted_file
-            self.file_id = self.file.uuid
             self.save_date = self.file.save_date
         elif file_id:
-            self.file_id = file_id
             self.file = File(**self.storage.get_file(file_id))
             self.save_date = self.file.save_date
         else:
@@ -99,7 +102,6 @@ class Task:
             if parent_task:
                 self.parent = Task(**parent_task)  # type: ignore
 
-        self.origin = origin
         if isinstance(status, Status):
             self._status = status
         elif isinstance(status, str):
@@ -108,21 +110,29 @@ class Task:
             self._status = Status.WAITING
         self.done = done
         self.linked_tasks = None
-        self.extracted_tasks = None
-        self.disabled_workers = disabled_workers
+        if disabled_workers:
+            self.disabled_workers = json.loads(disabled_workers)
+        else:
+            self.disabled_workers = []
 
-        # NOTE: this may need to be moved somewhere else
-        if self.file.deleted:
-            self.status = Status.DELETED
+    @property
+    def extracted(self) -> List['Task']:
+        to_return = []
+        for t_uuid in self.storage.get_extracted_references(self.uuid):
+            extract = self.storage.get_task(t_uuid)
+            if not extract:
+                continue
+            to_return.append(Task(**extract))  # type: ignore
+        return to_return
 
     @property
     def to_dict(self) -> Dict[str, Any]:
         return {k: v for k, v in {
             'uuid': self.uuid,
             'parent_id': self.parent.uuid if hasattr(self, 'parent') else None,
-            'origin_id': self.origin.uuid if self.origin else None,
-            'file_id': self.file.uuid if self.file else None,
+            'file_id': self.file.uuid if hasattr(self, 'file') else None,
             'user_id': self.user.get_id() if hasattr(self, 'user') else None,
+            'disabled_workers': json.dumps(self.disabled_workers) if hasattr(self, 'disabled_workers') else None,
             'status': self.status.name,
             'save_date': self.save_date.isoformat()
         }.items() if v is not None}
@@ -160,12 +170,15 @@ class Task:
 
     @property
     def status(self) -> Status:
+        if self.file.deleted:
+            self._status = Status.DELETED
         if self._status in [Status.DELETED, Status.ERROR, Status.ALERT, Status.WARN, Status.OKAY]:
             # If the status was set to any of these values, the reports finished
             return self._status
         elif self.workers_done:
             # All the workers are done, return success/error
             for report_name, report in self.reports.items():
+                # TODO: define order of importance, return highest status code.
                 if report.status != Status.OKAY:
                     self._status = report.status
                     return self._status

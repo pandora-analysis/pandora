@@ -165,6 +165,19 @@
                   </td>
                 </tr>
               {% endif %}
+              {% if task.extracted %}
+                <tr>
+                  <th>Extracted to</th>
+                  <td>
+                    {% for ext in task.extracted %}
+                      {{ render_icon(ext.file.icon) }}{{ ext.file.original_filename }}
+                    <a href="{{ url_for('api_analysis', task_id=ext.uuid, seed=seed) }}">
+                        <span class="btn btn-default btn-sm pull-right">See report</span>
+                    </a></br>
+                    {%endfor%}
+                  </td>
+                </tr>
+              {% endif %}
               {% if task.file.type is not none %}
                 <tr>
                   <th>Type</th>

@@ -70,6 +70,7 @@ class Extractor(BaseWorker):
                                                      filename=child.name,
                                                      disabled_workers=task.disabled_workers,
                                                      parent=task)
+                            pandora.add_extracted_reference(task, new_task)
                             pandora.enqueue_task(new_task)
                         elif child.is_dir():
                             folders.append(child)
@@ -87,6 +88,7 @@ class Extractor(BaseWorker):
                                                  filename=attachment['filename'],
                                                  disabled_workers=task.disabled_workers,
                                                  parent=task)
+                        pandora.add_extracted_reference(task, new_task)
                         pandora.enqueue_task(new_task)
                     shutil.rmtree(extracted_dir)
             except Exception as e:

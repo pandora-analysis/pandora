@@ -3,7 +3,7 @@
 
 import operator
 
-from typing import Optional, Dict, List, Union
+from typing import Optional, Dict, List, Union, Set
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
@@ -121,6 +121,12 @@ class Storage():
             tasks.append(self.storage.hgetall(f'tasks:{uuid}'))
         tasks.sort(key=operator.itemgetter('save_date'), reverse=True)
         return tasks
+
+    def add_extracted_reference(self, parent_task_uuid: str, extracted_task_uuid: str):
+        self.storage.sadd(f'tasks:{parent_task_uuid}:extracted', extracted_task_uuid)
+
+    def get_extracted_references(self, task_id: str) -> Set[str]:
+        return self.storage.smembers(f'tasks:{task_id}:extracted')
 
     # ##############
 

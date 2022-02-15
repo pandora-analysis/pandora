@@ -133,6 +133,9 @@ class Pandora():
                         maxlen=get_config('generic', 'tasks_max_len'))
         return task.uuid
 
+    def add_extracted_reference(self, task: Task, extracted_task: Task):
+        self.storage.add_extracted_reference(task.uuid, extracted_task.uuid)
+
     def get_tasks(self, user: User):
         tasks = []
         for task in self.storage.get_tasks():

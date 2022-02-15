@@ -176,9 +176,7 @@ def api_analysis(task_id, seed=None):
 
     # task.reports = pandora.get_task_reports(task=task)
     # task.linked_tasks = pandora.get_related_tasks(linked_with=task, user=flask_login.current_user)
-    # task.extracted_tasks = pandora.get_related_tasks(extracted_from=task, user=flask_login.current_user)
     task.linked_tasks = []
-    task.extracted_tasks = []
 
     # return render_template('analysis.html', task=task, zip_pass=setting.ZIP_PASS)
     return render_template('analysis.html', task=task, seed=seed, api=api, api_resource=ApiTaskAction)
