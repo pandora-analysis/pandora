@@ -116,3 +116,6 @@ dump.rdb
 config/*.json
 config/*.json.bkp
 config/workers.yml
+
+# Local tasks
+tasks/

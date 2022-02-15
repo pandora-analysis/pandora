@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import functools
+import operator
 import pkg_resources
 import traceback
 
@@ -32,7 +33,7 @@ from .generic_api import api as generic_api
 from .generic_api import ApiRole, ApiObservable, ApiSubmit, ApiTaskAction
 from .helpers import (get_secret_key, update_user_role, admin_required,
                       src_request_ip, load_user_from_request, build_users_table,
-                      )
+                      sri_load)
 from .proxied import ReverseProxied
 
 pandora: Pandora = Pandora()
@@ -86,6 +87,14 @@ status_icons = defaultdict(default_icon, {
 def inject_enums():
     '''All the templates have the Action enum'''
     return dict(action=Action, status=Status, status_icons=status_icons)
+
+
+def get_sri(directory: str, filename: str) -> str:
+    sha512 = functools.reduce(operator.getitem, directory.split('/'), sri_load())[filename]
+    return f'sha512-{sha512}'
+
+
+app.jinja_env.globals.update(get_sri=get_sri)
 
 
 @login_manager.user_loader

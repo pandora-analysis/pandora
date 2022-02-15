@@ -6,7 +6,9 @@
 
 {% block scripts %}
   {{ super() }}
-  <script src="{{ url_for('static', filename='js/role.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/role.js') }}"
+          integrity="{{get_sri('static/js', 'role.js')}}"
+          crossorigin="anonymous"></script>
   <script>
       var role = new Role("{{ csrf_token() }}", "{{ api.url_for(api_resource, action='update') }}", "{{ api.url_for(api_resource, action='reload') }}");
   </script>

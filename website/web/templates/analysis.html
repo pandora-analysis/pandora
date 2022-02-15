@@ -7,7 +7,9 @@
 
 {% block scripts %}
   {{ super() }}
-  <script src="{{ url_for('static', filename='js/analysis.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/analysis.js') }}"
+          integrity="{{get_sri('static/js', 'analysis.js')}}"
+          crossorigin="anonymous"></script>
   <script>
     var analysis = new Analysis("{{ csrf_token() }}");
 

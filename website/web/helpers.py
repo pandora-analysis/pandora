@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import hashlib
+import json
 import os
 
 from functools import lru_cache, wraps
@@ -110,3 +111,9 @@ def load_user_from_request(request) -> Optional[str]:
     if api_key in keys_table:
         return keys_table[api_key]
     return None
+
+
+@lru_cache(64)
+def sri_load() -> Dict[str, Dict[str, str]]:
+    with (get_homedir() / 'website' / 'web' / 'sri.txt').open() as f:
+        return json.load(f)

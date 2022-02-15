@@ -6,7 +6,9 @@
 
 {% block scripts %}
   {{ super() }}
-  <script src="{{ url_for('static', filename='js/observable.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/observable.js') }}"
+          integrity="{{get_sri('static/js', 'observable.js')}}"
+          crossorigin="anonymous"></script>
   <script>
       var observable = new Observable("{{ csrf_token() }}", "{{ api.url_for(api_resource, action='insert') }}", "{{ api.url_for(api_resource, action='update') }}");
   </script>

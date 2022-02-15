@@ -2,7 +2,9 @@
 
 {% block styles %}
   {{ super() }}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/dropzone.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/dropzone.css') }}"
+        integrity="{{get_sri('static/css/lib', 'dropzone.css')}}"
+        crossorigin="anonymous">
 {% endblock %}
 
 {% block content %}
@@ -53,8 +55,12 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='js/lib/dropzone-min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/submit.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lib/dropzone-min.js') }}"
+        integrity="{{get_sri('static/js/lib', 'dropzone-min.js')}}"
+        crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/submit.js') }}"
+        integrity="{{get_sri('static/js', 'submit.js')}}"
+        crossorigin="anonymous"></script>
 <script type="text/javascript">
   $("div#dropzone").dropzone({
     url: "{{ api.url_for(api_resource) }}",

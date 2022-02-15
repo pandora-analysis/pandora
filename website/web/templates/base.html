@@ -3,13 +3,19 @@
   <head>
     {% block head %}
     <meta charset="utf-8">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
+    <!-- todo
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon"
+          crossorigin="anonymous">
+    -->
 
-    {{ moment.include_moment(local_js='/static/js/lib/moment-with-locales.min.js', sri=None) }}
+    {{ moment.include_moment(local_js='/static/js/lib/moment-with-locales.min.js',
+                             sri=get_sri('static/js/lib', 'moment-with-locales.min.js')) }}
     {% block styles %}
     <!-- Included stylesheets -->
     {{ bootstrap.load_css() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"
+          integrity="{{get_sri('static/css', 'style.css')}}"
+          crossorigin="anonymous">
     {% endblock %}
 
     <title>{% block title %}Pandora{% endblock %}</title>
@@ -21,7 +27,9 @@
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <a class="navbar-brand" href="{{ url_for('api_root') }}">
-          <img src="{{ url_for('static', filename='images/pandora-large.png') }}" style="width:200px;" alt="PANDORA">
+          <img src="{{ url_for('static', filename='images/pandora-large.png') }}" style="width:200px;" alt="PANDORA"
+               integrity="{{get_sri('static/images', 'pandora-large.png')}}"
+               crossorigin="anonymous">
         </a>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -90,8 +98,9 @@
     {% block scripts %}
     <!-- Included scripts -->
     {{ bootstrap.load_js() }}
-    <script src="{{ url_for('static', filename='js/lib/jquery.min.js') }}"</script>
-    <script src="{{ url_for('static', filename='js/dropzone.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lib/jquery.min.js') }}"
+            integrity="{{get_sri('static/js/lib', 'jquery.min.js')}}"
+            crossorigin="anonymous"></script>
     <script>
        page = location.pathname.split("/")[1];
         $(`#${page}-nav`).addClass('active')
