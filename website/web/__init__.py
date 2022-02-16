@@ -285,6 +285,19 @@ def api_tasks(search=None):
     assert flask_login.current_user.role.can([Action.list_own_tasks, Action.list_all_tasks], 'or'), 'forbidden'
     search = search.strip() if search is not None else None
     tasks = pandora.get_tasks(user=flask_login.current_user)
+    if search:
+        filtered_tasks = []
+        # filter results
+        for task in tasks:
+            if flask_login.current_user.role.can(Action.search_file_hash):
+                if search in [task.file.md5, task.file.sha1, task.file.sha256]:
+                    filtered_tasks.append(task)
+                    continue
+            if flask_login.current_user.role.can(Action.search_file_name):
+                if search in [task.file.original_filename, task.file.path.name]:
+                    filtered_tasks.append(task)
+                    continue
+        tasks = filtered_tasks
     return render_template('tasks.html', tasks=tasks, search=search or '', status=Status, api=api, api_resource=ApiTaskAction)
 
 
