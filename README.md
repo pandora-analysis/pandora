@@ -12,17 +12,24 @@ this directory. See [this guide](https://www.lookyloo.eu/docs/main/install-looky
 
 ## Installation
 
-From the directory you just cloned, run:
+### System dependencies (requires root)
 
 ```bash
 sudo apt install libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0  # For HTML -> PDF
 sudo apt install libreoffice-base-nogui libreoffice-calc-nogui libreoffice-draw-nogui libreoffice-impress-nogui libreoffice-math-nogui libreoffice-writer-nogui  # For Office -> PDF
 sudo apt install exiftool  # for extracting exif information
-poetry install
 ```
 
 Note: on Ubuntu 20.04, libreoffice-nogui cannot be installed due to some dependencies issues.
 
+### Pandora installation
+
+From the directory you cloned Pandora to, run:
+
+```bash
+poetry install
+poetry run update
+```
 
 Initialize the `.env` file:
 
@@ -30,15 +37,26 @@ Initialize the `.env` file:
 echo PANDORA_HOME="`pwd`" >> .env
 ```
 
-## Configuration
+### Configuration
 
 Copy the config file:
 
 ```bash
 cp config/generic.json.sample config/generic.json
+cp config/workers.yml.sample config/workers.yml
 ```
 
 And configure it accordingly to your needs.
+
+### Update and launch
+
+Run the following command to fetch the required javascript deps and run pandora.
+
+```bash
+poetry run update --yes
+```
+
+With the default configuration, you can access the web interface on `http://0.0.0.0:6100`.
 
 # Usage
 
@@ -54,5 +72,4 @@ You can stop it with
 poetry run stop
 ```
 
-With the default configuration, you can access the web interface on `http://0.0.0.0:6100`,
-where you will find the API and can start playing with it.
+With the default configuration, you can access the web interface on `http://0.0.0.0:6100`.
