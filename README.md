@@ -28,7 +28,6 @@ From the directory you cloned Pandora to, run:
 
 ```bash
 poetry install
-poetry run update
 ```
 
 Initialize the `.env` file:
