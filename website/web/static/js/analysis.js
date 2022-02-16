@@ -29,7 +29,7 @@ Analysis.prototype.refreshStatus = function () {
         $("#taskStatusMessage").find(".alert-danger").removeClass("d-none");
     } else if (this.task.status === "WARN") {
         $("#taskStatusMessage").find(".alert-warning").removeClass("d-none");
-    } else if (this.task.status === "OKAY") {
+    } else if (this.task.status === "CLEAN") {
         $("#taskStatusMessage").find(".alert-success").removeClass("d-none");
     } else {
         $("#taskStatusMessage").find(".alert-info").removeClass("d-none");
@@ -76,7 +76,7 @@ Analysis.prototype.refreshTabs = function () {
     }
 
     for (const [worker_name, worker_done] of Object.entries(this.workers_status)){
-        if (!worker_done) {
+        if (!worker_done[0]) {
             continue;
         };
         if (document.getElementById(worker_name)){
@@ -96,7 +96,7 @@ Analysis.prototype.refreshTabs = function () {
         })
         .then(response => response.text())
         .then(text => {
-            const workers_results = document.getElementById("workers_results");
+            const workers_results = document.getElementById(`workers_results_${worker_done[1].toLowerCase()}`);
             workers_results.insertAdjacentHTML('beforeend', text);
         })
     }

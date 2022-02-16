@@ -11,6 +11,7 @@ class OleVBA(BaseWorker):
 
     def analyse(self, task: Task, report: Report):
         if not task.file.is_oletools_concerned:
+            self.status = Status.NOTAPPLICABLE
             return
 
         vba_parser = None

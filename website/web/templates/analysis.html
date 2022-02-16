@@ -218,15 +218,11 @@
               {% endif %}
             </table>
           </div>
-          <div id="workers_results"></div>
+          <div id="workers_results_alert"></div>
+          <div id="workers_results_warn"></div>
+          <div id="workers_results_clean"></div>
+          <div id="workers_results_error"></div>
         </div>
-
-      <!-- Reports -->
-      {% for module in task.reports %}
-        {% set report = task.reports[module] %}
-        <!-- reimplement that -->
-      {% endfor %}
-
       </div>
 
       <!-- Tabs column -->
@@ -598,7 +594,7 @@
                         {{ render_icon('x-circle') }}
                         {% elif extracted_task.status == status.WARN %}
                         {{ render_icon('exclamation-triangle') }}
-                        {% elif extracted_task.status == status.OKAY %}
+                        {% elif extracted_task.status == status.CLEAN %}
                         {{ render_icon('check-circle') }}
                         {% else %}
                         {{ render_icon('question') }}
@@ -645,7 +641,7 @@
                         {{ render_icon('x-circle') }}
                         {% elif linked_task.status == status.WARN %}
                         {{ render_icon('exclamation-triangle') }}
-                        {% elif linked_task.status == status.OKAY %}
+                        {% elif linked_task.status == status.CLEAN %}
                         {{ render_icon('check-circle') }}
                         {% else %}
                         {{ render_icon('question') }}

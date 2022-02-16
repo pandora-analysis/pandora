@@ -7,6 +7,7 @@ from io import BytesIO
 import py7zr  # type: ignore
 
 from ..default import safe_create_dir
+from ..helpers import Status
 from ..pandora import Pandora
 from ..report import Report
 from ..task import Task
@@ -21,6 +22,7 @@ class Extractor(BaseWorker):
 
     def analyse(self, task: Task, report: Report):
         if not (task.file.is_archive or task.file.is_eml or task.file.is_msg):
+            self.status = Status.NOTAPPLICABLE
             return
         pandora = Pandora()
 

@@ -14,6 +14,7 @@ class XLMMacroDeobfuscator(BaseWorker):
 
     def analyse(self, task: Task, report: Report):
         if not task.file.is_oletools_concerned:
+            self.status = Status.NOTAPPLICABLE
             return
 
         self.logger.debug(f'analysing file {task.file.path}...')

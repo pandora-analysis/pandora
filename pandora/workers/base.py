@@ -19,7 +19,7 @@ from ..task import Task
 
 
 class BaseWorker(multiprocessing.Process):
-    status: Status = Status.OKAY
+    status: Status = Status.WAITING
 
     def __init__(self, module: str, name: str, cache: str, timeout: str,
                  loglevel: int=logging.DEBUG, **options):
@@ -146,7 +146,7 @@ class BaseWorker(multiprocessing.Process):
                 else:
                     if report.status == Status.RUNNING:
                         # Only change to success if the analysis didn't change it.
-                        report.status = Status.OKAY
+                        report.status = Status.CLEAN
                 finally:
                     self.storage.set_report(report.to_dict)
                     self.logger.debug(f'Done with task {task_uuid}.')

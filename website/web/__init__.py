@@ -79,13 +79,13 @@ status_icons = defaultdict(default_icon, {
     Status.ERROR: 'exclamation-octagon',
     Status.ALERT: 'x-circle',
     Status.WARN: 'exclamation-triangle',
-    Status.OKAY: 'check-circle'
+    Status.CLEAN: 'check-circle'
 })
 
 
 @app.context_processor
 def inject_enums():
-    '''All the templates have the Action enum'''
+    '''All the templates have the Action and Status enum'''
     return dict(action=Action, status=Status, status_icons=status_icons)
 
 

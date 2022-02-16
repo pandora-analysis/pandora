@@ -5,7 +5,7 @@ import logging
 import re
 
 from datetime import timedelta
-from enum import Enum, unique, auto
+from enum import IntEnum, Enum, unique, auto
 from functools import lru_cache
 from typing import Dict, List, Optional, Union, Any
 
@@ -17,16 +17,20 @@ from .role import Role
 logger = logging.getLogger('Helpers')
 
 
+# NOTE: Status code order for the UI: ALERT -> WARN -> CLEAN
+#       the keys in the enum must stay in this order
 @unique
-class Status(Enum):
+class Status(IntEnum):
     WAITING = auto()
     RUNNING = auto()
-    OKAY = auto()
+    DELETED = auto()
+    NOTAPPLICABLE = auto()
+    DEACTIVATE = auto()
+    ERROR = auto()
+    OKAY = auto()  # Deprecated, needs to be deleted
+    CLEAN = auto()
     WARN = auto()
     ALERT = auto()
-    ERROR = auto()
-    DEACTIVATE = auto()
-    DELETED = auto()
 
 
 @unique
@@ -66,7 +70,8 @@ def workers() -> Dict[str, Dict[str, Any]]:
 
     with worker_config_file.open() as config_file:
         config = yaml.safe_load(config_file.read())
-    return {worker['module']: worker for worker in config['workers']}
+    w = {worker['module']: worker for worker in config['workers']}
+    return {name: w[name] for name in sorted(w)}
 
 
 def make_bool(value: Optional[Union[bool, int, str]]) -> bool:

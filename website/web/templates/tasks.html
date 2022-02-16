@@ -38,7 +38,7 @@
               {{ render_icon('x-circle') }}
             {% elif task.status == status.WARN %}
             {{ render_icon('exclamation-triangle') }}
-            {% elif task.status == status.OKAY %}
+            {% elif task.status == status.CLEAN %}
             {{ render_icon('check-circle') }}
             {% else %}
               {{ render_icon('question') }}
