@@ -7,7 +7,15 @@
       "style.css": "RZmrnMTgu35xQyKBT394vWQw6L35xQIuCkuRnZ6X52SxFv1aDuuapFibDRYOZ5EkDutA1+o5w+FNyKuWW8OO4Q=="
     },
     "images": {
-      "pandora-large.png": "d4G6Tz7IiFvahaxrQ+CZ1f3gDus4FNdnlLnccou9DsFEZnSBGjd1ZRKsFc96tWLsTmMDM7+8nZ72y/trGKs3iA=="
+      "favicons": {
+        "android-chrome-192x192.png": "zNurTHi68sCS2Hj5/79tEasGjySGBR0Jy7+ooYztUKr8yVL6mgTOm38cqZ9nNisaXedoFwDwutzkKy40dCNVuQ==",
+        "android-chrome-512x512.png": "8RZRLUejpKsz3QS/VJHC+QEgv0PBD4jJMrVd/XVfXANJCQXTOIlbz3+rs4WRo9B9p1Jgu9n3aVGonaaKpZWE2g==",
+        "apple-touch-icon.png": "wSYgieacRNuwKZgFpT/gCkFsWFWBPRrKVXA0j9imZPHa5NdCo6YQnJeWVcPWq7EIyWjbbnyBh5ATBtcaZ5V78w==",
+        "favicon.ico": "R896qziA8v9wLBNXuOEG8dUA0yVyivMKxxLU3xPaythNLiggkABswAVj5njGjQwsChOvQSi1LGHmOdBLitQuLQ==",
+        "site.webmanifest": "34hMXZ3DRe8kUaIKYZe2Avq+EZLshmMql2ObQXjsu9sGbeGj45JssDeffRZxOXP04tnRqZGP/1VQgLlNRX2eyw=="
+      },
+      "logo-h.svg": "6GFemUdS/Wecmfayrpzqo+sO61KfQFxjlv5zu8+XsMwDGDPsT/Z0rZoOwi2e6KTd5ZOnatrZBHeAKnkZX1CkYw==",
+      "logo.svg": "WxV9nvLMENSaB9jnzGZId8XTgNPbsnws0G7FhBkcgPFTW/XX0JZU3ubDCw2dQVcMaWvdxKbdDQkhrqgA3ASpbQ=="
     },
     "js": {
       "analysis.js": "34PpTCIPLR9yAjnAyfFdfOSkSdtK+4diHy5e6uExRz4iZ9RxH6bjgwaYYvwg38TuQPGD5Ebpcf91DNAMLEMbWg==",
