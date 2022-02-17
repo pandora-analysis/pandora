@@ -15,7 +15,7 @@
         <span class="badge bg-success">
         {% elif report.status == status.ERROR %}
         <span class="badge bg-dark">
-        {% elif report.status in [status.DEACTIVATE, status.NOTAPPLICABLE] %}
+        {% elif report.status in [status.DISABLED, status.NOTAPPLICABLE] %}
         <span class="badge bg-secondary">
         {% endif %}
           {{ report.status.name|lower }}
@@ -30,7 +30,15 @@
           {% for key, value in report.details.items() %}
           <tr>
             <th scope="row">{{key}}</th>
-            <td>{{value}}</td>
+            <td>
+            {% if value is sequence %}
+            {% for v in value %}
+              {{v}}</br>
+            {% endfor %}
+            {% else %}
+              {{value}}
+            {% endif %}
+            </td>
          </tr>
           {% endfor %}
         </table>

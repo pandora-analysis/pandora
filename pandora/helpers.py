@@ -25,7 +25,8 @@ class Status(IntEnum):
     RUNNING = auto()
     DELETED = auto()
     NOTAPPLICABLE = auto()
-    DEACTIVATE = auto()
+    DEACTIVATE = auto()  # Deprecated
+    DISABLED = auto()
     ERROR = auto()
     OKAY = auto()  # Deprecated, needs to be deleted
     CLEAN = auto()

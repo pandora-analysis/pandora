@@ -3,5 +3,10 @@
 
 from .default import PandoraException
 
+
 class Unsupported(PandoraException):
+    pass
+
+
+class NoPreview(PandoraException):
     pass

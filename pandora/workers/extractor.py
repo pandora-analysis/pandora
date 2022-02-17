@@ -22,7 +22,7 @@ class Extractor(BaseWorker):
 
     def analyse(self, task: Task, report: Report):
         if not (task.file.is_archive or task.file.is_eml or task.file.is_msg):
-            self.status = Status.NOTAPPLICABLE
+            report.status = Status.NOTAPPLICABLE
             return
         pandora = Pandora()
 

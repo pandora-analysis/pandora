@@ -25,7 +25,7 @@ from eml_parser import EmlParser
 from extract_msg import openMsg, Message  # type: ignore
 
 from .default import get_config
-from .exceptions import Unsupported
+from .exceptions import Unsupported, NoPreview
 from .helpers import make_bool, make_bool_for_redis
 from .storage_client import Storage
 from .text_parser import TextParser
@@ -288,7 +288,7 @@ class File:
         elif self.msg_data and self.msg_data.body:
             to_convert = list(self.directory.glob(f'{self.path.name}_body_*.pdf'))
         else:
-            return None
+            raise NoPreview('Preview not supported for this file format')
 
         for i, p in enumerate(to_convert):
             doc = fitz.open(p)

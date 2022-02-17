@@ -50,13 +50,19 @@ Analysis.prototype.refreshTabs = function () {
     let originTask = this.task;
     let file = this.file;
 
-    if (this.workers_status.preview) {
+    if (this.workers_status.preview[0]) {
         $('.preview-wait').each(function(index, element) {
           $(this).addClass("d-none");
         })
         $('.preview-done').each(function(index, element) {
           $(this).removeClass("d-none");
         })
+
+        if (this.workers_status.preview[1] == 'NOTAPPLICABLE') {
+            document.getElementById("previews_images").innerHTML = 'Cannot generate a preview for this file format.'
+            return
+        }
+
         previews_url = `/previews/${this.task.uuid}`
         if (this.seed) {
             previews_url = `${previews_url}/seed-${this.seed}`
@@ -97,7 +103,12 @@ Analysis.prototype.refreshTabs = function () {
         .then(response => response.text())
         .then(text => {
             const workers_results = document.getElementById(`workers_results_${worker_done[1].toLowerCase()}`);
-            workers_results.insertAdjacentHTML('beforeend', text);
+            if (workers_results) {
+                workers_results.insertAdjacentHTML('beforeend', text);
+            }
+            else {
+                console.log(`No div for ${worker_done[1]}`);
+            }
         })
     }
 

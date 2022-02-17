@@ -182,9 +182,9 @@ class Task:
             # All the workers are done, return success/error
             for report_name, report in self.reports.items():
                 # Status code order: ALERT - WARN - CLEAN - ERROR
-                # NOTE: when a report is Status.DEACTIVATED or Status.NOTAPPLICABLE,
+                # NOTE: when a report is Status.DISABLED or Status.NOTAPPLICABLE,
                 #       it has no impact on the general status of the task
-                if report.status in [Status.DEACTIVATE, Status.NOTAPPLICABLE]:
+                if report.status in [Status.DISABLED, Status.NOTAPPLICABLE]:
                     continue
                 if report.status > self._status:
                     self._status = report.status

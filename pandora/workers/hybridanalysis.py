@@ -20,10 +20,10 @@ class HybridAnalysis(BaseWorker):
     apiurl: str
 
     def __init__(self, module: str, name: str, cache: str, timeout: str,
-                 loglevel: int=logging.DEBUG, **options):
+                 loglevel: int=logging.INFO, **options):
         super().__init__(module, name, cache, timeout, loglevel, **options)
         if not self.apikey:
-            self.status = Status.DEACTIVATE
+            self.disabled = True
             return
 
         self._session = requests.Session()
@@ -39,7 +39,7 @@ class HybridAnalysis(BaseWorker):
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             self.logger.warning(e)
-            self.status = Status.DEACTIVATE
+            self.disabled = True
 
     def analyse(self, task: Task, report: Report):
         try:
