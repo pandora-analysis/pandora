@@ -31,7 +31,13 @@
           <tr>
             <th scope="row">{{key}}</th>
             <td>
-            {% if value is sequence %}
+            {% if value is string %}
+              {{value}}
+            {% elif value is mapping %}
+            {% for k, v in value.items() %}
+              {{k}} - {{v}}</br>
+            {% endfor %}
+            {% elif value is sequence %}
             {% for v in value %}
               {{v}}</br>
             {% endfor %}
