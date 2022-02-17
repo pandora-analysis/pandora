@@ -263,7 +263,7 @@
                       data-bs-target="#extracted"
                       type="button" role="tab"
                       aria-controls="extracted" aria-selected=false">
-                  Extracted&nbsp;&nbsp;<span class="badge">{{ task.extracted|length }}</span>
+                  Extracted&nbsp;&nbsp;<span class="badge bg-secondary">{{ task.extracted|length }}</span>
               </button>
             </li>
             <li role="presentation" class="nav-item {% if not task.linked_tasks %} d-none {% endif %}">
@@ -574,7 +574,7 @@
                       </a>
                     </td>
                     <td>
-                      <span class="img-thumbnail small-status-flag status-flag-{{ task.status.name.lower() }}">
+                      <span class="img-thumbnail small-status-flag status-flag-{{ extracted_task.status.name.lower() }}">
                         {% if extracted_task.status == status.ERROR %}
                         {{ render_icon('exclamation-octagon') }}
                         {% elif extracted_task.status == status.ALERT %}
