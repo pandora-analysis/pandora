@@ -42,6 +42,7 @@ py7zr = "^0.17.4"
 jbxapi = "^3.17.2"
 XLMMacroDeobfuscator = "^0.2.5"
 defusedxml = "^0.7.1"
+mwdblib = "^4.0.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.0.1"
