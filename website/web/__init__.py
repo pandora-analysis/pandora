@@ -294,7 +294,7 @@ def api_tasks(search=None):
                     filtered_tasks.append(task)
                     continue
             if flask_login.current_user.role.can(Action.search_file_name):
-                if search in [task.file.original_filename, task.file.path.name]:
+                if [name for name in [task.file.original_filename, task.file.path.name] if search in name]:
                     filtered_tasks.append(task)
                     continue
         tasks = filtered_tasks
