@@ -167,19 +167,6 @@
                   </td>
                 </tr>
               {% endif %}
-              {% if task.extracted %}
-                <tr>
-                  <th>Extracted to</th>
-                  <td>
-                    {% for ext in task.extracted %}
-                      {{ render_icon(ext.file.icon) }}{{ ext.file.original_filename }}
-                    <a href="{{ url_for('api_analysis', task_id=ext.uuid, seed=seed) }}">
-                        <span class="btn btn-default btn-sm pull-right">See report</span>
-                    </a></br>
-                    {%endfor%}
-                  </td>
-                </tr>
-              {% endif %}
               {% if task.file.type is not none %}
                 <tr>
                   <th>Type</th>
@@ -270,13 +257,13 @@
                       type="button" role="tab"
                       aria-controls="observables" aria-selected=false">Observables</a>
             </li>
-            <li role="presentation" class="nav-item {% if not task.extracted_tasks %} d-none {% endif %}">
+            <li role="presentation" class="nav-item {% if not task.extracted %} d-none {% endif %}">
               <button class="nav-link"
                       data-bs-toggle="tab"
                       data-bs-target="#extracted"
                       type="button" role="tab"
                       aria-controls="extracted" aria-selected=false">
-                  Extracted&nbsp;&nbsp;<span class="badge">{{ task.extracted_tasks|length }}</span>
+                  Extracted&nbsp;&nbsp;<span class="badge">{{ task.extracted|length }}</span>
               </button>
             </li>
             <li role="presentation" class="nav-item {% if not task.linked_tasks %} d-none {% endif %}">
@@ -561,7 +548,7 @@
             </div>
 
             <!-- Extracted tasks -->
-            <div role="tabpanel" class="tab-pane {% if not task.extracted_tasks%} d-none {% endif %}" id="extracted">
+            <div role="tabpanel" class="tab-pane {% if not task.extracted%} d-none {% endif %}" id="extracted">
               <div class="row" style="margin-bottom:30px">
                 <div class="col-md-8">
                   <h3>Extracted</h3>
@@ -575,7 +562,7 @@
                     <th>Name</th>
                     <th>Status</th>
                   </tr>
-                  {% for extracted_task in task.extracted_tasks %}
+                  {% for extracted_task in task.extracted %}
                   <tr id="extractedTaskRow-{{ extracted_task.uuid }}">
                     <td>
                       {{ moment(extracted_task.save_date).format('L LT [UTC]Z') }}

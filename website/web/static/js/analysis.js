@@ -60,24 +60,24 @@ Analysis.prototype.refreshTabs = function () {
 
         if (this.workers_status.preview[1] == 'NOTAPPLICABLE') {
             document.getElementById("previews_images").innerHTML = 'Cannot generate a preview for this file format.'
-            return
         }
+        else {
+            previews_url = `/previews/${this.task.uuid}`
+            if (this.seed) {
+                previews_url = `${previews_url}/seed-${this.seed}`
+            }
 
-        previews_url = `/previews/${this.task.uuid}`
-        if (this.seed) {
-            previews_url = `${previews_url}/seed-${this.seed}`
+            fetch(previews_url, {
+              method: "GET",
+              headers: {
+                "X-CSRF-Token": this.CSRFToken
+              }
+            })
+            .then(response => response.text())
+            .then(text => {
+              document.getElementById("previews_images").innerHTML=text;
+            })
         }
-
-        fetch(previews_url, {
-          method: "GET",
-          headers: {
-            "X-CSRF-Token": this.CSRFToken
-          }
-        })
-        .then(response => response.text())
-        .then(text => {
-          document.getElementById("previews_images").innerHTML=text;
-        })
 
     }
 
