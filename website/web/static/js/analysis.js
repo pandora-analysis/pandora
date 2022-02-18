@@ -197,7 +197,10 @@ Analysis.prototype.notify = function (url) {
       $("#notifySuccess").removeClass("d-none");
       $("#notifyError").addClass("d-none");
       $("#notifyErrorReason").text("");
-      $("#notifySubmit").attr("data-bs-dismiss", "modal").text("Done");
+      $("#notifySubmit")
+        .attr("type", "button")
+        .attr("data-bs-dismiss", "modal")
+        .text("Done");
     })
     .catch((error) => {
       $("#notifyError").removeClass("d-none");
