@@ -2,22 +2,17 @@
 
 {% block styles %}
   {{ super() }}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/dropzone.css') }}"
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/dropzone.css') }}" type="text/css"
         integrity="{{get_sri('static/css/lib', 'dropzone.css')}}"
         crossorigin="anonymous">
 {% endblock %}
 
 {% block content %}
 <div class="row">
-  <div>
-      <p class="name" data-dz-name></p>
-      <strong class="error text-danger" data-dz-errormessage></strong>
-  </div>
   <div class="col-md-2"></div>
     <div class="col-md-8" id="dropzone">
-     <p class="size" data-dz-size></p>
      <div class="dz-message" data-dz-message>
-       <h2>Drop suspicious file here...</h2>
+       <span><h2>Drop suspicious file here...</h2></span>
      </div>
     </div>
   </div>
@@ -51,6 +46,14 @@
     </div>
   </div>
 </div>
+<div class="dz-preview dz-file-preview d-none" id="preview-template">
+  <div class="dz-image"><img data-dz-thumbnail /></div>
+  <div class="dz-details">
+    <div class="dz-size"><span data-dz-size></span></div>
+    <div class="dz-filename"><span data-dz-name></span></div>
+  </div>
+  <div class="dz-error-message"><span data-dz-errormessage></span></div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -67,14 +70,21 @@
     headers: {"X-CSRF-Token": "{{ csrf_token() }}"},
     paramName: "file",
     maxFilesize: {{ max_file_size }}, // MB
+    previewTemplate: document.querySelector('#preview-template').innerHTML,
     sending: function(file, xhr, formData) {
       formData.append("workersDisabled", getDisabledWorkers());
     },
     success: function(file, answer){
-      window.location = `/analysis/${answer.taskId}`;
+      if (file.previewElement) {
+        file.previewElement.classList.add("dz-success");
+      };
+      window.setTimeout(function(){
+        window.location = `/analysis/${answer.taskId}`;
+      }, 500);
     },
-    error: function(file, answer) {
-      alert(`An error has occurred while submitting file : ${answer.error}`);
+    error: function(file, message) {
+      document.querySelector('.dz-message').innerHTML = message;
+      return
     }
   });
 </script>

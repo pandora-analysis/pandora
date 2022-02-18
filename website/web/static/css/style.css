@@ -71,5 +71,7 @@ a, *[onclick], *[title] {
     margin-bottom: 20px;
     align-items: center;
     display: flex;
-    justify-content: center
+    justify-content: center;
+    border-radius: 5px;
+    border: 2px dashed;
 }

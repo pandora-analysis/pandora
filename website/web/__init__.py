@@ -44,7 +44,6 @@ app.wsgi_app = ReverseProxied(app.wsgi_app)  # type: ignore
 
 app.config['SECRET_KEY'] = get_secret_key()
 app.config['UPLOAD_FOLDER'] = get_homedir() / 'upload'
-app.config['MAX_CONTENT_PATH'] = get_config('generic', 'max_file_size')
 app.config['CACHE_TYPE'] = 'simple'
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_REDIS'] = pandora.redis_bytes
@@ -167,7 +166,7 @@ def api_submit_page():
 
     return render_template(
         'submit.html', error=request.args.get('error', ''),
-        max_file_size=app.config['MAX_CONTENT_PATH'] // 10 ** 6, workers=workers().values(),
+        max_file_size=get_config('generic', 'max_file_size'), workers=workers().values(),
         api=api,
         api_resource=ApiSubmit
     )
