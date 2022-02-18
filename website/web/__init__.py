@@ -79,13 +79,13 @@ status_icons = defaultdict(default_icon, {
     Status.ERROR: 'exclamation-octagon',
     Status.ALERT: 'x-circle',
     Status.WARN: 'exclamation-triangle',
-    Status.OKAY: 'check-circle'
+    Status.CLEAN: 'check-circle'
 })
 
 
 @app.context_processor
 def inject_enums():
-    '''All the templates have the Action enum'''
+    '''All the templates have the Action and Status enum'''
     return dict(action=Action, status=Status, status_icons=status_icons)
 
 
@@ -294,7 +294,7 @@ def api_tasks(search=None):
                     filtered_tasks.append(task)
                     continue
             if flask_login.current_user.role.can(Action.search_file_name):
-                if search in [task.file.original_filename, task.file.path.name]:
+                if [name for name in [task.file.original_filename, task.file.path.name] if search in name]:
                     filtered_tasks.append(task)
                     continue
         tasks = filtered_tasks

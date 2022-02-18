@@ -4,19 +4,27 @@
       "lib": {
         "dropzone.css": "3XCkGeASl53asPugXJGPyH9mXEXRxYNUWojkV6twcSbSkpkAQZQt4wmG9WebDUq1Z/HX2j8Vw5nIlKAR/MJ3kg=="
       },
-      "style.css": "cjJJ2gBlczZ3vsABRbVwtZyL9hjIrub2Soplxjlfj2bICQSSCDYkX2iSDXZ42lEGkI77BEpoXkwnSuw7Poee5g=="
+      "style.css": "RZmrnMTgu35xQyKBT394vWQw6L35xQIuCkuRnZ6X52SxFv1aDuuapFibDRYOZ5EkDutA1+o5w+FNyKuWW8OO4Q=="
     },
     "images": {
-      "pandora-large.png": "d4G6Tz7IiFvahaxrQ+CZ1f3gDus4FNdnlLnccou9DsFEZnSBGjd1ZRKsFc96tWLsTmMDM7+8nZ72y/trGKs3iA=="
+      "favicons": {
+        "android-chrome-192x192.png": "zNurTHi68sCS2Hj5/79tEasGjySGBR0Jy7+ooYztUKr8yVL6mgTOm38cqZ9nNisaXedoFwDwutzkKy40dCNVuQ==",
+        "android-chrome-512x512.png": "8RZRLUejpKsz3QS/VJHC+QEgv0PBD4jJMrVd/XVfXANJCQXTOIlbz3+rs4WRo9B9p1Jgu9n3aVGonaaKpZWE2g==",
+        "apple-touch-icon.png": "wSYgieacRNuwKZgFpT/gCkFsWFWBPRrKVXA0j9imZPHa5NdCo6YQnJeWVcPWq7EIyWjbbnyBh5ATBtcaZ5V78w==",
+        "favicon.ico": "R896qziA8v9wLBNXuOEG8dUA0yVyivMKxxLU3xPaythNLiggkABswAVj5njGjQwsChOvQSi1LGHmOdBLitQuLQ==",
+        "site.webmanifest": "34hMXZ3DRe8kUaIKYZe2Avq+EZLshmMql2ObQXjsu9sGbeGj45JssDeffRZxOXP04tnRqZGP/1VQgLlNRX2eyw=="
+      },
+      "logo-h.svg": "6GFemUdS/Wecmfayrpzqo+sO61KfQFxjlv5zu8+XsMwDGDPsT/Z0rZoOwi2e6KTd5ZOnatrZBHeAKnkZX1CkYw==",
+      "logo.svg": "WxV9nvLMENSaB9jnzGZId8XTgNPbsnws0G7FhBkcgPFTW/XX0JZU3ubDCw2dQVcMaWvdxKbdDQkhrqgA3ASpbQ=="
     },
     "js": {
-      "analysis.js": "VP4/MoUAn3G98pgzDYAE27YSdiCk8WY0+ZhtfkMQAwvDWYugx7JGlJvB1bz5YBUFZWrsBi0dvqyLskQiHql16w==",
+      "analysis.js": "ChHkINIM4QIXc6Gnp+yTW9JGyKsUkpvi21IGWgWZ6w+m/O+w+BPQpoqiNNKhoQQa7kUfDOnOwOAOXpJBY1okFw==",
       "lib": {
         "dropzone-min.js": "kLQ8y6epwwH5HA1M6K0bw2erLB1+Vz+7HOUepLaKRecyGXaP0K/9b6kq2+MZlyWt6E/AH6dtnxDom8lniz5BWw==",
         "jquery.min.js": "894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==",
         "moment-with-locales.min.js": "LGXaggshOkD/at6PFNcp2V2unf9LzFq6LE+sChH7ceMTDP0g2kn6Vxwgg7wkPP7AAtX+lmPqPdxB47A0Nz0cMQ=="
       },
-      "observable.js": "siNvCBci/uF/Hcx/pEYn9YqPA2Dv6RAgAy0PjUbxm9ewxkbE5rg9IWaPiB01HSNTpWVcbj+jdNds9j2p/5CPIQ==",
+      "observable.js": "QjxdsGrKW+KcqBiVHn9pF3sQevMbRzjyZ4feB8LpVwAjaDTNd8ZmhyQZvX7K4GudRVwOMLW1He2akQKuif+lEQ==",
       "role.js": "BTP7CW18uIGpKdx7zwll71xZsb7UDjKk3I+AGeWLtyj4olvazpWslfZWqmE0rsamhtvUC6pjm6F5vC4hwTPs9Q==",
       "submit.js": "Yexx0osQzyQBXhMlAqky4/MSkrIi67Oj8b2HWzx/hmFdHdi48FOpG3LVrILjG+DQTJj+7FzRiWPhd0l/E5Em5g=="
     }

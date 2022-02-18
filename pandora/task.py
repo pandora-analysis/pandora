@@ -1,7 +1,7 @@
 import json
 
 from io import BytesIO
-from typing import Dict, Any, Optional, List, overload
+from typing import Dict, Any, Optional, List, overload, Tuple
 from uuid import uuid4
 
 from werkzeug.utils import secure_filename
@@ -162,31 +162,32 @@ class Task:
         return True
 
     @property
-    def workers_status(self) -> Dict[str, bool]:
-        to_return: Dict[str, bool] = {}
+    def workers_status(self) -> Dict[str, Tuple[bool, str]]:
+        to_return: Dict[str, Tuple[bool, str]] = {}
         for report_name, report in self.reports.items():
-            to_return[report_name] = report.is_done
+            to_return[report_name] = (report.is_done, report.status.name)
         return to_return
 
     @property
     def status(self) -> Status:
         if self.file.deleted:
             self._status = Status.DELETED
-        if self._status in [Status.DELETED, Status.ERROR, Status.ALERT, Status.WARN, Status.OKAY]:
+
+        if self._status in [Status.DELETED, Status.ERROR, Status.ALERT, Status.WARN, Status.CLEAN]:
             # If the status was set to any of these values, the reports finished
             return self._status
-        elif self.workers_done:
+
+        if self.workers_done:
+            self._status = Status.CLEAN
             # All the workers are done, return success/error
             for report_name, report in self.reports.items():
-                # TODO: define order of importance, return highest status code.
-                # NOTE: when a report is Status.DEACTIVATED, it means the module is deactivated
+                # Status code order: ALERT - WARN - CLEAN - ERROR
+                # NOTE: when a report is Status.DISABLED or Status.NOTAPPLICABLE,
                 #       it has no impact on the general status of the task
-                if report.status == Status.DEACTIVATE:
+                if report.status in [Status.DISABLED, Status.NOTAPPLICABLE]:
                     continue
-                if report.status != Status.OKAY:
+                if report.status > self._status:
                     self._status = report.status
-                    return self._status
-            self._status = Status.OKAY
             return self._status
         else:
             # At least one worker isn't done yet

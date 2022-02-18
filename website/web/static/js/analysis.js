@@ -29,7 +29,7 @@ Analysis.prototype.refreshStatus = function () {
         $("#taskStatusMessage").find(".alert-danger").removeClass("d-none");
     } else if (this.task.status === "WARN") {
         $("#taskStatusMessage").find(".alert-warning").removeClass("d-none");
-    } else if (this.task.status === "OKAY") {
+    } else if (this.task.status === "CLEAN") {
         $("#taskStatusMessage").find(".alert-success").removeClass("d-none");
     } else {
         $("#taskStatusMessage").find(".alert-info").removeClass("d-none");
@@ -50,33 +50,39 @@ Analysis.prototype.refreshTabs = function () {
     let originTask = this.task;
     let file = this.file;
 
-    if (this.workers_status.preview) {
+    if (this.workers_status.preview[0]) {
         $('.preview-wait').each(function(index, element) {
           $(this).addClass("d-none");
         })
         $('.preview-done').each(function(index, element) {
           $(this).removeClass("d-none");
         })
-        previews_url = `/previews/${this.task.uuid}`
-        if (this.seed) {
-            previews_url = `${previews_url}/seed-${this.seed}`
-        }
 
-        fetch(previews_url, {
-          method: "GET",
-          headers: {
-            "X-CSRF-Token": this.CSRFToken
-          }
-        })
-        .then(response => response.text())
-        .then(text => {
-          document.getElementById("previews_images").innerHTML=text;
-        })
+        if (this.workers_status.preview[1] == 'NOTAPPLICABLE') {
+            document.getElementById("previews_images").innerHTML = 'Cannot generate a preview for this file format.'
+        }
+        else {
+            previews_url = `/previews/${this.task.uuid}`
+            if (this.seed) {
+                previews_url = `${previews_url}/seed-${this.seed}`
+            }
+
+            fetch(previews_url, {
+              method: "GET",
+              headers: {
+                "X-CSRF-Token": this.CSRFToken
+              }
+            })
+            .then(response => response.text())
+            .then(text => {
+              document.getElementById("previews_images").innerHTML=text;
+            })
+        }
 
     }
 
     for (const [worker_name, worker_done] of Object.entries(this.workers_status)){
-        if (!worker_done) {
+        if (!worker_done[0]) {
             continue;
         };
         if (document.getElementById(worker_name)){
@@ -96,8 +102,13 @@ Analysis.prototype.refreshTabs = function () {
         })
         .then(response => response.text())
         .then(text => {
-            const workers_results = document.getElementById("workers_results");
-            workers_results.insertAdjacentHTML('beforeend', text);
+            const workers_results = document.getElementById(`workers_results_${worker_done[1].toLowerCase()}`);
+            if (workers_results) {
+                workers_results.insertAdjacentHTML('beforeend', text);
+            }
+            else {
+                console.log(`No div for ${worker_done[1]}`);
+            }
         })
     }
 
@@ -186,7 +197,10 @@ Analysis.prototype.notify = function (url) {
       $("#notifySuccess").removeClass("d-none");
       $("#notifyError").addClass("d-none");
       $("#notifyErrorReason").text("");
-      $("#notifySubmit").attr("data-bs-dismiss", "modal").text("Done");
+      $("#notifySubmit")
+        .attr("type", "button")
+        .attr("data-bs-dismiss", "modal")
+        .text("Done");
     })
     .catch((error) => {
       $("#notifyError").removeClass("d-none");

@@ -10,7 +10,7 @@
         "smtp_host": "localhost",
         "smtp_port": "25",
         "to": ["Investigation Team <investigation_unit@myorg.local>"],
-        "from": "Lookyloo <lookyloo@myorg.local>"
+        "from": "Pandora <pandora@myorg.local>"
     },
     "weasyprint_fetch_ressources": false,
     "systemd_service_name": "pandora",

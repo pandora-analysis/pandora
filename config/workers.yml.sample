@@ -1,4 +1,10 @@
 workers:
+  - module: mwdb
+    class: Mwdb
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    apikey: ''
   - module: hybridanalysis
     class: HybridAnalysis
     cache: 1h
@@ -23,6 +29,11 @@ workers:
     cache: 1h
     timeout: 1m
     replicas: 2
+  - module: hashlookup
+    class: HashlookupWorker
+    cache: 1h
+    timeout: 1m
+    replicas: 5
   - module: xmldeobfuscator
     class: XLMMacroDeobfuscator
     cache: 1h

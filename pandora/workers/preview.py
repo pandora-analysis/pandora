@@ -1,4 +1,5 @@
-from .. helpers import Status
+from ..exceptions import NoPreview
+from ..helpers import Status
 from ..task import Task
 from ..report import Report
 
@@ -11,6 +12,8 @@ class Preview(BaseWorker):
         try:
             task.file.convert()
             task.file.make_previews()
+        except NoPreview:
+            report.status = Status.NOTAPPLICABLE
         except Exception as e:
             self.logger.warning(f'Unable to generate preview, this is suspicious: {e}')
             report.status = Status.WARN

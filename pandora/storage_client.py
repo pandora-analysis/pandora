@@ -13,11 +13,16 @@ from .default import get_socket_path
 
 class Storage():
 
-    def __init__(self) -> None:
+    _instance = None
+
+    def __new__(cls) -> 'Storage':
         # NOTE: this will be a connector to kvrocks
-        self._redis_pool_storage: ConnectionPool = ConnectionPool(
-            connection_class=UnixDomainSocketConnection,
-            path=get_socket_path('cache'), decode_responses=True)
+        if cls._instance is None:
+            cls._instance = super(Storage, cls).__new__(cls)
+            cls._redis_pool_storage: ConnectionPool = ConnectionPool(
+                connection_class=UnixDomainSocketConnection,
+                path=get_socket_path('cache'), decode_responses=True)
+        return cls._instance
 
     @property
     def storage(self):

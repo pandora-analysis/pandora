@@ -21,7 +21,7 @@ Observable.prototype.insert = function () {
       cellAddress = $("<td>").html(`<b>${data.address}</b>`);
       cellallowlist = $("<td>").addClass("text-left");
       spanOkay = $("<span>").attr("id", `okay-${data.id}`).attr("onclick", `observable.update(${data.id}, 0)`);
-      spanOkay.attr("style", "width:150px").addClass("img-thumbnail small-status-flag status-flag-okay");
+      spanOkay.attr("style", "width:150px").addClass("img-thumbnail small-status-flag status-flag-clean");
       spanOkay.html('safe');
       spanWarn = $("<span>").attr("id", `warn-${data.id}`).attr("onclick", `observable.update(${data.id}, 1)`);
       spanWarn.attr("style", "width:150px").addClass("img-thumbnail small-status-flag status-flag-warn");

@@ -1,12 +1,26 @@
 <div class="col-md-12" id="{{worker_name}}">
   <div>
-    <h3>{{worker_name}} Report</h3>
+    <h3>{{worker_name|capitalize }} Report</h3>
   </div>
 
   <table class="table table-hover table-bordered">
     <tr>
       <th scope="row" style="width:30%">Status</th>
-      <td>{{report.status.name}}</td>
+      <td>
+        {% if report.status == status.ALERT %}
+        <span class="badge bg-danger">
+        {% elif report.status == status.WARN %}
+        <span class="badge bg-warning">
+        {% elif report.status == status.CLEAN %}
+        <span class="badge bg-success">
+        {% elif report.status == status.ERROR %}
+        <span class="badge bg-dark">
+        {% elif report.status in [status.DISABLED, status.NOTAPPLICABLE] %}
+        <span class="badge bg-secondary">
+        {% endif %}
+          {{ report.status.name|lower }}
+        </span>
+      </td>
     </tr>
     {% if report.details %}
     <tr>
@@ -16,7 +30,21 @@
           {% for key, value in report.details.items() %}
           <tr>
             <th scope="row">{{key}}</th>
-            <td>{{value}}</td>
+            <td>
+            {% if value is string %}
+              {{value}}
+            {% elif value is mapping %}
+            {% for k, v in value.items() %}
+              {{k}} - {{v}}</br>
+            {% endfor %}
+            {% elif value is sequence %}
+            {% for v in value %}
+              {{v}}</br>
+            {% endfor %}
+            {% else %}
+              {{value}}
+            {% endif %}
+            </td>
          </tr>
           {% endfor %}
         </table>

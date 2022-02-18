@@ -1,4 +1,4 @@
-{% if report.status.name != 'OKAY' %}
+{% if report.status != status.CLEAN %}
 <div class="col-md">
   {{report.suspicious}}
 </div>
