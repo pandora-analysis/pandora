@@ -56,6 +56,11 @@ workers:
     cache: 1h
     timeout: 1m
     replicas: 2
+  - module: oletools
+    class: OleTools
+    cache: 1h
+    timeout: 1m
+    replicas: 5
   - module: preview
     class: Preview
     cache: 1h
