@@ -4,7 +4,7 @@
 import logging
 import traceback
 
-import vt
+import vt  # type: ignore
 from vt import error
 
 from ..helpers import Status
