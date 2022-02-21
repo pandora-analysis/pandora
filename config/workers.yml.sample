@@ -1,4 +1,10 @@
 workers:
+  - module: virustotal
+    class: VirusTotal
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    apikey: ''
   - module: mwdb
     class: Mwdb
     cache: 1h

@@ -44,6 +44,7 @@ XLMMacroDeobfuscator = "^0.2.5"
 defusedxml = "^0.7.1"
 mwdblib = "^4.0.0"
 pyhashlookup = "^1.1.1"
+vt-py = "^0.13.1"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.0.1"
