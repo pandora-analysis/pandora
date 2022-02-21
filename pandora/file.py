@@ -329,7 +329,7 @@ class File:
         if not self.path.exists():
             return None
         with self.path.open('rb') as f:
-            return BytesIO(f.read(get_config('generic', 'max_file_size')))
+            return BytesIO(f.read())
 
     @property
     def to_dict(self) -> Dict[str, Union[str, int]]:

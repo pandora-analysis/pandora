@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import traceback
 
 from mwdblib import MWDB
-from mwdblib.exc import ObjectNotFoundError
+from mwdblib.exc import ObjectNotFoundError, MWDBError
 
 from ..helpers import Status
 from ..task import Task
@@ -29,7 +28,7 @@ class Mwdb(BaseWorker):
             self.mymwdb = MWDB(api_key=self.apikey)
             # This call raise san exception if the API key is invalid
             self.mymwdb.api.request('get', '/api/auth/validate')
-        except Exception as e:
+        except MWDBError as e:
             self.logger.warning(e)
             self.disabled = True
 
@@ -45,9 +44,4 @@ class Mwdb(BaseWorker):
                 report.add_details('malicious', set(malicious))
         except ObjectNotFoundError as e:
             self.logger.debug(e)
-            report.status = Status.CLEAN
-            return
-        except Exception as e:
-            err = f'{repr(e)}\n{traceback.format_exc()}'
-            self.logger.debug(f'Not found {err}')
-            report.status = Status.ERROR
+            report.status = Status.NOTAPPLICABLE

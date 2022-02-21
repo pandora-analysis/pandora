@@ -38,6 +38,9 @@ class JoeSandboxWorker(BaseWorker):
         try:
             self.logger.debug(f'analysing file {task.file.path}...')
             result = self.joesb.analysis_search(task.file.sha256)
+            if not result:
+                report.status = Status.NOTAPPLICABLE
+                return
 
             malicious = []
             # We check all webid

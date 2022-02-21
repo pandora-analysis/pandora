@@ -1,4 +1,10 @@
 workers:
+  - module: malwarebazaar
+    class: MalwareBazaar
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    apikey: ''
   - module: virustotal
     class: VirusTotal
     cache: 1h

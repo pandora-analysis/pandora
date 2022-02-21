@@ -28,23 +28,23 @@ class VirusTotal(BaseWorker):
     def analyse(self, task: Task, report: Report):
         try:
             self.logger.debug(f'analysing file {task.file.path}...')
-            VTfile = self.client.get_json(f'/files/{task.file.sha256}')
-            if 'last_analysis_stats' in VTfile['data']['attributes']:
-                if VTfile['data']['attributes']['last_analysis_stats'].get('malicious'):
+            response = self.client.get_json(f'/files/{task.file.sha256}')
+            if 'last_analysis_stats' in response['data']['attributes']:
+                if response['data']['attributes']['last_analysis_stats'].get('malicious'):
                     report.status = Status.ALERT
-                elif VTfile['data']['attributes']['last_analysis_stats'].get('suspicious'):
+                elif response['data']['attributes']['last_analysis_stats'].get('suspicious'):
                     report.status = Status.WARN
-                elif (VTfile['data']['attributes']['last_analysis_stats'].get('harmless')
+                elif (response['data']['attributes']['last_analysis_stats'].get('harmless')
                       # Not sure about the infected as clean?
-                      or VTfile['data']['attributes']['last_analysis_stats'].get('undetected')):
+                      or response['data']['attributes']['last_analysis_stats'].get('undetected')):
                     report.status = Status.CLEAN
 
             malicious = {}
             suspicious = {}
             harmless = {}
             undetected = []
-            if VTfile['data']['attributes'].get('last_analysis_results'):
-                for key, detect in VTfile['data']['attributes']['last_analysis_results'].items():
+            if response['data']['attributes'].get('last_analysis_results'):
+                for key, detect in response['data']['attributes']['last_analysis_results'].items():
                     if detect['category'] == 'malicious':
                         malicious[key] = detect['result']
                     elif detect['category'] == 'suspicious':
@@ -54,7 +54,7 @@ class VirusTotal(BaseWorker):
                     elif detect['category'] == 'undetected':
                         undetected.append(key)
 
-            report.add_details('permaurl', VTfile['data']['links']['self'])
+            report.add_details('permaurl', f"https://www.virustotal.com/gui/file/{response['data']['id']}")
             if malicious:
                 report.add_details('malicious', malicious)
             if suspicious:
@@ -71,8 +71,4 @@ class VirusTotal(BaseWorker):
                 return
             err = f'{repr(e)}\n{traceback.format_exc()}'
             self.logger.error(f'API: {err}')
-            report.status = Status.ERROR
-        except Exception as e:
-            err = f'{repr(e)}\n{traceback.format_exc()}'
-            self.logger.error(f'{err}')
             report.status = Status.ERROR

@@ -53,7 +53,7 @@ class OleVBA(BaseWorker):
 
         except olevba.FileOpenError:
             # File type is not supported by this module
-            pass
+            report.status = Status.NOTAPPLICABLE
         finally:
             if vba_parser is not None:
                 vba_parser.close()

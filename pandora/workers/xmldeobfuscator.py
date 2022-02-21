@@ -39,4 +39,4 @@ class XLMMacroDeobfuscator(BaseWorker):
                 # Not the cleanest, but it is how the module works.
                 report.status = Status.NOTAPPLICABLE
                 return
-            raise e
+            raise

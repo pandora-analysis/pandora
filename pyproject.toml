@@ -16,7 +16,7 @@ workers_manager = "bin.workers_manager:main"
 start_website = "bin.start_website:main"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.8,<3.11"
 redis = {version = "^4.1.4", extras = ["hiredis"]}
 flask-restx = "^0.5.1"
 gunicorn = "^20.1.0"
@@ -45,6 +45,7 @@ defusedxml = "^0.7.1"
 mwdblib = "^4.0.0"
 pyhashlookup = "^1.1.1"
 vt-py = "^0.13.1"
+malwarebazaar = "^0.1.3"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.0.1"
