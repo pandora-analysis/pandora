@@ -9,6 +9,12 @@ from ..report import Report
 
 from .base import BaseWorker
 
+# NOTES:
+# https://github.com/decalage2/oletools/blob/6f8d1cdcd1a2cdf1e03482987bccc7d27121b4ce/oletools/msodde.py#L913
+# * Use process_maybe_encrypted with passwords instead of process_file
+# * The module supports all word & excel, rtf, csv and straight xml
+# that is much more than task.file.is_oletools_concerned
+
 
 class MsoDDE(BaseWorker):
 

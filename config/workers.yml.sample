@@ -56,8 +56,8 @@ workers:
     cache: 1h
     timeout: 1m
     replicas: 2
-  - module: oletools
-    class: OleTools
+  - module: ole
+    class: Ole
     cache: 1h
     timeout: 1m
     replicas: 5
