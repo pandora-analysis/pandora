@@ -36,11 +36,6 @@ workers:
     cache: 1h
     timeout: 1m
     replicas: 5
-  - module: olevba
-    class: OleVBA
-    cache: 1h
-    timeout: 1m
-    replicas: 2
   - module: hashlookup
     class: HashlookupWorker
     cache: 1h
