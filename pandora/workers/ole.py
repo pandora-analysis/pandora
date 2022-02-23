@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import List, Set
 
 from oletools import oleid, ooxml  # type: ignore
-from oletools.ftguess import FTYPE, CONTAINER, FileTypeGuesser  # type: ignore
+from oletools.ftguess import FTYPE, CONTAINER, FType_Generic_OLE, FType_Generic_OpenXML, FileTypeGuesser  # type: ignore
 from oletools.oleid import RISK  # type: ignore
 from oletools.oleobj import get_logger, find_ole, find_external_relationships, OleObject  # type: ignore
 from oletools.olevba import VBA_Parser  # type: ignore
@@ -109,7 +109,7 @@ class Ole(BaseWorker):
         if oid.ftg.container == CONTAINER.OLE:
             oid.ole = oid.ftg.olefile
 
-        if oid.ftg.filetype == FTYPE.UNKNOWN:
+        if oid.ftg.filetype in [FTYPE.UNKNOWN, FTYPE.EXE_PE]:
             report.status = Status.NOTAPPLICABLE
             return
 
@@ -211,7 +211,7 @@ class Ole(BaseWorker):
             #        f = BytesIO(obj.rawdata)
             #        xxxswf.disneyland(f, name, options)
 
-        if oid.ftg.filetype != FTYPE.RTF:
+        if (isinstance(oid.ftg, FType_Generic_OLE) or isinstance(oid.ftg, FType_Generic_OpenXML)):
             # Macros, RTF don't have that
             vba_indicator, xlm_indicator = oid.check_macros()
             info.append(vba_indicator.description)
