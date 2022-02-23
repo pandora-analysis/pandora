@@ -5,7 +5,7 @@ import logging
 
 import asyncio
 import pathlib
-import irmacl_async
+import irmacl_async  # type: ignore
 import urllib.parse
 
 from ..helpers import Status
