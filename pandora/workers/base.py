@@ -20,20 +20,20 @@ from ..task import Task
 
 class BaseWorker(multiprocessing.Process):
 
-    def __init__(self, module: str, name: str, cache: str, timeout: str,
+    def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
                  loglevel: int=logging.INFO, **options):
         """
         Create a worker.
         :param module: module of the worker
-        :param name: name of the worker
+        :param worker_id: The ID of the worker (for replicats)
         :param cache: cache time for module
         :param timeout: timeout for module
         """
-        super().__init__(name=name, daemon=True)
+        super().__init__(name=f'{module}-{worker_id}', daemon=True)
         self.loglevel = loglevel
-        self.logger = logging.getLogger(f'{name}')
+        self.logger = logging.getLogger(module)
         self.logger.setLevel(loglevel)
-        self.logger.info(f'Initializing {name}')
+        self.logger.info(f'Initializing {self.name}')
 
         self.redis_pool_cache: ConnectionPool = ConnectionPool(
             connection_class=UnixDomainSocketConnection,

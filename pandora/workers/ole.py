@@ -5,8 +5,9 @@ import logging
 import os
 import re
 
+from collections import defaultdict
 from datetime import datetime
-from typing import List, Set
+from typing import List, Set, Tuple, Dict
 
 from oletools import oleid, ooxml  # type: ignore
 from oletools.ftguess import FTYPE, CONTAINER, FType_Generic_OLE, FType_Generic_OpenXML, FileTypeGuesser  # type: ignore
@@ -27,11 +28,13 @@ from .base import BaseWorker
 
 class Ole(BaseWorker):
 
-    def __init__(self, module: str, name: str, cache: str, timeout: str,
+    def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
                  loglevel: int=logging.DEBUG, **options):
-        super().__init__(module, name, cache, timeout, loglevel, **options)
+        super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         log = get_logger('oleobj')
-        log.setLevel(loglevel)
+        log.setLevel(logging.DEBUG)
+        # log = get_logger('olevba')
+        # log.setLevel(logging.DEBUG)
 
     def _get_meta_attributes(self, meta, attributes_list):
         to_return = {}
@@ -50,7 +53,7 @@ class Ole(BaseWorker):
             to_return[attrib] = attribute
         return to_return
 
-    def process_ole(self, ole):
+    def process_ole(self, ole) -> Tuple[Status, Dict]:
         details = {'malicious': ''}
         status = Status.CLEAN
         if ole.format_id == OleObject.TYPE_EMBEDDED:
@@ -99,6 +102,15 @@ class Ole(BaseWorker):
         if not details['malicious']:
             details.pop('malicious')
         return status, details
+
+    def _process_macros(self, filetype: FileTypeGuesser):
+        # NOTE: must pass a filepath because of XLMMacroDeobfuscator
+        # Code copied from: https://github.com/decalage2/oletools/blob/master/oletools/oleid.py#L415
+        details = defaultdict(list)
+        vba_parser = VBA_Parser(filetype.filepath)
+        for type_entry, keyword, description in vba_parser.analyze_macros(show_decoded_strings=True, deobfuscate=False):
+            details[type_entry].append(description)
+        return Status.ALERT, details
 
     def analyse(self, task: Task, report: Report):
         self.logger.debug(f'analysing file {task.file.path}...')
@@ -211,20 +223,20 @@ class Ole(BaseWorker):
             #        f = BytesIO(obj.rawdata)
             #        xxxswf.disneyland(f, name, options)
 
-        if (isinstance(oid.ftg, FType_Generic_OLE) or isinstance(oid.ftg, FType_Generic_OpenXML)):
+        if (issubclass(oid.ftg.ftype, FType_Generic_OLE)
+                or issubclass(oid.ftg.ftype, FType_Generic_OpenXML)):
             # Macros, RTF don't have that
             vba_indicator, xlm_indicator = oid.check_macros()
             info.append(vba_indicator.description)
             info.append(xlm_indicator.description)
             if vba_indicator.risk != RISK.NONE or xlm_indicator.risk != RISK.NONE:
-                report.status = Status.WARN
                 # has macro
                 # NOTE: must pass the file on disk:
                 # https://github.com/decalage2/oletools/blob/be16ef425c30c689c92ef33cb1af7f930adfd69f/oletools/oleid.py#L459
-                vba = VBA_Parser(filename=str(task.file.path))
-                macros = vba.extract_all_macros()
-                for m in macros:
-                    suspicious.append(m)
+                status, details = self._process_macros(oid.ftg)
+                report.status = status
+                for k, v in details.items():
+                    report.add_details(k, v)
 
         if malicious:
             report.add_details('malicious', malicious)

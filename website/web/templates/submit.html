@@ -36,7 +36,7 @@
         {% for worker in workers %}
           {% if worker.replicas > 0 and worker.module != "extractor" %}
           <tr>
-            <td>{{ worker.class }}</td>
+            <td>{{ worker.module }}</td>
             <td><input type="checkbox" name="{{ worker.module }}" checked/></td>
           </tr>
           {% endif %}

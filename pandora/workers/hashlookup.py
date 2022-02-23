@@ -16,9 +16,9 @@ from .base import BaseWorker
 
 class HashlookupWorker(BaseWorker):
 
-    def __init__(self, module: str, name: str, cache: str, timeout: str,
+    def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
                  loglevel: int=logging.DEBUG, **options):
-        super().__init__(module, name, cache, timeout, loglevel, **options)
+        super().__init__(module, worker_id, cache, timeout, loglevel, **options)
 
         try:
             self.hashlookup = Hashlookup()

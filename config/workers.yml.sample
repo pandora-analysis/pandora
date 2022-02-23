@@ -1,70 +1,58 @@
 workers:
   - module: irma
-    class: Irma
     cache: 1h
     timeout: 1m
     replicas: 1
     apiurl: null
     apitimeout: 60
   - module: malwarebazaar
-    class: MalwareBazaar
     cache: 1h
     timeout: 1m
     replicas: 1
     apikey: ''
   - module: virustotal
-    class: VirusTotal
     cache: 1h
     timeout: 1m
     replicas: 1
     apikey: ''
   - module: mwdb
-    class: Mwdb
     cache: 1h
     timeout: 1m
     replicas: 1
     apikey: ''
   - module: hybridanalysis
-    class: HybridAnalysis
     cache: 1h
     timeout: 1m
     replicas: 1
     apiurl: 'https://www.hybrid-analysis.com/api/v2/'
     apikey: ''
   - module: joesandbox
-    class: JoeSandboxWorker
     cache: 1h
     timeout: 1m
     replicas: 1
     apiurl: 'https://jbxcloud.joesecurity.org/api'
     apikey: ''
   - module: extractor
-    class: Extractor
     cache: 1h
     timeout: 1m
     replicas: 5
   - module: hashlookup
-    class: HashlookupWorker
     cache: 1h
     timeout: 1m
     replicas: 5
   - module: msodde
-    class: MsoDDE
     cache: 1h
     timeout: 1m
     replicas: 2
   - module: xmldeobfuscator
-    class: XLMMacroDeobfuscator
     cache: 1h
     timeout: 1m
     replicas: 2
   - module: ole
-    class: Ole
     cache: 1h
     timeout: 1m
     replicas: 5
   - module: preview
-    class: Preview
     cache: 1h
     timeout: 1m
     replicas: 5

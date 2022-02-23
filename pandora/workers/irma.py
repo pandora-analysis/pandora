@@ -20,9 +20,9 @@ class Irma(BaseWorker):
     apiurl: str
     apitimeout: int
 
-    def __init__(self, module: str, name: str, cache: str, timeout: str,
+    def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
                  loglevel: int=logging.INFO, **options):
-        super().__init__(module, name, cache, timeout, loglevel, **options)
+        super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         if not self.apiurl:
             self.disabled = True
             return
@@ -39,7 +39,7 @@ class Irma(BaseWorker):
             report.add_details('Click on "Sign in anonymously" button to reach IRMA report.', link)
 
     def analyse(self, task: Task, report: Report):
-        if task.file.is_archive():
+        if task.file.is_archive:
             report.status = Status.NOTAPPLICABLE
             return
 

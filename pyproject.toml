@@ -45,6 +45,7 @@ mwdblib = "^4.0.0"
 pyhashlookup = "^1.1.1"
 vt-py = "^0.13.1"
 malwarebazaar = "^0.1.3"
+irmacl-async = "^3.3.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.0.1"

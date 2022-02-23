@@ -10,3 +10,7 @@ class Unsupported(PandoraException):
 
 class NoPreview(PandoraException):
     pass
+
+
+class MissingWorker(PandoraException):
+    pass
