@@ -1,4 +1,11 @@
 workers:
+  - module: irma
+    class: Irma
+    cache: 1h
+    timeout: 1m
+    replicas: 1
+    apiurl: null
+    apitimeout: 60
   - module: malwarebazaar
     class: MalwareBazaar
     cache: 1h
