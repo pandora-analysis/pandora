@@ -1,58 +1,33 @@
+defaults:
+  cache: 1h
+  timeout: 1m
+  replicas: 1
 workers:
   - module: irma
-    cache: 1h
-    timeout: 1m
-    replicas: 1
-    apiurl: null
-    apitimeout: 60
+    apiurl: ''
+    apitimeout: 1m
+    timeout: 2m
   - module: malwarebazaar
-    cache: 1h
-    timeout: 1m
-    replicas: 1
     apikey: ''
   - module: virustotal
-    cache: 1h
-    timeout: 1m
-    replicas: 1
     apikey: ''
   - module: mwdb
-    cache: 1h
-    timeout: 1m
-    replicas: 1
     apikey: ''
   - module: hybridanalysis
-    cache: 1h
-    timeout: 1m
-    replicas: 1
     apiurl: 'https://www.hybrid-analysis.com/api/v2/'
     apikey: ''
   - module: joesandbox
-    cache: 1h
-    timeout: 1m
-    replicas: 1
     apiurl: 'https://jbxcloud.joesecurity.org/api'
     apikey: ''
   - module: extractor
-    cache: 1h
-    timeout: 1m
     replicas: 5
   - module: hashlookup
-    cache: 1h
-    timeout: 1m
     replicas: 5
   - module: msodde
-    cache: 1h
-    timeout: 1m
-    replicas: 2
+    replicas: 3
   - module: xmldeobfuscator
-    cache: 1h
-    timeout: 1m
-    replicas: 2
+    replicas: 3
   - module: ole
-    cache: 1h
-    timeout: 1m
     replicas: 5
   - module: preview
-    cache: 1h
-    timeout: 1m
     replicas: 5

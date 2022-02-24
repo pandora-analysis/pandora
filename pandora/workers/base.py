@@ -66,7 +66,7 @@ class BaseWorker(multiprocessing.Process):
 
     @contextlib.contextmanager
     def _timeout_context(self):
-        if self.timeout is not None:
+        if self.timeout != 0:
             # Register a function to raise a TimeoutError on the signal.
             signal.signal(signal.SIGALRM, self._raise_timeout)
             signal.alarm(self.timeout)

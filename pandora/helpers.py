@@ -71,7 +71,7 @@ def workers() -> Dict[str, Dict[str, Any]]:
 
     with worker_config_file.open() as config_file:
         config = yaml.safe_load(config_file.read())
-    w = {worker['module']: worker for worker in config['workers']}
+    w = {worker['module']: {**config['defaults'], **worker} for worker in config['workers']}
     return {name: w[name] for name in sorted(w)}
 
 
@@ -87,14 +87,14 @@ def make_bool_for_redis(value: Optional[bool]) -> int:
     return 0
 
 
-def expire_in_sec(time: Optional[Union[str, int]]) -> Optional[int]:
+def expire_in_sec(time: Union[str, int]) -> int:
     """
     Try to parse time value and return the amount of seconds.
     :param time: time value to parse
     :return: seconds until expire
     """
-    if time is None:
-        return None
+    if not time:
+        return 0
     match = re.fullmatch(r'(\d+)([smhd]?)', str(time))
     assert match is not None, f"impossible to parse cache '{time}'"
     if not match.group(2) or match.group(2) == 's':
@@ -105,4 +105,4 @@ def expire_in_sec(time: Optional[Union[str, int]]) -> Optional[int]:
         return int(timedelta(hours=int(match.group(1))).total_seconds())
     elif match.group(2) == 'd':
         return int(timedelta(days=int(match.group(1))).total_seconds())
-    return None
+    return 0

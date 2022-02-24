@@ -8,7 +8,7 @@ import pathlib
 import irmacl_async  # type: ignore
 import urllib.parse
 
-from ..helpers import Status
+from ..helpers import Status, expire_in_sec
 from ..task import Task
 from ..report import Report
 
@@ -26,6 +26,9 @@ class Irma(BaseWorker):
         if not self.apiurl:
             self.disabled = True
             return
+
+        if self.apitimeout:
+            self.apitimeout = expire_in_sec(self.apitimeout)
 
     async def _scan_task(self, task, report):
         # Set irma client config

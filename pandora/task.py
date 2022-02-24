@@ -111,7 +111,10 @@ class Task:
         self.done = done
         self.linked_tasks = None
         if disabled_workers:
-            self.disabled_workers = json.loads(disabled_workers)
+            if isinstance(disabled_workers, str):
+                self.disabled_workers = json.loads(disabled_workers)
+            else:
+                self.disabled_workers = disabled_workers
         else:
             self.disabled_workers = []
 
