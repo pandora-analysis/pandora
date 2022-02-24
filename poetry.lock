@@ -983,7 +983,7 @@ XLMMacroDeobfuscator = {url = "https://github.com/DissectMalware/XLMMacroDeobfus
 xlrd2 = {url = "https://github.com/DissectMalware/xlrd2/archive/master.zip", optional = true, markers = "extra == \"full\""}
 
 [package.extras]
-full = ["xlrd2 @ https://github.com/DissectMalware/xlrd2/archive/master.zip", "pyxlsb2 @ https://github.com/DissectMalware/pyxlsb2/archive/master.zip", "XLMMacroDeobfuscator @ https://github.com/DissectMalware/XLMMacroDeobfuscator/archive/master.zip"]
+full = ["xlrd2", "pyxlsb2", "xlmmacrodeobfuscator"]
 
 [package.source]
 type = "git"
@@ -1839,6 +1839,14 @@ optional = false
 python-versions = ">=3.4"
 
 [[package]]
+name = "yara-python"
+version = "4.1.3"
+description = "Python interface for YARA"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "yarl"
 version = "1.7.2"
 description = "Yet another URL library"
@@ -1873,7 +1881,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "6cce3a3990d3a95c7eb1942799117b054d14bdb70f230fc97c671a7e4374467e"
+content-hash = "9214b20e46c8c18b6b69c708eb1ab6481fda69f7b45671c49d66cba53d65e9a3"
 
 [metadata.files]
 aiohttp = [
@@ -3195,6 +3203,19 @@ xlrd2 = []
 xlsxwriter = [
     {file = "XlsxWriter-3.0.2-py3-none-any.whl", hash = "sha256:1aa65166697c42284e82f5bf9a33c2e913341eeef2b262019c3f5b5334768765"},
     {file = "XlsxWriter-3.0.2.tar.gz", hash = "sha256:53005f03e8eb58f061ebf41d5767c7495ee0772c2396fe26b7e0ca22fa9c2570"},
+]
+yara-python = [
+    {file = "yara-python-4.1.3.tar.gz", hash = "sha256:348d80039c3b499ad8ec9ce02ceaef0c1d5b7282b84e3b6fe6adb6a158c8e0cf"},
+    {file = "yara_python-4.1.3-cp35-cp35m-win32.whl", hash = "sha256:ecfa95fa1e2cc4114e6043ee7760590eaf094bd83e0784bb0fd5d438899934c7"},
+    {file = "yara_python-4.1.3-cp35-cp35m-win_amd64.whl", hash = "sha256:9ae9a523006fe32f46ad2144d0391fdcba1d4fb6de77437898816546e9290dd0"},
+    {file = "yara_python-4.1.3-cp36-cp36m-win32.whl", hash = "sha256:79964f785ce567fe51a7f76874a8d737b8e64e414a43437289b39a17bf087165"},
+    {file = "yara_python-4.1.3-cp36-cp36m-win_amd64.whl", hash = "sha256:b0d2ad9f7dba273b96214edc99b24cf622babe1d74af9205f82221a3a6dfdfa7"},
+    {file = "yara_python-4.1.3-cp37-cp37m-win32.whl", hash = "sha256:f89e514615b49998c27a92876a37cc57dc3c7fa9f163d5c2ea50176d7f9596b1"},
+    {file = "yara_python-4.1.3-cp37-cp37m-win_amd64.whl", hash = "sha256:da1423fa7d52498e8cb4d3c9bd1ad3237281c2aede82adbdcc8ce5a9b7fcfb7c"},
+    {file = "yara_python-4.1.3-cp38-cp38-win32.whl", hash = "sha256:0dde7a7458dd519e49c3c64a46dc3d1b4f614d27455f2669d4e113ff02ba6c66"},
+    {file = "yara_python-4.1.3-cp38-cp38-win_amd64.whl", hash = "sha256:352536454b1d415a132298d6cf8acbafa94d3f55576962a5b688dd41d0fb03e6"},
+    {file = "yara_python-4.1.3-cp39-cp39-win32.whl", hash = "sha256:6bec7be7fdd1d91f89113cb244c2d890431b51e8411480a649d754188e4bbabc"},
+    {file = "yara_python-4.1.3-cp39-cp39-win_amd64.whl", hash = "sha256:4159c2ffe6855b8e608e1b6728a80088e2edef31f23d7c8204ce43948ba2ea9b"},
 ]
 yarl = [
     {file = "yarl-1.7.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:f2a8508f7350512434e41065684076f640ecce176d262a7d54f0da41d99c5a95"},
