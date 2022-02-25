@@ -3,7 +3,9 @@
 
 import logging
 
-import yara
+from typing import Optional
+
+import yara  # type: ignore
 
 from ..default import get_homedir
 from ..helpers import Status
@@ -14,10 +16,12 @@ from .base import BaseWorker
 
 
 class YaraWorker(BaseWorker):
-    rulespath: str
+    rulespath = get_homedir() / 'yara_rules'
+    savepath = get_homedir() / 'yara_rules' / 'yara.compiled'
+    last_change: Optional[float] = None
 
     @property
-    def rules(self) -> None:
+    def rules(self) -> yara.Rules:
         yara_files = list(self.rulespath.glob('**/*.yar'))
         most_recent = max(entry.stat().st_mtime for entry in yara_files)
 
@@ -34,13 +38,15 @@ class YaraWorker(BaseWorker):
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
                  loglevel: int=logging.INFO, **options):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
+
+        if not list(self.rulespath.glob('**/*.yar')):
+            self.disabled = True
+            return
+
         if not self.rulespath:
             self.disabled = True
             return
         self.last_change = None
-
-        self.rulespath = get_homedir() / 'yara_rules'
-        self.savepath = self.rulespath / 'yara.compiled'
 
         try:
             # initialize the compiled rules
@@ -50,7 +56,7 @@ class YaraWorker(BaseWorker):
             self.logger.critical(f'Unable to initialize rules: {e}')
 
     def analyse(self, task: Task, report: Report):
-        matches = [str(match) for match in self.rules.match(data=task.file.data.getvalue())]
+        matches = [str(match) for match in self.rules.match(data=task.file.data.getvalue()) if match]
         if matches:
             report.status = Status.ALERT
             report.add_details('Rules matches', matches)
