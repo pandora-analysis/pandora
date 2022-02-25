@@ -119,3 +119,7 @@ config/workers.yml
 
 # Local tasks
 tasks/
+
+# Yara
+yara_rules/*.yar
+yara_rules/yara.compiled

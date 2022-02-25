@@ -31,3 +31,5 @@ workers:
     replicas: 5
   - module: preview
     replicas: 5
+  - module: yara
+    replicas: 2
