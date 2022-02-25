@@ -163,13 +163,16 @@ class Pandora():
         uuid = self.redis.get(f'seed:{seed}')
         return uuid if uuid is not None else None
 
-    def add_seed(self, task: Task, time: str) -> Tuple[str, int]:
-        seed = secrets.token_urlsafe()
+    def add_seed(self, task: Task, time: str, seed: Optional[str]=None) -> Tuple[str, int]:
         expire = expire_in_sec(time)
+        if not seed:
+            seed = secrets.token_urlsafe()
         if expire:
             self.redis.setex(name=f'seed:{seed}', time=expire, value=task.uuid)
         else:
             self.redis.set(name=f'seed:{seed}', value=task.uuid)
+        for e_task in task.extracted:
+            self.add_seed(e_task, time, seed)
         return seed, expire
 
     # ##############
