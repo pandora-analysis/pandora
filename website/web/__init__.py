@@ -7,9 +7,9 @@ import pkg_resources
 import traceback
 
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BytesIO
-from typing import Optional
+from typing import Optional, Union
 
 import flask_session  # type: ignore
 import flask_moment  # type: ignore
@@ -283,7 +283,14 @@ def api_tasks(search=None):
 
     assert flask_login.current_user.role.can([Action.list_own_tasks, Action.list_all_tasks], 'or'), 'forbidden'
     search = search.strip() if search is not None else None
-    tasks = pandora.get_tasks(user=flask_login.current_user)
+    if not search:
+        # filter results bu date, keep last 3 days,
+        # TODO: up to a max amount of tasks
+        first_date: Union[datetime, int] = datetime.now() - timedelta(days=3)
+    else:
+        # This will be slow and the way to search must be improved.
+        first_date = 0
+    tasks = pandora.get_tasks(user=flask_login.current_user, first_date=first_date)
     if search:
         filtered_tasks = []
         # filter results

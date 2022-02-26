@@ -3,6 +3,7 @@
 
 import operator
 
+from datetime import datetime
 from typing import Optional, Dict, List, Union, Set
 
 from redis import ConnectionPool, Redis
@@ -117,12 +118,13 @@ class Storage():
         return self.storage.hgetall(f'tasks:{task_id}')
 
     def set_task(self, task: Dict[str, str]):
+        timestamp = datetime.fromisoformat(task['save_date']).timestamp()
         self.storage.hmset(f'tasks:{task["uuid"]}', task)
-        self.storage.sadd('tasks', task["uuid"])
+        self.storage.zadd('tasks', {task["uuid"]: timestamp})
 
-    def get_tasks(self) -> List[Dict[str, str]]:
+    def get_tasks(self, *, first_date: Union[str, float]=0, last_date: Union[str, float]='+Inf') -> List[Dict[str, str]]:
         tasks = []
-        for uuid in self.storage.smembers('tasks'):
+        for uuid in self.storage.zrevrangebyscore('tasks', min=first_date, max=last_date):
             tasks.append(self.storage.hgetall(f'tasks:{uuid}'))
         tasks.sort(key=operator.itemgetter('save_date'), reverse=True)
         return tasks

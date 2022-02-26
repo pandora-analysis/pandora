@@ -5,6 +5,7 @@ import json
 import logging
 import secrets
 
+from datetime import datetime
 from typing import Optional, Union, Tuple, List
 
 from redis import ConnectionPool, Redis
@@ -12,7 +13,6 @@ from redis.connection import UnixDomainSocketConnection
 
 from .default import get_config, get_socket_path
 from .helpers import roles_from_config, allowlist_default, expire_in_sec
-# from .file import File
 from .observable import TaskObservable, Observable
 from .report import Report
 from .role import Role, RoleName
@@ -136,9 +136,13 @@ class Pandora():
     def add_extracted_reference(self, task: Task, extracted_task: Task):
         self.storage.add_extracted_reference(task.uuid, extracted_task.uuid)
 
-    def get_tasks(self, user: User):
+    def get_tasks(self, user: User, *, first_date: Union[datetime, int, float, str]=0, last_date: Union[datetime, int, float, str]='+Inf'):
+        if isinstance(first_date, datetime):
+            first_date = first_date.timestamp()
+        if isinstance(last_date, datetime):
+            last_date = last_date.timestamp()
         tasks = []
-        for task in self.storage.get_tasks():
+        for task in self.storage.get_tasks(first_date=first_date, last_date=last_date):
             # FIXME: get rid of that typing ignore
             _task = Task(**task)  # type: ignore
             if user.is_admin or (hasattr(_task, 'user') and user.get_id() == _task.user.get_id()):
