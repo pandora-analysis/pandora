@@ -104,3 +104,42 @@ poetry run stop
 ```
 
 With the default configuration, you can access the web interface on `http://0.0.0.0:6100`.
+
+# AppArmor and security notes
+
+It is important to keep in mind that Pandora parses and sometimes opens or runs untrusted and
+(potentially) malicious content.
+One of he most dangerous dependency is libreoffice, which is used to generate the
+previews of office documents. By default libreoffice doesn't runs macros, but
+as every big piece of software, it has vulnerabilities, known or not.
+You absolutely must make sure you always run the most up-to-date version, and keep track of the
+security patches. On top of that, there will be 0-days, meaning vulnerabilities lacking
+a patch (yet). If they can be exploited against libreoffice used by Pandora,
+it could lead to your system being compromised.
+
+Two things you can do to mitigate the risks:
+
+* make sure the machine running Pandora cannot be used to connect to anything internal in your organisation
+* enable AppArmor profiles related to libreoffice:
+
+```bash
+sudo apt install apparmor-utils  # Installs utils for apparmor
+```
+
+Edit `/etc/apparmor.d/usr.lib.libreoffice.program.soffice.bin` and insert:
+
+```
+  owner @{HOME}/pandora/tasks/** rwk,
+```
+
+Anywhere below this line:
+
+```
+profile libreoffice-soffice /usr/lib/libreoffice/program/soffice.bin {
+```
+
+And finally, enable the profiles:
+
+```bash
+aa-enforce /etc/apparmor.d/usr.lib.libreoffice*
+```
