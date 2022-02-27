@@ -6,9 +6,40 @@ You need poetry installed, see the [install guide](https://python-poetry.org/doc
 
 ## Prerequisites
 
+### Redis
+
 You need to have redis cloned and installed in the same directory you clone this template in:
 this repoitory and and `redis` must be in the same directory, and **not** `redis` cloned in the
 this directory. See [this guide](https://www.lookyloo.eu/docs/main/install-lookyloo.html#_install_redis).
+
+### Kvrocks
+
+The same way you installed redis, you need kvrocks. For that, please follow the [install guide](https://github.com/KvrocksLabs/kvrocks#building-kvrocks).
+the kvrocks directory *must* be in the same directory as redis, but *not* in the redis directory.
+
+### Clone pandora
+
+Do the usual:
+
+```bash
+git clone https://github.com/pandora-analysis/pandora.git
+```
+
+### Ready to install pandora?
+
+And at this point, you should be in a directory that contains `redis`, `kvrocks`, and `pandora`.
+
+Make sure it is the case by running `ls redis kvrocks pandora`. If you see `No such file or directory`,
+one of them is missing and you need to fix the installation.
+
+The directory tree must look like that:
+
+```
+.
+├── redis  => compiled redis
+├── kvrocks => compiled kvrocks
+└── pandra => not installed pandora yet
+```
 
 ## Installation
 
