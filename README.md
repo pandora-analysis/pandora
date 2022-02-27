@@ -46,6 +46,7 @@ The directory tree must look like that:
 ### System dependencies (requires root)
 
 ```bash
+sudo apt install python3-dev  # for compiling things
 sudo apt install libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0  # For HTML -> PDF
 sudo apt install libreoffice-base-nogui libreoffice-calc-nogui libreoffice-draw-nogui libreoffice-impress-nogui libreoffice-math-nogui libreoffice-writer-nogui  # For Office -> PDF
 sudo apt install exiftool  # for extracting exif information

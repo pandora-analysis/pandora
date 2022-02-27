@@ -166,6 +166,8 @@ class BaseWorker(multiprocessing.Process):
 
             except AssertionError as e:
                 self.logger.critical(f'assertion error with current task : {e}')
+            except ConnectionError:
+                self.logger.critical('Redis is gone, shutting down.')
             except FileNotFoundError as e:
                 self.logger.critical(f'unable to reach redis socket, shutting down : {e}')
             except BaseException as e:
