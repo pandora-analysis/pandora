@@ -9,9 +9,10 @@ from typing import Tuple, List
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
-from redis.exceptions import ResponseError
+from redis.exceptions import ResponseError, ConnectionError
 
 from ..default import get_socket_path
+from ..exceptions import PandoraException
 from ..helpers import expire_in_sec, Status
 from ..report import Report
 from ..storage_client import Storage
@@ -41,17 +42,27 @@ class BaseWorker(multiprocessing.Process):
 
         self.module = module
         self.logger.debug('Create redis stream group...')
+        self.disabled = False
         try:
             self.redis.xgroup_create(name='tasks_queue', groupname=self.module, mkstream=True)
             self.logger.debug('Redis stream group created.')
         except ResponseError:
             self.logger.debug('Redis stream group already exists.')
+        except ConnectionError:
+            self.logger.critical('Redis not started, shutting down.')
+            self.disabled = True
+        except Exception as e:
+            self.logger.critical(f'Unexpected error, shutting down: {e}.')
+            self.disabled = True
+        finally:
+            if self.disabled:
+                self.logger.critical(f'General error, unable to initialize the workers for {module}.')
+                raise PandoraException(f'General error, unable to initialize the workers for {module}.')
 
         self.storage = Storage()
 
         self.cache = expire_in_sec(cache)
         self.timeout = expire_in_sec(timeout)
-        self.disabled = False
 
         for key, value in options.items():
             setattr(self, key, value)
@@ -155,5 +166,7 @@ class BaseWorker(multiprocessing.Process):
 
             except AssertionError as e:
                 self.logger.critical(f'assertion error with current task : {e}')
+            except FileNotFoundError as e:
+                self.logger.critical(f'unable to reach redis socket, shutting down : {e}')
             except BaseException as e:
                 self.logger.critical(f'unknown error with current task : {repr(e)}\n{traceback.format_exc()}')

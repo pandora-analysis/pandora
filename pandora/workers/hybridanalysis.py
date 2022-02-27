@@ -24,6 +24,7 @@ class HybridAnalysis(BaseWorker):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         if not self.apikey:
             self.disabled = True
+            self.logger.warning('Disabled, missing apikey.')
             return
 
         self._session = requests.Session()

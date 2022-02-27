@@ -7,9 +7,8 @@ from datetime import datetime
 from typing import Optional, Dict, List, Union, Set
 
 from redis import ConnectionPool, Redis
-from redis.connection import UnixDomainSocketConnection
 
-from .default import get_socket_path
+from .default import get_config
 
 
 class Storage():
@@ -21,8 +20,9 @@ class Storage():
         if cls._instance is None:
             cls._instance = super(Storage, cls).__new__(cls)
             cls._redis_pool_storage: ConnectionPool = ConnectionPool(
-                connection_class=UnixDomainSocketConnection,
-                path=get_socket_path('cache'), decode_responses=True)
+                host=get_config('generic', 'storage_db_hostname'),
+                port=get_config('generic', 'storage_db_port'),
+                decode_responses=True)
         return cls._instance
 
     @property

@@ -50,7 +50,7 @@ Analysis.prototype.refreshTabs = function () {
     let originTask = this.task;
     let file = this.file;
 
-    if (this.workers_status.preview[0]) {
+    if (this.workers_status.preview && this.workers_status.preview[0]) {
         $('.preview-wait').each(function(index, element) {
           $(this).addClass("d-none");
         })

@@ -11,15 +11,18 @@ from typing import Optional, Dict
 from redis import Redis
 from redis.exceptions import ConnectionError
 
-from pandora.default import get_homedir, get_socket_path
+from pandora.default import get_homedir, get_socket_path, get_config
 
 
 def check_running(name: str) -> bool:
-    socket_path = get_socket_path(name)
-    if not os.path.exists(socket_path):
-        return False
-    try:
+    if name == "storage":
+        r = Redis(get_config('generic', 'storage_db_hostname'), get_config('generic', 'storage_db_port'))
+    else:
+        socket_path = get_socket_path(name)
+        if not os.path.exists(socket_path):
+            return False
         r = Redis(unix_socket_path=socket_path)
+    try:
         return True if r.ping() else False
     except ConnectionError:
         return False
@@ -44,15 +47,13 @@ def launch_storage(storage_directory: Optional[Path]=None):
     if not storage_directory:
         storage_directory = get_homedir()
     if not check_running('storage'):
-        Popen(["./run_redis.sh"], cwd=(storage_directory / 'storage'))
+        Popen(["./run_kvrocks.sh"], cwd=(storage_directory / 'storage'))
 
 
 def shutdown_storage(storage_directory: Optional[Path]=None):
-    if not storage_directory:
-        storage_directory = get_homedir()
-    r = Redis(unix_socket_path=get_socket_path('storage'))
-    r.shutdown(save=True)
-    print('Redis storage database shutdown.')
+    redis = Redis(get_config('generic', 'storage_db_hostname'), get_config('generic', 'storage_db_port'))
+    redis.shutdown()
+    print('Kvrocks storage database shutdown.')
 
 
 def launch_all():

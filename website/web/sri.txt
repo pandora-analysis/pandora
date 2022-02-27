@@ -18,7 +18,7 @@
       "logo.svg": "WxV9nvLMENSaB9jnzGZId8XTgNPbsnws0G7FhBkcgPFTW/XX0JZU3ubDCw2dQVcMaWvdxKbdDQkhrqgA3ASpbQ=="
     },
     "js": {
-      "analysis.js": "ChHkINIM4QIXc6Gnp+yTW9JGyKsUkpvi21IGWgWZ6w+m/O+w+BPQpoqiNNKhoQQa7kUfDOnOwOAOXpJBY1okFw==",
+      "analysis.js": "SxelEaa2dflf5fBUpAhSN8b+U6Ez9On4vIqay0JVGctbhzwLVwbTWBDSsZm6i57rEGv+YtdDHaWs1mxhJowuoA==",
       "lib": {
         "dropzone-min.js": "kLQ8y6epwwH5HA1M6K0bw2erLB1+Vz+7HOUepLaKRecyGXaP0K/9b6kq2+MZlyWt6E/AH6dtnxDom8lniz5BWw==",
         "jquery.min.js": "894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==",

@@ -25,6 +25,7 @@ class Irma(BaseWorker):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         if not self.apiurl:
             self.disabled = True
+            self.logger.warning('Disabled, missing apiurl.')
             return
 
         if self.apitimeout:

@@ -23,6 +23,7 @@ class JoeSandboxWorker(BaseWorker):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         if not self.apikey:
             self.disabled = True
+            self.logger.warning('Disabled, missing apikey.')
             return
 
         self.joesb = JoeSandbox(apikey=self.apikey, apiurl=self.apiurl,
