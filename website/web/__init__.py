@@ -277,11 +277,11 @@ def api_logout():
 
 
 @app.route('/tasks', methods=['GET'], strict_slashes=False)
-@app.route('/tasks/search-<search>', methods=['GET'], strict_slashes=False)
 @html_answer
-def api_tasks(search=None):
+def api_tasks():
 
     assert flask_login.current_user.role.can([Action.list_own_tasks, Action.list_all_tasks], 'or'), 'forbidden'
+    search = request.args.get('query')
     search = search.strip() if search is not None else None
     if not search:
         # filter results bu date, keep last 3 days,

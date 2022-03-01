@@ -64,8 +64,8 @@
                 {% else %}
                     {% set placeholder = 'Search filename' %}
                 {% endif %}
-                <form class="d-flex navbar-form navbar-left" role="search" title="Search for hash" onsubmit="return search()">
-                    <input class="form-control me-2" name="q" class="search" id="searchInput" style="width:400px" type="text" value="{{ search }}" required placeholder="{{ placeholder }}">
+                <form class="d-flex navbar-form navbar-left" role="search" title="Search for hash" action={{ url_for('api_tasks') }} method="get">
+                    <input class="form-control me-2" name="query" class="search" id="searchInput" style="width:400px" type="text" value="{{ search }}" required placeholder="{{ placeholder }}">
                 </form>
             {% endif %}
             <ul class="nav navbar-nav me-0 mb-0 mb-sm-0">
@@ -109,15 +109,6 @@
     <script src="{{ url_for('static', filename='js/lib/jquery.min.js') }}"
             integrity="{{get_sri('static/js/lib', 'jquery.min.js')}}"
             crossorigin="anonymous"></script>
-    <script>
-       page = location.pathname.split("/")[1];
-        $(`#${page}-nav`).addClass('active')
-
-       function search() {
-           window.location = "{{ url_for('api_tasks') }}/search-" + $("#searchInput").val();
-           return false;
-       }
-    </script>
     {% endblock %}
 
   </body>
