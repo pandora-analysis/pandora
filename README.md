@@ -174,7 +174,7 @@ If you have any report concerning security, please read the [SECURITY page](secu
 
 Copyright (C) 2021-2022 [CIRCL](https://www.circl.lu/) - Computer Incident Response Center Luxembourg
 
-Copyright (C) 2018-2022 [CERT-AG](https://cert-ag.com/) - CERT Credit Agricole
+Copyright (C) 2017-2022 [CERT-AG](https://cert-ag.com/) - CERT Credit Agricole
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
