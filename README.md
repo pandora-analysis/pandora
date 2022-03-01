@@ -168,7 +168,7 @@ Feel free to fork the code, play with it, make some patches and send us the pull
 
 Feel free to contact us, create [issues](https://github.com/pandora-analysis/pandora/issues) if you have questions, remarks or bug reports.
 
-If you have any report concerning security, please read the [SECURITY page](SECURITY.md) on how to report security issues and vulnerabilities.
+If you have any report concerning security, please read the [SECURITY page](security.md) on how to report security issues and vulnerabilities.
 
 # License
 
