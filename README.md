@@ -161,3 +161,29 @@ And finally, enable the profiles:
 ```bash
 aa-enforce /etc/apparmor.d/usr.lib.libreoffice*
 ```
+
+# Contributing
+
+Feel free to fork the code, play with it, make some patches and send us the pull requests.
+
+Feel free to contact us, create [issues](https://github.com/pandora-analysis/pandora/issues) if you have questions, remarks or bug reports.
+
+If you have any report concerning security, please read the [SECURITY page](SECURITY.md) on how to report security issues and vulnerabilities.
+
+# License
+
+Copyright (C) 2021-2022 [CIRCL](https://www.circl.lu/) - Computer Incident Response Center Luxembourg
+Copyright (C) 2018-2022 [CERT-AG](https://cert-ag.com/) - CERT Credit Agricole
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
