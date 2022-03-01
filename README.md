@@ -173,6 +173,7 @@ If you have any report concerning security, please read the [SECURITY page](secu
 # License
 
 Copyright (C) 2021-2022 [CIRCL](https://www.circl.lu/) - Computer Incident Response Center Luxembourg
+
 Copyright (C) 2018-2022 [CERT-AG](https://cert-ag.com/) - CERT Credit Agricole
 
 This program is free software: you can redistribute it and/or modify
