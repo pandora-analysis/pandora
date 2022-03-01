@@ -1,6 +1,6 @@
 # Pandora
 
-![](https://pandora.circl.lu/static/images/logo.svg)
+![](https://pandora.circl.lu/static/images/logo.svg =250x250)
 
 Pandora is an analysis framework to discover if a file is suspicious and conveniently show the results.
 
