@@ -18,6 +18,8 @@ import exiftool  # type: ignore
 import fitz  # type: ignore
 import magic
 from PIL import Image, ImageDraw, ImageFont  # type: ignore
+from svglib.svglib import svg2rlg  # type: ignore
+from reportlab.graphics import renderPDF  # type: ignore
 import textract  # type: ignore
 from weasyprint import HTML, default_url_fetcher  # type: ignore
 
@@ -83,7 +85,7 @@ class File:
         'image/x-icon': ['IMG', 'ico'],
         'image/jpeg': ['IMG', 'jpg'],
         'image/png': ['IMG', 'png'],
-        'image/svg+xml': ['IMG', 'svg'],
+        'image/svg+xml': ['SVG', 'svg'],
         'image/tiff': ['IMG', 'tiff'],
         'image/webp': ['IMG', 'webp'],
         'application/vnd.ms-outlook': ['MSG', 'msg'],
@@ -249,6 +251,10 @@ class File:
         if self.is_unoconv_concerned:
             office_to_pdf(self.path, f'{self.path}.pdf')
 
+        if self.is_svg:
+            drawing = svg2rlg(self.path)
+            renderPDF.drawToFile(drawing, f'{self.path}.pdf')
+
         if self.is_image:
             image = Image.open(self.path)
             im = image.convert('RGB')
@@ -281,7 +287,7 @@ class File:
     def make_previews(self) -> None:
         if self.is_pdf:
             to_convert = [self.path]
-        elif self.is_unoconv_concerned or self.is_html or self.is_image:
+        elif self.is_unoconv_concerned or self.is_html or self.is_image or self.is_svg:
             to_convert = [Path(f'{self.path}.pdf')]
         elif self.eml_data:
             to_convert = list(self.directory.glob(f'{self.path.name}_body_*.pdf'))
@@ -690,6 +696,14 @@ class File:
         :return (bool): boolean
         """
         return self.type == 'DOC'
+
+    @property
+    def is_svg(self) -> bool:
+        """
+        Whether this file is an SVG.
+        :return (bool): boolean
+        """
+        return self.type == 'SVG'
 
     @property
     def is_image(self) -> bool:
