@@ -75,3 +75,11 @@ a, *[onclick], *[title] {
     border-radius: 5px;
     border: 2px dashed;
 }
+
+/* Bootstrap 5 tweak: do not underline links unless hovered over */
+a:not([class*="btn"]) {
+    text-decoration: none;
+}
+a:not([class*="btn"]):hover {
+    text-decoration: underline;
+}

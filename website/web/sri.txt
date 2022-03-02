@@ -4,7 +4,8 @@
       "lib": {
         "dropzone.css": "3XCkGeASl53asPugXJGPyH9mXEXRxYNUWojkV6twcSbSkpkAQZQt4wmG9WebDUq1Z/HX2j8Vw5nIlKAR/MJ3kg=="
       },
-      "style.css": "FA7wUN7WCUK9hEGdbZLIRVmjgXv1R6vYgeya3UA6o0OUaz3IoTYBt+tOjXVUPRdFhJdqhumrjjacteoU6Xq/+g=="
+      "ribbon.css": "2hAsQwCClHQ7b6VthbKYIkUPam4Ef6wbSxa3+nK0UuqCHezvPMr3aqpz16gD0lyYop55VEd/dhzZJLA4WMAplQ==",
+      "style.css": "JvL21SOmbwHuPTEdFKvkmzVMhT0bGp0rQhPTJozXj9cLKSiqaRQw2XIHcpGVdhxpvMEaxYYAcBEbBpwJihddcw=="
     },
     "images": {
       "favicons": {

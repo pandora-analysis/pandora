@@ -961,7 +961,7 @@ XLMMacroDeobfuscator = {url = "https://github.com/DissectMalware/XLMMacroDeobfus
 xlrd2 = {url = "https://github.com/DissectMalware/xlrd2/archive/master.zip", optional = true, markers = "extra == \"full\""}
 
 [package.extras]
-full = ["xlrd2 @ https://github.com/DissectMalware/xlrd2/archive/master.zip", "pyxlsb2 @ https://github.com/DissectMalware/pyxlsb2/archive/master.zip", "XLMMacroDeobfuscator @ https://github.com/DissectMalware/XLMMacroDeobfuscator/archive/master.zip"]
+full = ["xlrd2", "pyxlsb2", "xlmmacrodeobfuscator"]
 
 [package.source]
 type = "git"

@@ -24,6 +24,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"
           integrity="{{get_sri('static/css', 'style.css')}}"
           crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ribbon.css') }}"
+          integrity="{{get_sri('static/css', 'ribbon.css')}}"
+          crossorigin="anonymous">
     {% endblock %}
 
     <title>{% block title %}Pandora{% endblock %}</title>
@@ -96,6 +99,9 @@
                 {% endif %}
             </ul>
         </div>
+      </div>
+      <div class="corner-ribbon top-right sticky bg-light shadow">
+        <a href="https://github.com/pandora-analysis">Project page</a>
       </div>
     </nav>
 
