@@ -80,6 +80,28 @@ Analysis.prototype.refreshTabs = function () {
         }
 
     }
+    if (this.workers_status.extractor && this.workers_status.extractor[0]) {
+        if (this.workers_status.extractor[1] != 'NOTAPPLICABLE') {
+            $('#extracted_tab').each(function(index, element) {
+                $(this).removeClass("d-none");
+            })
+            extracted_url = `/extracted/${this.task.uuid}`
+            if (this.seed) {
+                extracted_url = `${previews_url}/seed-${this.seed}`
+            }
+
+            fetch(extracted_url, {
+              method: "GET",
+              headers: {
+                "X-CSRF-Token": this.CSRFToken
+              }
+            })
+            .then(response => response.text())
+            .then(text => {
+              document.getElementById("extracted_content").innerHTML=text;
+            })
+        }
+    }
 
     for (const [worker_name, worker_done] of Object.entries(this.workers_status)){
         if (!worker_done[0]) {

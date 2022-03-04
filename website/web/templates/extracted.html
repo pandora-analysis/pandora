@@ -1,0 +1,46 @@
+{% from 'bootstrap5/utils.html' import render_icon %}
+
+<div class="row" style="margin-bottom:30px">
+  <div class="col-md-8">
+    <h3>Extracted</h3>
+  </div>
+</div>
+
+<div class="row">
+  <table class="table table-hover table-bordered" id="extractedTaskRows">
+    <tr>
+      <th>Date</th>
+      <th>Name</th>
+      <th>Status</th>
+    </tr>
+    {% for extracted_task in task.extracted %}
+    <tr id="extractedTaskRow-{{ extracted_task.uuid }}">
+      <td>
+				{{ extracted_task.save_date }}
+      </td>
+      <td>
+        <a href="{{ url_for('api_analysis', task_id=extracted_task.uuid, seed=seed) }}">
+          {{ render_icon(task.file.icon) }}
+          <span>{{ extracted_task.file.original_filename }}</span>
+        </a>
+      </td>
+      <td>
+        <span class="img-thumbnail small-status-flag status-flag-{{ extracted_task.status.name.lower() }}">
+          {% if extracted_task.status == status.ERROR %}
+          {{ render_icon('exclamation-octagon') }}
+          {% elif extracted_task.status == status.ALERT %}
+          {{ render_icon('x-circle') }}
+          {% elif extracted_task.status == status.WARN %}
+          {{ render_icon('exclamation-triangle') }}
+          {% elif extracted_task.status == status.CLEAN %}
+          {{ render_icon('check-circle') }}
+          {% else %}
+          {{ render_icon('question') }}
+          {% endif %}
+        </span>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+

@@ -1,6 +1,7 @@
 import zipfile
 import base64
 import shutil
+import time
 
 from io import BytesIO
 from pathlib import Path
@@ -36,13 +37,18 @@ class Extractor(BaseWorker):
                     break
                 is_encrypted = info.flag_bits & 0x1  # from https://github.com/python/cpython/blob/3.10/Lib/zipfile.py
                 if is_encrypted and not found_password:
-                    # NOTE: Not implemeted yet.
-                    report.status = Status.WARN
-                    report.add_details('Warning', 'Encypted archive, not supported yet')
-                    break
-                    # TODO:
-                    # 1. loop over passwords until we don't get a BaseException
-                    # 2. if it works, set the password with setpassword for the other files
+                    for pwd in self.ZIP_PASSWORDS:
+                        try:
+                            archive.read(info, pwd=pwd.encode())
+                            archive.setpassword(pwd.encode())
+                            found_password = True
+                            break
+                        except RuntimeError:
+                            continue
+                    else:
+                        report.status = Status.WARN
+                        report.add_details('Warning', 'File encrypted and unable to find password')
+                        break
                 if info.is_dir():
                     continue
                 if info.file_size > self.MAX_EXTRACTED_FILE_SIZE:
@@ -104,6 +110,8 @@ class Extractor(BaseWorker):
             return
         pandora = Pandora()
 
+        tasks = []
+
         # Try to extract files from archive
         # TODO: Support other archive formats
         if task.file.is_archive:
@@ -128,6 +136,7 @@ class Extractor(BaseWorker):
                                              parent=task)
                     pandora.add_extracted_reference(task, new_task)
                     pandora.enqueue_task(new_task)
+                    tasks.append(new_task)
             shutil.rmtree(extracted_dir)
 
         # Try to extract attachments from EML file
@@ -143,6 +152,17 @@ class Extractor(BaseWorker):
                                                  parent=task)
                         pandora.add_extracted_reference(task, new_task)
                         pandora.enqueue_task(new_task)
+                        tasks.append(new_task)
                     shutil.rmtree(extracted_dir)
             except Exception as e:
                 self.logger.exception(e)
+
+        # wait for all the tasks to finish
+        while True:
+            if all(t.workers_done for t in tasks):
+                break
+            time.sleep(1)
+
+        for t in tasks:
+            if t.status > report.status:
+                report.status = t.status

@@ -357,6 +357,17 @@ def html_previews(task_id: str, seed: Optional[str]=None):
     return render_template('previews.html', task=task, seed=seed, report=report)
 
 
+@app.route('/extracted/<task_id>', methods=['GET'], strict_slashes=False)
+@app.route('/extracted/<task_id>/seed-<seed>', methods=['GET'], strict_slashes=False)
+@html_answer
+def html_extracted(task_id: str, seed: Optional[str]=None):
+    task = pandora.get_task(task_id=task_id)
+    assert task is not None, 'analysis not found'
+    update_user_role(pandora, task, seed)
+    report = pandora.get_report(task_id, 'extractor')
+    return render_template('extracted.html', task=task, seed=seed, report=report)
+
+
 @app.route('/workers_results_html/<task_id>/<worker_name>', methods=['GET'], strict_slashes=False)
 @app.route('/workers_results_html/<task_id>/<worker_name>/seed-<seed>', methods=['GET'], strict_slashes=False)
 @html_answer
