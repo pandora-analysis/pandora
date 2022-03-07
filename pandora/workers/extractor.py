@@ -5,7 +5,7 @@ import time
 
 from io import BytesIO
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import py7zr  # type: ignore
 
@@ -23,7 +23,7 @@ class Extractor(BaseWorker):
 
     MAX_EXTRACT_FILES = 15
     MAX_EXTRACTED_FILE_SIZE = 100 * 1000000  # 100Mb
-    ZIP_PASSWORDS = ['', 'infected', 'virus', 'CERT_SOC', 'cert', 'pandora']
+    ZIP_PASSWORDS = ['', 'virus', 'CERT_SOC', 'cert', 'pandora', 'infected']
 
     def _extract_zip(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         found_password = False
@@ -64,30 +64,43 @@ class Extractor(BaseWorker):
                     report.status = Status.CLEAN
         return extracted_files
 
+    def _try_password_7z(self, path) -> Optional[str]:
+        for pwd in self.ZIP_PASSWORDS:
+            try:
+                with py7zr.SevenZipFile(file=path, mode='r', password=pwd) as archive:
+                    files_in_archive = archive.getnames()
+                    if files_in_archive:
+                        archive.read(files_in_archive[0])
+                        return pwd
+            except py7zr.exceptions.PasswordRequired:
+                continue
+            except Exception:
+                # TODO: notify that to the user?
+                continue
+        else:
+            return None
+
     def _extract_7z(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         # 7z can be encrypted at 2 places, headers, or files. if headers, we have to try.
+        needs_password = False
         try:
-            a = py7zr.SevenZipFile(file=archive_file.path, mode='r')
-            a.close()
+            with py7zr.SevenZipFile(file=archive_file.path, mode='r') as archive:
+                files_in_archive = archive.getnames()
+                if files_in_archive:
+                    archive.read(files_in_archive[0])
         except py7zr.exceptions.PasswordRequired:
-            # NOTE: Not implemeted yet.
-            report.status = Status.WARN
-            report.add_details('Warning', 'Encypted archive, not supported yet')
-            return []
-            # TODO:
-            # 1. loop over passwords until we find it
-            # 2. if it works, set the password
+            needs_password = True
 
-        with py7zr.SevenZipFile(file=archive_file.path, mode='r') as archive:
-            if archive.needs_password():
-                # NOTE: Not implemeted yet.
+        if needs_password:
+            password = self._try_password_7z(archive_file.path)
+            if password is None:
                 report.status = Status.WARN
-                report.add_details('Warning', 'Encypted archive, not supported yet')
+                report.add_details('Warning', 'Encypted archive, unable to find password')
                 return []
-                # TODO:
-                # 1. loop over passwords until we find it
-                # 2. if it works, set the password
+        else:
+            password = None
 
+        with py7zr.SevenZipFile(file=archive_file.path, mode='r', password=password) as archive:
             if archive.archiveinfo().uncompressed >= self.MAX_EXTRACTED_FILE_SIZE:
                 self.logger.warning(f'File {archive_file.path.name} too big ({archive.archiveinfo().uncompressed}).')
                 report.status = Status.WARN
