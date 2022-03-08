@@ -33,3 +33,5 @@ workers:
     replicas: 5
   - module: yara
     replicas: 2
+  - module: yara_signature_base
+    replicas: 2

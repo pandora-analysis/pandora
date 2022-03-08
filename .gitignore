@@ -122,4 +122,10 @@ tasks/
 
 # Yara
 yara_rules/*.yar
-yara_rules/yara.compiled
+yara.compiled
+
+# kvrocks
+storage/*.log.*
+storage/kvrocks.INFO
+storage/storage.pid
+storage/db/

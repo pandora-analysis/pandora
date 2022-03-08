@@ -18,11 +18,13 @@ from .base import BaseWorker
 class YaraWorker(BaseWorker):
     rulespath = get_homedir() / 'yara_rules'
     savepath = get_homedir() / 'yara_rules' / 'yara.compiled'
+    needs_external = []  # list of filenames, used for children classes with yara files requiring external variables
     last_change: Optional[float] = None
 
     @property
     def rules(self) -> yara.Rules:
         yara_files = list(self.rulespath.glob('**/*.yar'))
+        yara_files = [y_file for y_file in self.rulespath.glob('**/*.yar') if y_file.name not in self.needs_external]
         most_recent = max(entry.stat().st_mtime for entry in yara_files)
 
         if not self.last_change or self.last_change < most_recent:
