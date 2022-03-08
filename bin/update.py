@@ -67,7 +67,7 @@ def main():
 
     print('* Update repository.')
     keep_going(args.yes)
-    run_command('git submodules init')
+    run_command('git submodule init')
     run_command('git pull --recurse-submodules')
     new_hash = compute_hash_self()
     if old_hash != new_hash:
