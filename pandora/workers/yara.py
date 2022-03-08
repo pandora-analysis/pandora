@@ -3,7 +3,7 @@
 
 import logging
 
-from typing import Optional
+from typing import Optional, List
 
 import yara  # type: ignore
 
@@ -18,7 +18,7 @@ from .base import BaseWorker
 class YaraWorker(BaseWorker):
     rulespath = get_homedir() / 'yara_rules'
     savepath = get_homedir() / 'yara_rules' / 'yara.compiled'
-    needs_external = []  # list of filenames, used for children classes with yara files requiring external variables
+    needs_external: List[str] = []  # list of filenames, used for children classes with yara files requiring external variables
     last_change: Optional[float] = None
 
     @property
