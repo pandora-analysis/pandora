@@ -1,0 +1,4 @@
+meta:
+  name: Hashlookup
+  description: Lookup hash values against known database of files.
+  replicas: 5

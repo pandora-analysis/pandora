@@ -1,0 +1,6 @@
+meta:
+  name: Virus Total
+  description: Files analyzer
+
+settings:
+  apikey: null

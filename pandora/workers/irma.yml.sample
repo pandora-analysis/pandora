@@ -1,0 +1,7 @@
+meta:
+  name: Irma
+  description: File analysis tool
+
+settings:
+  apiurl: null
+  apitimeout: 60

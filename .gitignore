@@ -115,7 +115,7 @@ dump.rdb
 # Local config files
 config/*.json
 config/*.json.bkp
-config/workers.yml
+pandora/workers/*.yml
 
 # Local tasks
 tasks/

@@ -29,15 +29,17 @@
         <thead>
           <tr>
             <th scope="col">Module</th>
+            <th scope="col">Description</th>
             <th scope="col">Enable?</th>
           </tr>
         </thead>
         <tbody>
-        {% for worker in workers %}
-          {% if worker.replicas > 0 and worker.module != "extractor" %}
+        {% for worker_name, worker_config in workers.items() %}
+          {% if worker_config.meta.replicas > 0 %}
           <tr>
-            <td>{{ worker.module }}</td>
-            <td><input type="checkbox" name="{{ worker.module }}" checked/></td>
+            <td>{{ worker_config.meta.name }}</td>
+            <td>{{ worker_config.meta.description }}</td>
+            <td><input type="checkbox" name="{{ worker_name }}" checked/></td>
           </tr>
           {% endif %}
         {% endfor %}

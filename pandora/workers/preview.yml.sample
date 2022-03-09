@@ -1,0 +1,4 @@
+meta:
+  name: Preview
+  description: Generates a preview for the uploaded document (office, pdf, image, ...)
+  replicas: 5

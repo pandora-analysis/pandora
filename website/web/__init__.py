@@ -9,6 +9,7 @@ import traceback
 from collections import defaultdict
 from datetime import datetime, timedelta
 from io import BytesIO
+from pathlib import Path
 from typing import Optional, Union
 
 import flask_session  # type: ignore
@@ -20,7 +21,6 @@ from flask import (Flask, request, session, abort, render_template,
                    redirect, send_file, url_for)
 from flask_restx import Api  # type: ignore
 from flask_bootstrap import Bootstrap5  # type: ignore
-from jinja2.exceptions import TemplateNotFound
 from werkzeug.security import check_password_hash
 
 from pandora.default import get_config
@@ -40,6 +40,7 @@ pandora: Pandora = Pandora()
 
 app: Flask = Flask(__name__)
 
+
 app.wsgi_app = ReverseProxied(app.wsgi_app)  # type: ignore
 
 app.config['SECRET_KEY'] = get_secret_key()
@@ -48,6 +49,11 @@ app.config['CACHE_TYPE'] = 'simple'
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_REDIS'] = pandora.redis_bytes
 app.config['SESSION_KEY_PREFIX'] = 'session:'
+
+if not app.template_folder:
+    raise Exception('Folder template not defined')
+else:
+    template_dir: Path = Path(app.root_path) / app.template_folder
 
 Bootstrap5(app)
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
@@ -163,10 +169,11 @@ def api_root():
 @html_answer
 def api_submit_page():
     assert flask_login.current_user.role.can(Action.submit_file), 'forbidden'
-
+    enaled_workers = pandora.get_enabled_workers()
     return render_template(
         'submit.html', error=request.args.get('error', ''),
-        max_file_size=get_config('generic', 'max_file_size'), workers=workers().values(),
+        max_file_size=get_config('generic', 'max_file_size'),
+        workers={worker_name: config for worker_name, config in workers().items() if worker_name in enaled_workers},
         api=api,
         api_resource=ApiSubmit
     )
@@ -377,10 +384,14 @@ def html_workers_result(task_id: str, worker_name: str, seed: Optional[str]=None
     update_user_role(pandora, task, seed)
     assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
     report = pandora.get_report(task_id, worker_name)
-    try:
-        return render_template(f'{worker_name}.html', task=task, seed=seed, report=report)
-    except TemplateNotFound:
-        return render_template('default_worker.html', worker_name=worker_name, rtask=task, seed=seed, report=report)
+    if (template_dir / f'{worker_name}.html').exists():
+        template_file = f'{worker_name}.html'
+    else:
+        template_file = 'default_worker.html'
+    return render_template(template_file,
+                           worker_name=worker_name,
+                           worker_meta=workers()[worker_name]['meta'],
+                           task=task, seed=seed, report=report)
 
 
 # NOTE: this one must be at the end, it adds a route to / that will break the default one.

@@ -1,0 +1,4 @@
+meta:
+  name: Extractor
+  description: Extracts content from the uploaded object (email, archive)
+  replicas: 5

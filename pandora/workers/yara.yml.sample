@@ -1,0 +1,4 @@
+meta:
+  name: Yara local
+  description: Local Yara signatures
+  replicas: 2

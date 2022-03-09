@@ -1,0 +1,6 @@
+meta:
+  name: MWDB
+  description: Malware repository for automated malware collection and analysis systems.
+
+settings:
+  apikey: null

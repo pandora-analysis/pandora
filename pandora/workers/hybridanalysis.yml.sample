@@ -1,0 +1,7 @@
+meta:
+  name: Hybrid Analysis
+  description: Malware analysis service
+
+settings:
+  apiurl: https://www.hybrid-analysis.com/api/v2/
+  apikey: null

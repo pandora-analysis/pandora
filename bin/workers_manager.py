@@ -7,7 +7,9 @@ import logging
 
 from typing import List, Dict, Type
 
-from pandora.default import AbstractManager
+from redis import Redis
+
+from pandora.default import AbstractManager, get_socket_path
 from pandora.exceptions import MissingWorker
 from pandora.helpers import workers
 from pandora.workers.base import BaseWorker
@@ -22,24 +24,17 @@ class WorkersManager(AbstractManager):
         super().__init__(loglevel)
         self.script_name = 'workers_manager'
         self._workers: List[BaseWorker] = []
-        self._check_config()
 
-        for w_config in workers().values():
-            self._workers += self._init_worker(w_config)
+        self.redis = Redis(unix_socket_path=get_socket_path('cache'), decode_responses=True)
+
+        self.redis.delete('enabled_workers')
+
+        for module_name, w_config in workers().items():
+            self._workers += self._init_worker(module_name, w_config)
 
         for worker in self._workers:
             self.logger.info(f'starting worker {worker.name}...')
             worker.start()
-
-    def _check_config(self):
-        """
-        Read and check config.yml file.
-        """
-        for worker in workers().values():
-            assert worker.get('module'), 'expected key worker.module not found or empty in config.yml'
-            assert 'cache' in worker, 'expected key worker.cache not found in config.yml'
-            assert 'timeout' in worker, 'expected key worker.timeout not found in config.yml'
-            assert isinstance(worker['replicas'], int), 'key worker.replicas has to be an integer in config.yml'
 
     def _get_worker_class(self, module) -> Type[BaseWorker]:
         for class_name, worker in inspect.getmembers(module, inspect.isclass):
@@ -50,7 +45,7 @@ class WorkersManager(AbstractManager):
         else:
             raise MissingWorker(f'The worker class is missing in {module}')
 
-    def _init_worker(self, worker_conf: Dict[str, str], restart: bool=False) -> List[BaseWorker]:
+    def _init_worker(self, module_name: str, worker_conf: Dict[str, Dict[str, str]], restart: bool=False) -> List[BaseWorker]:
         """
         Create a new worker with given conf.
         :param worker_conf: dict extracted from yaml
@@ -59,15 +54,15 @@ class WorkersManager(AbstractManager):
         :return: list of BaseWorker objects
         """
         # Check replicas value
-        replicas = int(worker_conf['replicas'])
+        replicas = int(worker_conf['meta']['replicas'])
         if replicas < 1:
             return []
 
         # Import module
-        module = importlib.import_module(f'pandora.workers.{worker_conf["module"]}')
+        module = importlib.import_module(f'pandora.workers.{module_name}')
         options = {
-            key: value for key, value in worker_conf.items()
-            if key not in ('module', 'cache', 'timeout', 'replicas')
+            key: value for key, value in worker_conf['settings'].items()
+            if key not in ('cache', 'timeout')
         }
 
         # [re]Create workers
@@ -77,12 +72,15 @@ class WorkersManager(AbstractManager):
         for i in range(1, replicas + 1):
             try:
                 worker = self._get_worker_class(module)(
-                    module=worker_conf['module'], worker_id=i,
-                    cache=worker_conf['cache'],
-                    timeout=worker_conf['timeout'],
+                    module=module_name, worker_id=i,
+                    cache=worker_conf['settings']['cache'],
+                    timeout=worker_conf['settings']['timeout'],
                     loglevel=self.loglevel,
                     **options
                 )
+                if i == 1 and not worker.disabled:
+                    self.redis.sadd('enabled_workers', worker.module)
+
             except TypeError as e:
                 key = str(e).split(': ')[-1]
                 raise AssertionError(f"missing mandatory key {key} for worker in config")
@@ -101,7 +99,7 @@ class WorkersManager(AbstractManager):
             self._workers.remove(worker)
             # Restart module worker
             module_name, index = worker.module.split('-')
-            new_worker = self._init_worker(worker_conf=workers()[module_name], restart=True)[0]
+            new_worker = self._init_worker(module_name, worker_conf=workers()[module_name], restart=True)[0]
             self._workers.append(new_worker)
             new_worker.start()
 

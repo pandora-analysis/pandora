@@ -6,7 +6,7 @@ import logging
 import secrets
 
 from datetime import datetime
-from typing import Optional, Union, Tuple, List
+from typing import Optional, Union, Tuple, List, Set
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
@@ -189,3 +189,8 @@ class Pandora():
             raise Exception(f'Unknown Report ID: "{task_id}-{worker_name}"')
         # FIXME: get rid of that typing ignore
         return Report(**r)
+
+    # #### Other ####
+
+    def get_enabled_workers(self) -> Set[str]:
+        return self.redis.smembers('enabled_workers')

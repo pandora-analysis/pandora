@@ -1,0 +1,4 @@
+meta:
+  name: OLE
+  description: Microsoft OLE2 files parser
+  replicas: 5

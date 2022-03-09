@@ -64,15 +64,40 @@ def roles_from_config() -> Dict[str, Role]:
 
 @lru_cache(64)
 def workers() -> Dict[str, Dict[str, Any]]:
-    worker_config_file = get_homedir() / 'config' / 'workers.yml'
-    if not worker_config_file.exists():
-        logger.warning(f'Workers config file ({worker_config_file}) does not exists, falling back to default.')
-        worker_config_file = get_homedir() / 'config' / 'workers.yml.sample'
+    workers_dir = get_homedir() / 'pandora' / 'workers'
+    worker_default_config_file = workers_dir / 'base.yml'
+    if not worker_default_config_file.exists():
+        logger.warning(f'Workers config file ({worker_default_config_file}) does not exists, falling back to default.')
+        worker_default_config_file = workers_dir / 'base.yml.sample'
 
-    with worker_config_file.open() as config_file:
-        config = yaml.safe_load(config_file.read())
-    w = {worker['module']: {**config['defaults'], **worker} for worker in config['workers']}
-    return {name: w[name] for name in sorted(w)}
+    # load default parameters
+    with worker_default_config_file.open() as f:
+        default_config = yaml.safe_load(f.read())
+
+    all_configs = {}
+    # load all individual config files
+    for configfile in workers_dir.glob('*.yml'):
+        if configfile.name == 'base.yml':
+            continue
+        with configfile.open() as f:
+            module_config = yaml.safe_load(f.read())
+
+        # get the default config from the sample file, as a fallback
+        module_config_sample = {}
+        if (workers_dir / f'{configfile}.sample').exists():
+            with (workers_dir / f'{configfile}.sample').open() as f:
+                module_config_sample = yaml.safe_load(f.read())
+
+        all_configs[configfile.stem] = {
+            'meta': {**default_config['meta'], **module_config_sample['meta'], **module_config['meta']},
+            'settings': default_config['settings'].copy()
+        }
+
+        if 'settings' in module_config_sample:
+            all_configs[configfile.stem]['settings'].update(module_config_sample['settings'])
+        if 'settings' in module_config:
+            all_configs[configfile.stem]['settings'].update(module_config['settings'])
+    return {name: all_configs[name] for name in sorted(all_configs)}
 
 
 def make_bool(value: Optional[Union[bool, int, str]]) -> bool:

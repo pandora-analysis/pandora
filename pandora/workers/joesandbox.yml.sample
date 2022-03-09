@@ -1,0 +1,7 @@
+meta:
+  name: Joe Sandbox
+  description: File analyzer
+
+settings:
+  apiurl: https://jbxcloud.joesecurity.org/api
+  apikey: null

@@ -1,0 +1,4 @@
+meta:
+  name: Yara Signature Base
+  description: Signature base by Neo23x0
+  replicas: 2
