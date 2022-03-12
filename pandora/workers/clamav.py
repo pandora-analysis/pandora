@@ -34,7 +34,6 @@ class ClamAVWorker(BaseWorker):
             self.logger.debug(f'analysing file {task.file.path}...')
             res = self._socket.scan(str(task.file.path))
             status, message = res[str(task.file.path)]
-            malicious = []
             if status == 'OK':
                 report.status = Status.CLEAN
             elif status == 'FOUND':
