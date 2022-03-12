@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import py7zr  # type: ignore
+import rarfile # type: ignore
 
 from ..default import safe_create_dir
 from ..helpers import Status
@@ -23,7 +24,7 @@ class Extractor(BaseWorker):
 
     MAX_EXTRACT_FILES = 15
     MAX_EXTRACTED_FILE_SIZE = 100 * 1000000  # 100Mb
-    ZIP_PASSWORDS = ['', 'virus', 'CERT_SOC', 'cert', 'pandora', 'infected']
+    ZIP_PASSWORDS = ['', 'virus', 'CERT_SOC', 'cert', 'pandora', 'infected', '123']
 
     def _extract_zip(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         found_password = False
@@ -117,6 +118,53 @@ class Extractor(BaseWorker):
 
         return [path for path in dest_dir.iterdir() if path.is_file()]
 
+    def _try_password_rar(self, path) -> Optional[str]:
+        for pwd in self.ZIP_PASSWORDS:
+            try:
+                with rarfile.RarFile(file=path, mode='r') as archive:
+                    files_in_archive = archive.infolist()
+                    if files_in_archive:
+                        archive.read(files_in_archive[0],pwd=pwd)
+                        return pwd
+            except Exception as e:
+                self.logger.warning(e)
+                # TODO: notify that to the user?
+                continue
+        else:
+            return None
+
+    def _extract_rar(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
+        if len(rarfile.RarFile(file=archive_file.path, mode='r').namelist()) > self.MAX_EXTRACT_FILES :
+            self.logger.warning('Too many files in the archive.')
+            report.status = Status.ALERT
+            report.add_details('Warning', 'Too many files in the archive')
+            return []
+
+        archivesize = 0
+        for files in rarfile.RarFile(file=archive_file.path, mode='r').infolist():
+            archivesize += files.file_size
+        if archivesize >= self.MAX_EXTRACTED_FILE_SIZE:
+            self.logger.warning(f'File {archive_file.path.name} too big ({archive.archiveinfo().uncompressed}).')
+            report.status = Status.WARN
+            report.add_details('Warning', f'File {archive_file.path.name} too big ({archive.archiveinfo().uncompressed}).')
+            return []
+
+        needs_password = rarfile.RarFile(file=archive_file.path, mode='r').needs_password()
+
+        if needs_password:
+            password = self._try_password_rar(archive_file.path)
+            if password is None:
+                report.status = Status.WARN
+                report.add_details('Warning', 'Encypted archive, unable to find password')
+                return []
+        else:
+            password = None
+
+        with rarfile.RarFile(file=archive_file.path, mode='r') as archive:
+            archive.extractall(path=str(dest_dir), pwd=password)
+
+        return [path for path in dest_dir.iterdir() if path.is_file()]
+
     def analyse(self, task: Task, report: Report):
         if not (task.file.is_archive or task.file.is_eml or task.file.is_msg):
             report.status = Status.NOTAPPLICABLE
@@ -133,6 +181,8 @@ class Extractor(BaseWorker):
             try:
                 if task.file.mime_type == "application/x-7z-compressed":
                     extracted = self._extract_7z(task.file, report, extracted_dir)
+                elif task.file.mime_type == "application/x-rar":
+                    extracted = self._extract_rar(task.file, report, extracted_dir)
                 else:
                     extracted = self._extract_zip(task.file, report, extracted_dir)
             except BaseException as e:
