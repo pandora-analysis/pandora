@@ -68,6 +68,7 @@ sudo apt install python3-dev  # for compiling things
 sudo apt install libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0  # For HTML -> PDF
 sudo apt install libreoffice-base-nogui libreoffice-calc-nogui libreoffice-draw-nogui libreoffice-impress-nogui libreoffice-math-nogui libreoffice-writer-nogui  # For Office -> PDF
 sudo apt install exiftool  # for extracting exif information
+sudo apt install unrar  # for extracting rar files
 ```
 
 Note: on Ubuntu 20.04, libreoffice-nogui cannot be installed due to some dependencies issues.
@@ -123,6 +124,8 @@ sudo wget http://cdn.download.comodo.com/av/updates58/sigs/bases/bases.cav -O /o
 ```
 
 Best way to keep your Database up-to-date is to create a cron running it.
+
+In case of error during the next upgrade of the system, edit the file /var/lib/dpkg/status and remove the dependencie for cav-linux packages.
 
 ### Workers configuration
 

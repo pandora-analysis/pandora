@@ -72,6 +72,7 @@ class File:
         'application/zip': ['ARC', 'zip'],
         'application/java-archive': ['ARC', 'jar'],
         'application/x-7z-compressed': ['ARC', '7z'],
+        'application/x-rar' : ['ARC', 'rar'],
         'text/css': ['CSS', 'css'],
         'text/csv': ['CSV', 'csv'],
         'application/msword': ['DOC', 'doc'],

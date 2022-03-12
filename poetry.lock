@@ -1374,6 +1374,14 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "rarfile"
+version = "4.0"
+description = "RAR archive reader for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "redis"
 version = "4.1.4"
 description = "Python client for Redis database and key-value store"
@@ -1899,7 +1907,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "84adf11c01a06120d60c2bfb1d4deb47773fa70bae3e240e183d8c9163f3f0d6"
+content-hash = "d66c5aa410b84ae48de69acd763c60d8390cd7231f42db420cbed7df2b820591"
 
 [metadata.files]
 aiohttp = [
@@ -3199,6 +3207,10 @@ pyzstd = [
     {file = "pyzstd-0.15.2-pp38-pypy38_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:f45220443598b6567cb0072354f886f9fdc861f309a8a87d89ab86e59bbff833"},
     {file = "pyzstd-0.15.2-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:a5fff428ed8d055fbf22dbd06b2804b3f4d9d857c4be30c5e0ae9efd4b0573b2"},
     {file = "pyzstd-0.15.2.tar.gz", hash = "sha256:eda9d2874a8f3823eea882125f304620f592693b3af0101c484bfc75726c8c59"},
+]
+rarfile = [
+    {file = "rarfile-4.0-py3-none-any.whl", hash = "sha256:1094869119012f95c31a6f22cc3a9edbdca61861b805241116adbe2d737b68f8"},
+    {file = "rarfile-4.0.tar.gz", hash = "sha256:67548769229c5bda0827c1663dce3f54644f9dbfba4ae86d4da2b2afd3e602a1"},
 ]
 redis = [
     {file = "redis-4.1.4-py3-none-any.whl", hash = "sha256:04629f8e42be942c4f7d1812f2094568f04c612865ad19ad3ace3005da70631a"},
