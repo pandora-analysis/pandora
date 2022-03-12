@@ -92,10 +92,47 @@ Copy the config file:
 
 ```bash
 cp config/generic.json.sample config/generic.json
-cp config/workers.yml.sample config/workers.yml
 ```
 
 And configure it accordingly to your needs.
+
+### Antivirus workers installlation
+
+#### ClamAV
+
+Just install the package from the repo:
+
+```bash
+sudo apt-get install clamav-daemon
+```
+
+#### Comodo
+
+Install it from the official website:
+
+```bash
+wget https://download.comodo.com/cis/download/installs/linux/cav-linux_x64.deb
+sudo dpkg --ignore-depends=libssl0.9.8 -i cav-linux_x64.deb
+```
+
+As we need X session to download the database automatically, the easiest way to update it, is to do it manually.
+Using the official website: https://www.comodo.com/home/internet-security/updates/vdp/database.php
+
+```bash
+sudo wget http://cdn.download.comodo.com/av/updates58/sigs/bases/bases.cav -O /opt/COMODO/scanners/bases.cav
+```
+
+Best way to keep your Database up-to-date is to create a cron running it.
+
+### Workers configuration
+
+Copy the config files
+
+```bash
+cp pandora/workers/*.yml.sample pandora/workers/*.yml
+```
+
+And configure them accordingly to your needs.
 
 ### Update and launch
 

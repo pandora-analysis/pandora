@@ -48,6 +48,7 @@ malwarebazaar = "^0.1.3"
 irmacl-async = "^3.3.0"
 yara-python = "^4.1.3"
 svglib = "^1.2.1"
+clamd = "^1.0.2"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.1.1"

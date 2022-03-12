@@ -1,0 +1,7 @@
+meta:
+  name: Comodo
+  description: Local Comodo Scanner
+  replicas: 1
+
+settings:
+  comodo_path: /opt/COMODO/cmdscan
