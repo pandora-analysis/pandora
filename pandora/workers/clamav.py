@@ -28,12 +28,7 @@ class ClamAVWorker(BaseWorker):
             return
         self.last_change = None
 
-        try:
-            # initialize the compiled rules
-            self._socket = clamd.ClamdUnixSocket(path=self.socket_path)
-        except yara.Error as e:
-            self.disabled = True
-            self.logger.critical(f'Unable to initialize clamd: {e}')
+        self._socket = clamd.ClamdUnixSocket(path=self.socket_path)
 
     def analyse(self, task: Task, report: Report):
             self.logger.debug(f'analysing file {task.file.path}...')
