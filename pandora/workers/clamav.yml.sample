@@ -1,0 +1,7 @@
+meta:
+  name: ClamAV
+  description: Local ClamAV scanner
+  replicas: 1
+
+settings
+  socket_path: /var/run/clamav/clamd.ctl

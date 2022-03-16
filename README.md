@@ -68,6 +68,7 @@ sudo apt install python3-dev  # for compiling things
 sudo apt install libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0  # For HTML -> PDF
 sudo apt install libreoffice-base-nogui libreoffice-calc-nogui libreoffice-draw-nogui libreoffice-impress-nogui libreoffice-math-nogui libreoffice-writer-nogui  # For Office -> PDF
 sudo apt install exiftool  # for extracting exif information
+sudo apt install unrar  # for extracting rar files
 ```
 
 Note: on Ubuntu 20.04, libreoffice-nogui cannot be installed due to some dependencies issues.
@@ -92,10 +93,50 @@ Copy the config file:
 
 ```bash
 cp config/generic.json.sample config/generic.json
-cp config/workers.yml.sample config/workers.yml
 ```
 
 And configure it accordingly to your needs.
+
+### Antivirus workers
+
+#### ClamAV
+
+Install the package from the official repositories, and the default config will work out of the box:
+
+```bash
+sudo apt-get install clamav-daemon
+```
+
+#### Comodo
+
+Install it from the official website:
+
+```bash
+wget https://download.comodo.com/cis/download/installs/linux/cav-linux_x64.deb
+sudo dpkg --ignore-depends=libssl0.9.8 -i cav-linux_x64.deb
+```
+
+As we need X session to download the database automatically, the easiest on a server is to
+do it manually from the [official website](https://www.comodo.com/home/internet-security/updates/vdp/database.php).
+
+```bash
+sudo wget http://cdn.download.comodo.com/av/updates58/sigs/bases/bases.cav -O /opt/COMODO/scanners/bases.cav
+```
+
+Best way to keep your Database up-to-date is to create a cron running it.
+
+In case of error during the next upgrade of the system, edit `/var/lib/dpkg/status`
+and remove the dependencies for cav-linux packages.
+
+### Workers configuration
+
+Copy the sample config files (`<workername>.yml.sample`) and edit the newly created ones (`<workername>.yml`):
+
+```bash
+for file in pandora/workers/*.sample; do cp -i ${file} ${file%%.sample}; done
+```
+
+Configure them accordingly to your needs (API key, file paths, ...).
 
 ### Update and launch
 
