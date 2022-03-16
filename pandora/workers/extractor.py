@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import py7zr  # type: ignore
-import rarfile # type: ignore
+import rarfile  # type: ignore
 
 from ..default import safe_create_dir
 from ..helpers import Status
@@ -45,6 +45,47 @@ class Extractor(BaseWorker):
                             found_password = True
                             break
                         except RuntimeError:
+                            continue
+                    else:
+                        report.status = Status.WARN
+                        report.add_details('Warning', 'File encrypted and unable to find password')
+                        break
+                if info.is_dir():
+                    continue
+                if info.file_size > self.MAX_EXTRACTED_FILE_SIZE:
+                    self.logger.warning(f'Skipping file {info.filename}, too big ({info.file_size}).')
+                    report.status = Status.WARN
+                    report.add_details('Warning', f'Skipping file {info.filename}, too big ({info.file_size}).')
+                    continue
+                file_path = archive.extract(info, dest_dir)
+                extracted_files.append(Path(file_path))
+            else:
+                # was able to extract everything, except files that are too big.
+                if report.status == Status.RUNNING:
+                    report.status = Status.CLEAN
+        return extracted_files
+
+    def _extract_rar(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
+        found_password = False
+        extracted_files: List[Path] = []
+        with rarfile.RarFile(archive_file.path) as archive:
+            for file_number, info in enumerate(archive.infolist()):
+                if file_number >= self.MAX_EXTRACT_FILES:
+                    self.logger.warning('Too many files in the archive, stop extracting.')
+                    report.status = Status.ALERT
+                    report.add_details('Warning', 'Too many files in the archive')
+                    break
+                if info.needs_password() and not found_password:
+                    for pwd in self.ZIP_PASSWORDS:
+                        try:
+                            with archive.open(info, pwd=pwd.encode()) as f:
+                                f.read()
+                            archive.setpassword(pwd.encode())
+                            found_password = True
+                            break
+                        except rarfile.BadRarFile:
+                            continue
+                        except rarfile.PasswordRequired:
                             continue
                     else:
                         report.status = Status.WARN
@@ -115,53 +156,6 @@ class Extractor(BaseWorker):
                 return []
 
             archive.extractall(path=str(dest_dir))
-
-        return [path for path in dest_dir.iterdir() if path.is_file()]
-
-    def _try_password_rar(self, path) -> Optional[str]:
-        for pwd in self.ZIP_PASSWORDS:
-            try:
-                with rarfile.RarFile(file=path, mode='r') as archive:
-                    files_in_archive = archive.infolist()
-                    if files_in_archive:
-                        archive.read(files_in_archive[0],pwd=pwd)
-                        return pwd
-            except Exception as e:
-                self.logger.warning(e)
-                # TODO: notify that to the user?
-                continue
-        else:
-            return None
-
-    def _extract_rar(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
-        if len(rarfile.RarFile(file=archive_file.path, mode='r').namelist()) > self.MAX_EXTRACT_FILES :
-            self.logger.warning('Too many files in the archive.')
-            report.status = Status.ALERT
-            report.add_details('Warning', 'Too many files in the archive')
-            return []
-
-        archivesize = 0
-        for files in rarfile.RarFile(file=archive_file.path, mode='r').infolist():
-            archivesize += files.file_size
-        if archivesize >= self.MAX_EXTRACTED_FILE_SIZE:
-            self.logger.warning(f'File {archive_file.path.name} too big ({archive.archiveinfo().uncompressed}).')
-            report.status = Status.WARN
-            report.add_details('Warning', f'File {archive_file.path.name} too big ({archive.archiveinfo().uncompressed}).')
-            return []
-
-        needs_password = rarfile.RarFile(file=archive_file.path, mode='r').needs_password()
-
-        if needs_password:
-            password = self._try_password_rar(archive_file.path)
-            if password is None:
-                report.status = Status.WARN
-                report.add_details('Warning', 'Encypted archive, unable to find password')
-                return []
-        else:
-            password = None
-
-        with rarfile.RarFile(file=archive_file.path, mode='r') as archive:
-            archive.extractall(path=str(dest_dir), pwd=password)
 
         return [path for path in dest_dir.iterdir() if path.is_file()]
 

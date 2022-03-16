@@ -97,11 +97,11 @@ cp config/generic.json.sample config/generic.json
 
 And configure it accordingly to your needs.
 
-### Antivirus workers installlation
+### Antivirus workers
 
 #### ClamAV
 
-Just install the package from the repo:
+Install the package from the official repositories, and the default config will work out of the box:
 
 ```bash
 sudo apt-get install clamav-daemon
@@ -116,8 +116,8 @@ wget https://download.comodo.com/cis/download/installs/linux/cav-linux_x64.deb
 sudo dpkg --ignore-depends=libssl0.9.8 -i cav-linux_x64.deb
 ```
 
-As we need X session to download the database automatically, the easiest way to update it, is to do it manually.
-Using the official website: https://www.comodo.com/home/internet-security/updates/vdp/database.php
+As we need X session to download the database automatically, the easiest on a server is to
+do it manually from the [official website](https://www.comodo.com/home/internet-security/updates/vdp/database.php).
 
 ```bash
 sudo wget http://cdn.download.comodo.com/av/updates58/sigs/bases/bases.cav -O /opt/COMODO/scanners/bases.cav
@@ -125,17 +125,18 @@ sudo wget http://cdn.download.comodo.com/av/updates58/sigs/bases/bases.cav -O /o
 
 Best way to keep your Database up-to-date is to create a cron running it.
 
-In case of error during the next upgrade of the system, edit the file /var/lib/dpkg/status and remove the dependencie for cav-linux packages.
+In case of error during the next upgrade of the system, edit `/var/lib/dpkg/status`
+and remove the dependencies for cav-linux packages.
 
 ### Workers configuration
 
-Copy the config files
+Copy the sample config files (`<workername>.yml.sample`) and edit the newly created ones (`<workername>.yml`):
 
 ```bash
-cp pandora/workers/*.yml.sample pandora/workers/*.yml
+for file in pandora/workers/*.sample; do cp -i ${file} ${file%%.sample}; done
 ```
 
-And configure them accordingly to your needs.
+Configure them accordingly to your needs (API key, file paths, ...).
 
 ### Update and launch
 
