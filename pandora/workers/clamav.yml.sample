@@ -3,5 +3,5 @@ meta:
   description: Local ClamAV scanner
   replicas: 1
 
-settings
+settings:
   socket_path: /var/run/clamav/clamd.ctl

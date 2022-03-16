@@ -107,6 +107,12 @@ Install the package from the official repositories, and the default config will 
 sudo apt-get install clamav-daemon
 ```
 
+Then, check if `/var/run/clamav/clamd.ctl` exists. If it doesn't, start the service:
+
+```bash
+sudo service clamav-daemon start
+```
+
 #### Comodo
 
 Install it from the official website:
