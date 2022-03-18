@@ -381,6 +381,7 @@ def html_extracted(task_id: str, seed: Optional[str]=None):
 def html_workers_result(task_id: str, worker_name: str, seed: Optional[str]=None):
     task = pandora.get_task(task_id=task_id)
     assert task is not None, 'analysis not found'
+    assert worker_name in workers(), 'unknown worker name'
     update_user_role(pandora, task, seed)
     assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
     report = pandora.get_report(task_id, worker_name)
