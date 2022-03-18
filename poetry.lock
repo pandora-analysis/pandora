@@ -1185,16 +1185,11 @@ test = ["pytest", "pytest-cov", "pytest-flake8", "pytest-isort", "coverage", "pi
 
 [[package]]
 name = "pyexiftool"
-version = "0.5.2"
+version = "0.4.13"
 description = "Python wrapper for exiftool"
 category = "main"
 optional = false
-python-versions = ">=3.6"
-
-[package.extras]
-docs = ["packaging", "sphinx", "sphinx-autoapi", "sphinx-rtd-theme", "sphinx-autodoc-typehints"]
-json = ["ujson"]
-test = ["packaging"]
+python-versions = ">=2.6"
 
 [[package]]
 name = "pygments"
@@ -1590,7 +1585,7 @@ test = ["pytest"]
 
 [[package]]
 name = "types-pyyaml"
-version = "6.0.4"
+version = "6.0.5"
 description = "Typing stubs for PyYAML"
 category = "dev"
 optional = false
@@ -1598,7 +1593,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-redis"
-version = "4.1.17"
+version = "4.1.18"
 description = "Typing stubs for redis"
 category = "dev"
 optional = false
@@ -1606,7 +1601,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-requests"
-version = "2.27.12"
+version = "2.27.13"
 description = "Typing stubs for requests"
 category = "dev"
 optional = false
@@ -1617,7 +1612,7 @@ types-urllib3 = "<1.27"
 
 [[package]]
 name = "types-setuptools"
-version = "57.4.10"
+version = "57.4.11"
 description = "Typing stubs for setuptools"
 category = "dev"
 optional = false
@@ -1641,7 +1636,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "tzdata"
-version = "2021.5"
+version = "2022.1"
 description = "Provider of IANA time zone data"
 category = "main"
 optional = false
@@ -1666,7 +1661,7 @@ test = ["pytest-mock (>=3.3)", "pytest (>=4.3)"]
 
 [[package]]
 name = "unoserver"
-version = "1.1"
+version = "1.2"
 description = "A server for file conversions with Libre Office"
 category = "main"
 optional = false
@@ -1713,7 +1708,7 @@ test = ["pytest (>=2.2.3)", "flake8 (>=2.4.0)", "isort (>=4.2.2)"]
 
 [[package]]
 name = "vt-py"
-version = "0.13.2"
+version = "0.14.0"
 description = "The official Python client library for VirusTotal"
 category = "main"
 optional = false
@@ -1909,7 +1904,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "c95bbad8be71c419b9999e87d93bb2e3dc5b7e563fba59d0b7e8040a93e410e9"
+content-hash = "2cbadf73921c44c5898d878697e42df51caa9c8bcd49cb52e5a78092615e1463"
 
 [metadata.files]
 aiohttp = [
@@ -2903,8 +2898,8 @@ pydyf = [
     {file = "pydyf-0.1.2.tar.gz", hash = "sha256:1e2f5de48174f505de025a7d1e7cf01bbdd9422ca8ab9451782bf00ee178602c"},
 ]
 pyexiftool = [
-    {file = "PyExifTool-0.5.2-py3-none-any.whl", hash = "sha256:6935b744a746d299c26ae0f7a639c2bd95bd7b82af884c241f1b3582f4c4a145"},
-    {file = "PyExifTool-0.5.2.tar.gz", hash = "sha256:87decb24d8ba3df32d41e963cb84e07fe65a6c2141b82770efc985d6b5304c10"},
+    {file = "PyExifTool-0.4.13-py3-none-any.whl", hash = "sha256:fda35484325eecd150364160665baadc90cf330288d2048665505ad8ba5b4fc2"},
+    {file = "PyExifTool-0.4.13.tar.gz", hash = "sha256:c59c502dab4aa7dd0708e91d4a30cd06c10b08cd7daa1c86b6fe85330cec1293"},
 ]
 pygments = [
     {file = "Pygments-2.11.2-py3-none-any.whl", hash = "sha256:44238f1b60a76d78fc8ca0528ee429702aae011c265fe6a8dd8b63049ae41c65"},
@@ -3285,20 +3280,20 @@ traitlets = [
     {file = "traitlets-5.1.1.tar.gz", hash = "sha256:059f456c5a7c1c82b98c2e8c799f39c9b8128f6d0d46941ee118daace9eb70c7"},
 ]
 types-pyyaml = [
-    {file = "types-PyYAML-6.0.4.tar.gz", hash = "sha256:6252f62d785e730e454dfa0c9f0fb99d8dae254c5c3c686903cf878ea27c04b7"},
-    {file = "types_PyYAML-6.0.4-py3-none-any.whl", hash = "sha256:693b01c713464a6851f36ff41077f8adbc6e355eda929addfb4a97208aea9b4b"},
+    {file = "types-PyYAML-6.0.5.tar.gz", hash = "sha256:464e050914f3d1d83a8c038e1cf46da5cb96b7cd02eaa096bcaa03675edd8a2e"},
+    {file = "types_PyYAML-6.0.5-py3-none-any.whl", hash = "sha256:2fd21310870addfd51db621ad9f3b373f33ee3cbb81681d70ef578760bd22d35"},
 ]
 types-redis = [
-    {file = "types-redis-4.1.17.tar.gz", hash = "sha256:5c8707423c60e70ba6ff9a5f01baacbb6c871e44f6a2bd562790cee9edd5b5b1"},
-    {file = "types_redis-4.1.17-py3-none-any.whl", hash = "sha256:7e98c567f0e279b47b0a0ddee8c0180a086e4a5f1b95e6890b40b2a84dc97fb6"},
+    {file = "types-redis-4.1.18.tar.gz", hash = "sha256:b00fc56074d8ef0d7f52f5dc3ebfa2cc2f1970b384c8c83733ebab940b1f985e"},
+    {file = "types_redis-4.1.18-py3-none-any.whl", hash = "sha256:93bc85db6fb4634e85eff8b64cb662d47a55141b532085f4a99c70b174e65e8d"},
 ]
 types-requests = [
-    {file = "types-requests-2.27.12.tar.gz", hash = "sha256:fd1382fa2e28eac848faedb0332840204f06f0cb517008e3c7b8282ca53e56d2"},
-    {file = "types_requests-2.27.12-py3-none-any.whl", hash = "sha256:120c949953b618e334bbe78de38e65aa261e1f48df021a05f0be833a848e4ba7"},
+    {file = "types-requests-2.27.13.tar.gz", hash = "sha256:cf0646031dd6307113b37814f743c04f0707a3357378c2bb1326f848412f5ba9"},
+    {file = "types_requests-2.27.13-py3-none-any.whl", hash = "sha256:5d6f77f3c7565659bdb7b7bce1d33d1abb7d0b056138cac714860e13da2f19df"},
 ]
 types-setuptools = [
-    {file = "types-setuptools-57.4.10.tar.gz", hash = "sha256:9a13513679c640f6616e2d9ab50d431c99ca8ae9848a97243f887c80fd5cf294"},
-    {file = "types_setuptools-57.4.10-py3-none-any.whl", hash = "sha256:ddc98da82c12e1208012d65276641a132d3aadc78ecfff68fd3e17d85933a3c1"},
+    {file = "types-setuptools-57.4.11.tar.gz", hash = "sha256:262f7406e0c7d705ad6bb4526b5b761fa500bf99eab74de85ac3592187d62935"},
+    {file = "types_setuptools-57.4.11-py3-none-any.whl", hash = "sha256:fbb0647569d6fb2f6bc472402265250c0ffa53e60180d2cbfee9e84f085921f0"},
 ]
 types-urllib3 = [
     {file = "types-urllib3-1.26.11.tar.gz", hash = "sha256:24d64e441168851eb05f1d022de18ae31558f5649c8f1117e384c2e85e31315b"},
@@ -3309,16 +3304,16 @@ typing-extensions = [
     {file = "typing_extensions-4.1.1.tar.gz", hash = "sha256:1a9462dcc3347a79b1f1c0271fbe79e844580bb598bafa1ed208b94da3cdcd42"},
 ]
 tzdata = [
-    {file = "tzdata-2021.5-py2.py3-none-any.whl", hash = "sha256:3eee491e22ebfe1e5cfcc97a4137cd70f092ce59144d81f8924a844de05ba8f5"},
-    {file = "tzdata-2021.5.tar.gz", hash = "sha256:68dbe41afd01b867894bbdfd54fa03f468cfa4f0086bfb4adcd8de8f24f3ee21"},
+    {file = "tzdata-2022.1-py2.py3-none-any.whl", hash = "sha256:238e70234214138ed7b4e8a0fab0e5e13872edab3be586ab8198c407620e2ab9"},
+    {file = "tzdata-2022.1.tar.gz", hash = "sha256:8b536a8ec63dc0751342b3984193a3118f8fca2afe25752bb9b7fffd398552d3"},
 ]
 tzlocal = [
     {file = "tzlocal-4.1-py3-none-any.whl", hash = "sha256:28ba8d9fcb6c9a782d6e0078b4f6627af1ea26aeaa32b4eab5324abc7df4149f"},
     {file = "tzlocal-4.1.tar.gz", hash = "sha256:0f28015ac68a5c067210400a9197fc5d36ba9bc3f8eaf1da3cbd59acdfed9e09"},
 ]
 unoserver = [
-    {file = "unoserver-1.1-py3-none-any.whl", hash = "sha256:30ed6e2318962c9cb40b0dc9272c848435394d5c1242e29d9280366476a57939"},
-    {file = "unoserver-1.1.tar.gz", hash = "sha256:2614fa4f3d780c15c182c827ef502df48157c4f48ce8456a8ea00c49357d1d60"},
+    {file = "unoserver-1.2-py3-none-any.whl", hash = "sha256:b65d7bc3575202e44a80ef8446d461f8d9b3845f57308854cd4c29cd27d0215c"},
+    {file = "unoserver-1.2.tar.gz", hash = "sha256:832f0646d2a9bfa36109ebdf23968bfb0fbc67617ec4ee9f45dadd2aa943c6be"},
 ]
 untangle = [
     {file = "untangle-1.1.1.tar.gz", hash = "sha256:e7cfa1ad57707e6b74cfea8b9fc50f7cbe9bbaf18401cc9d72192002bcd80bcb"},
@@ -3332,8 +3327,8 @@ validators = [
     {file = "validators-0.18.2.tar.gz", hash = "sha256:37cd9a9213278538ad09b5b9f9134266e7c226ab1fede1d500e29e0a8fbb9ea6"},
 ]
 vt-py = [
-    {file = "vt-py-0.13.2.tar.gz", hash = "sha256:2a505f4f416e68f21dbf785af8fd7b427527cb21f054ce75323e3539714cc773"},
-    {file = "vt_py-0.13.2-py3-none-any.whl", hash = "sha256:77786de6771b9c1cd730821de8e9568ddc9005b279742895194fdcc426f27660"},
+    {file = "vt-py-0.14.0.tar.gz", hash = "sha256:f3e9341cfa344ec3b3b582e29255af7055a61c907c2f28e2a402e363bdf4c40b"},
+    {file = "vt_py-0.14.0-py3-none-any.whl", hash = "sha256:0841b54da3f3e0ba80d1086e2e4e4d3dfb5282db42bfe991d67a6e946d9e9cf9"},
 ]
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},
