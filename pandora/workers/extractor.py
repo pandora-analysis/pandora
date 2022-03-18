@@ -19,6 +19,32 @@ from ..file import File
 
 from .base import BaseWorker
 
+# Notes:
+# 1. Never blindly extract a file:
+#    * check unpacked size with a method of the unpacker lib.
+#      If it's not (bz2, gz, lzma), read the file up to MAX_EXTRACTED_FILE_SIZE
+#      and throw an exception/warning if we reach that.
+#    * check how many files are in an archive, preferably with a method of the unpacker lib.
+#      If it is not possible, extract files until you reach MAX_EXTRACT_FILES
+# => for those two reasons, we cannot use shutil.unpack_archive, which doesn't check anything
+
+# 2. The file can have a password?
+#    * figure out how to detect that => library method? exception?
+#    * Is possible, keep it in one loop:
+#        1. loop over all the files in the archive
+#        2. inside that loop, try each possible password against 1st file
+#        3. if something works, use a method to set the password in the lib
+#       That's the clean approach, works on zip, and rar files
+#
+#    * Else:
+#        1. Loop over each passwords, try to open the archive file until something works
+#        2. Reopen the file with the working password
+#       => 7z files
+
+# TODO: Standard python lib
+#   bz2, gz, lzma: can only contain one file, but it could be > MAX_EXTRACTED_FILE_SIZE
+#   tar: Multiple files => check MAX_EXTRACT_FILES
+
 
 class Extractor(BaseWorker):
 
