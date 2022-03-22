@@ -26,9 +26,26 @@ You need poetry installed, see the [install guide](https://python-poetry.org/doc
 
 ### Redis
 
-You need to have redis cloned and installed in the same directory you clone this template in:
-this repoitory and and `redis` must be in the same directory, and **not** `redis` cloned in the
-this directory. See [this guide](https://www.lookyloo.eu/docs/main/install-lookyloo.html#_install_redis).
+[Redis](https://redis.io/): An open source (BSD licensed), in-memory data structure store, used as a database, cache and message broker.
+
+NOTE: Redis should be installed from the source, and the repository must be in the same directory as the one you will be cloning Lookyloo into.
+
+In order to compile and test redis, you will need a few packages:
+
+```bash
+sudo apt-get update
+sudo apt install build-essential tcl
+```
+
+```bash
+git clone https://github.com/redis/redis.git
+cd redis
+git checkout 6.2
+make
+# Optionally, you can run the tests:
+make test
+cd ..
+```
 
 ### Kvrocks
 
