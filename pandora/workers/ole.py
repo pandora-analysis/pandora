@@ -189,9 +189,13 @@ class Ole(BaseWorker):
             xmlparser = ooxml.XmlParser(str(task.file.path))
             # external relationships
             # same as oid.check_external_relationships(), but gets the details.
+            # rel_type is one of BLACKLISTED_RELATIONSHIP_TYPES in https://github.com/decalage2/oletools/blob/master/oletools/oleobj.py
             for rel_type, attribute in find_external_relationships(xmlparser):
-                report.status = Status.ALERT
-                malicious.append(f'{rel_type} - {attribute}')
+                if rel_type == 'hyperlink':
+                    task.add_observable(attribute, 'url')
+                else:
+                    report.status = Status.ALERT
+                    malicious.append(f'{rel_type} - {attribute}')
 
             for olefile in find_ole(task.file.original_filename, task.file.data.getvalue()):
                 report.status = Status.ALERT

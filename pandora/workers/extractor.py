@@ -225,7 +225,7 @@ class Extractor(BaseWorker):
         # Try to extract attachments from EML file
         if task.file.is_eml or task.file.is_msg:
             try:
-                if task.file.eml_data.get('attachment'):
+                if task.file.eml_data and task.file.eml_data.get('attachment'):
                     extracted_dir = task.file.directory / 'extracted'
                     safe_create_dir(extracted_dir)
                     for attachment in task.file.eml_data['attachment']:

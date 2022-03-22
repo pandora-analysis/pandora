@@ -11,9 +11,6 @@
             Hello {{ current_user.name }} !
         </div>
         <div class="list-group">
-          {% if current_user.role.can(action.list_observables) %}
-            <a href="{{ url_for('api_observables') }}" class="list-group-item list-group-item-action">See observables</a>
-          {% endif %}
           {% if current_user.role.can(action.list_tasks) %}
             <a href="{{ url_for('api_tasks') }}" class="list-group-item list-group-item-action">See tasks</a>
           {% endif %}

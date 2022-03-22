@@ -9,6 +9,7 @@ from enum import IntEnum, Enum, unique, auto
 from functools import lru_cache
 from typing import Dict, List, Optional, Union, Any
 
+from publicsuffix2 import PublicSuffixList, fetch  # type: ignore
 import yaml
 
 from .default import get_homedir
@@ -131,3 +132,15 @@ def expire_in_sec(time: Union[str, int]) -> int:
     elif match.group(2) == 'd':
         return int(timedelta(days=int(match.group(1))).total_seconds())
     return 0
+
+
+@lru_cache(64)
+def get_public_suffix_list() -> PublicSuffixList:
+    # Initialize Public Suffix List
+    try:
+        psl_file = fetch()
+        psl = PublicSuffixList(psl_file=psl_file)
+    except Exception as e:
+        logging.getLogger(__name__).warning(f'Unable to fetch the PublicSuffixList: {e}')
+        psl = PublicSuffixList()
+    return psl

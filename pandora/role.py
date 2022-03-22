@@ -61,7 +61,6 @@ class Role:
         to_return['actions'] = json.dumps({action.name: perm for action, perm in self.actions.items()})
         return to_return
 
-    @property
     def store(self) -> None:
         self.storage.set_role(self.to_dict)
 

@@ -30,7 +30,7 @@ from pandora.role import Action
 from pandora.user import User
 
 from .generic_api import api as generic_api
-from .generic_api import ApiRole, ApiObservable, ApiSubmit, ApiTaskAction
+from .generic_api import ApiRole, ApiSubmit, ApiTaskAction
 from .helpers import (get_secret_key, update_user_role, admin_required,
                       src_request_ip, load_user_from_request, build_users_table,
                       sri_load)
@@ -314,16 +314,6 @@ def api_tasks():
     return render_template('tasks.html', tasks=tasks, search=search or '', status=Status, api=api, api_resource=ApiTaskAction)
 
 
-@app.route('/observables', methods=['GET'], strict_slashes=False)
-@admin_required
-@html_answer
-def api_observables():
-
-    assert flask_login.current_user.role.can(Action.list_observables), 'forbidden'
-    observables = pandora.get_observables()
-    return render_template('observables.html', observables=observables, api=api, api_resource=ApiObservable)
-
-
 @app.route('/users', methods=['GET'], strict_slashes=False)
 @admin_required
 @html_answer
@@ -362,6 +352,16 @@ def html_previews(task_id: str, seed: Optional[str]=None):
     assert flask_login.current_user.role.can(Action.download_images), 'forbidden'
     report = pandora.get_report(task_id, 'preview')
     return render_template('previews.html', task=task, seed=seed, report=report)
+
+
+@app.route('/observables/<task_id>', methods=['GET'], strict_slashes=False)
+@app.route('/observables/<task_id>/seed-<seed>', methods=['GET'], strict_slashes=False)
+@html_answer
+def html_observables(task_id: str, seed: Optional[str]=None):
+    task = pandora.get_task(task_id=task_id)
+    assert task is not None, 'analysis not found'
+    update_user_role(pandora, task, seed)
+    return render_template('observables.html', task=task, seed=seed)
 
 
 @app.route('/extracted/<task_id>', methods=['GET'], strict_slashes=False)

@@ -1,5 +1,6 @@
 import json
 
+from datetime import datetime
 from io import BytesIO
 from typing import Dict, Any, Optional, List, overload, Tuple
 from uuid import uuid4
@@ -9,7 +10,7 @@ from werkzeug.utils import secure_filename
 from .default import get_homedir, safe_create_dir
 from .file import File
 from .helpers import Status, workers
-from .observable import TaskObservable, Observable
+from .observable import Observable
 from .report import Report
 from .storage_client import Storage
 from .user import User
@@ -94,7 +95,6 @@ class Task:
             if user:
                 self.user = User(**user)
 
-        self.observables: List[Observable] = []
         if parent:
             self.parent = parent
         elif parent_id:
@@ -117,6 +117,10 @@ class Task:
                 self.disabled_workers = disabled_workers
         else:
             self.disabled_workers = []
+
+        for observable_type, values in self.file.observables.items():
+            for value in values:
+                self.add_observable(value, observable_type)
 
     @property
     def extracted(self) -> List['Task']:
@@ -201,12 +205,23 @@ class Task:
     def status(self, _status: Status):
         self._status = _status
 
-    def set_observables(self, links):
-        """
-        Add observables to current task.
-        :param (list) links: list of strings
-        """
-        self.observables = TaskObservable.get_observables(links)
+    def add_observable(self, value: str, observable_type: str):
+        # check if observable already exists
+        observable_dict = self.storage.get_observable(value, observable_type)
+        if observable_dict:
+            observable = Observable(**observable_dict)
+            observable.last_seen = datetime.now()
+            observable.store()
+        else:
+            observable = Observable.new_observable(value, observable_type)
+        self.storage.add_task_observable(self.uuid, observable.sha256, observable.observable_type)
+
+    @property
+    def observables(self) -> List[Observable]:
+        observables = []
+        for observable in self.storage.get_task_observables(self.uuid):
+            observables.append(Observable(**observable))
+        return observables
 
     def __str__(self):
         return f'<uuid: {self.uuid} - file: {self.file}>'

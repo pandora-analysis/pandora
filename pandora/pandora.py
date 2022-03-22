@@ -12,8 +12,8 @@ from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
 
 from .default import get_config, get_socket_path
-from .helpers import roles_from_config, allowlist_default, expire_in_sec
-from .observable import TaskObservable, Observable
+from .helpers import roles_from_config, expire_in_sec
+from .observable import Observable
 from .report import Report
 from .role import Role, RoleName
 from .task import Task
@@ -43,8 +43,8 @@ class Pandora():
                 role.store
 
         # Load user-defined allowlist
-        for observable in TaskObservable.get_observables(links=allowlist_default(), allowlist=True):
-            observable.store
+        # for observable in TaskObservable.get_observables(links=allowlist_default(), allowlist=True):
+        #     observable.store
 
     @property
     def redis_bytes(self):
@@ -154,10 +154,8 @@ class Pandora():
     # #### Observable ####
 
     def get_observables(self) -> List[Observable]:
-        observables = []
-        for observable in self.storage.get_observables():
-            observables.append(Observable(**observable))
-        return observables
+        # TODO: get most recent observables, optionnally filter
+        pass
 
     # ##############
 

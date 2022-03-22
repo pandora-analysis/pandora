@@ -4,7 +4,7 @@
 import operator
 
 from datetime import datetime
-from typing import Optional, Dict, List, Union, Set
+from typing import Optional, Dict, List, Union, Set, overload
 
 from redis import ConnectionPool, Redis
 
@@ -80,18 +80,37 @@ class Storage():
     # #### Observable ####
 
     def set_observable(self, observable: Dict[str, str]):
-        # TODO: need UUID for each observable.
-        if 'allowlist' in observable and observable['allowlist']:
-            self.storage.hmset(f'observables:allowlist:{observable["address"]}', observable)
-            self.storage.sadd('observables:allowlist', observable["address"])
-        else:
-            raise Exception('not implemented')
+        timestamp = datetime.fromisoformat(observable['last_seen']).timestamp()
+        identifier = f'{observable["sha256"]}-{observable["observable_type"]}'
 
-    def get_observables(self) -> List[Dict[str, str]]:
+        self.storage.hmset(f'observables:{identifier}', observable)
+        # TODO: use that in search page for observables.
+        # Note: scan doesn't return the entries in any order, so we need to paginate manually
+        self.storage.zadd('observables', {identifier: timestamp})
+
+    @overload
+    def get_observable(self, sha256: str, observable_type: str) -> Optional[Dict[str, str]]:
+        ...
+
+    @overload
+    def get_observable(self, identifier: str) -> Optional[Dict[str, str]]:
+        ...
+
+    def get_observable(self, sha256=None, observable_type=None, identifier=None):
+        if not identifier:
+            identifier = f'{sha256}-{observable_type}'
+        return self.storage.hgetall(f'observables:{identifier}')
+
+    def get_task_observables(self, task_uuid: str) -> List[Dict[str, str]]:
         observables = []
-        for address in self.storage.smembers('observables:allowlist'):
-            observables.append(self.storage.hgetall(f'observables:allowlist:{address}'))
+        for identifier in self.storage.smembers(f'{task_uuid}:observables'):
+            observable = self.get_observable(identifier=identifier)
+            if observable:
+                observables.append(observable)
         return observables
+
+    def add_task_observable(self, task_uuid: str, sha256: str, observable_type: str):
+        self.storage.sadd(f'{task_uuid}:observables', f'{sha256}-{observable_type}')
 
     # ##############
 
@@ -107,7 +126,7 @@ class Storage():
     def get_files(self) -> List[Dict[str, str]]:
         files = []
         for uuid in self.storage.smembers('files'):
-            files.append(self.storage.hgetall(f'files:{uuid}'))
+            files.append(self.get_file(uuid))
         return files
 
     # ##############
@@ -125,7 +144,7 @@ class Storage():
     def get_tasks(self, *, first_date: Union[str, float]=0, last_date: Union[str, float]='+Inf') -> List[Dict[str, str]]:
         tasks = []
         for uuid in self.storage.zrevrangebyscore('tasks', min=first_date, max=last_date):
-            tasks.append(self.storage.hgetall(f'tasks:{uuid}'))
+            tasks.append(self.get_task(uuid))
         tasks.sort(key=operator.itemgetter('save_date'), reverse=True)
         return tasks
 

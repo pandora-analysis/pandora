@@ -47,9 +47,6 @@ Analysis.prototype.refreshReports = function () {
 };
 
 Analysis.prototype.refreshTabs = function () {
-    let originTask = this.task;
-    let file = this.file;
-
     if (this.workers_status.preview && this.workers_status.preview[0]) {
         $('.preview-wait').each(function(index, element) {
           $(this).addClass("d-none");
@@ -78,7 +75,32 @@ Analysis.prototype.refreshTabs = function () {
               document.getElementById("previews_images").innerHTML=text;
             })
         }
+    }
 
+    if (this.number_observables) {
+        document.getElementById("number_observables").innerHTML = this.number_observables;
+       $('#observables_tab').each(function(index, element) {
+           $(this).removeClass("d-none");
+       })
+       extracted_url = `/observables/${this.task.uuid}`
+       if (this.seed) {
+           extracted_url = `${previews_url}/seed-${this.seed}`
+       }
+
+       fetch(extracted_url, {
+         method: "GET",
+         headers: {
+           "X-CSRF-Token": this.CSRFToken
+         }
+       })
+       .then(response => response.text())
+       .then(text => {
+         document.getElementById("observables_content").innerHTML=text;
+       })
+    }
+
+    if (this.number_extracted) {
+        document.getElementById("number_extracted").innerHTML = this.number_extracted;
     }
     if (this.workers_status.extractor && this.workers_status.extractor[0]) {
         if (this.workers_status.extractor[1] != 'NOTAPPLICABLE') {
@@ -133,18 +155,6 @@ Analysis.prototype.refreshTabs = function () {
             }
         })
     }
-
-    if (originTask.observables) {
-        // TODO: get html blocks from flask
-    }
-
-    if (originTask.extracted_tasks) {
-        // TODO: get html blocks from flask
-    }
-
-    if (originTask.linked_tasks) {
-        // TODO: get html blocks from flask
-    }
 };
 
 Analysis.prototype.refreshHTML = function () {
@@ -173,6 +183,8 @@ Analysis.prototype.refresh = function (url) {
     analysis.file = data.file;
     analysis.workers_done = data.workers_done;
     analysis.workers_status = data.workers_status;
+    analysis.number_observables = data.number_observables;
+    analysis.number_extracted = data.number_extracted;
     analysis.refreshHTML();
   })
   .catch((error) => {

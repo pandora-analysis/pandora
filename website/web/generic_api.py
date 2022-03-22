@@ -12,11 +12,10 @@ from flask_restx import Namespace, Resource  # type: ignore
 
 from pandora.default import get_config, PandoraException
 from pandora.pandora import Pandora
-from pandora.observable import Observable
 from pandora.mail import Mail
 from pandora.role import Action
 from pandora.task import Task
-from pandora.helpers import roles_from_config
+from pandora.helpers import roles_from_config, workers
 
 from .helpers import admin_required, update_user_role
 
@@ -81,38 +80,6 @@ class ApiRole(Resource):
         raise AssertionError('forbidden')
 
 
-@api.route('/observable/<action>', methods=['POST'], strict_slashes=False)
-@api.doc(description='Update or insert observables')
-class ApiObservable(Resource):
-
-    @admin_required
-    @json_answer
-    def post(self, action):
-        data: Dict[str, str] = request.get_json()  # type: ignore
-
-        assert action in ('update', 'insert'), f"unknown action '{action}'"
-        if action == 'update' and flask_login.current_user.role.can(Action.update_observable):
-            assert 'address' in data, "missing mandatory key 'address'"
-            assert 'allowlist' in data, "missing mandatory key 'allowlist'"
-            observable = Observable(
-                address=data['address'], allowlist=bool(int(data['allowlist']))
-            )
-            observable.store
-            return {'success': True}
-
-        if action == 'insert' and flask_login.current_user.role.can(Action.insert_observable):
-            assert 'address' in data, "missing mandatory key 'address'"
-            assert 'allowlist' in data, "missing mandatory key 'allowlist'"
-            observable = Observable(
-                address=data['address'], allowlist=bool(int(data['allowlist']))
-            )
-            observable.store
-            assert observable.address, f"observable '{observable.address}' already exists"
-            return {'success': True, 'type_observable': observable.type_observable.name,
-                    'address': observable.address, 'allowlist': observable.allowlist}
-        raise AssertionError('forbidden')
-
-
 @api.route('/submit', methods=['POST'], strict_slashes=False)
 class ApiSubmit(Resource):
 
@@ -123,6 +90,9 @@ class ApiSubmit(Resource):
         assert submitted_file.filename, 'file required'
 
         file_bytes = BytesIO(submitted_file.read())
+        # check if file is empty. Do not run any worker if it is the case.
+        if file_bytes.getvalue().strip() == b'':
+            disabled_workers = list(workers())
         disabled_workers = request.form["workersDisabled"].split(",") if request.form.get("workersDisabled") else []
         try:
             task = Task.new_task(flask_login.current_user, sample=file_bytes,
@@ -152,6 +122,8 @@ class ApiTaskAction(Resource):
             # task.store()
             return {'success': True, 'task': task.to_dict, 'workers_done': task.workers_done,
                     'seed': seed, 'workers_status': task.workers_status,
+                    'number_observables': len(task.observables),
+                    'number_extracted': len(task.extracted),
                     'file': task.file.to_web}
 
         if action == 'share' and flask_login.current_user.role.can(Action.share_analysis):

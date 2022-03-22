@@ -82,11 +82,6 @@
                         <a class="nav-link active" href="{{ url_for('api_users') }}">Users</a>
                     </li>
                 {% endif %}
-                {% if current_user.role.can('list_observables') %}
-                    <li class="nav-item" id="observables-nav">
-                        <a class="nav-link active" href="{{ url_for('api_observables') }}">Observables</a>
-                    </li>
-                {% endif %}
                 {% if current_user.role.can('list_stats') %}
                     <li class="nav-item" id="stats-nav">
                         <a class="nav-link active" href="{{ url_for('api_stats') }}">Statistics</a>

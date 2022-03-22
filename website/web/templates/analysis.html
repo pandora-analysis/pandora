@@ -250,12 +250,14 @@
                       type="button" role="tab"
                       aria-controls="metadata" aria-selected=false">Metadata</button>
             </li>
-            <li role="presentation" class="nav-item {% if not task.observables %} d-none {% endif %}">
+            <li role="presentation" class="nav-item {% if not task.observables %} d-none {% endif %}" id="observables_tab">
               <button class="nav-link"
                       data-bs-toggle="tab"
                       data-bs-target="#observables"
                       type="button" role="tab"
-                      aria-controls="observables" aria-selected=false">Observables</a>
+                      aria-controls="observables" aria-selected=false">
+                  Observables&nbsp;&nbsp;<span class="badge bg-secondary" id="number_observables">{{ task.observables|length }}</span>
+              </button>
             </li>
             <li role="presentation" class="nav-item {% if not task.extracted %} d-none {% endif %}" id="extracted_tab">
               <button class="nav-link"
@@ -263,7 +265,7 @@
                       data-bs-target="#extracted"
                       type="button" role="tab"
                       aria-controls="extracted" aria-selected=false">
-                  Extracted&nbsp;&nbsp;<span class="badge bg-secondary">{{ task.extracted|length }}</span>
+                  Extracted&nbsp;&nbsp;<span class="badge bg-secondary" id="number_extracted">{{ task.extracted|length }}</span>
               </button>
             </li>
             <li role="presentation" class="nav-item {% if not task.linked_tasks %} d-none {% endif %}">
@@ -501,50 +503,8 @@
             {% endif %}
 
             <!-- Observables -->
-            <div role="tabpanel" class="tab-pane {% if not task.observables %} d-none {% endif %}" id="observables">
-              <div class="row" style="margin-bottom:30px">
-                <div class="col-md-8">
-                  <h3>Observables</h3>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-12" style="margin-bottom:50px">
-                  <table class="table table-hover table-bordered" >
-                    <thead>
-                      <tr>
-                        <th>Type</th>
-                        <th>Référence</th>
-                        <th>Observable</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                    {% for observable in task.observables %}
-                      <tr>
-                        <th style="width:20%">
-                         {{ observable.type }}
-                         {% if observable.whitelist %}
-                           <span class="pull-right">
-                             <i style="color:#5cb85c; font-size:20px" title="URL in whitelist"></i>
-                           </span>
-                         {% else %}
-                           <span class="pull-right">
-                             <i style="color:#ec971f; font-size:20px" title="Suspicious or uknown URL"></i>
-                           </span>
-                         {% endif %}
-                        </th>
-                        <td>
-                          {{ observable.link }}
-                        </td>
-                        <td>
-                          {{ observable.address }}
-                        </td>
-                      </tr>
-                    {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+            <div role="tabpanel" class="tab-pane" id="observables">
+              <div id="observables_content"></div>
             </div>
 
             <!-- Extracted tasks -->

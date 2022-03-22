@@ -1,5 +1,6 @@
 import hashlib
 import importlib
+import logging
 import os
 import re
 import shutil
@@ -72,7 +73,7 @@ class File:
         'application/zip': ['ARC', 'zip'],
         'application/java-archive': ['ARC', 'jar'],
         'application/x-7z-compressed': ['ARC', '7z'],
-        'application/x-rar' : ['ARC', 'rar'],
+        'application/x-rar': ['ARC', 'rar'],
         'text/css': ['CSS', 'css'],
         'text/csv': ['CSV', 'csv'],
         'application/msword': ['DOC', 'doc'],
@@ -203,6 +204,7 @@ class File:
         """
 
         self.storage = Storage()
+        self.logger = logging.getLogger(f'{self.__class__.__name__}')
 
         if isinstance(path, str):
             self.path: Path = Path(path)
@@ -533,17 +535,24 @@ class File:
         return to_return
 
     @property
-    def links(self) -> Set[str]:
+    def observables(self) -> Dict[str, Set[str]]:
         """
-        Extract links from file content
-        :return (set): set of links (ips, urls, ibans, emails, hostnames)
+        Extract observables from file content
         """
-        links = set()
-        parsed = ""
+        observables: Dict[str, Set[str]] = {'ip-dst': set(), 'iban': set(), 'url': set(), 'hostname': set(), 'email': set()}
 
         # Try to extract eml|msg observables
         try:
+            parsed = ""
             if self.eml_data:
+                for body in self.eml_data['body']:
+                    if 'ip' in body:
+                        observables['ip-dst'].update(body['ip'])
+                    if 'uri' in body:
+                        observables['url'].update(body['uri'])
+                    if 'email' in body:
+                        observables['email'].update(body['email'])
+
                 for value in self.eml_data['body'][0]['content']:
                     parsed += value
                 parsed += ' '
@@ -554,25 +563,25 @@ class File:
                     parsed += va
 
             tp = TextParser(parsed.replace('\r\n', ''))
-            links.update(tp.ips)
-            links.update(tp.ibans)
-            links.update(tp.urls)
-            links.update(tp.hostnames)
-            links.update(tp.emails)
-        except BaseException:
-            pass
+            observables['ip-dst'].update(tp.ips)
+            observables['iban'].update(tp.ibans)
+            observables['url'].update(tp.urls)
+            observables['hostname'].update(tp.hostnames)
+            observables['email'].update(tp.emails)
+        except BaseException as e:
+            self.logger.exception(e)
 
         # Try to extract links from text
         if self.text:
             tp = TextParser(self.text.replace('\r\n', ''))
-            links.update(tp.ips)
-            links.update(tp.ibans)
-            links.update(tp.urls)
-            links.update(tp.hostnames)
-            links.update(tp.emails)
+            observables['ip-dst'].update(tp.ips)
+            observables['iban'].update(tp.ibans)
+            observables['url'].update(tp.urls)
+            observables['hostname'].update(tp.hostnames)
+            observables['email'].update(tp.emails)
 
         # TODO: extract stuff from pdfs, was using PyPDF4, which is dead.
-        return links
+        return observables
 
     @cached_property
     def eml_data(self) -> Optional[Dict]:
