@@ -277,7 +277,7 @@ class File:
             # get all content -> make it a PDF
             if 'body' in self.eml_data:
                 for i, body_part in enumerate(self.eml_data['body']):
-                    if self.MIME_TYPE_EQUAL.get(body_part['content_type']):
+                    if 'content_type' in body_part and self.MIME_TYPE_EQUAL.get(body_part['content_type']):
                         body_part_type = self.MIME_TYPE_EQUAL[body_part['content_type']][0]
                         if body_part_type == 'HTM':
                             html_to_pdf(body_part['content'], f'{self.path}_body_{i}.pdf')
@@ -286,6 +286,10 @@ class File:
                             converter.convert(indata=body_part['content'].encode(), outpath=f'{self.path}_body_{i}.pdf')
                         else:
                             print('Unexpected body type:', body_part_type)
+                    else:
+                        # Assume txt
+                        converter = dirty_load_unoconverter().UnoConverter()
+                        converter.convert(indata=body_part['content'].encode(), outpath=f'{self.path}_body_{i}.pdf')
 
     def make_previews(self) -> None:
         if self.is_pdf:
@@ -555,12 +559,14 @@ class File:
 
                 for value in self.eml_data['body'][0]['content']:
                     parsed += value
-                parsed += ' '
-                for val in self.eml_data['header']['from']:
-                    parsed += val
-                parsed += ' '
-                for va in self.eml_data['header']['to']:
-                    parsed += va
+                if 'from' in self.eml_data['header']:
+                    parsed += ' '
+                    for val in self.eml_data['header']['from']:
+                        parsed += val
+                if 'to' in self.eml_data['header']:
+                    parsed += ' '
+                    for va in self.eml_data['header']['to']:
+                        parsed += va
 
             tp = TextParser(parsed.replace('\r\n', ''))
             observables['ip-dst'].update(tp.ips)

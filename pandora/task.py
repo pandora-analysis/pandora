@@ -118,10 +118,6 @@ class Task:
         else:
             self.disabled_workers = []
 
-        for observable_type, values in self.file.observables.items():
-            for value in values:
-                self.add_observable(value, observable_type)
-
     @property
     def extracted(self) -> List['Task']:
         to_return = []
@@ -205,19 +201,34 @@ class Task:
     def status(self, _status: Status):
         self._status = _status
 
-    def add_observable(self, value: str, observable_type: str):
+    def add_observable(self, value: str, observable_type: str, seen: Optional[datetime]=None):
+        if not seen:
+            seen = datetime.now()
         # check if observable already exists
         observable_dict = self.storage.get_observable(value, observable_type)
         if observable_dict:
             observable = Observable(**observable_dict)
-            observable.last_seen = datetime.now()
-            observable.store()
+            changed = False
+            if seen < observable.first_seen:
+                observable.first_seen = seen
+                changed = True
+            elif seen > observable.last_seen:
+                observable.last_seen = seen
+                changed = True
+            if changed:
+                observable.store()
         else:
-            observable = Observable.new_observable(value, observable_type)
+            observable = Observable.new_observable(value, observable_type, seen)
         self.storage.add_task_observable(self.uuid, observable.sha256, observable.observable_type)
+
+    def __init_observables_from_file(self):
+        for observable_type, values in self.file.observables.items():
+            for value in values:
+                self.add_observable(value, observable_type, self.file.save_date)
 
     @property
     def observables(self) -> List[Observable]:
+        self.__init_observables_from_file()
         observables = []
         for observable in self.storage.get_task_observables(self.uuid):
             observables.append(Observable(**observable))

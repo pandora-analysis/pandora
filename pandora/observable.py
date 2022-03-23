@@ -9,11 +9,13 @@ from .storage_client import Storage
 class Observable:
 
     @classmethod
-    def new_observable(cls, value: str, observable_type: str):
+    def new_observable(cls, value: str, observable_type: str, seen: Optional[datetime]=None):
+        if not seen:
+            seen = datetime.now()
         # NOTE: observable_type must be a valid MISP Type, we need to check that.
         sha256 = hashlib.sha256(value.encode()).hexdigest()
-        first_seen = datetime.now()
-        last_seen = datetime.now()
+        first_seen = seen
+        last_seen = seen
         observable = cls(sha256, value, observable_type, first_seen, last_seen)
         observable.store()
         return observable
