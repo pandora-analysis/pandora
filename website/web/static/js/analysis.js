@@ -82,12 +82,12 @@ Analysis.prototype.refreshTabs = function () {
        $('#observables_tab').each(function(index, element) {
            $(this).removeClass("d-none");
        })
-       extracted_url = `/observables/${this.task.uuid}`
+       observables_url = `/observables/${this.task.uuid}`
        if (this.seed) {
-           extracted_url = `${previews_url}/seed-${this.seed}`
+           observables_url = `${observables_url}/seed-${this.seed}`
        }
 
-       fetch(extracted_url, {
+       fetch(observables_url, {
          method: "GET",
          headers: {
            "X-CSRF-Token": this.CSRFToken
