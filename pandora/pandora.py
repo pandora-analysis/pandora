@@ -42,10 +42,6 @@ class Pandora():
             for role in roles_from_config().values():
                 role.store
 
-        # Load user-defined allowlist
-        # for observable in TaskObservable.get_observables(links=allowlist_default(), allowlist=True):
-        #     observable.store
-
     @property
     def redis_bytes(self):
         return Redis(connection_pool=self.redis_pool_cache_bytes)

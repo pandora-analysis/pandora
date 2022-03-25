@@ -11,6 +11,7 @@
     <tr>
       <th>Type</th>
       <th>Observable</th>
+      <th>Warninglists</th>
     </tr>
     {% for observable in task.observables %}
     <tr id="observableRow-{{ observable.sha256 }}">
@@ -19,6 +20,13 @@
       </td>
       <td>
         {{observable.value}}
+      </td>
+      <td>
+        <ul>
+        {% for wl in observable.warninglists%}
+          <li>{{wl.name}}</li>
+        {% endfor %}
+        </ul>
       </td>
     </tr>
     {% endfor %}

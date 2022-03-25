@@ -10,6 +10,7 @@ from functools import lru_cache
 from typing import Dict, List, Optional, Union, Any
 
 from publicsuffix2 import PublicSuffixList, fetch  # type: ignore
+from pymispwarninglists import WarningLists
 import yaml
 
 from .default import get_homedir
@@ -144,3 +145,8 @@ def get_public_suffix_list() -> PublicSuffixList:
         logging.getLogger(__name__).warning(f'Unable to fetch the PublicSuffixList: {e}')
         psl = PublicSuffixList()
     return psl
+
+
+@lru_cache(64)
+def get_warninglists() -> WarningLists:
+    return WarningLists(slow_search=True)

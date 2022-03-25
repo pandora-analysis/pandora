@@ -1,8 +1,14 @@
 import hashlib
+import logging
 
 from datetime import datetime
-from typing import Optional, overload
+import json
+from typing import Optional, overload, List
 
+# NOTE: remove .api on next package release.
+from pymispwarninglists.api import WarningList
+
+from .helpers import get_warninglists
 from .storage_client import Storage
 
 
@@ -14,26 +20,43 @@ class Observable:
             seen = datetime.now()
         # NOTE: observable_type must be a valid MISP Type, we need to check that.
         sha256 = hashlib.sha256(value.encode()).hexdigest()
-        first_seen = seen
-        last_seen = seen
-        observable = cls(sha256, value, observable_type, first_seen, last_seen)
-        observable.store()
+        # Check if it already exists, update if needed
+        stored_observable = Storage().get_observable(sha256, observable_type)
+        if stored_observable:
+            observable = cls(**stored_observable)
+            changed = False
+            if seen < observable.first_seen:
+                observable.first_seen = seen
+                changed = True
+            elif seen > observable.last_seen:
+                observable.last_seen = seen
+                changed = True
+            if changed:
+                observable.check_warninglists()
+                observable.store()
+        else:
+            first_seen = seen
+            last_seen = seen
+            observable = cls(sha256, value, observable_type, first_seen, last_seen)
+            observable.check_warninglists()
+            observable.store()
         return observable
 
     @overload
     def __init__(self, sha256: str, value: str, observable_type: str,
-                 first_seen: str, last_seen: str, warninglist: Optional[str]=None):
+                 first_seen: str, last_seen: str, warninglists: Optional[str]=None):
         '''From redis'''
         ...
 
     @overload
     def __init__(self, sha256: str, value: str, observable_type: str,
-                 first_seen: datetime, last_seen: datetime, warninglist: Optional[str]=None):
+                 first_seen: datetime, last_seen: datetime, warninglists: Optional[List[WarningList]]=None):
         '''From python'''
         ...
 
-    def __init__(self, sha256, value, observable_type, first_seen, last_seen, warninglist=None):
+    def __init__(self, sha256, value, observable_type, first_seen, last_seen, warninglists=None, warninglist=None):
         self.storage = Storage()
+        self.logger = logging.getLogger(f'{self.__class__.__name__}')
 
         self.sha256 = sha256
         self.value = value
@@ -49,11 +72,19 @@ class Observable:
         else:
             self.last_seen = last_seen
 
-        if warninglist:
-            self.warninglist = warninglist
-        else:
-            # in case warninglist == ''
-            self.warninglist = None
+        self.warninglists: List[WarningList] = []
+        if warninglists:
+            if isinstance(warninglists, str):
+                for wl in json.loads(warninglists):
+                    if get_warninglists().get(wl):
+                        self.warninglists.append(get_warninglists()[wl])
+                    else:
+                        self.logger.warning(f'Unable to find warning list {wl}')
+            else:
+                self.warninglists = warninglists
+
+    def check_warninglists(self):
+        self.warninglists = get_warninglists().search(self.value)
 
     @property
     def to_dict(self):
@@ -63,7 +94,7 @@ class Observable:
             'observable_type': self.observable_type,
             'first_seen': self.first_seen.isoformat(),
             'last_seen': self.last_seen.isoformat(),
-            'warninglist': self.warninglist if self.warninglist else ''
+            'warninglists': json.dumps([wl.name for wl in self.warninglists])
         }
 
     def store(self):

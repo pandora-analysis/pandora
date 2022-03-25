@@ -204,21 +204,7 @@ class Task:
     def add_observable(self, value: str, observable_type: str, seen: Optional[datetime]=None):
         if not seen:
             seen = datetime.now()
-        # check if observable already exists
-        observable_dict = self.storage.get_observable(value, observable_type)
-        if observable_dict:
-            observable = Observable(**observable_dict)
-            changed = False
-            if seen < observable.first_seen:
-                observable.first_seen = seen
-                changed = True
-            elif seen > observable.last_seen:
-                observable.last_seen = seen
-                changed = True
-            if changed:
-                observable.store()
-        else:
-            observable = Observable.new_observable(value, observable_type, seen)
+        observable = Observable.new_observable(value, observable_type, seen)
         self.storage.add_task_observable(self.uuid, observable.sha256, observable.observable_type)
 
     def __init_observables_from_file(self):
