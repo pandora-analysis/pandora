@@ -18,6 +18,8 @@ from zipfile import ZipFile
 import exiftool  # type: ignore
 import fitz  # type: ignore
 import magic
+import pikepdf
+
 from PIL import Image, ImageDraw, ImageFont  # type: ignore
 from svglib.svglib import svg2rlg  # type: ignore
 from reportlab.graphics import renderPDF  # type: ignore
@@ -545,39 +547,27 @@ class File:
         """
         observables: Dict[str, Set[str]] = {'ip-dst': set(), 'iban': set(), 'url': set(), 'hostname': set(), 'email': set()}
 
-        # Try to extract eml|msg observables
-        try:
-            parsed = ""
-            if self.eml_data:
-                for body in self.eml_data['body']:
-                    if 'ip' in body:
-                        observables['ip-dst'].update(body['ip'])
-                    if 'uri' in body:
-                        observables['url'].update(body['uri'])
-                    if 'email' in body:
-                        observables['email'].update(body['email'])
+        if self.eml_data:
+            for body in self.eml_data['body']:
+                if 'ip' in body:
+                    observables['ip-dst'].update(body['ip'])
+                if 'uri' in body:
+                    observables['url'].update(body['uri'])
+                if 'email' in body:
+                    observables['email'].update(body['email'])
+        elif self.is_pdf:
+            pdf_file = pikepdf.Pdf.open(self.data)
+            for page in pdf_file.pages:
+                if not page.get("/Annots"):
+                    continue
+                for annots in page.get("/Annots"):
+                    if not annots.get("/A"):
+                        continue
+                    uri = annots.get("/A").get("/URI")
+                    if uri is not None:
+                        observables['url'].add(str(uri))
 
-                for value in self.eml_data['body'][0]['content']:
-                    parsed += value
-                if 'from' in self.eml_data['header']:
-                    parsed += ' '
-                    for val in self.eml_data['header']['from']:
-                        parsed += val
-                if 'to' in self.eml_data['header']:
-                    parsed += ' '
-                    for va in self.eml_data['header']['to']:
-                        parsed += va
-
-            tp = TextParser(parsed.replace('\r\n', ''))
-            observables['ip-dst'].update(tp.ips)
-            observables['iban'].update(tp.ibans)
-            observables['url'].update(tp.urls)
-            observables['hostname'].update(tp.hostnames)
-            observables['email'].update(tp.emails)
-        except BaseException as e:
-            self.logger.exception(e)
-
-        # Try to extract links from text
+        # Try to extract observables from text
         if self.text:
             tp = TextParser(self.text.replace('\r\n', ''))
             observables['ip-dst'].update(tp.ips)
