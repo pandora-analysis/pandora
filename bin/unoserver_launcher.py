@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from subprocess import Popen
+
+from unoserver.server import UnoServer  # type: ignore
 
 from pandora.default import AbstractManager
-from pandora.default import get_homedir
 
 logging.basicConfig(format='%(asctime)s %(name)s %(levelname)s:%(message)s',
                     level=logging.INFO)
@@ -20,7 +20,8 @@ class UnoserverLauncher(AbstractManager):
         self.set_running()
 
     def _launch_unoserver(self):
-        return Popen(['unoserver'], cwd=get_homedir())
+        unoserver = UnoServer()
+        return unoserver.start()
 
 
 def main():
