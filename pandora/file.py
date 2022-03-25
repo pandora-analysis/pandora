@@ -555,15 +555,17 @@ class File:
                     observables['url'].update(body['uri'])
                 if 'email' in body:
                     observables['email'].update(body['email'])
-        elif self.is_pdf:
+        elif self.is_pdf and self.data:
             pdf_file = pikepdf.Pdf.open(self.data)
             for page in pdf_file.pages:
+                if not page:
+                    continue
                 if not page.get("/Annots"):
                     continue
-                for annots in page.get("/Annots"):
+                for annots in page["/Annots"]:  # type: ignore
                     if not annots.get("/A"):
                         continue
-                    uri = annots.get("/A").get("/URI")
+                    uri = annots["/A"].get("/URI")
                     if uri is not None:
                         observables['url'].add(str(uri))
 
