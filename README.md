@@ -235,6 +235,8 @@ Feel free to contact us, create [issues](https://github.com/pandora-analysis/pan
 
 If you have any report concerning security, please read the [SECURITY page](security.md) on how to report security issues and vulnerabilities.
 
+For more details about how to contribute, don't hesitate to have a look at our [contributing](CONTRIBUTING.md) page.
+
 # License
 
 Copyright (C) 2021-2022 [CIRCL](https://www.circl.lu/) - Computer Incident Response Center Luxembourg
