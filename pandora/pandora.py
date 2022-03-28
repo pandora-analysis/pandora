@@ -157,9 +157,8 @@ class Pandora():
 
     # #### Seed ####
 
-    def check_seed(self, seed: str):
-        uuid = self.redis.get(f'seed:{seed}')
-        return uuid if uuid is not None else None
+    def get_seed_uuid(self, seed: str) -> Optional[str]:
+        return self.redis.get(f'seed:{seed}')
 
     def add_seed(self, task: Task, time: str, seed: Optional[str]=None) -> Tuple[str, int]:
         expire = expire_in_sec(time)
@@ -169,9 +168,14 @@ class Pandora():
             self.redis.setex(name=f'seed:{seed}', time=expire, value=task.uuid)
         else:
             self.redis.set(name=f'seed:{seed}', value=task.uuid)
-        for e_task in task.extracted:
-            self.add_seed(e_task, time, seed)
         return seed, expire
+
+    def is_seed_valid(self, task: Task, seed: str) -> bool:
+        if task.uuid == self.get_seed_uuid(seed):
+            return True
+        elif hasattr(task, 'parent') and task.parent:
+            return self.is_seed_valid(task.parent, seed)
+        return False
 
     # ##############
 

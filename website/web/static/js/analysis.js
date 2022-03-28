@@ -109,7 +109,7 @@ Analysis.prototype.refreshTabs = function () {
             })
             extracted_url = `/extracted/${this.task.uuid}`
             if (this.seed) {
-                extracted_url = `${previews_url}/seed-${this.seed}`
+                extracted_url = `${extracted_url}/seed-${this.seed}`
             }
 
             fetch(extracted_url, {

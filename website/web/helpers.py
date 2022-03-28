@@ -14,7 +14,9 @@ import flask_login  # type: ignore
 from werkzeug.security import generate_password_hash
 
 from pandora.default import get_homedir, get_config
+from pandora.pandora import Pandora
 from pandora.role import RoleName
+from pandora.task import Task
 
 
 def src_request_ip(request) -> str:
@@ -36,17 +38,13 @@ def get_secret_key() -> bytes:
         return f.read()
 
 
-def update_user_role(pandora, task, seed: Optional[str]=None):
+def update_user_role(pandora: Pandora, task: Task, seed: Optional[str]=None):
     if flask_login.current_user.is_admin:
         flask_login.current_user.role = pandora.get_role(role_name=RoleName.admin)
     elif hasattr(task, 'user') and task.user.get_id() == flask_login.current_user.get_id():
         flask_login.current_user.role = pandora.get_role(role_name=RoleName.owner)
-    elif seed is not None:
-        authorized_uuid = pandora.check_seed(seed)
-        if authorized_uuid == task.uuid:
-            flask_login.current_user.role = pandora.get_role(role_name=RoleName.reader)
-        elif task.origin and authorized_uuid == task.origin.uuid:
-            flask_login.current_user.role = pandora.get_role(role_name=RoleName.reader)
+    elif seed is not None and pandora.is_seed_valid(task, seed):
+        flask_login.current_user.role = pandora.get_role(role_name=RoleName.reader)
     else:
         flask_login.current_user.role = pandora.get_role(role_name=RoleName.other)
 

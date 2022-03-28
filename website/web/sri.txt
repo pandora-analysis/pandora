@@ -19,7 +19,7 @@
       "logo.svg": "WxV9nvLMENSaB9jnzGZId8XTgNPbsnws0G7FhBkcgPFTW/XX0JZU3ubDCw2dQVcMaWvdxKbdDQkhrqgA3ASpbQ=="
     },
     "js": {
-      "analysis.js": "Yg+8BUijcoQuXisAswjrfHM9hkonYyEGj8nyV7DaI6BnH7ITz8PykpRXov1TZO9kDV/DS7zQiLBc1Z6GDsdnmw==",
+      "analysis.js": "jlwR5gGkgNvRfGxaOj6ek+IM+UJniz/PcZ9tDyPJt8uidQ26u1eTltjDFjsiIReJsuQc7Uk1hVNJG46/WTI6XA==",
       "lib": {
         "dropzone-min.js": "kLQ8y6epwwH5HA1M6K0bw2erLB1+Vz+7HOUepLaKRecyGXaP0K/9b6kq2+MZlyWt6E/AH6dtnxDom8lniz5BWw==",
         "jquery.min.js": "894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==",
