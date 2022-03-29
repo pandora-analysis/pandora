@@ -613,26 +613,38 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form id="shareForm" class="form-horizontal" action="{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='share') }}"
-                  onsubmit="return analysis.share($(this).attr('action'))">
-              <div class="row">
-                <div class="col-md-8"><span><b>URL Validity (set to 0 for the seed to be persistent) : </b></span></div>
-                <div class="col-md-4"><input style="width:60px" id="shareDays" name="number" type="number" min="0" value="1" required> day(s)</div>
-              </div>
-              <div class="row">
-                <div class="col-md-1"></div>
-                <div class="col-md-10 d-none alert alert-info" id="shareSuccess">
-                  This analysis will be available publicly
-                  <span id="sharePeriod"></span> <b><a href="" id="shareLink">with this link</a></b>.
+              <form id="shareForm" class="form-horizontal"
+                    action="{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='share') }}"
+                    onsubmit="return analysis.share($(this).attr('action'))">
+              <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                  <label for="shareDays" class="col-form-label">URL lifetime:</label>
                 </div>
-                <div class="col-md-10 d-none alert alert-danger" id="shareError">
-                  An error has occurred while building a public link:
-                  <span id="shareErrorReason"></span>
+                <div class="col-auto">
+                  <input style="width:100px" class="form-control" aria-describedby="shareDaysHelp" id="shareDays" name="number" type="number" min="0" value="1" required>
                 </div>
-                <div class="col-md-1"></div>
+                <div class="col-auto">
+                  <span id="shareDaysHelp" class="form-text">
+                    In day(s), 0 means unlimited.
+                  </span>
+                </div>
               </div>
               <button type="submit" class="btn btn-secondary" id="shareBuild" style="float: right;">Build URL</button>
               </form>
+
+              </br>
+
+              <div class="row">
+                <div class="col d-none alert alert-info" id="shareSuccess">
+                  This analysis will be available publicly
+                  <b><span id="sharePeriod"></span></b> with
+                  <a href="" id="shareLink" class="alert-link">this link</a>.
+                </div>
+                <div class="col d-none alert alert-danger" id="shareError">
+                  An error has occurred while building a public link:
+                  <span id="shareErrorReason"></span>
+                </div>
+              </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary d-none" data-bs-dismiss="modal" id="closeBuild">Close</button>

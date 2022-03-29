@@ -14,6 +14,8 @@ from pandora.default import get_homedir
 def sri_for_dir(directory: Path) -> Dict[str, Any]:
     to_return: Dict[str, Any] = {}
     for entry in directory.iterdir():
+        if entry.name.startswith('.'):
+            continue
         if entry.is_dir():
             sris = sri_for_dir(entry)
             if sris:
