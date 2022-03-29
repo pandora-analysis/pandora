@@ -52,12 +52,12 @@
       <div class="col-md-6">
         <!-- Overall header -->
         <div class="row">
-          <div class="col-md-7">
+          <div class="col-sm-6">
             <div id="overall-label"><h1>Overall Result<br/></h1></div>
           </div>
           {% if current_user.role.can('share_analysis') %}
-          <div class="col">
-          <button type="button" class="btn btn-primary" style="margin:5px"
+          <div class="col-sm-4">
+          <button type="button" class="btn btn-secondary" style="margin:5px"
                   data-bs-toggle="modal" data-bs-target="#shareModal">
               Share analysis
           </button>
@@ -65,7 +65,7 @@
           {% endif %}
 
           {% if current_user.role.can(['rescan_file', 'notify_cert', 'delete_file'], 'or') %}
-          <div class="col">
+          <div class="col-sm-2">
             <div class="dropdown" style="margin:5px">
               <button class="btn btn-secondary dropdown-toggle" type="button"
                       id="dropdownMenuActions" data-bs-toggle="dropdown"
@@ -219,7 +219,7 @@
           <!-- Nav tabs -->
           <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="nav-item">
-              <button class="nav-link active"
+              <button class="nav-link active link-dark"
                       data-bs-toggle="tab"
                       data-bs-target="#content-preview"
                       type="button" role="tab"
@@ -227,7 +227,7 @@
             </li>
             {% if current_user.role.can(action.see_text_preview) %}
             <li role="presentation" class="nav-item {% if not task.file.text %} d-none {% endif %}">
-              <button class="nav-link"
+              <button class="nav-link link-dark"
                       data-bs-toggle="tab"
                       data-bs-target="#text-preview-content"
                       type="button" role="tab"
@@ -236,7 +236,7 @@
             {% endif %}
             {% if current_user.role.can(action.download_text) %}
             <li role="presentation" class="nav-item {% if not task.file.text %} d-none {% endif %}">
-              <button class="nav-link"
+              <button class="nav-link link-dark"
                       data-bs-toggle="tab"
                       data-bs-target="#text-content"
                       type="button" role="tab"
@@ -244,14 +244,14 @@
             </li>
             {% endif %}
             <li role="presentation" class="nav-item {% if not task.file.metadata%} d-none {% endif %}">
-              <button class="nav-link"
+              <button class="nav-link link-dark"
                       data-bs-toggle="tab"
                       data-bs-target="#metadata"
                       type="button" role="tab"
                       aria-controls="metadata" aria-selected=false">Metadata</button>
             </li>
             <li role="presentation" class="nav-item {% if not task.observables %} d-none {% endif %}" id="observables_tab">
-              <button class="nav-link"
+              <button class="nav-link link-dark"
                       data-bs-toggle="tab"
                       data-bs-target="#observables"
                       type="button" role="tab"
@@ -260,7 +260,7 @@
               </button>
             </li>
             <li role="presentation" class="nav-item {% if not task.extracted %} d-none {% endif %}" id="extracted_tab">
-              <button class="nav-link"
+              <button class="nav-link link-dark"
                       data-bs-toggle="tab"
                       data-bs-target="#extracted"
                       type="button" role="tab"
@@ -269,7 +269,7 @@
               </button>
             </li>
             <li role="presentation" class="nav-item {% if not task.linked_tasks %} d-none {% endif %}">
-              <button class="nav-link"
+              <button class="nav-link link-dark"
                       data-bs-toggle="tab"
                       data-bs-target="#history"
                       type="button" role="tab"
@@ -631,7 +631,7 @@
                 </div>
                 <div class="col-md-1"></div>
               </div>
-              <button type="submit" class="btn btn-primary" id="shareBuild" style="float: right;">Build URL</button>
+              <button type="submit" class="btn btn-secondary" id="shareBuild" style="float: right;">Build URL</button>
               </form>
             </div>
             <div class="modal-footer">
