@@ -115,6 +115,7 @@ class AbstractManager(ABC):
                     # Killing everything if possible.
                     self.process.send_signal(signal.SIGWINCH)
                     self.process.send_signal(signal.SIGTERM)
+                    self.process.send_signal(signal.SIGKILL)
                 except Exception:
                     pass
             try:
@@ -158,6 +159,7 @@ class AbstractManager(ABC):
                     # Killing everything if possible.
                     self.process.send_signal(signal.SIGWINCH)
                     self.process.send_signal(signal.SIGTERM)
+                    self.process.send_signal(signal.SIGKILL)
                 except Exception:
                     pass
             try:
