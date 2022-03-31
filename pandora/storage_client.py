@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import operator
 
@@ -18,7 +17,7 @@ class Storage():
     def __new__(cls) -> 'Storage':
         # NOTE: this will be a connector to kvrocks
         if cls._instance is None:
-            cls._instance = super(Storage, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
             cls._redis_pool_storage: ConnectionPool = ConnectionPool(
                 host=get_config('generic', 'storage_db_hostname'),
                 port=get_config('generic', 'storage_db_port'),

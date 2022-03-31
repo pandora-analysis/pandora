@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 from XLMMacroDeobfuscator.deobfuscator import process_file  # type: ignore
 from xlrd2.biffh import XLRDError  # type: ignore

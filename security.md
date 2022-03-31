@@ -2,9 +2,9 @@
 
 ## Reporting security vulnerabilities for pandora or related pandora project repositories
 
-Reporting security vulnerabilities is of great importance for us, as pandora project is used by different security operators and organisations. 
+Reporting security vulnerabilities is of great importance for us, as pandora project is used by different security operators and organisations.
 
-In the case of a security vulnerability report, we ask the reporter to send it directly to [CIRCL](https://www.circl.lu/contact/), if possible encrypted with the following GnuPG key: **CA57 2205 C002 4E06 BA70 BE89 EAAD CFFC 22BD 4CD5**. We usually fix reported and confirmed security vulnerabilities in less than 48 hours, followed by a software release containing the fixes within the following days. 
+In the case of a security vulnerability report, we ask the reporter to send it directly to [CIRCL](https://www.circl.lu/contact/), if possible encrypted with the following GnuPG key: **CA57 2205 C002 4E06 BA70 BE89 EAAD CFFC 22BD 4CD5**. We usually fix reported and confirmed security vulnerabilities in less than 48 hours, followed by a software release containing the fixes within the following days.
 If you report security vulnerabilities, do not forget to **tell us if and how you want to be acknowledged** and if you already requested CVE(s). Otherwise, we will request the CVE(s) directly.
 
 As one of the critical user-bases of pandora project consists of the CSIRT community, it is our duty to clearly state which bug could be abused and have a security impact on a pandora instance. CVE assignment is performed even for minor bugs suspected of having a security impact. This allows every user with pandora instances set up in their environments to understand which bugs could impact their security.
@@ -100,4 +100,3 @@ C3Ij/2IWN6eLTSzd0ikG7wOOKExTrCltTycyEMC0HwRSKYqQaBKPZcNSgm+3ma70FCv2
 =fKH+
 -----END PGP PUBLIC KEY BLOCK-----
 ~~~~
-

@@ -23,4 +23,3 @@ in the title a keyword such as `[enhancement]` to clearly state in the issue, it
 
 Pandora analysis project accepts pull-requests from external parties. There is no copyright assignment or need of CAL to be signed for the contributions. All contributions
 are falling into the [Developer Certificate of Origin](https://developercertificate.org/) and each contributor is listed a contributor to the project.
-

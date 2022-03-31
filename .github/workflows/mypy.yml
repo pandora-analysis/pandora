@@ -30,4 +30,3 @@ jobs:
     - name: Test with MyPy
       run: |
         poetry run mypy .
-

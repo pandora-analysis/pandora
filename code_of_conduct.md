@@ -78,4 +78,3 @@ compliance with the free software licensing terms of the project.
 
 [homepage]: http://contributor-covenant.org
 [version]: http://contributor-covenant.org/version/1/4/
-
