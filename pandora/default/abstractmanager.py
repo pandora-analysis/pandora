@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import asyncio
 import logging
@@ -84,6 +83,21 @@ class AbstractManager(ABC):
     def _to_run_forever(self) -> None:
         pass
 
+    def _kill_process(self):
+        kill_order = [signal.SIGWINCH, signal.SIGTERM, signal.SIGINT, signal.SIGKILL]
+        for sig in kill_order:
+            if self.process.poll() is None:
+                self.logger.info(f'Sending {sig} to {self.process.pid}.')
+                self.process.send_signal(sig)
+                time.sleep(1)
+            else:
+                break
+        else:
+            self.logger.warning(f'Unable to kill {self.process.pid}, keep sending SIGKILL')
+            while self.process.poll() is None:
+                self.process.send_signal(signal.SIGKILL)
+                time.sleep(1)
+
     def run(self, sleep_in_sec: int) -> None:
         self.logger.info(f'Launching {self.__class__.__name__}')
         try:
@@ -111,13 +125,7 @@ class AbstractManager(ABC):
             self.logger.warning(f'{self.script_name} killed by user.')
         finally:
             if self.process:
-                try:
-                    # Killing everything if possible.
-                    self.process.send_signal(signal.SIGWINCH)
-                    self.process.send_signal(signal.SIGTERM)
-                    self.process.send_signal(signal.SIGKILL)
-                except Exception:
-                    pass
+                self._kill_process()
             try:
                 self.unset_running()
             except Exception:
@@ -155,13 +163,7 @@ class AbstractManager(ABC):
             self.logger.warning(f'{self.script_name} killed by user.')
         finally:
             if self.process:
-                try:
-                    # Killing everything if possible.
-                    self.process.send_signal(signal.SIGWINCH)
-                    self.process.send_signal(signal.SIGTERM)
-                    self.process.send_signal(signal.SIGKILL)
-                except Exception:
-                    pass
+                self._kill_process()
             try:
                 self.unset_running()
             except Exception:
