@@ -39,7 +39,7 @@ class Pandora():
         # probably move that somewhere else
         if not self.storage.has_roles():
             for role in roles_from_config().values():
-                role.store
+                role.store()
 
     @property
     def redis_bytes(self):
