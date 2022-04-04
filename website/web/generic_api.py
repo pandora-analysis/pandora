@@ -5,9 +5,11 @@ import traceback
 from io import BytesIO
 from typing import Dict
 
-from flask import request, url_for
 import flask_login  # type: ignore
+
+from flask import request, url_for
 from flask_restx import Namespace, Resource  # type: ignore
+from werkzeug.datastructures import FileStorage
 
 from pandora.default import get_config, PandoraException
 from pandora.pandora import Pandora
@@ -79,13 +81,20 @@ class ApiRole(Resource):
         raise AssertionError('forbidden')
 
 
+upload_parser = api.parser()
+upload_parser.add_argument('file', location='files',
+                           type=FileStorage, required=True)
+
+
 @api.route('/submit', methods=['POST'], strict_slashes=False)
+@api.expect(upload_parser)
 class ApiSubmit(Resource):
 
     @json_answer
     def post(self):
         assert flask_login.current_user.role.can(Action.submit_file), 'forbidden'
-        submitted_file = request.files['file']
+        args = upload_parser.parse_args()
+        submitted_file = args['file']
         assert submitted_file.filename, 'file required'
 
         file_bytes = BytesIO(submitted_file.read())

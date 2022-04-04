@@ -64,12 +64,23 @@ API_LOG_TRACEBACK = get_config('generic', 'debug_web')
 flask_session.Session(app=app)
 login_manager = flask_login.LoginManager(app=app)
 flask_moment.Moment(app=app)
-flask_wtf.CSRFProtect(app=app)
+app.config['WTF_CSRF_CHECK_DEFAULT'] = False
+csrf = flask_wtf.CSRFProtect(app=app)
 
+# Query API
+
+authorizations = {
+    'apikey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization'
+    }
+}
 
 api = Api(title='Pandora API',
           description='API to query Pandora.',
           doc='/doc/',
+          authorizations=authorizations,
           version=pkg_resources.get_distribution('pandora').version)
 
 api.add_namespace(generic_api)
@@ -119,6 +130,10 @@ def _load_user_from_request(request):
 @app.before_request
 def update_user():
     if flask_login.current_user.is_authenticated:
+        if flask_login.current_user.name and not _load_user_from_request(request):
+            # If the user doesn't have a name, it is session based, no need to check
+            # If the request has a valid auth key (=authenticated API call), we skip the csrf check
+            csrf.protect()
         flask_login.current_user.last_ip = src_request_ip(request)
         flask_login.current_user.last_seen = datetime.now()
         flask_login.current_user.store
