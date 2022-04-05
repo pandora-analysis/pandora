@@ -65,12 +65,11 @@ jobs:
         poetry run start
         sleep 10
 
-        # NOTE: Enable when repo is made public.
-        # git clone https://github.com/pandora-analysis/pypandora.git
-        # pushd pypandora
-        # poetry install
-        # poetry run pytest tests/test_web.py
-        # popd
+        git clone https://github.com/pandora-analysis/pypandora.git
+        pushd pypandora
+        poetry install
+        poetry run pytest tests/test_web.py
+        popd
 
         poetry run stop
 
