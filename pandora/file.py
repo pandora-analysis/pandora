@@ -65,9 +65,9 @@ def office_to_pdf(source: Union[Path, bytes], dest: str) -> None:
             converter.convert(source, outpath=dest)
         elif isinstance(source, bytes):
             converter.convert(indata=source, outpath=dest)
-    except AttributeError:
+    except AttributeError as e:
         # Happens when the file is password protected, might be happening on other occasions
-        raise Unsupported("The Office document is probably password protected, this feature isn't supported yet.")
+        raise Unsupported(f"The Office document is probably password protected, this feature isn't supported yet - Error message: {e}.")
 
 
 class File:

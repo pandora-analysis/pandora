@@ -54,7 +54,7 @@ def json_answer(func):
     return wrapper
 
 
-@api.route('/role/<action>', methods=['POST'], strict_slashes=False)
+@api.route('/role/<action>', methods=['POST'], strict_slashes=False, doc=False)
 @api.doc(description='Update or reload roles')
 class ApiRole(Resource):
 
@@ -83,7 +83,12 @@ class ApiRole(Resource):
 
 upload_parser = api.parser()
 upload_parser.add_argument('file', location='files',
-                           type=FileStorage, required=True)
+                           type=FileStorage, required=True,
+                           help="The file you want to analyze")
+upload_parser.add_argument('validity', type=int, required=False,
+                           # default=None,
+                           location='args',
+                           help="Number of seconds the seed will be valid (0 means forever, empty doesn't create a seed).")
 
 
 @api.route('/submit', methods=['POST'], strict_slashes=False)
@@ -93,7 +98,7 @@ class ApiSubmit(Resource):
     @json_answer
     def post(self):
         assert flask_login.current_user.role.can(Action.submit_file), 'forbidden'
-        args = upload_parser.parse_args()
+        args = upload_parser.parse_args(request)
         submitted_file = args['file']
         assert submitted_file.filename, 'file required'
 
@@ -109,11 +114,19 @@ class ApiSubmit(Resource):
         except PandoraException as e:
             return {'success': False, 'error': str(e)}, 400
         pandora.enqueue_task(task)
-        return {'success': True, 'taskId': task.uuid}
+        if args.get('validity'):
+            seed, expire = pandora.add_seed(task, args['validity'])
+            link = url_for('api_analysis', task_id=task.uuid, seed=seed)
+            return {'success': True, 'taskId': task.uuid, 'seed': seed,
+                    'lifetime': expire, 'link': link}
+        link = url_for('api_analysis', task_id=task.uuid)
+        return {'success': True, 'taskId': task.uuid, 'link': link}
 
 
+# TODO: make that different endpoints.
 @api.route('/task-action/<task_id>/<action>',
-           '/task-action/<task_id>/seed-<seed>/<action>', methods=['POST'], strict_slashes=False)
+           '/task-action/<task_id>/seed-<seed>/<action>', methods=['POST'],
+           strict_slashes=False, doc=False)
 class ApiTaskAction(Resource):
 
     @json_answer
