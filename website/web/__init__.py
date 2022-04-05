@@ -176,6 +176,9 @@ def api_error_403(_):
 
 @app.route('/', strict_slashes=False)
 def api_root():
+    if request.method == 'HEAD':
+        # Just returns ack if the webserver is running
+        return 'Ack'
     return redirect(url_for('api_submit_page'), 301)
 
 
