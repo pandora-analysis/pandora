@@ -560,7 +560,12 @@ class File:
             for page in pdf_file.pages:
                 if not page:
                     continue
-                if not page.get("/Annots"):
+                try:
+                    if not page.get("/Annots"):
+                        continue
+                except Exception as e:
+                    # this call can trigger an exception
+                    self.logger.warning(f'Unable to process a page: {e}')
                     continue
                 for annots in page["/Annots"]:  # type: ignore
                     if not annots.get("/A"):
