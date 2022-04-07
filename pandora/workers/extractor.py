@@ -204,7 +204,7 @@ class Extractor(BaseWorker):
             if archive_file.path.suffix == ".bz2":
                 new_file_path = dest_dir / archive_file.path.name[:-4]  # assuming the filepath ends with .bz2
             else:
-                new_file_path = archive_file.path.name
+                new_file_path = dest_dir / archive_file.path.name
             open(new_file_path, 'wb').write(data)  # write an uncompressed file
             return [new_file_path]
 
@@ -243,7 +243,7 @@ class Extractor(BaseWorker):
             if archive_file.path.suffix == ".gz":
                 new_file_path = dest_dir / archive_file.path.name[:-3]  # assuming the filepath ends with .bz2
             else:
-                new_file_path = archive_file.path.name
+                new_file_path = dest_dir / archive_file.path.name
             open(new_file_path, 'wb').write(data)  # write an uncompressed file
             return [new_file_path]
 
@@ -260,7 +260,7 @@ class Extractor(BaseWorker):
             if archive_file.path.suffix == ".lzma":
                 new_file_path = dest_dir / archive_file.path.name[:-5]  # assuming the filepath ends with .bz2
             else:
-                new_file_path = archive_file.path.name
+                new_file_path = dest_dir / archive_file.path.name
             open(new_file_path, 'wb').write(data)  # write an uncompressed file
             return [new_file_path]
 
