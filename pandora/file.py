@@ -73,7 +73,11 @@ def office_to_pdf(source: Union[Path, bytes], dest: str) -> None:
 class File:
     MIME_TYPE_EQUAL: Dict[str, List[str]] = {
         'application/zip': ['ARC', 'zip'],
+        'application/x-bzip2': ['ARC', 'bz2'],
         'application/java-archive': ['ARC', 'jar'],
+        'application/x-tar': ['ARC', 'tar'],
+        'application/gzip': ['ARC', 'gz'],
+        'application/x-lzma': ['ARC', 'lzma'],
         'application/x-7z-compressed': ['ARC', '7z'],
         'application/x-rar': ['ARC', 'rar'],
         'text/css': ['CSS', 'css'],
@@ -113,7 +117,7 @@ class File:
     }
 
     TYPE_EXTENSIONS: Dict[str, Set[str]] = {
-        'ARC': {'.zip', '.tar', '.gz', '.bz2', '.bz', '.rar', '.7z'},
+        'ARC': {'.zip', '.tar', '.gz', '.bz2', '.bz', '.rar', '.7z', 'lzma'},
         'BIN': {'.bin', '.iso'},
         'CSS': {'.css'},
         'CSV': {'.csv'},
