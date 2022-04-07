@@ -2,11 +2,11 @@ import zipfile
 import base64
 import shutil
 import time
-import bz2
 from tarfile import TarFile
-import gzip
-import lzma
 
+from bz2 import BZ2File
+from gzip import GzipFile
+from lzma import LZMAFile
 from io import BytesIO
 from pathlib import Path
 from typing import List, Optional
@@ -44,10 +44,6 @@ from .base import BaseWorker
 #        1. Loop over each passwords, try to open the archive file until something works
 #        2. Reopen the file with the working password
 #       => 7z files
-
-# TODO: Standard python lib
-#   bz2, gz, lzma: can only contain one file, but it could be > MAX_EXTRACTED_FILE_SIZE
-#   tar: Multiple files => check MAX_EXTRACT_FILES
 
 
 class Extractor(BaseWorker):
@@ -193,76 +189,77 @@ class Extractor(BaseWorker):
         # bz2 is a TAR archive, we basically need to unzip it and then extract the files from the TAR
         # No password can be used to protect a bz2, so we don't need to check for passwords this time
         # Sometimes the bz2 won't contain a TAR, but the way to unzip bz2 stays the same either way
-        bz2file = bz2.BZ2File(archive_file.path)  # open the file
+        bz2file = BZ2File(archive_file.path)  # open the file
         data = bz2file.read(self.MAX_EXTRACTED_FILE_SIZE + 1)  # get the decompressed data
         if len(data) > self.MAX_EXTRACTED_FILE_SIZE:
             self.logger.warning(f'File {archive_file.path.name} too big ({len(data)}).')
             report.status = Status.WARN
             report.add_details('Warning', f'File {archive_file.path.name} too big ({len(data)}).')
             return []
+
+        if archive_file.path.suffix == ".bz2":
+            new_file_path = dest_dir / archive_file.path.stem
         else:
-            if archive_file.path.suffix == ".bz2":
-                new_file_path = dest_dir / archive_file.path.name[:-4]  # assuming the filepath ends with .bz2
-            else:
-                new_file_path = dest_dir / archive_file.path.name
-            open(new_file_path, 'wb').write(data)  # write an uncompressed file
-            return [new_file_path]
+            new_file_path = dest_dir / archive_file.path.name
+        with new_file_path.open('wb') as f:
+            f.write(data)  # write an uncompressed file
+        return [new_file_path]
 
     def _extract_tar(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         # tar is not a compressed archive but a directory mainly used to regroup other directories
         extracted_files: List[Path] = []
-        tar = TarFile(archive_file.path) # open the file
-        tar_list = tar.getmembers()
-        for file_number, tarinfo in enumerate(tar_list):
+        tar = TarFile(archive_file.path)  # open the file
+        for file_number, tarinfo in enumerate(tar.getmembers()):
             if file_number >= self.MAX_EXTRACT_FILES:
                 self.logger.warning('Too many files in the archive, stop extracting.')
                 report.status = Status.ALERT
                 report.add_details('Warning', 'Too many files in the archive')
                 break
-            if tarinfo.isfile():
-                if tarinfo.size >= self.MAX_EXTRACTED_FILE_SIZE:
-                    self.logger.warning(f'File {archive_file.path.name} too big ({tarinfo.size}).')
-                    report.status = Status.WARN
-                    report.add_details('Warning', f'File {archive_file.path.name} too big ({tarinfo.size}).')
-                    continue
-                tar.extract(tarinfo, dest_dir)
-                file_path = dest_dir / tarinfo.name
-                extracted_files.append(Path(file_path))
+            if not tarinfo.isfile():
+                continue
+            if tarinfo.size >= self.MAX_EXTRACTED_FILE_SIZE:
+                self.logger.warning(f'File {archive_file.path.name} too big ({tarinfo.size}).')
+                report.status = Status.WARN
+                report.add_details('Warning', f'File {archive_file.path.name} too big ({tarinfo.size}).')
+                continue
+            tar.extract(tarinfo, dest_dir)
+            file_path = dest_dir / tarinfo.name
+            extracted_files.append(Path(file_path))
         return extracted_files
 
     def _extract_gz(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         # gz is just like bz2, a compressed archive with a TAR directory inside
-        gz_file = gzip.GzipFile(archive_file.path)
+        gz_file = GzipFile(archive_file.path)
         data = gz_file.read(self.MAX_EXTRACTED_FILE_SIZE + 1)
         if len(data) > self.MAX_EXTRACTED_FILE_SIZE:
             self.logger.warning(f'File {archive_file.path.name} too big ({len(data)}).')
             report.status = Status.WARN
             report.add_details('Warning', f'File {archive_file.path.name} too big ({len(data)}).')
             return []
+        if archive_file.path.suffix == ".gz":
+            new_file_path = dest_dir / archive_file.path.stem
         else:
-            if archive_file.path.suffix == ".gz":
-                new_file_path = dest_dir / archive_file.path.name[:-3]  # assuming the filepath ends with .bz2
-            else:
-                new_file_path = dest_dir / archive_file.path.name
-            open(new_file_path, 'wb').write(data)  # write an uncompressed file
-            return [new_file_path]
+            new_file_path = dest_dir / archive_file.path.name
+        with new_file_path.open('wb') as f:
+            f.write(data)  # write an uncompressed file
+        return [new_file_path]
 
     def _extract_lzma(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         # lzma is just like bz2 and gz, a compressed archive with a TAR directory inside
-        lzma_file = lzma.LZMAFile(archive_file.path)
+        lzma_file = LZMAFile(archive_file.path)
         data = lzma_file.read(self.MAX_EXTRACTED_FILE_SIZE + 1)
         if len(data) > self.MAX_EXTRACTED_FILE_SIZE:
             self.logger.warning(f'File {archive_file.path.name} too big ({len(data)}).')
             report.status = Status.WARN
             report.add_details('Warning', f'File {archive_file.path.name} too big ({len(data)}).')
             return []
+        if archive_file.path.suffix == ".lzma":
+            new_file_path = dest_dir / archive_file.path.stem
         else:
-            if archive_file.path.suffix == ".lzma":
-                new_file_path = dest_dir / archive_file.path.name[:-5]  # assuming the filepath ends with .bz2
-            else:
-                new_file_path = dest_dir / archive_file.path.name
-            open(new_file_path, 'wb').write(data)  # write an uncompressed file
-            return [new_file_path]
+            new_file_path = dest_dir / archive_file.path.name
+        with new_file_path.open('wb') as f:
+            f.write(data)  # write an uncompressed file
+        return [new_file_path]
 
     def analyse(self, task: Task, report: Report):
         if not (task.file.is_archive or task.file.is_eml or task.file.is_msg):
