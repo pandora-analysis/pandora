@@ -14,6 +14,7 @@ run_backend = "bin.run_backend:main"
 unoserver_launcher = "bin.unoserver_launcher:main"
 workers_manager = "bin.workers_manager:main"
 start_website = "bin.start_website:main"
+imap_fetcher = "bin.imap_fetcher:main"
 
 [tool.poetry.dependencies]
 python = "^3.8,<3.11"
@@ -30,12 +31,12 @@ validators = "^0.18.2"
 python-magic = "^0.4.25"
 PyMuPDF = "^1.19.6"
 requests = "^2.27.1"
-textract = "^1.6.4"
+textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "<0.5"
 eml-parser = "^1.17.0"
 unoserver = "^1.2"
 weasyprint = "^54.3"
-extract-msg = "^0.29"
+extract-msg = "^0.30"
 Pillow = "^9.1.0"
 oletools = {git = "https://github.com/decalage2/oletools.git", branch = "master", extras = ["full"]}
 py7zr = "^0.18.1"
@@ -53,6 +54,7 @@ rarfile = "^4.0"
 publicsuffix2 = "^2.20191221"
 pymispwarninglists = "^1.3"
 pikepdf = "^5.1.0"
+imapclient = "^2.1.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"
