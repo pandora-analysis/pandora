@@ -149,3 +149,9 @@ def get_public_suffix_list() -> PublicSuffixList:
 @lru_cache(64)
 def get_warninglists() -> WarningLists:
     return WarningLists(slow_search=True)
+
+
+@lru_cache(64)
+def get_email_template() -> str:
+    with (get_homedir() / 'config' / 'email.tmpl').open() as f:
+        return f.read()
