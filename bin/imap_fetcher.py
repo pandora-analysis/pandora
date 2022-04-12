@@ -84,7 +84,7 @@ class IMAPFetcher(AbstractManager):
                 client.add_flags(uid, ('\\Seen'))
 
                 seed, _ = self.pandora.add_seed(new_task, '0')
-                domain = get_config('generic', 'root_public')
+                domain = get_config('generic', 'public_url')
                 permaurl = f'{domain}/analysis/{new_task.uuid}/seed-{seed}'
                 reply = self._prepare_reply(email_message, permaurl)
 
