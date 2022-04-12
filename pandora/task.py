@@ -214,7 +214,6 @@ class Task:
 
     @property
     def observables(self) -> List[Observable]:
-        # FIXME: this method is called multiple times on the analysis result, we should not add the same observables multiple times in redis
         self.__init_observables_from_file()
         observables = []
         for observable in self.storage.get_task_observables(self.uuid):
