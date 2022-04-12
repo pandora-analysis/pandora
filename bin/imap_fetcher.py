@@ -8,6 +8,7 @@ from email.message import EmailMessage
 from email import policy
 from io import BytesIO
 from smtplib import SMTP
+from typing import Optional
 
 from imapclient import imapclient, IMAPClient  # type: ignore
 
@@ -33,6 +34,7 @@ class IMAPFetcher(AbstractManager):
         self.smtp_port = get_config('mail', 'smtp_port')
         if not self.smtp_server:
             self.smtp_server = self.imap_server
+        self.smtp_requires_login = get_config('mail', 'smtp_requires_login')
         self.pandora = Pandora()
         # FIXME: make that cleaner
         self.user = User('email_submitter', last_ip='127.0.0.1', name='email')
@@ -41,7 +43,7 @@ class IMAPFetcher(AbstractManager):
     def _to_run_forever(self):
         self._imap_fetcher()
 
-    def _prepare_reply(self, initial_message: EmailMessage, permaurl: str) -> EmailMessage:
+    def _prepare_reply(self, initial_message: EmailMessage, permaurl: str) -> Optional[EmailMessage]:
         msg = EmailMessage()
         msg['From'] = get_config('mail', 'from')
         if initial_message.get('reply-to'):
@@ -51,7 +53,10 @@ class IMAPFetcher(AbstractManager):
         msg['subject'] = f'Re: {initial_message["subject"]}'
         msg['message-id'] = initial_message['message-id']
         body = get_email_template()
-        recipient = initial_message['from']
+        recipient = msg['to']
+        if recipient.addresses[0].username == get_config('mail', 'from'):
+            # this is going to cause a loop.
+            return None
         try:
             if recipient.addresses[0].display_name:
                 recipient = recipient.addresses[0].display_name
@@ -88,12 +93,15 @@ class IMAPFetcher(AbstractManager):
                 permaurl = f'{domain}/analysis/{new_task.uuid}/seed-{seed}'
                 reply = self._prepare_reply(email_message, permaurl)
 
-                try:
-                    with SMTP(self.smtp_server, port=self.smtp_port) as smtp:
-                        smtp.send_message(reply)
-                except Exception as e:
-                    self.logger.exception(e)
-                    self.logger.warning(reply.as_string())
+                if reply:
+                    try:
+                        with SMTP(self.smtp_server, port=self.smtp_port) as smtp:
+                            if self.smtp_requires_login:
+                                smtp.login(self.imap_login, self.imap_password)
+                            smtp.send_message(reply)
+                    except Exception as e:
+                        self.logger.exception(e)
+                        self.logger.warning(reply.as_string())
                 sent_dir = client.find_special_folder(imapclient.SENT)
                 client.append(sent_dir, reply.as_string())
                 client.add_flags(uid, ('\\Answered'))
@@ -107,7 +115,7 @@ def main():
         return
 
     f = IMAPFetcher()
-    f.run(sleep_in_sec=60)
+    f.run(sleep_in_sec=10)
 
 
 if __name__ == '__main__':
