@@ -5,6 +5,7 @@
     "imap_folder": "Inbox",
     "smtp_server": "mail.mysmtp.server",
     "smtp_port": 25,
+    "smtp_requires_login": false,
     "from": "Pandora <pandora@myorg.server>",
     "_nodes": {
         "imap_server": "IMAP server to fetch the mails from",
@@ -13,6 +14,7 @@
         "imap_folder": "Folder where the script will look at unseen messages",
         "smtp_server": "SMTP server to use to send replies",
         "smtp_port": "SMTP port of the SMTP server",
+        "smtp_requires_login": "set to true if the SMTP server requires a login, it will use the imap credentials",
         "from": "Email address for the replies"
     }
 }
