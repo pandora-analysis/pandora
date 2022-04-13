@@ -218,6 +218,7 @@ class Task:
         observables = []
         for observable in self.storage.get_task_observables(self.uuid):
             observables.append(Observable(**observable))
+            observables.sort()
         return observables
 
     def __str__(self):
