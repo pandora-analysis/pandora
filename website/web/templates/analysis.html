@@ -638,14 +638,25 @@
                 <div class="col d-none alert alert-info" id="shareSuccess">
                   This analysis will be available publicly
                   <b><span id="sharePeriod"></span></b> with
-                  <a href="" id="shareLink" class="alert-link">this link</a>.
-                  <button type="button" class="btn btn-secondary" style="margin:5px"
-                          onclick="navigator.clipboard.writeText(shareLink)">Copy Link</button>
+                  <a href="" id="shareLink" class="alert-link">this link</a>
+                  <button type="button" class="btn btn-link" style="padding:0"
+                          title="Copy to clipboard"
+                          onclick="navigator.clipboard.writeText(shareLink).then(
+                                    function() {document.getElementById('copySuccess').classList.remove('d-none')},
+                                    function() {document.getElementById('copyError').classList.remove('d-none')})">
+                      {{ render_icon('clipboard-plus', color='black') }}
+                  </button>
                 </div>
                 <div class="col d-none alert alert-danger" id="shareError">
                   An error has occurred while building a public link:
                   <span id="shareErrorReason"></span>
                 </div>
+              </div>
+              <div class="col d-none alert alert-success" id="copySuccess">
+                Sharing link successfully copied to clipboard.
+              </div>
+              <div class="col d-none alert alert-danger" id="copyError">
+                Unable to copy the sharing link.
               </div>
             </div>
             <div class="modal-footer">
