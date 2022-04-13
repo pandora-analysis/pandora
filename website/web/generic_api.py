@@ -86,7 +86,6 @@ upload_parser.add_argument('file', location='files',
                            type=FileStorage, required=True,
                            help="The file you want to analyze")
 upload_parser.add_argument('validity', type=int, required=False,
-                           # default=None,
                            location='args',
                            help="Number of seconds the seed will be valid (0 means forever, empty doesn't create a seed).")
 

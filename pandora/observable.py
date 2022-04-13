@@ -83,11 +83,12 @@ class Observable:
             else:
                 self.warninglists = warninglists
 
-    def __lt__(self, obj):
+    def __lt__(self, obj: 'Observable') -> bool:
         if self.observable_type < obj.observable_type:
             return True
         elif self.observable_type == obj.observable_type:
             return self.value < obj.value
+        return False
 
     def check_warninglists(self):
         self.warninglists = get_warninglists().search(self.value)
