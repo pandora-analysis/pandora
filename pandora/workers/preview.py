@@ -15,6 +15,7 @@ class Preview(BaseWorker):
         except NoPreview:
             report.status = Status.NOTAPPLICABLE
         except Exception as e:
+            self.logger.exception(e)
             self.logger.warning(f'Unable to generate preview, this is suspicious: {e}')
             report.status = Status.WARN
             report.add_details('suspicious', f'Unable to generate preview: {e}')

@@ -77,8 +77,8 @@ Analysis.prototype.refreshTabs = function () {
         }
     }
 
-    if (this.number_observables) {
-        document.getElementById("number_observables").innerHTML = this.number_observables;
+    if (this.number_observables && document.getElementById("number_observables").innerHTML != '') {
+       document.getElementById("number_observables").innerHTML = this.number_observables;
        $('#observables_tab').each(function(index, element) {
            $(this).removeClass("d-none");
        })
