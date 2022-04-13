@@ -123,6 +123,32 @@ class ApiSubmit(Resource):
         return {'success': True, 'taskId': task.uuid, 'link': link}
 
 
+status_parser = api.parser()
+status_parser.add_argument('task_id', required=True,
+                           location='args',
+                           help="The id of the task you'd like to get the status of")
+status_parser.add_argument('seed', required=False,
+                           location='args',
+                           help="The seed of the task you'd like to get the status of")
+
+
+@api.route('/task_status', methods=['GET'], strict_slashes=False)
+@api.expect(status_parser)
+class ApiTaskStatus(Resource):
+
+    @json_answer
+    def get(self):
+        args = status_parser.parse_args(request)
+        task_id = args['task_id']
+        seed = args['seed']
+        if not seed:
+            seed = None
+        task = pandora.get_task(task_id=task_id)
+        update_user_role(pandora, task, seed)
+        assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
+        return {'success': True, 'taskId': task.uuid, 'status': task.status.name}
+
+
 # TODO: make that different endpoints.
 @api.route('/task-action/<task_id>/<action>',
            '/task-action/<task_id>/seed-<seed>/<action>', methods=['POST'],
