@@ -353,6 +353,44 @@ def api_roles():
     return render_template('roles.html', roles=roles, api=api, api_resource=ApiRole)
 
 
+@app.route('/observables_lists', methods=['GET'], strict_slashes=False)
+@admin_required
+@html_answer
+def observables_lists():
+
+    assert flask_login.current_user.role.can(Action.manage_observables_lists), 'forbidden'
+    suspicious = pandora.get_suspicious_observables()
+    legitimate = pandora.get_legitimate_observables()
+    return render_template('observables_lists.html', suspicious=suspicious, legitimate=legitimate)
+
+
+@app.route('/observables_lists/insert', methods=['POST'], strict_slashes=False)
+@admin_required
+@html_answer
+def observables_lists_insert():
+
+    data = request.form
+    assert 'observable' in data, "missing mandatory key 'observable'"
+    assert 'type' in data, "missing mandatory key 'type'"
+    assert 'list_type' in data, "missing mandatory key 'list_type'"
+    if int(data['list_type']) == 0:
+        pandora.add_legitimate_observable(data['observable'], data['type'])
+    else:
+        pandora.add_suspicious_observable(data['observable'], data['type'])
+    return redirect(url_for('observables_lists'))
+
+
+@app.route('/observables_lists/delete/<int:list_type>/<string:observable>', strict_slashes=False)
+@admin_required
+@html_answer
+def observables_lists_delete(list_type, observable):
+    if list_type == 0:
+        pandora.delete_legitimate_observable(observable)
+    else:
+        pandora.delete_suspicious_observable(observable)
+    return redirect(url_for('observables_lists'))
+
+
 @app.route('/stats', methods=['GET'], strict_slashes=False)
 @admin_required
 @html_answer

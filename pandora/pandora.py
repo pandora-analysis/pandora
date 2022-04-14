@@ -152,6 +152,26 @@ class Pandora():
         # TODO: get most recent observables, optionnally filter
         pass
 
+    # #### Observables Lists ####
+
+    def get_suspicious_observables(self):
+        return self.storage.get_suspicious_observables()
+
+    def add_suspicious_observable(self, observable: str, observable_type: str):
+        return self.storage.add_suspicious_observable(observable, observable_type)
+
+    def delete_suspicious_observable(self, observable: str):
+        return self.storage.delete_suspicious_observable(observable)
+
+    def get_legitimate_observables(self):
+        return self.storage.get_legitimate_observables()
+
+    def add_legitimate_observable(self, observable: str, observable_type: str):
+        return self.storage.add_legitimate_observable(observable, observable_type)
+
+    def delete_legitimate_observable(self, observable: str):
+        return self.storage.delete_legitimate_observable(observable)
+
     # ##############
 
     # #### Seed ####

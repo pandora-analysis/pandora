@@ -39,6 +39,7 @@ class Action(Enum):
     list_roles = auto()
     update_role = auto()
     list_stats = auto()
+    manage_observables_lists = auto()
 
 
 class Role:
