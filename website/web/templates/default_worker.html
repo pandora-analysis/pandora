@@ -1,4 +1,5 @@
 {% from 'bootstrap5/utils.html' import render_icon %}
+{% from "macros.html" import display_status_badge %}
 
 <div class="col-md-12" id="{{worker_name}}">
   <div>
@@ -10,19 +11,7 @@
     <tr>
       <th scope="row" style="width:30%">Status</th>
       <td>
-        {% if report.status == status.ALERT %}
-        <span class="badge bg-danger">
-        {% elif report.status == status.WARN %}
-        <span class="badge bg-warning">
-        {% elif report.status == status.CLEAN %}
-        <span class="badge bg-success">
-        {% elif report.status == status.ERROR %}
-        <span class="badge bg-dark">
-        {% elif report.status in [status.DISABLED, status.NOTAPPLICABLE] %}
-        <span class="badge bg-secondary">
-        {% endif %}
-          {{ report.status.name|lower }}
-        </span>
+        {{ display_status_badge(report.status, status) }}
       </td>
     </tr>
     {% if report.details %}

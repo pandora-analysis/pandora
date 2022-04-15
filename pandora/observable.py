@@ -8,7 +8,7 @@ from typing import Optional, overload, List
 # NOTE: remove .api on next package release.
 from pymispwarninglists.api import WarningList
 
-from .helpers import get_warninglists
+from .helpers import get_warninglists, Status
 from .storage_client import Storage
 
 
@@ -92,6 +92,16 @@ class Observable:
 
     def check_warninglists(self):
         self.warninglists = get_warninglists().search(self.value)
+
+    @property
+    def status(self) -> Status:
+        if self.value in self.storage.get_suspicious_observables():
+            self._status = Status.ALERT
+        elif self.value in self.storage.get_legitimate_observables():
+            self._status = Status.CLEAN
+        else:
+            self._status = Status.NOTAPPLICABLE
+        return self._status
 
     @property
     def to_dict(self):
