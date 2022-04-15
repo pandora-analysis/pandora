@@ -1,0 +1,15 @@
+{% macro display_status_badge(entry_status, status) %}
+{% if entry_status == status.ALERT %}
+<span class="badge bg-danger" title="Consider this as malicious">
+{% elif entry_status == status.WARN %}
+<span class="badge bg-warning" title="Consider this as suspicious, act accordingly">
+{% elif entry_status == status.CLEAN %}
+<span class="badge bg-success" title="Consider it as clean, but check if any other module flag it as dangerous">
+{% elif entry_status == status.ERROR %}
+<span class="badge bg-dark" title="Something went wrong.">
+{% elif entry_status in [status.DISABLED, status.NOTAPPLICABLE] %}
+<span class="badge bg-secondary" title="Unable to determine the legitimacy">
+{% endif %}
+  {{ entry_status.name|lower }}
+</span>
+{% endmacro %}
