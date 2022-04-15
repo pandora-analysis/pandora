@@ -15,7 +15,7 @@ import flask_session  # type: ignore
 import flask_moment  # type: ignore
 import flask_login  # type: ignore
 import flask_wtf  # type: ignore
-import pyzipper
+import pyzipper  # type: ignore
 
 from flask import (Flask, request, session, abort, render_template,
                    redirect, send_file, url_for)
