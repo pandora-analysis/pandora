@@ -1,8 +1,9 @@
 import hashlib
+import json
 import logging
 
 from datetime import datetime
-import json
+from functools import cached_property
 from typing import Optional, overload, List
 
 # NOTE: remove .api on next package release.
@@ -93,15 +94,14 @@ class Observable:
     def check_warninglists(self):
         self.warninglists = get_warninglists().search(self.value)
 
-    @property
+    @cached_property
     def status(self) -> Status:
         if self.value in self.storage.get_suspicious_observables():
-            self._status = Status.ALERT
+            return Status.ALERT
         elif self.value in self.storage.get_legitimate_observables():
-            self._status = Status.CLEAN
+            return Status.CLEAN
         else:
-            self._status = Status.NOTAPPLICABLE
-        return self._status
+            return Status.NOTAPPLICABLE
 
     @property
     def to_dict(self):
