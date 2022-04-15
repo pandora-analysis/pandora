@@ -326,13 +326,12 @@
                       </li>
                       {% endif %}
 
-                      {% if current_user.role.can('download_zip') and task.file.archive %}
-                      <!-- TODO: not implemented yet -->
+                      {% if current_user.role.can('download_zip') %}
                       <li role="separator" class="divider"></li>
                       <li><a class="dropdown-item"
                            href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='zip') }}"
                            title="Download protected zip file containing sample (password is {{ zip_pass }})">
-                         Zip encrypted sample (pw:{{ zip_pass }})
+                         Original sample (password: "{{ zip_passwd }}")
                         </a>
                       </li>
                       {% endif %}
