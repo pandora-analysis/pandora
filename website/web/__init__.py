@@ -374,9 +374,9 @@ def observables_lists_insert():
     assert 'type' in data, "missing mandatory key 'type'"
     assert 'list_type' in data, "missing mandatory key 'list_type'"
     if int(data['list_type']) == 0:
-        pandora.add_legitimate_observable(data['observable'], data['type'])
+        pandora.add_legitimate_observable(data['observable'].strip(), data['type'].strip())
     else:
-        pandora.add_suspicious_observable(data['observable'], data['type'])
+        pandora.add_suspicious_observable(data['observable'].strip(), data['type'].strip())
     return redirect(url_for('observables_lists'))
 
 
@@ -385,9 +385,9 @@ def observables_lists_insert():
 @html_answer
 def observables_lists_delete(list_type, observable):
     if list_type == 0:
-        pandora.delete_legitimate_observable(observable)
+        pandora.delete_legitimate_observable(observable.strip())
     else:
-        pandora.delete_suspicious_observable(observable)
+        pandora.delete_suspicious_observable(observable.strip())
     return redirect(url_for('observables_lists'))
 
 
