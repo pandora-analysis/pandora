@@ -146,7 +146,7 @@ class ApiTaskStatus(Resource):
         task = pandora.get_task(task_id=task_id)
         update_user_role(pandora, task, seed)
         assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
-        return {'success': True, 'taskId': task.uuid, 'status': task.status.name}
+        return {'success': True, 'taskId': task.uuid, 'status': task.status.name, 'workersStatus': task.workers_status}
 
 
 # TODO: make that different endpoints.
