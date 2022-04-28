@@ -188,18 +188,18 @@ class ApiWorkerDetails(Resource):
         if not seed:
             seed = None
         task = pandora.get_task(task_id=task_id)
-        report = pandora.get_report(task_id, worker_name)
         update_user_role(pandora, task, seed)
         assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
         to_return = {}
         if all_workers == 1:
             list_details = []
-            for report in task.reports.values():
-                list_details.append(report.worker_name)
-                list_details.append(report.status.name)
-                list_details.append(report.details)
+            for r in task.reports.values():
+                list_details.append(r.worker_name)
+                list_details.append(r.status.name)
+                list_details.append(r.details)
             to_return['workers_info'] = list_details
         else:
+            report = pandora.get_report(task_id, worker_name)
             to_return['report'] = report.status.name
             if details == 1:
                 to_return['details'] = report.details
