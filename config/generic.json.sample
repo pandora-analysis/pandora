@@ -8,6 +8,7 @@
     "storage_db_port": 6101,
     "tasks_max_len": 5000,
     "max_file_size": 100,
+    "sample_password": "infected",
     "users": {"admin": ""},
     "enable_imap_fetcher": false,
     "email": {
@@ -28,6 +29,7 @@
         "storage_db_port": "Port of the kvrocks instance. Must be the same as in storage/kvrocks.conf",
         "tasks_max_len": "Maximum length of the tasks list.",
         "max_file_size": "Maximum file size, in Mb. Default: 100Mb.",
+        "sample_password": "Default password used to encrypt the original sample when downloaded from the web interface",
         "users": "Admin acount(s). Format: {username: password}",
         "enable_imap_fetcher": "If true, the imap fetcher is enabled.",
         "email": "Email configuration",

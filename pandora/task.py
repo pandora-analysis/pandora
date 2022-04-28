@@ -180,8 +180,15 @@ class Task:
             # If the status was set to any of these values, the reports finished
             return self._status
 
+        for observable in self.observables:
+            if observable.status in [Status.DISABLED, Status.NOTAPPLICABLE]:
+                continue
+            if observable.status > self._status:
+                self._status = observable.status
+
         if self.workers_done:
-            self._status = Status.CLEAN
+            if self._status < Status.CLEAN:
+                self._status = Status.CLEAN
             # All the workers are done, return success/error
             for report_name, report in self.reports.items():
                 # Status code order: ALERT - WARN - CLEAN - ERROR
@@ -218,7 +225,7 @@ class Task:
         observables = []
         for observable in self.storage.get_task_observables(self.uuid):
             observables.append(Observable(**observable))
-            observables.sort()
+        observables.sort()
         return observables
 
     def __str__(self):

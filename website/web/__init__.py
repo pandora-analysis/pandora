@@ -15,6 +15,7 @@ import flask_session  # type: ignore
 import flask_moment  # type: ignore
 import flask_login  # type: ignore
 import flask_wtf  # type: ignore
+import pyzipper  # type: ignore
 
 from flask import (Flask, request, session, abort, render_template,
                    redirect, send_file, url_for)
@@ -202,18 +203,17 @@ def api_submit_page():
 def api_analysis(task_id, seed=None):
     task = pandora.get_task(task_id=task_id)
     assert task is not None, 'analysis not found'
-    update_user_role(pandora, task, seed)
 
+    update_user_role(pandora, task, seed)
     assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
 
-    # task.reports = pandora.get_task_reports(task=task)
-    # task.linked_tasks = pandora.get_related_tasks(linked_with=task, user=flask_login.current_user)
     task.linked_tasks = []
 
-    # return render_template('analysis.html', task=task, zip_pass=setting.ZIP_PASS)
     if hasattr(task, 'parent') and seed and not pandora.is_seed_valid(task.parent, seed):
         del task.parent
-    return render_template('analysis.html', task=task, seed=seed, api=api, api_resource=ApiTaskAction)
+    return render_template('analysis.html', task=task, seed=seed, api=api,
+                           zip_passwd=get_config('generic', 'sample_password'),
+                           api_resource=ApiTaskAction)
 
 
 @app.route('/task-download/<task_id>/seed-<seed>/<source>', methods=['GET'], strict_slashes=False)
@@ -248,9 +248,13 @@ def api_task_download(task_id, source, seed=None, idx=None):
         return send_file(task.file.text_preview, download_name=f'{task.file.path.name}.png', mimetype='image/png')
 
     if source == 'zip' and flask_login.current_user.role.can(Action.download_zip):
-        if task.file.zip_name is None:
-            raise AssertionError('content not available')
-        return send_file(task.file.zip_path)
+        # download the original file, zipped, with password
+        to_return = BytesIO()
+        with pyzipper.AESZipFile(to_return, 'w', encryption=pyzipper.WZ_AES) as archive:
+            archive.setpassword(get_config('generic', 'sample_password').encode())
+            archive.writestr(task.file.original_filename, task.file.data.getvalue())
+        to_return.seek(0)
+        return send_file(to_return, download_name=f'{task.file.path.name}.zip')
 
     raise AssertionError('forbidden')
 
@@ -351,6 +355,44 @@ def api_roles():
     assert flask_login.current_user.role.can(Action.list_roles), 'forbidden'
     roles = pandora.get_roles()
     return render_template('roles.html', roles=roles, api=api, api_resource=ApiRole)
+
+
+@app.route('/observables_lists', methods=['GET'], strict_slashes=False)
+@admin_required
+@html_answer
+def observables_lists():
+
+    assert flask_login.current_user.role.can(Action.manage_observables_lists), 'forbidden'
+    suspicious = pandora.get_suspicious_observables()
+    legitimate = pandora.get_legitimate_observables()
+    return render_template('observables_lists.html', suspicious=suspicious, legitimate=legitimate)
+
+
+@app.route('/observables_lists/insert', methods=['POST'], strict_slashes=False)
+@admin_required
+@html_answer
+def observables_lists_insert():
+
+    data = request.form
+    assert 'observable' in data, "missing mandatory key 'observable'"
+    assert 'type' in data, "missing mandatory key 'type'"
+    assert 'list_type' in data, "missing mandatory key 'list_type'"
+    if int(data['list_type']) == 0:
+        pandora.add_legitimate_observable(data['observable'].strip(), data['type'].strip())
+    else:
+        pandora.add_suspicious_observable(data['observable'].strip(), data['type'].strip())
+    return redirect(url_for('observables_lists'))
+
+
+@app.route('/observables_lists/delete/<int:list_type>/<string:observable>', strict_slashes=False)
+@admin_required
+@html_answer
+def observables_lists_delete(list_type, observable):
+    if list_type == 0:
+        pandora.delete_legitimate_observable(observable.strip())
+    else:
+        pandora.delete_suspicious_observable(observable.strip())
+    return redirect(url_for('observables_lists'))
 
 
 @app.route('/stats', methods=['GET'], strict_slashes=False)

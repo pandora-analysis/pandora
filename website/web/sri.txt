@@ -25,7 +25,6 @@
         "jquery.min.js": "894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==",
         "moment-with-locales.min.js": "LGXaggshOkD/at6PFNcp2V2unf9LzFq6LE+sChH7ceMTDP0g2kn6Vxwgg7wkPP7AAtX+lmPqPdxB47A0Nz0cMQ=="
       },
-      "observable.js": "QjxdsGrKW+KcqBiVHn9pF3sQevMbRzjyZ4feB8LpVwAjaDTNd8ZmhyQZvX7K4GudRVwOMLW1He2akQKuif+lEQ==",
       "role.js": "BTP7CW18uIGpKdx7zwll71xZsb7UDjKk3I+AGeWLtyj4olvazpWslfZWqmE0rsamhtvUC6pjm6F5vC4hwTPs9Q==",
       "submit.js": "Yexx0osQzyQBXhMlAqky4/MSkrIi67Oj8b2HWzx/hmFdHdi48FOpG3LVrILjG+DQTJj+7FzRiWPhd0l/E5Em5g=="
     }

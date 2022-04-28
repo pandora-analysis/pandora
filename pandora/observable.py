@@ -1,14 +1,15 @@
 import hashlib
+import json
 import logging
 
 from datetime import datetime
-import json
+from functools import cached_property
 from typing import Optional, overload, List
 
 # NOTE: remove .api on next package release.
 from pymispwarninglists.api import WarningList
 
-from .helpers import get_warninglists
+from .helpers import get_warninglists, Status
 from .storage_client import Storage
 
 
@@ -83,14 +84,24 @@ class Observable:
             else:
                 self.warninglists = warninglists
 
-    def __lt__(self, obj):
+    def __lt__(self, obj: 'Observable') -> bool:
         if self.observable_type < obj.observable_type:
             return True
         elif self.observable_type == obj.observable_type:
             return self.value < obj.value
+        return False
 
     def check_warninglists(self):
         self.warninglists = get_warninglists().search(self.value)
+
+    @cached_property
+    def status(self) -> Status:
+        if self.value in self.storage.get_suspicious_observables():
+            return Status.ALERT
+        elif self.value in self.storage.get_legitimate_observables():
+            return Status.CLEAN
+        else:
+            return Status.NOTAPPLICABLE
 
     @property
     def to_dict(self):

@@ -61,21 +61,21 @@ class ApiRole(Resource):
     @admin_required
     @json_answer
     def post(self, action):
-        data: Dict[str, str] = request.get_json()  # type: ignore
 
         assert action in ('update', 'reload'), f"unknown action '{action}'"
         if action == 'update' and flask_login.current_user.role.can(Action.update_role):
+            data: Dict[str, str] = request.get_json()  # type: ignore
             assert 'role_name' in data, "missing mandatory key 'role_name'"
             assert 'permission' in data, "missing mandatory key 'permission'"
             assert 'value' in data, "missing mandatory key 'value'"
             role = pandora.get_role(data['role_name'])
             role.actions[Action[data['permission']]] = bool(int(data['value']))
-            role.store
+            role.store()
             return {'success': True}
 
         if action == 'reload' and flask_login.current_user.role.can(Action.update_role):
             for role in roles_from_config().values():
-                role.store
+                role.store()
             return {'success': True}
 
         raise AssertionError('forbidden')
@@ -86,7 +86,6 @@ upload_parser.add_argument('file', location='files',
                            type=FileStorage, required=True,
                            help="The file you want to analyze")
 upload_parser.add_argument('validity', type=int, required=False,
-                           # default=None,
                            location='args',
                            help="Number of seconds the seed will be valid (0 means forever, empty doesn't create a seed).")
 

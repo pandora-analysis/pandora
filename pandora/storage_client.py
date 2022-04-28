@@ -111,6 +111,26 @@ class Storage():
     def add_task_observable(self, task_uuid: str, sha256: str, observable_type: str):
         self.storage.sadd(f'{task_uuid}:observables', f'{sha256}-{observable_type}')
 
+    # #### Observables lists ####
+
+    def get_suspicious_observables(self):
+        return self.storage.hgetall('suspicious_observables')
+
+    def add_suspicious_observable(self, observable: str, observable_type: str):
+        self.storage.hset('suspicious_observables', observable.strip(), observable_type.strip())
+
+    def delete_suspicious_observable(self, observable: str):
+        self.storage.hdel('suspicious_observables', observable.strip())
+
+    def get_legitimate_observables(self):
+        return self.storage.hgetall('legitimate_observables')
+
+    def add_legitimate_observable(self, observable: str, observable_type: str):
+        self.storage.hset('legitimate_observables', observable.strip(), observable_type.strip())
+
+    def delete_legitimate_observable(self, observable: str):
+        self.storage.hdel('legitimate_observables', observable.strip())
+
     # ##############
 
     # #### File ####
