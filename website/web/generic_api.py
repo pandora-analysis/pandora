@@ -129,6 +129,9 @@ status_parser.add_argument('task_id', required=True,
 status_parser.add_argument('seed', required=False,
                            location='args',
                            help="The seed of the task you'd like to get the status of")
+status_parser.add_argument('details', type=int, required=False,
+                           location='args',
+                           help="Do you want details about the report status of every worker ? If yes, print 1, else print 0")
 
 
 @api.route('/task_status', methods=['GET'], strict_slashes=False)
@@ -140,12 +143,16 @@ class ApiTaskStatus(Resource):
         args = status_parser.parse_args(request)
         task_id = args['task_id']
         seed = args['seed']
+        details = args['details']
         if not seed:
             seed = None
         task = pandora.get_task(task_id=task_id)
         update_user_role(pandora, task, seed)
         assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
-        return {'success': True, 'taskId': task.uuid, 'status': task.status.name, 'workersStatus': task.workers_status}
+        to_return = {'success': True, 'taskId': task.uuid, 'status': task.status.name}
+        if details == 1:
+            to_return['workersStatus'] = task.workers_status
+        return to_return
 
 
 # TODO: make that different endpoints.
