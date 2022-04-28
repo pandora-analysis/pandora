@@ -58,9 +58,9 @@ class Extractor(BaseWorker):
         with zipfile.ZipFile(archive_file.path) as archive:
             for file_number, info in enumerate(archive.infolist()):
                 if file_number >= self.MAX_EXTRACT_FILES:
-                    self.logger.warning('Too many files in the archive, stop extracting.')
+                    self.logger.warning(f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive, stop extracting.')
                     report.status = Status.ALERT
-                    report.add_details('Warning', 'Too many files in the archive')
+                    report.add_details('Warning', f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive')
                     break
                 is_encrypted = info.flag_bits & 0x1  # from https://github.com/python/cpython/blob/3.10/Lib/zipfile.py
                 if is_encrypted and not found_password:
@@ -97,9 +97,9 @@ class Extractor(BaseWorker):
         with rarfile.RarFile(archive_file.path) as archive:
             for file_number, info in enumerate(archive.infolist()):
                 if file_number >= self.MAX_EXTRACT_FILES:
-                    self.logger.warning('Too many files in the archive, stop extracting.')
+                    self.logger.warning(f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive, stop extracting.')
                     report.status = Status.ALERT
-                    report.add_details('Warning', 'Too many files in the archive')
+                    report.add_details('Warning', f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive')
                     break
                 if info.needs_password() and not found_password:
                     for pwd in self.ZIP_PASSWORDS:
@@ -176,9 +176,9 @@ class Extractor(BaseWorker):
                 return []
 
             if len(archive.getnames()) > self.MAX_EXTRACT_FILES:
-                self.logger.warning('Too many files in the archive.')
+                self.logger.warning(f'Too many files ({len(archive.getnames())}/{self.MAX_EXTRACT_FILES}) in the archive.')
                 report.status = Status.ALERT
-                report.add_details('Warning', 'Too many files in the archive')
+                report.add_details('Warning', f'Too many files ({len(archive.getnames())}/{self.MAX_EXTRACT_FILES}) in the archive')
                 return []
 
             archive.extractall(path=str(dest_dir))
@@ -211,9 +211,9 @@ class Extractor(BaseWorker):
         tar = TarFile(archive_file.path)  # open the file
         for file_number, tarinfo in enumerate(tar.getmembers()):
             if file_number >= self.MAX_EXTRACT_FILES:
-                self.logger.warning('Too many files in the archive, stop extracting.')
+                self.logger.warning(f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive, stop extracting.')
                 report.status = Status.ALERT
-                report.add_details('Warning', 'Too many files in the archive')
+                report.add_details('Warning', f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive')
                 break
             if not tarinfo.isfile():
                 continue

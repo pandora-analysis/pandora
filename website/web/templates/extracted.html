@@ -29,7 +29,7 @@
           {% if extracted_task.status == status.ERROR %}
           {{ render_icon('exclamation-octagon') }}
           {% elif extracted_task.status == status.ALERT %}
-          {{ render_icon('x-circle') }}
+          <img src="{{ url_for('static', filename='images/skull.svg') }}" width = "13" height = "13">
           {% elif extracted_task.status == status.WARN %}
           {{ render_icon('exclamation-triangle') }}
           {% elif extracted_task.status == status.CLEAN %}

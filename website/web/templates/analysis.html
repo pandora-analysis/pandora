@@ -108,7 +108,11 @@
           {% for status in status %}
           <div class="col-md-4 img-thumbnail overall-status-flag status-flag-{{ status.name|lower }}
                {% if status != status.WAITING %} d-none {% endif %}" id="taskStatusIcon">
-            {{ render_icon(status_icons[status]) }}
+            {% if status != status.ALERT %}
+              {{ render_icon(status_icons[status]) }}
+            {% else %}
+              <img src="{{ url_for('static', filename='images/skull.svg') }}" width = "160" height = "160">
+            {% endif %}
           </div>
           {% endfor %}
 
@@ -163,7 +167,7 @@
                 <tr>
                   <th>Extracted from</th>
                   <td>{{ render_icon(task.file.icon) }}{{ task.parent.file.original_filename }}
-                    <a href="{{ url_for('api_analysis', task_id=task.parent.uuid, seed=seed) }}"><span class="btn btn-default btn-sm pull-right">See report</span></a>
+                    <a href="{{ url_for('api_analysis', task_id=task.parent.uuid, seed=seed) }}"><span class="alert-link">See report</span></a>
                   </td>
                 </tr>
               {% endif %}
@@ -542,7 +546,7 @@
                         {% if linked_task.status == status.ERROR %}
                         {{ render_icon('exclamation-octagon') }}
                         {% elif linked_task.status == status.ALERT %}
-                        {{ render_icon('x-circle') }}
+                        <img src="{{ url_for('static', filename='images/skull.svg') }}" width = "13" height = "13">
                         {% elif linked_task.status == status.WARN %}
                         {{ render_icon('exclamation-triangle') }}
                         {% elif linked_task.status == status.CLEAN %}
