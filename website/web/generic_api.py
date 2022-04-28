@@ -155,6 +155,57 @@ class ApiTaskStatus(Resource):
         return to_return
 
 
+worker_parser = api.parser()
+worker_parser.add_argument('task_id', required=True,
+                           location='args',
+                           help="The id of the task you'd like to get the status of")
+worker_parser.add_argument('seed', required=False,
+                           location='args',
+                           help="The seed of the task you'd like to get the status of")
+worker_parser.add_argument('all_workers', type=int, required=False,
+                           location='args',
+                           help="Do you want the details of every workers ? If yes, print 1, else print 0")
+worker_parser.add_argument('worker_name', required=False,
+                           location='args',
+                           help="The name of the worker you want to get the report of")
+worker_parser.add_argument('details', type=int, required=False,
+                           location='args',
+                           help="Do you want the details of the worker status ? If yes, print 1, else print 0")
+
+
+@api.route('/worker_status', methods=['GET'], strict_slashes=False)
+@api.expect(worker_parser)
+class ApiWorkerDetails(Resource):
+
+    @json_answer
+    def get(self):
+        args = worker_parser.parse_args(request)
+        task_id = args['task_id']
+        seed = args['seed']
+        worker_name = args['worker_name']
+        details = args['details']
+        all_workers = args['all_workers']
+        if not seed:
+            seed = None
+        task = pandora.get_task(task_id=task_id)
+        report = pandora.get_report(task_id, worker_name)
+        update_user_role(pandora, task, seed)
+        assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
+        to_return = {}
+        if all_workers == 1:
+            list_details = []
+            for report in task.reports.values():
+                list_details.append(report.worker_name)
+                list_details.append(report.status.name)
+                list_details.append(report.details)
+            to_return['workers_info'] = list_details
+        else:
+            to_return['report'] = report.status.name
+            if details == 1:
+                to_return['details'] = report.details
+        return to_return
+
+
 # TODO: make that different endpoints.
 @api.route('/task-action/<task_id>/<action>',
            '/task-action/<task_id>/seed-<seed>/<action>', methods=['POST'],
