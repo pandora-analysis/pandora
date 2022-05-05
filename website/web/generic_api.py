@@ -192,17 +192,15 @@ class ApiWorkerDetails(Resource):
         assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
         to_return = {}
         if all_workers == 1:
-            list_details = []
             for r in task.reports.values():
-                list_details.append(r.worker_name)
-                list_details.append(r.status.name)
-                list_details.append(r.details)
-            to_return['workers_info'] = list_details
+                to_return[r.worker_name] = {'status': r.status.name}
+                if details:
+                    to_return[r.worker_name]['details'] = r.details
         else:
             report = pandora.get_report(task_id, worker_name)
-            to_return['report'] = report.status.name
-            if details == 1:
-                to_return['details'] = report.details
+            to_return[report.worker_name] = {'status': report.status.name}
+            if details:
+                to_return[report.worker_name]['details'] = report.details
         return to_return
 
 
