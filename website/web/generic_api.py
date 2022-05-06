@@ -142,15 +142,13 @@ class ApiTaskStatus(Resource):
     def get(self):
         args = status_parser.parse_args(request)
         task_id = args['task_id']
-        seed = args['seed']
-        details = args['details']
-        if not seed:
-            seed = None
+        seed = args['seed'] if args.get('seed') else None
+        details = True if args.get('details') else False
         task = pandora.get_task(task_id=task_id)
         update_user_role(pandora, task, seed)
         assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
         to_return = {'success': True, 'taskId': task.uuid, 'status': task.status.name}
-        if details == 1:
+        if details:
             to_return['workersStatus'] = task.workers_status
         return to_return
 
@@ -181,22 +179,25 @@ class ApiWorkerDetails(Resource):
     def get(self):
         args = worker_parser.parse_args(request)
         task_id = args['task_id']
-        seed = args['seed']
-        worker_name = args['worker_name']
-        details = args['details']
-        all_workers = args['all_workers']
-        if not seed:
-            seed = None
+        seed = args['seed'] if args.get('seed') else None
+        worker_name = args['worker_name'] if args.get('worker_name') else None
+        details = True if args.get('details') else False
+        all_workers = True if args.get('all_workers') else False
+
+        if not any(worker_name, all_workers):
+            return {'error': 'either all_workers must be set, or we need a worker name'}
+
         task = pandora.get_task(task_id=task_id)
         update_user_role(pandora, task, seed)
         assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
         to_return = {}
-        if all_workers == 1:
+        if all_workers:
             for r in task.reports.values():
                 to_return[r.worker_name] = {'status': r.status.name}
                 if details:
                     to_return[r.worker_name]['details'] = r.details
         else:
+            # FIXME: this will fail if the worker_name is incorrect and doesn't exists.
             report = pandora.get_report(task_id, worker_name)
             to_return[report.worker_name] = {'status': report.status.name}
             if details:
