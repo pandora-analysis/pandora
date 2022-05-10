@@ -97,6 +97,7 @@ class IMAPFetcher(AbstractManager):
                     try:
                         with SMTP(self.smtp_server, port=self.smtp_port) as smtp:
                             if self.smtp_requires_login:
+                                smtp.starttls(context=ssl_context)
                                 smtp.login(self.imap_login, self.imap_password)
                             smtp.send_message(reply)
                     except Exception as e:
