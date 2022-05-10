@@ -27,8 +27,8 @@ class ClamAVWorker(BaseWorker):
 
     def analyse(self, task: Task, report: Report):
         self.logger.debug(f'analysing file {task.file.path}...')
-        res = self._socket.scan(str(task.file.path))
-        status, message = res[str(task.file.path)]
+        res = self._socket.instream(task.file.data)
+        status, message = res['stream']
         if status == 'OK':
             report.status = Status.CLEAN
         elif status == 'FOUND':
