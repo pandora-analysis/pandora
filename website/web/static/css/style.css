@@ -8,13 +8,14 @@ a, *[onclick], *[title] {
   border-width:1px;
   border-color:#AAAAAA;
   border-style:solid;
-  transition: all .3s ease;
+  transition: all .5s ease;
   z-index:0;
 }
+
 .img-hover img:hover {
   z-index:10;
   backface-visibility: hidden;
-  transform: scale(3);
+  transform: scale(4) translate(-35%, 35%);
 }
 
 .tab-pane {

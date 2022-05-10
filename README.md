@@ -18,6 +18,10 @@ Pandora is an analysis framework to discover if a file is suspicious and conveni
 
 # Install guide
 
+Note that is is *strongly* recommended to use Ubuntu 22.04, which comes with a more recent of libreoffice.
+Using anything older will result in annoying issues when restarting the service: libreoffice
+isn't always stopped properly and it results in dead processes using 100% CPU.
+
 ## System dependencies
 
 You need poetry installed, see the [install guide](https://python-poetry.org/docs/).
@@ -49,8 +53,26 @@ cd ..
 
 ### Kvrocks
 
-The same way you installed redis, you need kvrocks. For that, please follow the [install guide](https://github.com/KvrocksLabs/kvrocks#building-kvrocks).
-the kvrocks directory *must* be in the same directory as redis, but *not* in the redis directory.
+[Kvrocks](https://github.com/apache/incubator-kvrocks) is a distributed key value NoSQL database that uses RocksDB as storage engine and is compatible with Redis protocol. Kvrocks intends to decrease the cost of memory and increase the capability while compared to Redis.
+
+NOTE: Kvrocks should be installed from the source, and the repository must be in the same directory as the one you will be cloning Lookyloo into.
+
+In order to compile kvrocks, you will need a few packages:
+
+```bash
+sudo apt-get update
+sudo apt install gcc g++ make libsnappy-dev autoconf automake libtool googletest libgtest-dev
+```
+
+```bash
+git clone --recursive https://github.com/apache/incubator-kvrocks.git kvrocks
+cd kvrocks
+git checkout 2.0
+make -j4
+# Optionally, you can run the tests:
+make test
+cd ..
+```
 
 ### Clone pandora
 
@@ -73,7 +95,7 @@ The directory tree must look like that:
 .
 ├── redis  => compiled redis
 ├── kvrocks => compiled kvrocks
-└── pandra => not installed pandora yet
+└── pandora => not installed pandora yet
 ```
 
 ## Installation
@@ -96,6 +118,7 @@ Note: on Ubuntu 20.04, libreoffice-nogui cannot be installed due to some depende
 From the directory you cloned Pandora to, run:
 
 ```bash
+cd pandora  # if you're not already in the directory
 poetry install
 ```
 
@@ -123,6 +146,7 @@ Install the package from the official repositories, and the default config will 
 
 ```bash
 sudo apt-get install clamav-daemon
+sudo freshclam
 ```
 
 Then, check if `/var/run/clamav/clamd.ctl` exists. If it doesn't, start the service:

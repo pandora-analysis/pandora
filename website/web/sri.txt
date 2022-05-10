@@ -5,7 +5,7 @@
         "dropzone.css": "3XCkGeASl53asPugXJGPyH9mXEXRxYNUWojkV6twcSbSkpkAQZQt4wmG9WebDUq1Z/HX2j8Vw5nIlKAR/MJ3kg=="
       },
       "ribbon.css": "2hAsQwCClHQ7b6VthbKYIkUPam4Ef6wbSxa3+nK0UuqCHezvPMr3aqpz16gD0lyYop55VEd/dhzZJLA4WMAplQ==",
-      "style.css": "JvL21SOmbwHuPTEdFKvkmzVMhT0bGp0rQhPTJozXj9cLKSiqaRQw2XIHcpGVdhxpvMEaxYYAcBEbBpwJihddcw=="
+      "style.css": "i3SEmUOP2iw77JEQmbAVkY5PJ7pZ1exf6nVbZT8Wt+MXt2drlS8g5gVz1Wj/3KnP7XVhbE9kDSh4h/gZMvDuWg=="
     },
     "images": {
       "favicons": {
@@ -16,7 +16,8 @@
         "site.webmanifest": "34hMXZ3DRe8kUaIKYZe2Avq+EZLshmMql2ObQXjsu9sGbeGj45JssDeffRZxOXP04tnRqZGP/1VQgLlNRX2eyw=="
       },
       "logo-h.svg": "6GFemUdS/Wecmfayrpzqo+sO61KfQFxjlv5zu8+XsMwDGDPsT/Z0rZoOwi2e6KTd5ZOnatrZBHeAKnkZX1CkYw==",
-      "logo.svg": "WxV9nvLMENSaB9jnzGZId8XTgNPbsnws0G7FhBkcgPFTW/XX0JZU3ubDCw2dQVcMaWvdxKbdDQkhrqgA3ASpbQ=="
+      "logo.svg": "WxV9nvLMENSaB9jnzGZId8XTgNPbsnws0G7FhBkcgPFTW/XX0JZU3ubDCw2dQVcMaWvdxKbdDQkhrqgA3ASpbQ==",
+      "skull.svg": "jVXBiN5aVJDJpcYfnDcCecHCL8mRl1Zc74QB0+bd6k4I46aCqMYBHUCRrA1KmCUE/ANwZjfvked+FJQJWR9NTA=="
     },
     "js": {
       "analysis.js": "lBb4Stg4vBgN+BQRZ7ucjmbiegGFJhLRZlKX2QvWiki5eWv1O2cCmFg16qbWnkduovQtyFuKEyT2yckjEouXKg==",
