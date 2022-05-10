@@ -7,7 +7,7 @@ from uuid import uuid4
 
 from werkzeug.utils import secure_filename
 
-from .default import get_homedir, safe_create_dir
+from .default import get_homedir, safe_create_dir, PandoraException
 from .file import File
 from .helpers import Status, workers
 from .observable import Observable
@@ -17,6 +17,10 @@ from .user import User
 
 
 class Task:
+
+    _file: File
+    _user: User
+    _parent: Optional['Task']
 
     @classmethod
     def new_task(cls, user: User, sample: BytesIO, filename: str, disabled_workers: List[str],
@@ -83,7 +87,7 @@ class Task:
             self.file = submitted_file
             self.save_date = self.file.save_date
         elif file_id:
-            self.file = File(**self.storage.get_file(file_id))
+            self._file_id = file_id
             self.save_date = self.file.save_date
         else:
             self.save_date = save_date
@@ -91,16 +95,12 @@ class Task:
         if user:
             self.user = user
         elif user_id:
-            user = self.storage.get_user(user_id)
-            if user:
-                self.user = User(**user)
+            self._user_id = user_id
 
         if parent:
             self.parent = parent
         elif parent_id:
-            parent_task = self.storage.get_task(parent_id)
-            if parent_task:
-                self.parent = Task(**parent_task)  # type: ignore
+            self._parent_id = parent_id
 
         if isinstance(status, Status):
             self._status = status
@@ -119,6 +119,48 @@ class Task:
             self.disabled_workers = []
 
     @property
+    def user(self) -> User:
+        if hasattr(self, '_user'):
+            return self._user
+        elif hasattr(self, '_user_id'):
+            if (u := self.storage.get_user(self._user_id)):
+                self._user = User(**u)  # type: ignore
+                return self._user
+        raise PandoraException('unknown user')
+
+    @user.setter
+    def user(self, u: User) -> None:
+        self._user = u
+
+    @property
+    def file(self) -> File:
+        if hasattr(self, '_file'):
+            return self._file
+        elif hasattr(self, '_file_id'):
+            if (f := self.storage.get_file(self._file_id)):
+                self._file = File(**f)  # type: ignore
+                return self._file
+        raise PandoraException('missing file')
+
+    @file.setter
+    def file(self, f: File) -> None:
+        self._file = f
+
+    @property
+    def parent(self) -> Optional['Task']:
+        if hasattr(self, '_parent'):
+            return self._parent
+        elif hasattr(self, '_parent_id'):
+            if (parent_task := self.storage.get_task(self._parent_id)):
+                self._parent = Task(**parent_task)  # type: ignore
+                return self._parent
+        return None
+
+    @parent.setter
+    def parent(self, parent: 'Task'):
+        self._parent = parent
+
+    @property
     def extracted(self) -> List['Task']:
         to_return = []
         for t_uuid in self.storage.get_extracted_references(self.uuid):
@@ -132,9 +174,9 @@ class Task:
     def to_dict(self) -> Dict[str, Any]:
         return {k: v for k, v in {
             'uuid': self.uuid,
-            'parent_id': self.parent.uuid if hasattr(self, 'parent') else None,
-            'file_id': self.file.uuid if hasattr(self, 'file') else None,
-            'user_id': self.user.get_id() if hasattr(self, 'user') else None,
+            'parent_id': self.parent.uuid if self.parent else None,
+            'file_id': self.file.uuid,
+            'user_id': self.user.get_id(),
             'disabled_workers': json.dumps(self.disabled_workers) if hasattr(self, 'disabled_workers') else None,
             'status': self.status.name,
             'save_date': self.save_date.isoformat()

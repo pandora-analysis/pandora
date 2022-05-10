@@ -32,6 +32,10 @@ class YaraSignatureBaseWorker(YaraWorker):
         return rules
 
     def analyse(self, task: Task, report: Report):
+        if not task.file.data:
+            report.status = Status.NOTAPPLICABLE
+            return
+
         super().analyse(task=task, report=report)
 
         filetype = task.file.type  # only match in generic_anomalies.yar for "GIF"

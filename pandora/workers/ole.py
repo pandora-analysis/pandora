@@ -112,6 +112,10 @@ class Ole(BaseWorker):
         return Status.ALERT, details
 
     def analyse(self, task: Task, report: Report):
+        if not task.file.data:
+            report.status = Status.NOTAPPLICABLE
+            return
+
         self.logger.debug(f'analysing file {task.file.path}...')
         oid = oleid.OleID(task.file.path)
         # We must initialize a bunch of internal variables in order to run the calls below

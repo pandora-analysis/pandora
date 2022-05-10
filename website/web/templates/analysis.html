@@ -167,7 +167,9 @@
                 <tr>
                   <th>Extracted from</th>
                   <td>{{ render_icon(task.file.icon) }}{{ task.parent.file.original_filename }}
-                    <a href="{{ url_for('api_analysis', task_id=task.parent.uuid, seed=seed) }}"><span class="alert-link">See report</span></a>
+                    <a href="{{ url_for('api_analysis', task_id=task.parent.uuid, seed=seed) }}">
+                        <span class="alert-link">See report</span>
+                    </a>
                   </td>
                 </tr>
               {% endif %}

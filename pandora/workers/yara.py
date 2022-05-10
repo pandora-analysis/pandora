@@ -57,7 +57,12 @@ class YaraWorker(BaseWorker):
             self.logger.critical(f'Unable to initialize rules: {e}')
 
     def analyse(self, task: Task, report: Report):
-        matches = [str(match) for match in self.rules.match(data=task.file.data.getvalue()) if match]
+        if not task.file.data:
+            # Empty file
+            report.status = Status.NOTAPPLICABLE
+            return
+
+        matches = [str(_match) for _match in self.rules.match(data=task.file.data.getvalue()) if _match]
         if matches:
             report.status = Status.ALERT
             report.add_details('Rules matches', matches)

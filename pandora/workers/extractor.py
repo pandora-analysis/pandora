@@ -58,9 +58,10 @@ class Extractor(BaseWorker):
         with zipfile.ZipFile(archive_file.path) as archive:
             for file_number, info in enumerate(archive.infolist()):
                 if file_number >= self.MAX_EXTRACT_FILES:
-                    self.logger.warning(f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive, stop extracting.')
+                    warning_msg = f'Too many files ({len(archive.infolist())}) in the archive, stoping at {self.MAX_EXTRACT_FILES}.'
+                    self.logger.warning(warning_msg)
                     report.status = Status.ALERT
-                    report.add_details('Warning', f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive')
+                    report.add_details('Warning', warning_msg)
                     break
                 is_encrypted = info.flag_bits & 0x1  # from https://github.com/python/cpython/blob/3.10/Lib/zipfile.py
                 if is_encrypted and not found_password:
@@ -79,9 +80,10 @@ class Extractor(BaseWorker):
                 if info.is_dir():
                     continue
                 if info.file_size > self.MAX_EXTRACTED_FILE_SIZE:
-                    self.logger.warning(f'Skipping file {info.filename}, too big ({info.file_size}).')
+                    warning_msg = f'Skipping file {info.filename}, too big ({info.file_size}).'
+                    self.logger.warning(warning_msg)
                     report.status = Status.WARN
-                    report.add_details('Warning', f'Skipping file {info.filename}, too big ({info.file_size}).')
+                    report.add_details('Warning', warning_msg)
                     continue
                 file_path = archive.extract(info, dest_dir)
                 extracted_files.append(Path(file_path))
