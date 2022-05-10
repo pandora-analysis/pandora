@@ -103,7 +103,8 @@ class IMAPFetcher(AbstractManager):
                         self.logger.exception(e)
                         self.logger.warning(reply.as_string())
                     sent_dir = client.find_special_folder(imapclient.SENT)
-                    client.append(sent_dir, reply.as_string())
+                    if sent_dir:
+                        client.append(sent_dir, reply.as_string())
                 client.add_flags(uid, ('\\Answered'))
 
         self.logger.info('Done with fetching mails.')
