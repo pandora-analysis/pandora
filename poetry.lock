@@ -965,12 +965,11 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "oletools"
-version = "0.60.1.dev8"
+version = "0.60.1"
 description = "Python tools to analyze security characteristics of MS Office and OLE files (also called Structured Storage, Compound File Binary Format or Compound Document File Format), for Malware Analysis and Incident Response #DFIR"
 category = "main"
 optional = false
 python-versions = "*"
-develop = false
 
 [package.dependencies]
 colorclass = "*"
@@ -979,18 +978,10 @@ msoffcrypto-tool = {version = "*", markers = "platform_python_implementation != 
 olefile = ">=0.46"
 pcodedmp = ">=1.2.5"
 pyparsing = ">=2.1.0,<3"
-pyxlsb2 = {url = "https://github.com/DissectMalware/pyxlsb2/archive/master.zip", optional = true, markers = "extra == \"full\""}
-XLMMacroDeobfuscator = {url = "https://github.com/DissectMalware/XLMMacroDeobfuscator/archive/master.zip", optional = true, markers = "extra == \"full\""}
-xlrd2 = {url = "https://github.com/DissectMalware/xlrd2/archive/master.zip", optional = true, markers = "extra == \"full\""}
+XLMMacroDeobfuscator = {version = "*", optional = true, markers = "extra == \"full\""}
 
 [package.extras]
-full = ["xlrd2 @ https://github.com/DissectMalware/xlrd2/archive/master.zip", "pyxlsb2 @ https://github.com/DissectMalware/pyxlsb2/archive/master.zip", "XLMMacroDeobfuscator @ https://github.com/DissectMalware/XLMMacroDeobfuscator/archive/master.zip"]
-
-[package.source]
-type = "git"
-url = "https://github.com/decalage2/oletools.git"
-reference = "master"
-resolved_reference = "140e36081cb2f3dff39d7b9b03716476db3ac836"
+full = ["xlmmacrodeobfuscator"]
 
 [[package]]
 name = "packaging"
@@ -1375,15 +1366,11 @@ python-versions = "*"
 
 [[package]]
 name = "pyxlsb2"
-version = "0.0.8"
+version = "0.0.9"
 description = "Excel 2007+ Binary Workbook (xlsb) parser"
 category = "main"
 optional = false
 python-versions = "*"
-
-[package.source]
-type = "url"
-url = "https://github.com/DissectMalware/pyxlsb2/archive/master.zip"
 
 [[package]]
 name = "pyyaml"
@@ -1422,7 +1409,7 @@ python-versions = "*"
 
 [[package]]
 name = "redis"
-version = "4.2.2"
+version = "4.3.1"
 description = "Python client for Redis database and key-value store"
 category = "main"
 optional = false
@@ -1658,7 +1645,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-redis"
-version = "4.2.1"
+version = "4.2.2"
 description = "Typing stubs for redis"
 category = "dev"
 optional = false
@@ -1865,7 +1852,7 @@ MarkupSafe = "*"
 email = ["email-validator"]
 
 [[package]]
-name = "XLMMacroDeobfuscator"
+name = "xlmmacrodeobfuscator"
 version = "0.2.5"
 description = "XLMMacroDeobfuscator is an XLM Emulation engine written in Python 3, designed to analyze and deobfuscate malicious XLM macros, also known as Excel 4.0 macros, contained in MS Excel files (XLS, XLSM, and XLSB)."
 category = "main"
@@ -1882,10 +1869,6 @@ xlrd2 = "*"
 
 [package.extras]
 secure = ["defusedxml"]
-
-[package.source]
-type = "url"
-url = "https://github.com/DissectMalware/XLMMacroDeobfuscator/archive/master.zip"
 
 [[package]]
 name = "xlrd"
@@ -1907,10 +1890,6 @@ description = "Library for developers to extract data from Microsoft Excel legac
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-
-[package.source]
-type = "url"
-url = "https://github.com/DissectMalware/xlrd2/archive/master.zip"
 
 [[package]]
 name = "xlsxwriter"
@@ -1974,7 +1953,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "d154a1d4ae04d44cc1b409e3a89ea70c746ef3dda913a61e75792d3169ca2ef3"
+content-hash = "a163786b44273c3fe0a7d12064b24ab32171d117b89043fd947df07b95456c78"
 
 [metadata.files]
 aiohttp = [
@@ -2816,7 +2795,10 @@ mypy-extensions = [
 olefile = [
     {file = "olefile-0.46.zip", hash = "sha256:133b031eaf8fd2c9399b78b8bc5b8fcbe4c31e85295749bb17a87cba8f3c3964"},
 ]
-oletools = []
+oletools = [
+    {file = "oletools-0.60.1-py2.py3-none-any.whl", hash = "sha256:edef92374e688989a39269eb9a11142fb20a023629c23538c849c14d1d1144ea"},
+    {file = "oletools-0.60.1.zip", hash = "sha256:67a796da4c4b8e2feb9a6b2495bef8798a3323a75512de4e5669d9dc9d1fae31"},
+]
 packaging = [
     {file = "packaging-21.3-py3-none-any.whl", hash = "sha256:ef103e05f519cdc783ae24ea4e2e0f508a9c99b2d4969652eed6a2e1ea5bd522"},
     {file = "packaging-21.3.tar.gz", hash = "sha256:dd47c42927d89ab911e606518907cc2d3a1f38bbd026385970643f9c5b8ecfeb"},
@@ -3212,7 +3194,10 @@ pywin32-ctypes = [
     {file = "pywin32-ctypes-0.2.0.tar.gz", hash = "sha256:24ffc3b341d457d48e8922352130cf2644024a4ff09762a2261fd34c36ee5942"},
     {file = "pywin32_ctypes-0.2.0-py2.py3-none-any.whl", hash = "sha256:9dc2d991b3479cc2df15930958b674a48a227d5361d413827a4cfd0b5876fc98"},
 ]
-pyxlsb2 = []
+pyxlsb2 = [
+    {file = "pyxlsb2-0.0.9-py3-none-any.whl", hash = "sha256:d5e652e753f15cd0d3efd8465a86ba0b2d9242c895f5d24b51a682ccf42b22f2"},
+    {file = "pyxlsb2-0.0.9.tar.gz", hash = "sha256:7746c4ce999714957409fd6a446499fee7a1528ea6e0f40f8ca4aed90c4cd488"},
+]
 pyyaml = [
     {file = "PyYAML-6.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d4db7c7aef085872ef65a8fd7d6d09a14ae91f691dec3e87ee5ee0539d516f53"},
     {file = "PyYAML-6.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:9df7ed3b3d2e0ecfe09e14741b857df43adb5a3ddadc919a2d94fbdf78fea53c"},
@@ -3345,8 +3330,8 @@ rarfile = [
     {file = "rarfile-4.0.tar.gz", hash = "sha256:67548769229c5bda0827c1663dce3f54644f9dbfba4ae86d4da2b2afd3e602a1"},
 ]
 redis = [
-    {file = "redis-4.2.2-py3-none-any.whl", hash = "sha256:4e95f4ec5f49e636efcf20061a5a9110c20852f607cfca6865c07aaa8a739ee2"},
-    {file = "redis-4.2.2.tar.gz", hash = "sha256:0107dc8e98a4f1d1d4aa00100e044287f77121a1e6d2085545c4b7fa94a7a27f"},
+    {file = "redis-4.3.1-py3-none-any.whl", hash = "sha256:84316970995a7adb907a56754d2b92d88fc2d252963dc5ac34c88f0f1a22c25d"},
+    {file = "redis-4.3.1.tar.gz", hash = "sha256:94b617b4cd296e94991146f66fc5559756fbefe9493604f0312e4d3298ac63e9"},
 ]
 reportlab = [
     {file = "reportlab-3.6.9-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:4ba8eebfa4383e4680d6e7e6dba9c45c1fe19bbc0a754db4d84823f1a9511e56"},
@@ -3446,8 +3431,8 @@ types-pyyaml = [
     {file = "types_PyYAML-6.0.7-py3-none-any.whl", hash = "sha256:7b273a34f32af9910cf9405728c9d2ad3afc4be63e4048091a1a73d76681fe67"},
 ]
 types-redis = [
-    {file = "types-redis-4.2.1.tar.gz", hash = "sha256:3b8a8efb2fabc349555d47a1867b4da060646574d946956ec37cc4201b7667b7"},
-    {file = "types_redis-4.2.1-py3-none-any.whl", hash = "sha256:36767c4831fe52d1369aacef930587f32f5cbe06eb9e836ab36a75914b2e55c9"},
+    {file = "types-redis-4.2.2.tar.gz", hash = "sha256:616e5331e957832321c14a4bd206b41f967657cf360f62419b21588880af3933"},
+    {file = "types_redis-4.2.2-py3-none-any.whl", hash = "sha256:8035a2631591ea2d0484f979f1424789ed757e72b56f0c5d6291a9484540e9c0"},
 ]
 types-requests = [
     {file = "types-requests-2.27.25.tar.gz", hash = "sha256:805ae7e38fd9d157153066dc4381cf585fd34dfa212f2fc1fece248c05aac571"},
@@ -3581,12 +3566,18 @@ wtforms = [
     {file = "WTForms-3.0.1-py3-none-any.whl", hash = "sha256:837f2f0e0ca79481b92884962b914eba4e72b7a2daaf1f939c890ed0124b834b"},
     {file = "WTForms-3.0.1.tar.gz", hash = "sha256:6b351bbb12dd58af57ffef05bc78425d08d1914e0fd68ee14143b7ade023c5bc"},
 ]
-XLMMacroDeobfuscator = []
+xlmmacrodeobfuscator = [
+    {file = "XLMMacroDeobfuscator-0.2.5-py3-none-any.whl", hash = "sha256:5e6bf9fd777c20d4ad4cfdab885906a7bc65d6d39d732644567f2fa665f34e37"},
+    {file = "XLMMacroDeobfuscator-0.2.5.tar.gz", hash = "sha256:fdee926d56895d0519869f2e6c50206cb0d39d14ae860c57293e0dac261b7f85"},
+]
 xlrd = [
     {file = "xlrd-2.0.1-py2.py3-none-any.whl", hash = "sha256:6a33ee89877bd9abc1158129f6e94be74e2679636b8a205b43b85206c3f0bbdd"},
     {file = "xlrd-2.0.1.tar.gz", hash = "sha256:f72f148f54442c6b056bf931dbc34f986fd0c3b0b6b5a58d013c9aef274d0c88"},
 ]
-xlrd2 = []
+xlrd2 = [
+    {file = "xlrd2-1.3.4-py2.py3-none-any.whl", hash = "sha256:88147c56883ad0e789af13dd8e1affcaf74ace91a251fd1737299347a5d8dd05"},
+    {file = "xlrd2-1.3.4.tar.gz", hash = "sha256:1f6fcd61b696608faaff92c7c14f70995de26b6c45c4463485ffb8105c902750"},
+]
 xlsxwriter = [
     {file = "XlsxWriter-3.0.3-py3-none-any.whl", hash = "sha256:df0aefe5137478d206847eccf9f114715e42aaea077e6a48d0e8a2152e983010"},
     {file = "XlsxWriter-3.0.3.tar.gz", hash = "sha256:e89f4a1d2fa2c9ea15cde77de95cd3fd8b0345d0efb3964623f395c8c4988b7f"},
