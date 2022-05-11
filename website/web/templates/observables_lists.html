@@ -11,8 +11,12 @@
     <input type="text" class="form-text" name="observable" id="observable" required>
   </div>
   <div class="col-auto">
-    <label for="type" class="form-label">Type</label>
-    <input type="text" class="form-text" name="type" id="type" required>
+    <select class="form-select" name="type" id="type" aria-label="Observable type" required>
+      <option selected disabled value="">Select a type</option>
+      {% for type in types %}
+      <option value="{{type}}">{{type}}</option>
+      {% endfor %}
+    </select>
   </div>
   <div class="col-auto">
     <div class="form-check">

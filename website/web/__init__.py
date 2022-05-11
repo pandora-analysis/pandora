@@ -21,6 +21,7 @@ from flask import (Flask, request, session, abort, render_template,
                    redirect, send_file, url_for)
 from flask_restx import Api  # type: ignore
 from flask_bootstrap import Bootstrap5  # type: ignore
+from pymisp.abstract import describe_types
 from werkzeug.security import check_password_hash
 
 from pandora.default import get_config
@@ -365,7 +366,8 @@ def observables_lists():
     assert flask_login.current_user.role.can(Action.manage_observables_lists), 'forbidden'
     suspicious = pandora.get_suspicious_observables()
     legitimate = pandora.get_legitimate_observables()
-    return render_template('observables_lists.html', suspicious=suspicious, legitimate=legitimate)
+    observable_types = [t for t in describe_types['types'] if '|' not in t]
+    return render_template('observables_lists.html', types=observable_types, suspicious=suspicious, legitimate=legitimate)
 
 
 @app.route('/observables_lists/insert', methods=['POST'], strict_slashes=False)
@@ -376,6 +378,7 @@ def observables_lists_insert():
     data = request.form
     assert 'observable' in data, "missing mandatory key 'observable'"
     assert 'type' in data, "missing mandatory key 'type'"
+    assert data['type'].strip() in [t for t in describe_types['types'] if '|' not in t], "invalid type"
     assert 'list_type' in data, "missing mandatory key 'list_type'"
     if int(data['list_type']) == 0:
         pandora.add_legitimate_observable(data['observable'].strip(), data['type'].strip())

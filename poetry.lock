@@ -1244,6 +1244,30 @@ requests = ">=2.26.0,<3.0.0"
 docs = ["Sphinx (>=4.3.1,<5.0.0)"]
 
 [[package]]
+name = "pymisp"
+version = "2.4.157"
+description = "Python API for MISP."
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[package.dependencies]
+deprecated = ">=1.2.13,<2.0.0"
+jsonschema = ">=4.0,<5.0"
+python-dateutil = ">=2.8.2,<3.0.0"
+requests = ">=2.26.0,<3.0.0"
+
+[package.extras]
+email = ["extract_msg (>=0.30.8,<0.31.0)", "RTFDE (>=0.0.2,<0.0.3)", "oletools (>=0.60,<0.61)"]
+fileobjects = ["python-magic (>=0.4.24,<0.5.0)", "pydeep2 (>=0.5,<0.6)", "lief (>=0.11.5,<0.12.0)"]
+openioc = ["beautifulsoup4 (>=4.10.0,<5.0.0)"]
+virustotal = ["validators (>=0.18.2,<0.19.0)"]
+docs = ["sphinx-autodoc-typehints (>=1.12.0,<2.0.0)", "recommonmark (>=0.7.1,<0.8.0)"]
+pdfexport = ["reportlab (>=3.6.3,<4.0.0)"]
+url = ["pyfaup (>=1.2,<2.0)", "chardet (>=4.0,<5.0)"]
+brotli = ["urllib3[brotli] (>=1.26.7,<2.0.0)"]
+
+[[package]]
 name = "pymispwarninglists"
 version = "1.4"
 description = "Python API for the MISP warning lists."
@@ -1953,7 +1977,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "a163786b44273c3fe0a7d12064b24ab32171d117b89043fd947df07b95456c78"
+content-hash = "85225fee3e6ae83d55f0ffb5950a9a0a70f0c03eed4121d8a386ee5997af2230"
 
 [metadata.files]
 aiohttp = [
@@ -3048,6 +3072,10 @@ pygments = [
 pyhashlookup = [
     {file = "pyhashlookup-1.1.1-py3-none-any.whl", hash = "sha256:e1563296524f62f02025191b85bfd36f8531ba472dab6b5ad2fcea7223b96ba6"},
     {file = "pyhashlookup-1.1.1.tar.gz", hash = "sha256:3b0ecd0aab7ff803044617a1f7026fe96469f1c5e62b17891755c9bca702371e"},
+]
+pymisp = [
+    {file = "pymisp-2.4.157-py3-none-any.whl", hash = "sha256:f3977d5f275e2917b651fc4e8a43920b8e38fbe21998e9798f24fef889a62814"},
+    {file = "pymisp-2.4.157.tar.gz", hash = "sha256:b19d6d565972b391f90e8fe7050101b3b84f45f83214d3bf9b339a6490856cf2"},
 ]
 pymispwarninglists = [
     {file = "pymispwarninglists-1.4-py3-none-any.whl", hash = "sha256:b1e0b01cbe655a931d3739bd860ad9d74356ac8899e4eec9d6404d5e4a17dbc1"},
