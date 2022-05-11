@@ -140,7 +140,7 @@ class Pandora():
         for task in self.storage.get_tasks(first_date=first_date, last_date=last_date):
             # FIXME: get rid of that typing ignore
             _task = Task(**task)  # type: ignore
-            if user.is_admin or (hasattr(_task, 'user') and user.get_id() == _task.user.get_id()):
+            if user.is_admin or (_task.user and user.get_id() == _task.user.get_id()):
                 tasks.append(_task)
         return tasks
 

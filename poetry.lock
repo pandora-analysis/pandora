@@ -1626,14 +1626,14 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "traitlets"
-version = "5.1.1"
+version = "5.2.0"
 description = "Traitlets Python configuration system"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 
 [package.extras]
-test = ["pytest"]
+test = ["pytest", "pre-commit"]
 
 [[package]]
 name = "types-pyyaml"
@@ -1853,7 +1853,7 @@ email = ["email-validator"]
 
 [[package]]
 name = "xlmmacrodeobfuscator"
-version = "0.2.5"
+version = "0.2.6"
 description = "XLMMacroDeobfuscator is an XLM Emulation engine written in Python 3, designed to analyze and deobfuscate malicious XLM macros, also known as Excel 4.0 macros, contained in MS Excel files (XLS, XLSM, and XLSB)."
 category = "main"
 optional = false
@@ -3423,8 +3423,8 @@ tomli = [
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
 traitlets = [
-    {file = "traitlets-5.1.1-py3-none-any.whl", hash = "sha256:2d313cc50a42cd6c277e7d7dc8d4d7fedd06a2c215f78766ae7b1a66277e0033"},
-    {file = "traitlets-5.1.1.tar.gz", hash = "sha256:059f456c5a7c1c82b98c2e8c799f39c9b8128f6d0d46941ee118daace9eb70c7"},
+    {file = "traitlets-5.2.0-py3-none-any.whl", hash = "sha256:9dd4025123fbe018a2092b2ad6984792f53ea3362c698f37473258b1fa97b0bc"},
+    {file = "traitlets-5.2.0.tar.gz", hash = "sha256:60474f39bf1d39a11e0233090b99af3acee93bbc2281777e61dd8c87da8a0014"},
 ]
 types-pyyaml = [
     {file = "types-PyYAML-6.0.7.tar.gz", hash = "sha256:59480cf44595d836aaae050f35e3c39f197f3a833679ef3978d97aa9f2fb7def"},
@@ -3567,8 +3567,8 @@ wtforms = [
     {file = "WTForms-3.0.1.tar.gz", hash = "sha256:6b351bbb12dd58af57ffef05bc78425d08d1914e0fd68ee14143b7ade023c5bc"},
 ]
 xlmmacrodeobfuscator = [
-    {file = "XLMMacroDeobfuscator-0.2.5-py3-none-any.whl", hash = "sha256:5e6bf9fd777c20d4ad4cfdab885906a7bc65d6d39d732644567f2fa665f34e37"},
-    {file = "XLMMacroDeobfuscator-0.2.5.tar.gz", hash = "sha256:fdee926d56895d0519869f2e6c50206cb0d39d14ae860c57293e0dac261b7f85"},
+    {file = "XLMMacroDeobfuscator-0.2.6-py3-none-any.whl", hash = "sha256:c657ce8f7c91a5d40fad73263fc1558d0cc17c1ede4f5d160aaf769fae55b8da"},
+    {file = "XLMMacroDeobfuscator-0.2.6.tar.gz", hash = "sha256:2200828ec15b83517b9f6e085808a682c0d3c4ba802b4c48d2f7b3b9c84c58b1"},
 ]
 xlrd = [
     {file = "xlrd-2.0.1-py2.py3-none-any.whl", hash = "sha256:6a33ee89877bd9abc1158129f6e94be74e2679636b8a205b43b85206c3f0bbdd"},

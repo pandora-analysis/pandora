@@ -14,7 +14,7 @@ from typing import List, Optional
 import py7zr  # type: ignore
 import rarfile  # type: ignore
 
-from ..default import safe_create_dir
+from ..default import safe_create_dir, PandoraException
 from ..helpers import Status
 from ..pandora import Pandora
 from ..report import Report
@@ -267,6 +267,10 @@ class Extractor(BaseWorker):
         if not (task.file.is_archive or task.file.is_eml or task.file.is_msg):
             report.status = Status.NOTAPPLICABLE
             return
+
+        if not task.user:
+            raise PandoraException('The task user is missing. Should not happen, but investigate if it does.')
+
         pandora = Pandora()
 
         tasks = []

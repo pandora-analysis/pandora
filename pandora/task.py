@@ -119,14 +119,14 @@ class Task:
             self.disabled_workers = []
 
     @property
-    def user(self) -> User:
+    def user(self) -> Optional[User]:
         if hasattr(self, '_user'):
             return self._user
         elif hasattr(self, '_user_id'):
             if (u := self.storage.get_user(self._user_id)):
                 self._user = User(**u)  # type: ignore
                 return self._user
-        raise PandoraException('unknown user')
+        return None
 
     @user.setter
     def user(self, u: User) -> None:
@@ -176,7 +176,7 @@ class Task:
             'uuid': self.uuid,
             'parent_id': self.parent.uuid if self.parent else None,
             'file_id': self.file.uuid,
-            'user_id': self.user.get_id(),
+            'user_id': self.user.get_id() if self.user else None,
             'disabled_workers': json.dumps(self.disabled_workers) if hasattr(self, 'disabled_workers') else None,
             'status': self.status.name,
             'save_date': self.save_date.isoformat()
