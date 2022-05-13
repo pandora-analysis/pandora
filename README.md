@@ -251,6 +251,43 @@ And finally, enable the profiles:
 aa-enforce /etc/apparmor.d/usr.lib.libreoffice*
 ```
 
+# Notes & issues
+
+If you're getting a stacktrace that look like that:
+
+```
+Fatal exception: Signal 6
+Stack:
+/usr/lib/libreoffice/program/libuno_sal.so.3(+0x3ffc3)[0x7f80bb86ffc3]
+/usr/lib/libreoffice/program/libuno_sal.so.3(+0x4013a)[0x7f80bb87013a]
+/lib/x86_64-linux-gnu/libc.so.6(+0x43090)[0x7f80bb675090]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0xcb)[0x7f80bb67500b]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0x12b)[0x7f80bb654859]
+/usr/lib/libreoffice/program/libmergedlo.so(+0x1219b92)[0x7f80bcab2b92]
+/usr/lib/libreoffice/program/libmergedlo.so(_ZN11Application5AbortERKN3rtl8OUStringE+0x98)[0x7f80bea12ed8]
+/usr/lib/libreoffice/program/libmergedlo.so(+0x21c6026)[0x7f80bda5f026]
+/usr/lib/libreoffice/program/libmergedlo.so(+0x3181ec1)[0x7f80bea1aec1]
+/usr/lib/libreoffice/program/libuno_sal.so.3(+0x18832)[0x7f80bb848832]
+/usr/lib/libreoffice/program/libuno_sal.so.3(+0x400a7)[0x7f80bb8700a7]
+/lib/x86_64-linux-gnu/libc.so.6(+0x43090)[0x7f80bb675090]
+/usr/lib/libreoffice/program/libmergedlo.so(_ZNK3vcl6Window9GetCursorEv+0x4)[0x7f80be7473a4]
+/usr/lib/libreoffice/program/libmergedlo.so(+0x276cfba)[0x7f80be005fba]
+/usr/lib/libreoffice/program/libmergedlo.so(_ZN9Scheduler22CallbackTaskSchedulingEv+0x2fb)[0x7f80bea0372b]
+/usr/lib/libreoffice/program/libmergedlo.so(_ZN14SvpSalInstance12CheckTimeoutEb+0x10e)[0x7f80beb835ce]
+/usr/lib/libreoffice/program/libmergedlo.so(_ZN14SvpSalInstance7DoYieldEbb+0x8b)[0x7f80beb836db]
+/usr/lib/libreoffice/program/libmergedlo.so(+0x3179872)[0x7f80bea12872]
+/usr/lib/libreoffice/program/libmergedlo.so(_ZN11Application7ExecuteEv+0x45)[0x7f80bea14d35]
+/usr/lib/libreoffice/program/libmergedlo.so(+0x21cdc2b)[0x7f80bda66c2b]
+/usr/lib/libreoffice/program/libmergedlo.so(_Z10ImplSVMainv+0x51)[0x7f80bea1c731]
+/usr/lib/libreoffice/program/libmergedlo.so(soffice_main+0xa3)[0x7f80bda80523]
+/usr/lib/libreoffice/program/soffice.bin(+0x10b0)[0x55edfc86e0b0]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3)[0x7f80bb656083]
+/usr/lib/libreoffice/program/soffice.bin(+0x10ee)[0x55edfc86e0ee]
+```
+
+Install the full `libreoffice` package, the `*-nogui` onces cause crashes like that, on some files.
+
+
 # Contributing
 
 Feel free to fork the code, play with it, make some patches and send us the pull requests.
