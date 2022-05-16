@@ -2,11 +2,14 @@
 import functools
 import traceback
 
+from collections import defaultdict
+from datetime import datetime, timedelta, time
 from io import BytesIO
-from typing import Dict
+from typing import Dict, List, Tuple
 
 import flask_login  # type: ignore
 
+from dateutil import rrule
 from flask import request, url_for
 from flask_restx import Namespace, Resource  # type: ignore
 from werkzeug.datastructures import FileStorage
@@ -16,7 +19,7 @@ from pandora.pandora import Pandora
 from pandora.mail import Mail
 from pandora.role import Action
 from pandora.task import Task
-from pandora.helpers import roles_from_config, workers
+from pandora.helpers import roles_from_config, workers, Status
 
 from .helpers import admin_required, update_user_role
 
@@ -272,3 +275,223 @@ class ApiTaskAction(Resource):
             return {'success': True}
 
         raise AssertionError('forbidden')
+
+
+# Add stats related API stuff
+def check_year(year):
+    """
+    check numeric string year validity and return None if not valid or -1 if '-1' is sent
+    :param year: string numeric
+    :return: int
+    """
+    if year == '-1':
+        return -1
+    try:
+        year_ = int(year)
+        if year_ > 2100 or year_ < 1990:
+            return
+        else:
+            return year_
+    except ValueError:
+        return
+
+
+def _intervals(freq: int, first: datetime, last: datetime) -> List[Tuple[datetime, datetime]]:
+    to_return = []
+    if freq in [rrule.MONTHLY, rrule.WEEKLY, rrule.DAILY]:
+        first = datetime.combine(first.date(), time.min)
+        last = datetime.combine(last.date(), time.max)
+    elif freq == rrule.HOURLY:
+        first = first.replace(minute=0, second=0, microsecond=0)
+        last = first.replace(minute=59, second=59, microsecond=999999)
+
+    if freq == rrule.MONTHLY:
+        dates = rrule.rrule(freq, bymonthday=1, dtstart=first, until=last)
+    elif freq == rrule.WEEKLY:
+        dates = rrule.rrule(freq, byweekday=0, dtstart=first, until=last)
+    elif freq == rrule.DAILY:
+        dates = rrule.rrule(freq, byhour=0, dtstart=first, until=last)
+    elif freq == rrule.HOURLY:
+        dates = rrule.rrule(freq, byminute=0, dtstart=first, until=last)
+
+    begin = dates[0]
+    for dt in dates[1:]:
+        to_return.append((begin, dt))
+        begin = dt
+    to_return.append((begin, last))
+    return to_return
+
+
+@api.route('/api/stats/submit/year',
+           '/api/stats/submit/year/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiSubmitStatsYear(Resource):
+
+    @json_answer
+    def get(self, year="-1"):
+        last_date = datetime.now()
+        first_date = last_date.replace(month=1, day=1)
+        to_return = {'date_start': first_date.date().isoformat(),
+                     'date_end': last_date.date().isoformat(),
+                     'sub_months': []}
+        for first, last in _intervals(rrule.MONTHLY, first_date, last_date):
+            tasks = pandora.storage.get_tasks(first_date=first.timestamp(), last_date=last.timestamp())
+            to_return['sub_months'].append((first.month, len(tasks)))
+        to_return['total'] = sum(number for _, number in to_return['sub_months'])
+        return to_return
+
+
+@api.route('/api/stats/year',
+           '/api/stats/year/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiStatsYear(Resource):
+
+    @json_answer
+    def get(self, year="-1"):
+        last_date = datetime.now()
+        first_date = last_date.replace(month=1, day=1)
+        to_return = {'date_start': first_date.date().isoformat(),
+                     'date_end': last_date.date().isoformat()}
+        # NOTE: the actual source of the submission isn't stored yet.
+        to_return['submit'] = defaultdict(int)
+        to_return['file'] = defaultdict(int)
+        to_return['metrics'] = defaultdict()
+        to_return['submit_size'] = {'min': 0, 'max': 0, 'avg': 0}
+        nb_alert = 0
+        for first, last in _intervals(rrule.MONTHLY, first_date, last_date):
+            tasks = pandora.storage.get_tasks(first_date=first.timestamp(), last_date=last.timestamp())
+            to_return['submit']['unknown'] += len(tasks)
+            to_return['submit']['total'] += len(tasks)
+            for t in tasks:
+                task = Task(**t)
+                to_return['file'][task.file.mime_type] += 1
+                to_return['submit_size']['min'] = min(to_return['submit_size']['min'], task.file.size)
+                to_return['submit_size']['max'] = max(to_return['submit_size']['max'], task.file.size)
+                to_return['submit_size']['avg'] += task.file.size
+                if task.status >= Status.WARN:
+                    nb_alert += 1
+        to_return['submit_size']['avg'] = to_return['submit_size']['avg'] / to_return['submit']['total']
+        to_return['metrics']['submits'] = to_return['submit']['total']
+        to_return['metrics']['malicious'] = nb_alert
+        to_return['metrics']['alert_ratio'] = nb_alert / to_return['submit']['total'] * 100
+        return to_return
+
+
+@api.route('/api/stats/submit/week',
+           '/api/stats/submit/week/<string:week>',
+           '/api/stats/submit/week/<string:week>/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiSubmitStatsWeek(Resource):
+
+    @json_answer
+    def get(self, year="-1", week="-1"):
+        last_date = datetime.now()
+        first_date = last_date - timedelta(days=datetime.today().weekday() % 7)
+        to_return = {'date_start': first_date.date().isoformat(),
+                     'date_end': last_date.date().isoformat(),
+                     'sub_days': []}
+        for first, last in _intervals(rrule.DAILY, first_date, last_date):
+            tasks = pandora.storage.get_tasks(first_date=first.timestamp(), last_date=last.timestamp())
+            to_return['sub_days'].append((first.isocalendar().weekday, len(tasks)))
+        to_return['total'] = sum(number for _, number in to_return['sub_days'])
+        return to_return
+
+
+@api.route('/api/stats/week',
+           '/api/stats/week/<string:week>',
+           '/api/stats/week/<string:week>/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiStatsWeek(Resource):
+
+    @json_answer
+    def get(self, year="-1", week="-1"):
+        last_date = datetime.now()
+        first_date = last_date - timedelta(days=datetime.today().weekday() % 7)
+        to_return = {'date_start': first_date.date().isoformat(),
+                     'date_end': last_date.date().isoformat()}
+        # NOTE: the actual source of the submission isn't stored yet.
+        to_return['submit'] = defaultdict(int)
+        to_return['file'] = defaultdict(int)
+        to_return['metrics'] = defaultdict()
+        to_return['submit_size'] = {'min': 0, 'max': 0, 'avg': 0}
+        nb_alert = 0
+        for first, last in _intervals(rrule.WEEKLY, first_date, last_date):
+            if first.year != last_date.year:
+                continue
+            tasks = pandora.storage.get_tasks(first_date=first.timestamp(), last_date=last.timestamp())
+            to_return['submit']['unknown'] += len(tasks)
+            to_return['submit']['total'] += len(tasks)
+            for t in tasks:
+                task = Task(**t)
+                to_return['file'][task.file.mime_type] += 1
+                to_return['submit_size']['min'] = min(to_return['submit_size']['min'], task.file.size)
+                to_return['submit_size']['max'] = max(to_return['submit_size']['max'], task.file.size)
+                to_return['submit_size']['avg'] += task.file.size
+                if task.status >= Status.WARN:
+                    nb_alert += 1
+        to_return['submit_size']['avg'] = to_return['submit_size']['avg'] / to_return['submit']['total']
+        to_return['metrics']['submits'] = to_return['submit']['total']
+        to_return['metrics']['malicious'] = nb_alert
+        to_return['metrics']['alert_ratio'] = nb_alert / to_return['submit']['total'] * 100
+        return to_return
+
+
+@api.route('/api/stats/submit/month',
+           '/api/stats/submit/month/<string:month>',
+           '/api/stats/submit/month/<string:month>/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiSubmitStatsMonth(Resource):
+
+    @json_answer
+    def get(self, year="-1", month="-1"):
+        last_date = datetime.now()
+        first_date = last_date.replace(day=1)
+        to_return = {'date_start': first_date.date().isoformat(),
+                     'date_end': last_date.date().isoformat(),
+                     'sub_weeks': []}
+        for first, last in _intervals(rrule.DAILY, first_date, last_date):
+            if first.year != last_date.year:
+                continue
+            tasks = pandora.storage.get_tasks(first_date=first.timestamp(), last_date=last.timestamp())
+            to_return['sub_weeks'].append((first.day, len(tasks)))
+        to_return['total'] = sum(number for _, number in to_return['sub_weeks'])
+        return to_return
+
+
+@api.route('/api/stats/month',
+           '/api/stats/month/<string:month>',
+           '/api/stats/month/<string:month>/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiStatsMonth(Resource):
+
+    @json_answer
+    def get(self, year="-1", month="-1"):
+        last_date = datetime.now()
+        first_date = last_date.replace(day=1)
+        to_return = {'date_start': first_date.date().isoformat(),
+                     'date_end': last_date.date().isoformat()}
+        # NOTE: the actual source of the submission isn't stored yet.
+        to_return['submit'] = defaultdict(int)
+        to_return['file'] = defaultdict(int)
+        to_return['metrics'] = defaultdict()
+        to_return['submit_size'] = {'min': 0, 'max': 0, 'avg': 0}
+        nb_alert = 0
+        for first, last in _intervals(rrule.DAILY, first_date, last_date):
+            if first.year != last_date.year:
+                continue
+            tasks = pandora.storage.get_tasks(first_date=first.timestamp(), last_date=last.timestamp())
+            to_return['submit']['unknown'] += len(tasks)
+            to_return['submit']['total'] += len(tasks)
+            for t in tasks:
+                task = Task(**t)
+                to_return['file'][task.file.mime_type] += 1
+                to_return['submit_size']['min'] = min(to_return['submit_size']['min'], task.file.size)
+                to_return['submit_size']['max'] = max(to_return['submit_size']['max'], task.file.size)
+                to_return['submit_size']['avg'] += task.file.size
+                if task.status >= Status.WARN:
+                    nb_alert += 1
+        to_return['submit_size']['avg'] = to_return['submit_size']['avg'] / to_return['submit']['total']
+        to_return['metrics']['submits'] = to_return['submit']['total']
+        to_return['metrics']['malicious'] = nb_alert
+        to_return['metrics']['alert_ratio'] = nb_alert / to_return['submit']['total'] * 100
+        return to_return

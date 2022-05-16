@@ -66,11 +66,6 @@ class Report:
         Return duration of analysis if start_date and end_date are known.
         :return (int|None): Total duration in seconds or None
         """
-        start = getattr(self, 'start_date', None)
-        end = getattr(self, 'end_date', None)
-        if start and end:
-            return 1 + int((end - start).total_seconds())
-        return None
 
     @property
     def details(self) -> Dict[str, str]:

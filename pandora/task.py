@@ -1,6 +1,6 @@
 import json
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BytesIO
 from typing import Dict, Any, Optional, List, overload, Tuple
 from uuid import uuid4
@@ -36,7 +36,7 @@ class Task:
 
         task = cls(uuid=task_uuid, submitted_file=file, disabled_workers=disabled_workers,
                    user=user, parent=parent)
-        task.store()
+        task.store(force=True)
         return task
 
     @overload
@@ -117,6 +117,7 @@ class Task:
                 self.disabled_workers = disabled_workers
         else:
             self.disabled_workers = []
+        self.store()
 
     @property
     def user(self) -> Optional[User]:
@@ -182,8 +183,9 @@ class Task:
             'save_date': self.save_date.isoformat()
         }.items() if v is not None}
 
-    def store(self):
-        self.storage.set_task(self.to_dict)
+    def store(self, force: bool=False):
+        if force or (self.workers_done and self.status not in [Status.WAITING, Status.RUNNING]):
+            self.storage.set_task(self.to_dict)
 
     @property
     def reports(self) -> Dict[str, Report]:
@@ -201,6 +203,10 @@ class Task:
 
     @property
     def workers_done(self) -> bool:
+        if self.save_date <= datetime.now() - timedelta(hours=1):
+            # NOTE Failsafe. If the task was started more than 1h ago, it is
+            # either done, or it failed.
+            return True
         for report_name, report in self.reports.items():
             if not report.is_done:
                 return False
@@ -217,6 +223,11 @@ class Task:
     def status(self) -> Status:
         if self.file.deleted:
             self._status = Status.DELETED
+
+        if self._status in [Status.WAITING, Status.RUNNING] and self.save_date <= datetime.now() - timedelta(hours=1):
+            # NOTE Failsafe. If the task was started more than 1h ago, it is
+            # either done, or it failed.
+            self._status = Status.ERROR
 
         if self._status in [Status.DELETED, Status.ERROR, Status.ALERT, Status.WARN, Status.CLEAN]:
             # If the status was set to any of these values, the reports finished

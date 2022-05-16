@@ -21,12 +21,16 @@
     },
     "js": {
       "analysis.js": "lBb4Stg4vBgN+BQRZ7ucjmbiegGFJhLRZlKX2QvWiki5eWv1O2cCmFg16qbWnkduovQtyFuKEyT2yckjEouXKg==",
+      "dashboard.js": "Z8fghUZkbl5Bn54nu06gbqHwi8qqoSjTV4GCu2V+zN6sHPVmyJOPHOU3sY/FdDA6dcAxOsRvpm1vgNynMm7a0w==",
       "lib": {
+        "bootstrap-datepicker.min.js": "T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==",
+        "chart.min.js": "QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==",
         "dropzone-min.js": "kLQ8y6epwwH5HA1M6K0bw2erLB1+Vz+7HOUepLaKRecyGXaP0K/9b6kq2+MZlyWt6E/AH6dtnxDom8lniz5BWw==",
         "jquery.min.js": "894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==",
-        "moment-with-locales.min.js": "LGXaggshOkD/at6PFNcp2V2unf9LzFq6LE+sChH7ceMTDP0g2kn6Vxwgg7wkPP7AAtX+lmPqPdxB47A0Nz0cMQ=="
+        "moment-with-locales.min.js": "vFABRuf5oGUaztndx4KoAEUVQnOvAIFs59y4tO0DILGWhQiFnFHiR+ZJfxLDyJlXgeut9Z07Svuvm+1Jv89w5g=="
       },
       "role.js": "BTP7CW18uIGpKdx7zwll71xZsb7UDjKk3I+AGeWLtyj4olvazpWslfZWqmE0rsamhtvUC6pjm6F5vC4hwTPs9Q==",
+      "stats.js": "1mWuPrpJ/Z62ap8deTquoo4HO36uWpn2Eupy4eCqdUv2bcEq7fv2whdxcKKjCpBsO3aDiX9pcuU+rcy1FHKPxQ==",
       "submit.js": "Yexx0osQzyQBXhMlAqky4/MSkrIi67Oj8b2HWzx/hmFdHdi48FOpG3LVrILjG+DQTJj+7FzRiWPhd0l/E5Em5g=="
     }
   }

@@ -6,8 +6,9 @@ from pandora.default import get_homedir, safe_create_dir
 
 jquery_version = "3.6.0"
 dropzone_version = "6.0.0-beta.1"
-moments_version = "2.29.1"
-
+moments_version = "2.29.3"
+datepicker_version = "1.9.0"
+chart_version = "3.7.1"
 
 if __name__ == '__main__':
     dest_dir_js = get_homedir() / 'website' / 'web' / 'static' / 'js' / 'lib'
@@ -26,6 +27,16 @@ if __name__ == '__main__':
     with (dest_dir_js / 'moment-with-locales.min.js').open('wb') as f:
         f.write(moments.content)
         print(f'Downloaded moments v{moments_version}.')
+
+    chart = requests.get(f'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/{chart_version}/chart.min.js')
+    with (dest_dir_js / 'chart.min.js').open('wb') as f:
+        f.write(chart.content)
+        print(f'Downloaded chart v{chart_version}.')
+
+    datepicker = requests.get(f'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/{datepicker_version}/js/bootstrap-datepicker.min.js')
+    with (dest_dir_js / 'bootstrap-datepicker.min.js').open('wb') as f:
+        f.write(datepicker.content)
+        print(f'Downloaded datepicker v{datepicker_version}.')
 
     dropzone_js = requests.get(f'https://unpkg.com/dropzone@{dropzone_version}/dist/dropzone-min.js')
     with (dest_dir_js / 'dropzone-min.js').open('wb') as f:

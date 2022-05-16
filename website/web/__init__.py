@@ -398,14 +398,6 @@ def observables_lists_delete(list_type, observable):
     return redirect(url_for('observables_lists'))
 
 
-@app.route('/stats', methods=['GET'], strict_slashes=False)
-@admin_required
-@html_answer
-def api_stats():
-    assert flask_login.current_user.role.can(Action.list_stats), 'forbidden'
-    return render_template('stats.html')
-
-
 @app.route('/previews/<task_id>', methods=['GET'], strict_slashes=False)
 @app.route('/previews/<task_id>/seed-<seed>', methods=['GET'], strict_slashes=False)
 @html_answer
@@ -457,6 +449,14 @@ def html_workers_result(task_id: str, worker_name: str, seed: Optional[str]=None
                            worker_name=worker_name,
                            worker_meta=workers()[worker_name]['meta'],
                            task=task, seed=seed, report=report)
+
+
+@app.route('/stats', methods=['GET'], strict_slashes=False)
+@admin_required
+@html_answer
+def api_stats():
+    assert flask_login.current_user.role.can(Action.list_stats), 'forbidden'
+    return render_template('stats.html')
 
 
 # NOTE: this one must be at the end, it adds a route to / that will break the default one.
