@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
+import calendar
 import functools
 import traceback
 
+from collections import defaultdict
+from datetime import datetime, time
 from io import BytesIO
-from typing import Dict
+from typing import Dict, List, Tuple, Optional
 
 import flask_login  # type: ignore
 
+from dateutil import rrule
 from flask import request, url_for
 from flask_restx import Namespace, Resource  # type: ignore
 from werkzeug.datastructures import FileStorage
@@ -16,7 +20,7 @@ from pandora.pandora import Pandora
 from pandora.mail import Mail
 from pandora.role import Action
 from pandora.task import Task
-from pandora.helpers import roles_from_config, workers
+from pandora.helpers import roles_from_config, workers, Status
 
 from .helpers import admin_required, update_user_role
 
@@ -272,3 +276,239 @@ class ApiTaskAction(Resource):
             return {'success': True}
 
         raise AssertionError('forbidden')
+
+
+# Add stats related API stuff
+def _intervals(freq: int, first: datetime, last: datetime) -> List[Tuple[datetime, datetime]]:
+    to_return = []
+    first = datetime.combine(first.date(), time.min)
+    last = datetime.combine(last.date(), time.max)
+
+    if freq == rrule.MONTHLY:
+        dates = rrule.rrule(freq, bymonthday=1, dtstart=first, until=last)
+    elif freq == rrule.WEEKLY:
+        dates = rrule.rrule(freq, byweekday=0, dtstart=first, until=last)
+    elif freq == rrule.DAILY:
+        dates = rrule.rrule(freq, byhour=0, dtstart=first, until=last)
+    elif freq == rrule.HOURLY:
+        dates = rrule.rrule(freq, byminute=0, dtstart=first, until=last)
+
+    begin = dates[0]
+    for dt in dates[1:]:
+        to_return.append((begin, dt))
+        begin = dt
+    to_return.append((begin, last))
+    return to_return
+
+
+def _normalize_year(year: Optional[str]) -> Tuple[datetime, datetime]:
+    if year:
+        last_date = datetime(int(year), 12, 31)
+    else:
+        last_date = datetime.now()
+    first_date = last_date.replace(month=1, day=1)
+    return first_date, last_date
+
+
+def _normalize_month(year: Optional[str], month: Optional[str]) -> Tuple[datetime, datetime]:
+    if month:
+        if not year:
+            year = datetime.now().year
+        last_date = datetime(int(year), int(month), calendar.monthrange(int(year), int(month))[1])
+    else:
+        last_date = datetime.now()
+    first_date = last_date.replace(day=1)
+    return first_date, last_date
+
+
+def _normalize_week(year: Optional[str], week: Optional[str]) -> Tuple[datetime, datetime]:
+    if week:
+        if not year:
+            year = datetime.now().year
+        first_date = datetime.fromisocalendar(int(year), int(week), 1)
+        last_date = datetime.fromisocalendar(int(year), int(week), 7)
+    else:
+        now = datetime.now()
+        first_date = datetime.fromisocalendar(now.year, now.isocalendar().week, 1)
+        last_date = datetime.fromisocalendar(now.year, now.isocalendar().week, 7)
+    return first_date, last_date
+
+
+def _normalize_day(year: Optional[str], month: Optional[str], day: Optional[str]) -> Tuple[datetime, datetime]:
+    if day:
+        if not month:
+            month = datetime.now().month
+            if not year:
+                year = datetime.now().year
+        last_date = datetime(int(year), int(month), int(day))
+    else:
+        last_date = datetime.now()
+    return last_date, last_date
+
+
+@api.route('/api/stats/submit/year',
+           '/api/stats/submit/year/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiSubmitStatsYear(Resource):
+
+    @admin_required
+    @json_answer
+    def get(self, year: Optional[str]=None):
+        first_date, last_date = _normalize_year(year)
+        to_return = {'date_start': first_date.date().isoformat(),
+                     'date_end': last_date.date().isoformat(),
+                     'sub_months': []}
+        for first, last in _intervals(rrule.MONTHLY, first_date, last_date):
+            tasks_count = pandora.storage.count_tasks(first_date=first.timestamp(), last_date=last.timestamp())
+            to_return['sub_months'].append((first.month, tasks_count))
+        to_return['total'] = sum(number for _, number in to_return['sub_months'])
+        return to_return
+
+
+@api.route('/api/stats/submit/month',
+           '/api/stats/submit/month/<string:month>',
+           '/api/stats/submit/month/<string:month>/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiSubmitStatsMonth(Resource):
+
+    @admin_required
+    @json_answer
+    def get(self, year: Optional[str]=None, month: Optional[str]=None):
+        first_date, last_date = _normalize_month(year, month)
+        to_return = {'date_start': first_date.date().isoformat(),
+                     'date_end': last_date.date().isoformat(),
+                     'sub_weeks': []}
+        for first, last in _intervals(rrule.DAILY, first_date, last_date):
+            tasks_count = pandora.storage.count_tasks(first_date=first.timestamp(), last_date=last.timestamp())
+            to_return['sub_weeks'].append((first.day, tasks_count))
+        to_return['total'] = sum(number for _, number in to_return['sub_weeks'])
+        return to_return
+
+
+@api.route('/api/stats/submit/week',
+           '/api/stats/submit/week/<string:week>',
+           '/api/stats/submit/week/<string:week>/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiSubmitStatsWeek(Resource):
+
+    @admin_required
+    @json_answer
+    def get(self, year: Optional[str]=None, week: Optional[str]=None):
+        first_date, last_date = _normalize_week(year, week)
+        to_return = {'date_start': first_date.date().isoformat(),
+                     'date_end': last_date.date().isoformat(),
+                     'sub_days': []}
+        for first, last in _intervals(rrule.DAILY, first_date, last_date):
+            tasks_count = pandora.storage.count_tasks(first_date=first.timestamp(), last_date=last.timestamp())
+            to_return['sub_days'].append((first.strftime('%A'), tasks_count))
+        to_return['total'] = sum(number for _, number in to_return['sub_days'])
+        return to_return
+
+
+@api.route('/api/stats/submit/day',
+           '/api/stats/submit/day/<string:day>',
+           '/api/stats/submit/day/<string:day>/<string:month>',
+           '/api/stats/submit/day/<string:day>/<string:month>/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiSubmitStatsDay(Resource):
+
+    @admin_required
+    @json_answer
+    def get(self, year: Optional[str]=None, month: Optional[str]=None, day: Optional[str]=None):
+        first_date, last_date = _normalize_day(year, month, day)
+        to_return = {'date_start': first_date.date().isoformat(),
+                     'date_end': last_date.date().isoformat(),
+                     'sub_hours': []}
+        for first, last in _intervals(rrule.HOURLY, first_date, last_date):
+            tasks_count = pandora.storage.count_tasks(first_date=first.timestamp(), last_date=last.timestamp())
+            to_return['sub_hours'].append((first.hour, tasks_count))
+        to_return['total'] = sum(number for _, number in to_return['sub_hours'])
+        return to_return
+
+
+def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
+    to_return = {'date_start': intervals[0][0].date().isoformat(),
+                 'date_end': intervals[-1][1].date().isoformat()}
+    # NOTE: the actual source of the submission isn't stored yet.
+    to_return['submit'] = defaultdict(int)
+    to_return['file'] = defaultdict(int)
+    to_return['metrics'] = defaultdict()
+    to_return['submit_size'] = {'min': 0, 'max': 0, 'avg': 0}
+    nb_alert = 0
+    for first, last in intervals:
+        tasks = pandora.storage.get_tasks(first_date=first.timestamp(), last_date=last.timestamp())
+        to_return['submit']['unknown'] += len(tasks)
+        to_return['submit']['total'] += len(tasks)
+        for t in tasks:
+            task = Task(**t)
+            to_return['file'][task.file.mime_type] += 1
+            to_return['submit_size']['min'] = min(to_return['submit_size']['min'], task.file.size)
+            to_return['submit_size']['max'] = max(to_return['submit_size']['max'], task.file.size)
+            to_return['submit_size']['avg'] += task.file.size
+            if task.status >= Status.WARN:
+                nb_alert += 1
+    if to_return['submit']['total']:
+        to_return['submit_size']['avg'] = to_return['submit_size']['avg'] / to_return['submit']['total']
+        to_return['metrics']['alert_ratio'] = nb_alert / to_return['submit']['total'] * 100
+    else:
+        to_return['submit_size']['avg'] = 0
+        to_return['metrics']['alert_ratio'] = 0
+    to_return['metrics']['submits'] = to_return['submit']['total']
+    to_return['metrics']['malicious'] = nb_alert
+    return to_return
+
+
+@api.route('/api/stats/year',
+           '/api/stats/year/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiStatsYear(Resource):
+
+    @admin_required
+    @json_answer
+    def get(self, year: Optional[str]=None):
+        first_date, last_date = _normalize_year(year)
+        intervals = _intervals(rrule.MONTHLY, first_date, last_date)
+        return _stats(intervals)
+
+
+@api.route('/api/stats/month',
+           '/api/stats/month/<string:month>',
+           '/api/stats/month/<string:month>/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiStatsMonth(Resource):
+
+    @admin_required
+    @json_answer
+    def get(self, year: Optional[str]=None, month: Optional[str]=None):
+        first_date, last_date = _normalize_month(year, month)
+        intervals = _intervals(rrule.DAILY, first_date, last_date)
+        return _stats(intervals)
+
+
+@api.route('/api/stats/week',
+           '/api/stats/week/<string:week>',
+           '/api/stats/week/<string:week>/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiStatsWeek(Resource):
+
+    @admin_required
+    @json_answer
+    def get(self, year: Optional[str]=None, week: Optional[str]=None):
+        first_date, last_date = _normalize_week(year, week)
+        intervals = _intervals(rrule.WEEKLY, first_date, last_date)
+        return _stats(intervals)
+
+
+@api.route('/api/stats/day',
+           '/api/stats/day/<string:day>',
+           '/api/stats/day/<string:day>/<string:month>',
+           '/api/stats/day/<string:day>/<string:month>/<string:year>', methods=['GET'],
+           strict_slashes=False)
+class ApiStatsDay(Resource):
+
+    @admin_required
+    @json_answer
+    def get(self, year: Optional[str]=None, month: Optional[str]=None, day: Optional[str]=None):
+        first_date, last_date = _normalize_day(year, month, day)
+        intervals = _intervals(rrule.HOURLY, first_date, last_date)
+        return _stats(intervals)

@@ -167,6 +167,9 @@ class Storage():
         tasks.sort(key=operator.itemgetter('save_date'), reverse=True)
         return tasks
 
+    def count_tasks(self, *, first_date: Union[str, float]=0, last_date: Union[str, float]='+Inf') -> int:
+        return self.storage.zcount('tasks', min=first_date, max=last_date)
+
     def add_extracted_reference(self, parent_task_uuid: str, extracted_task_uuid: str):
         self.storage.sadd(f'tasks:{parent_task_uuid}:extracted', extracted_task_uuid)
 
