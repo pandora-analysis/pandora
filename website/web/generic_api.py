@@ -6,7 +6,7 @@ import traceback
 from collections import defaultdict
 from datetime import datetime, time
 from io import BytesIO
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Union, Any
 
 import flask_login  # type: ignore
 
@@ -310,7 +310,7 @@ def _normalize_year(year: Optional[str]) -> Tuple[datetime, datetime]:
     return first_date, last_date
 
 
-def _normalize_month(year: Optional[str], month: Optional[str]) -> Tuple[datetime, datetime]:
+def _normalize_month(year: Optional[Union[str, int]], month: Optional[Union[str, int]]) -> Tuple[datetime, datetime]:
     if month:
         if not year:
             year = datetime.now().year
@@ -321,7 +321,7 @@ def _normalize_month(year: Optional[str], month: Optional[str]) -> Tuple[datetim
     return first_date, last_date
 
 
-def _normalize_week(year: Optional[str], week: Optional[str]) -> Tuple[datetime, datetime]:
+def _normalize_week(year: Optional[Union[str, int]], week: Optional[Union[str, int]]) -> Tuple[datetime, datetime]:
     if week:
         if not year:
             year = datetime.now().year
@@ -334,12 +334,13 @@ def _normalize_week(year: Optional[str], week: Optional[str]) -> Tuple[datetime,
     return first_date, last_date
 
 
-def _normalize_day(year: Optional[str], month: Optional[str], day: Optional[str]) -> Tuple[datetime, datetime]:
+def _normalize_day(year: Optional[Union[str, int]], month: Optional[Union[str, int]],
+                   day: Optional[Union[str, int]]) -> Tuple[datetime, datetime]:
     if day:
         if not month:
             month = datetime.now().month
-            if not year:
-                year = datetime.now().year
+        if not year:
+            year = datetime.now().year
         last_date = datetime(int(year), int(month), int(day))
     else:
         last_date = datetime.now()
@@ -355,9 +356,9 @@ class ApiSubmitStatsYear(Resource):
     @json_answer
     def get(self, year: Optional[str]=None):
         first_date, last_date = _normalize_year(year)
-        to_return = {'date_start': first_date.date().isoformat(),
-                     'date_end': last_date.date().isoformat(),
-                     'sub_months': []}
+        to_return: Dict[str, Any] = {'date_start': first_date.date().isoformat(),
+                                     'date_end': last_date.date().isoformat(),
+                                     'sub_months': []}
         for first, last in _intervals(rrule.MONTHLY, first_date, last_date):
             tasks_count = pandora.storage.count_tasks(first_date=first.timestamp(), last_date=last.timestamp())
             to_return['sub_months'].append((first.month, tasks_count))
@@ -375,9 +376,9 @@ class ApiSubmitStatsMonth(Resource):
     @json_answer
     def get(self, year: Optional[str]=None, month: Optional[str]=None):
         first_date, last_date = _normalize_month(year, month)
-        to_return = {'date_start': first_date.date().isoformat(),
-                     'date_end': last_date.date().isoformat(),
-                     'sub_weeks': []}
+        to_return: Dict[str, Any] = {'date_start': first_date.date().isoformat(),
+                                     'date_end': last_date.date().isoformat(),
+                                     'sub_weeks': []}
         for first, last in _intervals(rrule.DAILY, first_date, last_date):
             tasks_count = pandora.storage.count_tasks(first_date=first.timestamp(), last_date=last.timestamp())
             to_return['sub_weeks'].append((first.day, tasks_count))
@@ -395,9 +396,9 @@ class ApiSubmitStatsWeek(Resource):
     @json_answer
     def get(self, year: Optional[str]=None, week: Optional[str]=None):
         first_date, last_date = _normalize_week(year, week)
-        to_return = {'date_start': first_date.date().isoformat(),
-                     'date_end': last_date.date().isoformat(),
-                     'sub_days': []}
+        to_return: Dict[str, Any] = {'date_start': first_date.date().isoformat(),
+                                     'date_end': last_date.date().isoformat(),
+                                     'sub_days': []}
         for first, last in _intervals(rrule.DAILY, first_date, last_date):
             tasks_count = pandora.storage.count_tasks(first_date=first.timestamp(), last_date=last.timestamp())
             to_return['sub_days'].append((first.strftime('%A'), tasks_count))
@@ -416,9 +417,9 @@ class ApiSubmitStatsDay(Resource):
     @json_answer
     def get(self, year: Optional[str]=None, month: Optional[str]=None, day: Optional[str]=None):
         first_date, last_date = _normalize_day(year, month, day)
-        to_return = {'date_start': first_date.date().isoformat(),
-                     'date_end': last_date.date().isoformat(),
-                     'sub_hours': []}
+        to_return: Dict[str, Any] = {'date_start': first_date.date().isoformat(),
+                                     'date_end': last_date.date().isoformat(),
+                                     'sub_hours': []}
         for first, last in _intervals(rrule.HOURLY, first_date, last_date):
             tasks_count = pandora.storage.count_tasks(first_date=first.timestamp(), last_date=last.timestamp())
             to_return['sub_hours'].append((first.hour, tasks_count))
@@ -427,8 +428,8 @@ class ApiSubmitStatsDay(Resource):
 
 
 def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
-    to_return = {'date_start': intervals[0][0].date().isoformat(),
-                 'date_end': intervals[-1][1].date().isoformat()}
+    to_return: Dict[str, Any] = {'date_start': intervals[0][0].date().isoformat(),
+                                 'date_end': intervals[-1][1].date().isoformat()}
     # NOTE: the actual source of the submission isn't stored yet.
     to_return['submit'] = defaultdict(int)
     to_return['file'] = defaultdict(int)
@@ -440,7 +441,7 @@ def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
         to_return['submit']['unknown'] += len(tasks)
         to_return['submit']['total'] += len(tasks)
         for t in tasks:
-            task = Task(**t)
+            task = Task(**t)  # type: ignore
             to_return['file'][task.file.mime_type] += 1
             to_return['submit_size']['min'] = min(to_return['submit_size']['min'], task.file.size)
             to_return['submit_size']['max'] = max(to_return['submit_size']['max'], task.file.size)

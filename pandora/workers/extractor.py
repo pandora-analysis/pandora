@@ -297,7 +297,7 @@ class Extractor(BaseWorker):
                     extracted = self._extract_zip(task.file, report, extracted_dir)
             except BaseException as e:
                 report.status = Status.WARN
-                report.add_details('Warning', f'Unable to extract {task.file.name}: {e}.')
+                report.add_details('Warning', f'Unable to extract {task.file.path.name}: {e}.')
                 extracted = []
                 self.logger.exception(e)
 
