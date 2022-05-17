@@ -34,8 +34,9 @@ jobs:
         sudo apt-get update
         sudo apt-get install gcc g++ make libsnappy-dev autoconf automake libtool libgtest-dev
         pushd ..
-        git clone --recursive https://github.com/kvrockslabs/kvrocks.git
+        git clone --recursive https://github.com/apache/incubator-kvrocks.git kvrocks
         pushd kvrocks
+        git checkout 2.0
         make -j4
         popd
         popd
