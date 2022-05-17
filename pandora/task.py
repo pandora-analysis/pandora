@@ -224,11 +224,6 @@ class Task:
         if self.file.deleted:
             self._status = Status.DELETED
 
-        if self._status in [Status.WAITING, Status.RUNNING] and self.save_date <= datetime.now() - timedelta(hours=1):
-            # NOTE Failsafe. If the task was started more than 1h ago, it is
-            # either done, or it failed.
-            self._status = Status.ERROR
-
         if self._status in [Status.DELETED, Status.ERROR, Status.ALERT, Status.WARN, Status.CLEAN]:
             # If the status was set to any of these values, the reports finished
             return self._status
@@ -251,11 +246,16 @@ class Task:
                     continue
                 if report.status > self._status:
                     self._status = report.status
-            return self._status
         else:
             # At least one worker isn't done yet
             self._status = Status.WAITING
-            return self._status
+
+        if self._status in [Status.WAITING, Status.RUNNING] and self.save_date <= datetime.now() - timedelta(hours=1):
+            # NOTE Failsafe. If the task was started more than 1h ago, it is
+            # either done, or it failed.
+            self._status = Status.ERROR
+
+        return self._status
 
     @status.setter
     def status(self, _status: Status):
