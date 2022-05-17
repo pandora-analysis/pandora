@@ -560,23 +560,26 @@ class File:
                 if 'email' in body:
                     observables['email'].update(body['email'])
         elif self.is_pdf and self.data:
-            pdf_file = pikepdf.Pdf.open(self.data)
-            for page in pdf_file.pages:
-                if not page:
-                    continue
-                try:
-                    if not page.get("/Annots"):
+            try:
+                pdf_file = pikepdf.Pdf.open(self.data)
+                for page in pdf_file.pages:
+                    if not page:
                         continue
-                except Exception as e:
-                    # this call can trigger an exception
-                    self.logger.warning(f'Unable to process a page: {e}')
-                    continue
-                for annots in page["/Annots"]:  # type: ignore
-                    if not annots.get("/A"):
+                    try:
+                        if not page.get("/Annots"):
+                            continue
+                    except Exception as e:
+                        # this call can trigger an exception
+                        self.logger.warning(f'Unable to process a page: {e}')
                         continue
-                    uri = annots["/A"].get("/URI")
-                    if uri is not None:
-                        observables['url'].add(str(uri))
+                    for annots in page["/Annots"]:  # type: ignore
+                        if not annots.get("/A"):
+                            continue
+                        uri = annots["/A"].get("/URI")
+                        if uri is not None:
+                            observables['url'].add(str(uri))
+            except Exception as e:
+                self.logger.warning(f'Unable to process PDF in file {self.uuid}: {e}')
 
         # Try to extract observables from text
         if self.text:
