@@ -329,8 +329,9 @@ def _normalize_week(year: Optional[Union[str, int]], week: Optional[Union[str, i
         last_date = datetime.fromisocalendar(int(year), int(week), 7)
     else:
         now = datetime.now()
-        first_date = datetime.fromisocalendar(now.year, now.isocalendar().week, 1)
-        last_date = datetime.fromisocalendar(now.year, now.isocalendar().week, 7)
+        # FIXME Starting in python 3.9, we can do now.isocalendar().week
+        first_date = datetime.fromisocalendar(now.year, now.isocalendar()[1], 1)
+        last_date = datetime.fromisocalendar(now.year, now.isocalendar()[1], 7)
     return first_date, last_date
 
 
