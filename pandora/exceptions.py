@@ -13,3 +13,7 @@ class NoPreview(PandoraException):
 
 class MissingWorker(PandoraException):
     pass
+
+
+class TooManyObservables(PandoraException):
+    pass

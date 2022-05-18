@@ -417,7 +417,7 @@ def html_observables(task_id: str, seed: Optional[str]=None):
     task = pandora.get_task(task_id=task_id)
     assert task is not None, 'analysis not found'
     update_user_role(pandora, task, seed)
-    return render_template('observables.html', task=task, seed=seed)
+    return render_template('observables_list.html', task=task, seed=seed)
 
 
 @app.route('/extracted/<task_id>', methods=['GET'], strict_slashes=False)

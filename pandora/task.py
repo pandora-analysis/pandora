@@ -8,6 +8,7 @@ from uuid import uuid4
 from werkzeug.utils import secure_filename
 
 from .default import get_homedir, safe_create_dir, PandoraException
+from .exceptions import TooManyObservables
 from .file import File
 from .helpers import Status, workers
 from .observable import Observable
@@ -267,17 +268,18 @@ class Task:
         observable = Observable.new_observable(value, observable_type, seen)
         self.storage.add_task_observable(self.uuid, observable.sha256, observable.observable_type)
 
-    def __init_observables_from_file(self):
+    def init_observables_from_file(self):
+        nb_observables = 0
         for observable_type, values in self.file.observables.items():
             for value in values:
                 self.add_observable(value, observable_type, self.file.save_date)
+                nb_observables += 1
+                if nb_observables > 1000:
+                    raise TooManyObservables('This file has more than 1000 observables.')
 
     @property
     def observables(self) -> List[Observable]:
-        self.__init_observables_from_file()
-        observables = []
-        for observable in self.storage.get_task_observables(self.uuid):
-            observables.append(Observable(**observable))
+        observables = [Observable(**observable) for observable in self.storage.get_task_observables(self.uuid)]
         observables.sort()
         return observables
 

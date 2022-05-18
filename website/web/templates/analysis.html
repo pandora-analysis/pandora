@@ -259,7 +259,7 @@
             <li role="presentation" class="nav-item {% if not task.observables %} d-none {% endif %}" id="observables_tab">
               <button class="nav-link link-dark"
                       data-bs-toggle="tab"
-                      data-bs-target="#observables"
+                      data-bs-target="#observables_list"
                       type="button" role="tab"
                       aria-controls="observables" aria-selected=false">
                   Observables&nbsp;&nbsp;<span class="badge bg-secondary" id="number_observables">{{ task.observables|length }}</span>
@@ -508,7 +508,7 @@
             {% endif %}
 
             <!-- Observables -->
-            <div role="tabpanel" class="tab-pane" id="observables">
+            <div role="tabpanel" class="tab-pane" id="observables_list">
               <div id="observables_content"></div>
             </div>
 

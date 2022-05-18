@@ -590,7 +590,6 @@ class File:
             observables['hostname'].update(tp.hostnames)
             observables['email'].update(tp.emails)
 
-        # TODO: extract stuff from pdfs, was using PyPDF4, which is dead.
         return observables
 
     @cached_property
