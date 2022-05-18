@@ -229,12 +229,6 @@ class Task:
             # If the status was set to any of these values, the reports finished
             return self._status
 
-        for observable in self.observables:
-            if observable.status in [Status.DISABLED, Status.NOTAPPLICABLE]:
-                continue
-            if observable.status > self._status:
-                self._status = observable.status
-
         if self.workers_done:
             if self._status < Status.CLEAN:
                 self._status = Status.CLEAN
