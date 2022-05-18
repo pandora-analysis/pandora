@@ -6,16 +6,16 @@
 {% endblock %}
 
 {% block content %}
-  <table class="table table-hover">
+  <table class="table table-hover table-responsive">
     <thead>
       <tr>
         <th>Id</th>
         <th>Owner</th>
-        <th style="width:200px">Date</th>
+        <th style="max-width:200px">Date</th>
         <th style="width:20px;text-align:center">Status</th>
         <th>Name</th>
-        <th>SHA256</th>
-        <th colspan="3"></th>
+        <th style="max-width:400px">SHA256</th>
+        <th style="max-width:250px"></th>
       </tr>
     </thead>
 
@@ -46,18 +46,16 @@
           </span>
         </td>
         <td>{{ render_icon(task.file.icon) }}<b>{{ task.file.original_filename }}</b></td>
-        <td>{{ task.file.sha256 }}</td>
+        <td class="text-break">{{ task.file.sha256 }}</td>
         <td>
           <a href="{{ url_for('api_analysis', task_id=task.uuid) }}">
-            <span class="btn btn-primary btn-xs btn-table" style="white-space: nowrap;">See report</span>
+            <span class="btn btn-primary mt-1">See report</span>
           </a>
-        </td>
-        <td>
         {% if current_user.is_admin %}
           {% if task.file.deleted %}
-            <span class="btn btn-default btn-xs btn-table" style="white-space: nowrap;">File deleted</span>
+            <span class="btn btn-default mt-1">File deleted</span>
           {% else %}
-            <span id="delete-{{ task.uuid }}" class="btn btn-danger btn-xs btn-table" style="white-space: nowrap;"
+            <span id="delete-{{ task.uuid }}" class="btn btn-danger mt-1"
                   onclick="javascript:deleteFile($(this).attr('data-url'), $(this).attr('data-uid'))"
                   data-url="{{ api.url_for(api_resource, task_id=task.uuid, action='delete') }}" data-uid="{{ task.file_id }}">
                 Delete file
