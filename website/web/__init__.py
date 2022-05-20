@@ -27,7 +27,7 @@ from werkzeug.security import check_password_hash
 from pandora.default import get_config
 from pandora.helpers import workers, get_homedir, Status
 from pandora.pandora import Pandora
-from pandora.role import Action
+from pandora.role import Action, RoleName
 from pandora.user import User
 
 from .generic_api import api as generic_api
@@ -123,9 +123,10 @@ def load_user(user_id):
 def _load_user_from_request(request):
     matching_username = load_user_from_request(request)
     if matching_username:
+        # NOTE: Admins are the only ones with login/password or authkeys, so we can do that here.
         flask_login.current_user.name = matching_username
+        flask_login.current_user.role = pandora.get_role(role_name=RoleName.admin)
         flask_login.current_user.store
-        flask_login.login_user(flask_login.current_user)
     return None
 
 
@@ -138,6 +139,8 @@ def update_user():
             csrf.protect()
         flask_login.current_user.last_ip = src_request_ip(request)
         flask_login.current_user.last_seen = datetime.now()
+        # NOTE: Admins are the only ones with login/password or authkeys, so we can do that here.
+        flask_login.current_user.role = pandora.get_role(role_name=RoleName.admin)
         flask_login.current_user.store
         return
     # Note: session.sid comes from flask_session

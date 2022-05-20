@@ -12,8 +12,9 @@ import flask_login  # type: ignore
 
 from dateutil import rrule
 from flask import request, url_for
-from flask_restx import Namespace, Resource  # type: ignore
+from flask_restx import Namespace, Resource, abort  # type: ignore
 from werkzeug.datastructures import FileStorage
+from werkzeug.security import check_password_hash
 
 from pandora.default import get_config, PandoraException
 from pandora.pandora import Pandora
@@ -22,13 +23,19 @@ from pandora.role import Action
 from pandora.task import Task
 from pandora.helpers import roles_from_config, workers, Status
 
-from .helpers import admin_required, update_user_role
+from .helpers import admin_required, update_user_role, build_users_table, load_user_from_request
 
 API_LOG_TRACEBACK = get_config('generic', 'debug_web')
 API_VERBOSE_JSON = get_config('generic', 'debug_web')
 
 pandora: Pandora = Pandora()
 api = Namespace('PandoraAPI', description='Pandora API', path='/')
+
+
+def api_auth_check(method):
+    if load_user_from_request(request) or flask_login.current_user.is_authenticated:
+        return method
+    abort(403, 'Authentication required.')
 
 
 @api.route('/redis_up')
@@ -56,6 +63,22 @@ def json_answer(func):
             return res
 
     return wrapper
+
+
+@api.route('/json/get_token')
+@api.doc(description='Get the API token required for authenticated calls')
+class AuthToken(Resource):
+
+    users_table = build_users_table()
+
+    @api.param('username', 'Your username')
+    @api.param('password', 'Your password')
+    def get(self):
+        username = request.args['username'] if request.args.get('username') else False
+        password = request.args['password'] if request.args.get('password') else False
+        if username in self.users_table and check_password_hash(self.users_table[username]['password'], password):
+            return {'authkey': self.users_table[username]['authkey']}
+        return {'error': 'User/Password invalid.'}, 401
 
 
 @api.route('/role/<action>', methods=['POST'], strict_slashes=False, doc=False)
@@ -278,7 +301,7 @@ class ApiTaskAction(Resource):
         raise AssertionError('forbidden')
 
 
-# Add stats related API stuff
+# Stats related API stuff
 def _intervals(freq: int, first: datetime, last: datetime) -> List[Tuple[datetime, datetime]]:
     to_return = []
     first = datetime.combine(first.date(), time.min)
@@ -351,7 +374,9 @@ def _normalize_day(year: Optional[Union[str, int]], month: Optional[Union[str, i
 @api.route('/api/stats/submit/year',
            '/api/stats/submit/year/<string:year>', methods=['GET'],
            strict_slashes=False)
+@api.doc(description="Get the yearly submit stats", security='apikey')
 class ApiSubmitStatsYear(Resource):
+    method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
@@ -371,7 +396,9 @@ class ApiSubmitStatsYear(Resource):
            '/api/stats/submit/month/<string:month>',
            '/api/stats/submit/month/<string:month>/<string:year>', methods=['GET'],
            strict_slashes=False)
+@api.doc(description="Get the monthly submit stats", security='apikey')
 class ApiSubmitStatsMonth(Resource):
+    method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
@@ -391,7 +418,9 @@ class ApiSubmitStatsMonth(Resource):
            '/api/stats/submit/week/<string:week>',
            '/api/stats/submit/week/<string:week>/<string:year>', methods=['GET'],
            strict_slashes=False)
+@api.doc(description="Get the weekly submit stats", security='apikey')
 class ApiSubmitStatsWeek(Resource):
+    method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
@@ -412,7 +441,9 @@ class ApiSubmitStatsWeek(Resource):
            '/api/stats/submit/day/<string:day>/<string:month>',
            '/api/stats/submit/day/<string:day>/<string:month>/<string:year>', methods=['GET'],
            strict_slashes=False)
+@api.doc(description="Get the daily submit stats", security='apikey')
 class ApiSubmitStatsDay(Resource):
+    method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
@@ -463,7 +494,9 @@ def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
 @api.route('/api/stats/year',
            '/api/stats/year/<string:year>', methods=['GET'],
            strict_slashes=False)
+@api.doc(description="Get the yearly stats", security='apikey')
 class ApiStatsYear(Resource):
+    method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
@@ -477,7 +510,9 @@ class ApiStatsYear(Resource):
            '/api/stats/month/<string:month>',
            '/api/stats/month/<string:month>/<string:year>', methods=['GET'],
            strict_slashes=False)
+@api.doc(description="Get the monthly stats", security='apikey')
 class ApiStatsMonth(Resource):
+    method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
@@ -491,7 +526,9 @@ class ApiStatsMonth(Resource):
            '/api/stats/week/<string:week>',
            '/api/stats/week/<string:week>/<string:year>', methods=['GET'],
            strict_slashes=False)
+@api.doc(description="Get the weekly stats", security='apikey')
 class ApiStatsWeek(Resource):
+    method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
@@ -506,7 +543,9 @@ class ApiStatsWeek(Resource):
            '/api/stats/day/<string:day>/<string:month>',
            '/api/stats/day/<string:day>/<string:month>/<string:year>', methods=['GET'],
            strict_slashes=False)
+@api.doc(description="Get the daily stats", security='apikey')
 class ApiStatsDay(Resource):
+    method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
