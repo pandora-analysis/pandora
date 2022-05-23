@@ -9,7 +9,7 @@
     "tasks_max_len": 5000,
     "max_file_size": 100,
     "sample_password": "infected",
-    "users": {"admin": ""},
+    "users": {},
     "enable_imap_fetcher": false,
     "email": {
         "smtp_host": "localhost",
