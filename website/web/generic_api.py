@@ -4,7 +4,7 @@ import functools
 import traceback
 
 from collections import defaultdict
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from io import BytesIO
 from typing import Dict, List, Tuple, Optional, Union, Any
 
@@ -65,7 +65,7 @@ def json_answer(func):
     return wrapper
 
 
-@api.route('/json/get_token')
+@api.route('/api/get_token')
 @api.doc(description='Get the API token required for authenticated calls')
 class AuthToken(Resource):
 
@@ -299,6 +299,25 @@ class ApiTaskAction(Resource):
             return {'success': True}
 
         raise AssertionError('forbidden')
+
+
+@api.route('/api/search/<query>',
+           '/api/search/<query>/<int:days>', methods=['GET'],
+           strict_slashes=False)
+@api.doc(description="Search a task by hash or name. The 'days' parameter (10 by default) is there to limit how far in the past we go for the search", security='apikey')
+class ApiSearch(Resource):
+    method_decorators = [api_auth_check]
+
+    @admin_required
+    @json_answer
+    def get(self, query: str, days: int=10):
+        first_date: Union[datetime, int] = datetime.now() - timedelta(days=days)
+        to_return = {'matching_tasks': []}
+        for task in pandora.get_tasks(user=flask_login.current_user, first_date=first_date):
+            if (query in [task.file.md5, task.file.sha1, task.file.sha256]
+                    or [name for name in [task.file.original_filename, task.file.path.name] if query in name]):
+                to_return['matching_tasks'].append(task.uuid)
+        return to_return
 
 
 # Stats related API stuff

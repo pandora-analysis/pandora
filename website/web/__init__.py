@@ -318,11 +318,11 @@ def api_tasks():
     search = request.args.get('query')
     search = search.strip() if search is not None else None
     if not search:
-        # filter results bu date, keep last 3 days,
+        # filter results by date, keep last 3 days,
         # TODO: up to a max amount of tasks
         first_date: Union[datetime, int] = datetime.now() - timedelta(days=3)
     else:
-        # This will be slow and the way to search must be improved.
+        # FIXME: This will be slow and the way to search must be improved.
         first_date = 0
     tasks = pandora.get_tasks(user=flask_login.current_user, first_date=first_date)
     if search:
