@@ -312,7 +312,7 @@ class ApiSearch(Resource):
     @json_answer
     def get(self, query: str, days: int=10):
         first_date: Union[datetime, int] = datetime.now() - timedelta(days=days)
-        to_return = {'matching_tasks': []}
+        to_return: Dict = {'matching_tasks': []}
         for task in pandora.get_tasks(user=flask_login.current_user, first_date=first_date):
             if (query in [task.file.md5, task.file.sha1, task.file.sha256]
                     or [name for name in [task.file.original_filename, task.file.path.name] if query in name]):
