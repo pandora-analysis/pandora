@@ -15,7 +15,7 @@ class Observables(BaseWorker):
                 if observable.status > report.status:
                     report.status = observable.status
             if report.status >= Status.WARN:
-                report.add_details('suspicious', 'At least one observable in known as bad.')
+                report.add_details('Warning', 'At least one observable in known as bad, click on the "Observables" tab for more.')
 
         except TooManyObservables:
             if report.status < Status.WARN:

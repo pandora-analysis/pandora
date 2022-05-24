@@ -341,3 +341,6 @@ class Extractor(BaseWorker):
         for t in tasks:
             if t.status > report.status:
                 report.status = t.status
+
+        if report.status > Status.CLEAN:
+            report.add_details('Warning', 'There are suspicious files in this archive, click on the "Extracted" tab for more.')
