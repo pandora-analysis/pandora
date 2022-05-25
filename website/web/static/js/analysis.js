@@ -1,3 +1,28 @@
+async function LookylooSubmit(lookyloo_url, url_to_submit) {
+    uuid = await fetch(`${lookyloo_url}/submit`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+        body: JSON.stringify({url: url_to_submit, listing: false})
+    })
+    .then(response => response.json())
+    .then(data => {
+        return data;
+    })
+    .catch((error) => {
+        throw new Error(error);
+    });
+    return uuid;
+}
+
+async function lookyloo(lookyloo_url, sha256, url_to_submit) {
+  let uuid = await LookylooSubmit(lookyloo_url, url_to_submit);
+  document.getElementById(`lookyloo_submit-${sha256}`).style.display = 'none';
+  document.getElementById(`lookyloo_link-${sha256}`).style.display = 'block';
+  document.getElementById(`lookyloo_link-${sha256}`).href = `${lookyloo_url}/tree/${uuid}`;
+}
+
 function Analysis(CSRFToken) {
     this.CSRFToken = CSRFToken;
     this.task = null;

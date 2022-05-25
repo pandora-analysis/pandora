@@ -9,6 +9,7 @@
     "tasks_max_len": 5000,
     "max_file_size": 100,
     "sample_password": "infected",
+    "lookyloo_url": "",
     "users": {},
     "enable_imap_fetcher": false,
     "email": {
@@ -30,6 +31,7 @@
         "tasks_max_len": "Maximum length of the tasks list.",
         "max_file_size": "Maximum file size, in Mb. Default: 100Mb.",
         "sample_password": "Default password used to encrypt the original sample when downloaded from the web interface",
+        "lookyloo_url": "The URL of the lookyloo instance you want to connect to. Use the *public* URL, not localhost (the browser blocks that).",
         "users": "Admin acount(s). Format: {username: password}",
         "enable_imap_fetcher": "If true, the imap fetcher is enabled.",
         "email": "Email configuration",

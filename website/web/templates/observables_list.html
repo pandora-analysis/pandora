@@ -25,6 +25,16 @@
       </td>
       <td>
         {{observable.value}}
+        {% if lookyloo_url and observable.observable_type == "url" %}
+        <div style="float:right" id="lookyloo_submit-{{observable.sha256}}" class="btn"
+             onclick="lookyloo('{{lookyloo_url}}', '{{observable.sha256}}', '{{observable.value}}')">
+          Submit to Lookyloo
+        </div>
+        <a style="float:right;display:none" id='lookyloo_link-{{observable.sha256}}'
+           class="btn" target="_blank" href=''>
+          See capture on lookyloo
+        </a>
+        {% endif %}
       </td>
       <td>
         <ul>
