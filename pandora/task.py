@@ -5,9 +5,10 @@ from io import BytesIO
 from typing import Dict, Any, Optional, List, overload, Tuple
 from uuid import uuid4
 
+from pymisp import MISPEvent, MISPAttribute
 from werkzeug.utils import secure_filename
 
-from .default import get_homedir, safe_create_dir, PandoraException
+from .default import get_homedir, safe_create_dir, PandoraException, get_config
 from .exceptions import TooManyObservables
 from .file import File
 from .helpers import Status, workers
@@ -279,3 +280,15 @@ class Task:
 
     def __str__(self):
         return f'<uuid: {self.uuid} - file: {self.file}>'
+
+    def misp_export(self) -> MISPEvent:
+        public_url = get_config('generic', 'public_url')
+        event = MISPEvent()
+        event.info = f'Pandora analysis ({self.file.original_filename})'
+        pandora_link: MISPAttribute = event.add_attribute('link', f'{public_url}/analysis/{self.uuid}')  # type: ignore
+        pandora_link.distribution = 0
+        # Delegate population to file class as the objects will depend on the filetype.
+        self.file.populate_misp_event(event)
+        for observable in self.observables:
+            event.add_attribute(observable.observable_type, observable.value)
+        return event

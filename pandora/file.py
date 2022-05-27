@@ -11,6 +11,8 @@ from datetime import datetime
 from functools import cached_property, lru_cache
 from io import BytesIO
 from pathlib import Path
+from pymisp import MISPEvent
+from pymisp.tools import make_binary_objects
 from typing import Optional, List, Union, Dict, cast, Set
 from uuid import uuid4
 from zipfile import ZipFile
@@ -763,3 +765,26 @@ class File:
         :return (bool): boolean
         """
         return self.type == 'EXE'
+
+    def populate_misp_event(self, event: MISPEvent) -> None:
+        try:
+            # Currently only extract indicators from binary files (PE, ELF, MachO)
+            fo, peo, seos = make_binary_objects(pseudofile=self.data, filename=self.original_filename)
+        except Exception:
+            traceback.print_exc()
+
+        if seos:
+            for s in seos:
+                event.add_object(s)
+            if peo:
+                if hasattr(peo, 'certificates') and hasattr(peo, 'signers'):
+                    for c in peo.certificates:
+                        event.add_object(c)
+                    for s in peo.signers:
+                        event.add_object(s)
+                    del peo.certificates
+                    del peo.signers
+                del peo.sections
+                event.add_object(peo)
+            if fo:
+                event.add_object(fo)

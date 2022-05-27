@@ -341,6 +341,16 @@
                         </a>
                       </li>
                       {% endif %}
+
+                      {% if current_user.role.can('download_misp') %}
+                      <li role="separator" class="divider"></li>
+                      <li><a class="dropdown-item"
+                           href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='misp') }}"
+                           title="Download the analysis in MISP format">
+                         Download the analysis in MISP format
+                        </a>
+                      </li>
+                      {% endif %}
                     </ul>
                   </div>
                 </div>

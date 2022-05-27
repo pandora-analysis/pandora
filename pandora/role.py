@@ -23,6 +23,7 @@ class Action(Enum):
     download_text = auto()
     see_text_preview = auto()
     download_zip = auto()
+    download_misp = auto()
     refresh_analysis = auto()
     rescan_file = auto()
     notify_cert = auto()

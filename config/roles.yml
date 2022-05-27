@@ -8,6 +8,7 @@ roles:
     can_download_text: true
     can_see_text_preview: true
     can_download_zip: true
+    can_download_misp: true
     can_refresh_analysis: true
     can_rescan_file: true
     can_notify_cert: true
@@ -36,6 +37,7 @@ roles:
     can_download_text: true
     can_see_text_preview: true
     can_download_zip: false
+    can_download_misp: false
     can_refresh_analysis: true
     can_rescan_file: true
     can_notify_cert: true
@@ -63,6 +65,7 @@ roles:
     can_download_text: true
     can_see_text_preview: true
     can_download_zip: false
+    can_download_misp: false
     can_refresh_analysis: true
     can_rescan_file: true
     can_notify_cert: true
@@ -90,6 +93,7 @@ roles:
     can_download_text: false
     can_see_text_preview: true
     can_download_zip: false
+    can_download_misp: false
     can_refresh_analysis: false
     can_rescan_file: false
     can_notify_cert: false

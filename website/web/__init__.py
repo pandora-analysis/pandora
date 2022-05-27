@@ -21,6 +21,7 @@ from flask import (Flask, request, session, abort, render_template,
                    redirect, send_file, url_for)
 from flask_restx import Api  # type: ignore
 from flask_bootstrap import Bootstrap5  # type: ignore
+from pymisp import MISPEvent, PyMISP
 from pymisp.abstract import describe_types
 from werkzeug.security import check_password_hash
 
@@ -226,7 +227,7 @@ def api_analysis(task_id, seed=None):
 @app.route('/task-download/<task_id>/<source>/<int:idx>', methods=['GET'], strict_slashes=False)
 @html_answer
 def api_task_download(task_id, source, seed=None, idx=None):
-    assert source in ('img', 'pdf', 'txt', 'zip', 'txt_preview'), f"unexpected source '{source}'"
+    assert source in ('img', 'pdf', 'txt', 'zip', 'txt_preview', 'misp'), f"unexpected source '{source}'"
     task = pandora.get_task(task_id=task_id)
     assert task is not None, 'analysis not found'
     update_user_role(pandora, task, seed)
@@ -259,6 +260,10 @@ def api_task_download(task_id, source, seed=None, idx=None):
             archive.writestr(task.file.original_filename, task.file.data.getvalue())
         to_return.seek(0)
         return send_file(to_return, download_name=f'{task.file.path.name}.zip')
+
+    if source == 'misp' and flask_login.current_user.role.can(Action.download_misp):
+        event = task.misp_export()
+        return send_file(BytesIO(event.to_json().encode()), download_name=f'{task.uuid}.json', mimetype='application/json', as_attachment=True)
 
     raise AssertionError('forbidden')
 
