@@ -1,6 +1,6 @@
 import json
 
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Union, List, Set, Any, overload
 
 from .helpers import Status
 
@@ -18,9 +18,13 @@ class Report:
             self.status = Status[status]
         else:
             self.status = Status.WAITING
+        self._details: Dict[str, Union[Dict[str, Any], Set[str], str]] = {}
         if details:
             for k, v in json.loads(details).items():
-                setattr(self, k, json.loads(v))
+                if isinstance(v, list):
+                    self._details[k] = set(v)
+                else:
+                    self._details[k] = v
 
     @property
     def to_dict(self):
@@ -41,25 +45,6 @@ class Report:
     def is_done(self):
         return self.status not in (Status.WAITING, Status.RUNNING)
 
-    def display_attr(self, attr):
-        """
-        Used to display report attr in html.
-        :param (str) attr: attr to display
-        :return: value to display
-        """
-        value = getattr(self, attr, None)
-        if value is None:
-            return None
-        if isinstance(value, bytes):
-            value = json.loads(value.decode())
-            if isinstance(value, (list, set)):
-                return '\n'.join(value)
-            elif isinstance(value, dict):
-                return '\n'.join([f'{k}: {v}' for k, v in value.items()])
-            else:
-                return value
-        return value
-
     @property
     def duration(self):
         """
@@ -68,20 +53,39 @@ class Report:
         """
 
     @property
-    def details(self) -> Dict[str, str]:
-        excluded_keys = (
-            'worker_name', 'task_uuid', 'cache', 'status', 'start_date', 'end_date', 'error', 'error_trace', 'web_name'
-        )
-        return {key: value for key, value in self.__dict__.items() if not key.startswith('_') and key not in excluded_keys}
+    def details(self) -> Dict[str, Union[Dict[str, Any], List[str], str]]:
+        to_return: Dict[str, Union[Dict[str, Any], List[str], str]] = {}
+        for k, v in self._details.items():
+            if isinstance(v, set):
+                to_return[k] = list(v)
+            else:
+                to_return[k] = v
+        return to_return
 
-    def add_details(self, details_name: str, details: Any):
-        if isinstance(details, set):
-            details = list(details)
-        setattr(self, details_name, details)
+    @overload
+    def add_details(self, details_name: str, details: str):
+        ...
 
-    def __str__(self):
-        return ', '.join([
-            f'{key}={value}'
-            for key, value in self.__dict__.items()
-            if not key.startswith('_') and key not in ('worker_name', 'task_uuid')
-        ])
+    @overload
+    def add_details(self, details_name: str, details: Union[List[str], Set[str]]):
+        ...
+
+    @overload
+    def add_details(self, details_name: str, details: Dict[str, Any]):
+        ...
+
+    def add_details(self, details_name, details):
+        if isinstance(details, list):
+            details = set(details)
+
+        if details_name not in self._details:
+            # just add the details, call it a day
+            self._details[details_name] = details
+        else:
+            if isinstance(self._details[details_name], str):
+                if isinstance(details, dict):
+                    raise Exception('Unable to concatenate a str with a dict')
+                self._details[details_name] = {self._details[details_name], }
+            if isinstance(details, str):
+                details = {details, }
+            self._details[details_name] |= details
