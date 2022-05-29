@@ -36,9 +36,6 @@ class IMAPFetcher(AbstractManager):
             self.smtp_server = self.imap_server
         self.smtp_requires_login = get_config('mail', 'smtp_requires_login')
         self.pandora = Pandora()
-        # FIXME: make that cleaner
-        self.user = User('email_submitter', last_ip='127.0.0.1', name='email')
-        self.user.store
 
     def _to_run_forever(self):
         self._imap_fetcher()
@@ -78,10 +75,13 @@ class IMAPFetcher(AbstractManager):
             client.select_folder(self.imap_folder, readonly=False)
 
             messages = client.search("UNSEEN")
+            # FIXME: make that cleaner
+            user = User('email_submitter', last_ip='127.0.0.1', name='email')
+            user.store
             for uid, message_data in client.fetch(messages, "RFC822").items():
                 email_message = email.message_from_bytes(message_data[b"RFC822"], policy=policy.default)
                 # TODO: Add disabled workers? set filename to some identifier?
-                new_task = Task.new_task(user=self.user, sample=BytesIO(email_message.as_bytes()),
+                new_task = Task.new_task(user=user, sample=BytesIO(email_message.as_bytes()),
                                          disabled_workers=[],
                                          filename=f'{email_message["subject"]}.eml'
                                          )
