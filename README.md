@@ -216,7 +216,7 @@ With the default configuration, you can access the web interface on `http://0.0.
 
 It is important to keep in mind that Pandora parses and sometimes opens or runs untrusted and
 (potentially) malicious content.
-One of he most dangerous dependency is libreoffice, which is used to generate the
+One of the most dangerous dependency is libreoffice, which is used to generate the
 previews of office documents. By default libreoffice doesn't runs macros, but
 as every big piece of software, it has vulnerabilities, known or not.
 You absolutely must make sure you always run the most up-to-date version, and keep track of the
