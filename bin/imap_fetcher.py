@@ -61,7 +61,7 @@ class IMAPFetcher(AbstractManager):
             self.logger.warning(e)
         sender = get_config('mail', 'from')
         body = body.format(recipient=recipient, permaurl=permaurl,
-                           sender=sender)
+                           sender=msg['From'].addresses[0].display_name)
         msg.set_content(body)
         return msg
 
