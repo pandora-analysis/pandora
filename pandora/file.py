@@ -776,15 +776,15 @@ class File:
         if seos:
             for s in seos:
                 event.add_object(s)
-            if peo:
-                if hasattr(peo, 'certificates') and hasattr(peo, 'signers'):
-                    for c in peo.certificates:
-                        event.add_object(c)
-                    for s in peo.signers:
-                        event.add_object(s)
-                    del peo.certificates
-                    del peo.signers
-                del peo.sections
-                event.add_object(peo)
-            if fo:
-                event.add_object(fo)
+        if peo:
+            if hasattr(peo, 'certificates') and hasattr(peo, 'signers'):
+                for c in peo.certificates:
+                    event.add_object(c)
+                for s in peo.signers:
+                    event.add_object(s)
+                del peo.certificates
+                del peo.signers
+            del peo.sections
+            event.add_object(peo)
+        if fo:
+            event.add_object(fo)
