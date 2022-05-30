@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_icon %}
+{% from 'bootstrap5/utils.html' import render_messages %}
 
 {% block title %}
     Pandora - Analysis of {{ task.file.original_filename }}
@@ -22,6 +23,7 @@
 {% endblock %}
 
 {% block content %}
+  {{ render_messages(container=True, dismissible=True) }}
   <div class="container-fluid" style="margin-bottom:50px">
     <!-- Eventual JS Error -->
     <div class="row d-none" id="errorJS">
@@ -93,6 +95,15 @@
                     <a class="dropdown-item" href="#" onclick="javascript:analysis.deleteFile($(this).attr('data-url'))"
                        data-url="{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='delete') }}">
                       Delete file
+                    </a>
+                  </li>
+              {% endif %}
+              {% if current_user.role.can('submit_to_misp') and not task.file.deleted %}
+                  <li id="submitMISPButton">
+                    <a class="dropdown-item"
+                       href="{{ url_for('task_misp_submit', task_id=task.uuid, seed=seed) }}"
+                       title="Submit to MISP">
+                      Submit to MISP
                     </a>
                   </li>
               {% endif %}

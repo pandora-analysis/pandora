@@ -18,7 +18,7 @@ import flask_wtf  # type: ignore
 import pyzipper  # type: ignore
 
 from flask import (Flask, request, session, abort, render_template,
-                   redirect, send_file, url_for)
+                   redirect, send_file, url_for, flash)
 from flask_restx import Api  # type: ignore
 from flask_bootstrap import Bootstrap5  # type: ignore
 from pymisp import MISPEvent, PyMISP
@@ -122,32 +122,29 @@ def load_user(user_id):
 
 @login_manager.request_loader
 def _load_user_from_request(request):
-    matching_username = load_user_from_request(request)
-    if matching_username:
-        # NOTE: Admins are the only ones with login/password or authkeys, so we can do that here.
-        flask_login.current_user.name = matching_username
-        flask_login.current_user.role = pandora.get_role(role_name=RoleName.admin)
-        flask_login.current_user.store
+    user_name = load_user_from_request(request)
+    if user_name:
+        return User(session.sid, last_ip=src_request_ip(request),
+                    name=user_name, role='admin')
     return None
 
 
 @app.before_request
 def update_user():
-    if flask_login.current_user.is_authenticated:
-        if flask_login.current_user.name and not _load_user_from_request(request):
+    if (user := _load_user_from_request(request)):
+        flask_login.login_user(user)
+    elif flask_login.current_user.is_authenticated:
+        if flask_login.current_user.name:
             # If the user doesn't have a name, it is session based, no need to check
-            # If the request has a valid auth key (=authenticated API call), we skip the csrf check
             csrf.protect()
         flask_login.current_user.last_ip = src_request_ip(request)
         flask_login.current_user.last_seen = datetime.now()
-        # NOTE: Admins are the only ones with login/password or authkeys, so we can do that here.
-        flask_login.current_user.role = pandora.get_role(role_name=RoleName.admin)
         flask_login.current_user.store
-        return
-    # Note: session.sid comes from flask_session
-    user = User(session_id=session.sid, last_ip=src_request_ip(request))  # type: ignore
-    user.store
-    flask_login.login_user(user)
+    else:
+        # Note: session.sid comes from flask_session
+        user = User(session_id=session.sid, last_ip=src_request_ip(request))  # type: ignore
+        user.store
+        flask_login.login_user(user)
 
 
 @app.template_filter()
@@ -219,6 +216,25 @@ def api_analysis(task_id, seed=None):
     return render_template('analysis.html', task=task, seed=seed, api=api,
                            zip_passwd=get_config('generic', 'sample_password'),
                            api_resource=ApiTaskAction)
+
+
+@app.route('/task-misp-submit/<task_id>', methods=['GET'], strict_slashes=False)
+@app.route('/task-misp-submit/<task_id>/seed-<seed>', methods=['GET'], strict_slashes=False)
+@html_answer
+def task_misp_submit(task_id, seed=None):
+    task = pandora.get_task(task_id=task_id)
+    assert task is not None, 'analysis not found'
+    update_user_role(pandora, task, seed)
+
+    if not flask_login.current_user.role.can(Action.submit_to_misp):
+        raise AssertionError('forbidden')
+
+    event: MISPEvent = task.misp_export()
+    misp_settings = get_config('generic', 'misp')
+    pymisp = PyMISP(misp_settings['url'], misp_settings['apikey'], ssl=misp_settings['tls_verify'])
+    pymisp.add_event(event)
+    flash('Task successfully submitted to MISP', 'success')
+    return redirect(url_for('api_analysis', task_id=task_id, seed=seed))
 
 
 @app.route('/task-download/<task_id>/seed-<seed>/<source>', methods=['GET'], strict_slashes=False)

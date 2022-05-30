@@ -21,10 +21,9 @@ class Report:
         self._details: Dict[str, Union[Dict[str, Any], Set[str], str]] = {}
         if details:
             for k, v in json.loads(details).items():
-                if isinstance(v, list):
-                    self._details[k] = set(v)
-                else:
-                    self._details[k] = v
+                self._details[k] = json.loads(v)
+                if isinstance(self._details[k], list):
+                    self._details[k] = set(self._details[k])
 
     @property
     def to_dict(self):

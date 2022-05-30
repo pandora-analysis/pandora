@@ -12,6 +12,11 @@
     "lookyloo_url": "",
     "users": {},
     "enable_imap_fetcher": false,
+    "misp": {
+        "url": "",
+        "apikey": "",
+        "tls_verify": true
+    },
     "email": {
         "smtp_host": "localhost",
         "smtp_port": "25",
@@ -34,6 +39,7 @@
         "lookyloo_url": "The URL of the lookyloo instance you want to connect to. Use the *public* URL, not localhost (the browser blocks that).",
         "users": "Admin acount(s). Format: {username: password}",
         "enable_imap_fetcher": "If true, the imap fetcher is enabled.",
+        "misp": "The MISP configuration",
         "email": "Email configuration",
         "weasyprint_fetch_ressources": "If true, weasyprint will fetch resources linked in HTML content",
         "systemd_service_name": "(Optional) Name of the systemd service if your project has one."
