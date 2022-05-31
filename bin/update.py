@@ -5,8 +5,10 @@ import hashlib
 import logging
 import platform
 import shlex
+import shutil
 import subprocess
 import sys
+
 from pathlib import Path
 
 from pandora.default import get_homedir, get_config
@@ -22,7 +24,7 @@ def compute_hash_self():
         return m.digest()
 
 
-def keep_going(ignore=False):
+def keep_going(ignore: bool=False):
     if ignore:
         return
     keep_going = input('Continue? (y/N) ')
@@ -57,6 +59,36 @@ def check_poetry_version():
         sys.exit()
 
 
+def check_unconfigured_workers(default_yes: bool=False):
+    workers_dir = get_homedir() / 'pandora' / 'workers'
+    for sample_config in workers_dir.glob('*.yml.sample'):
+        if (workers_dir / sample_config.stem).exists():
+            continue
+        # The yml file is missing.
+        print(f'\nNew worker available ({sample_config.stem}), but the config file is missing.')
+        if default_yes:
+            shutil.copy(sample_config, workers_dir / sample_config.stem)
+            print(f'{sample_config.stem} enabled.')
+            continue
+        print('Do you want to configure it? If not, it will not be enabled.')
+        keep_going = input('Continue? (y/N) ')
+        if keep_going.lower() != 'y':
+            print('Skipping.')
+            continue
+        print('Sample config:')
+        with sample_config.open() as f:
+            print('----------')
+            print(f.read())
+            print('----------')
+        print('Do you want to use it?')
+        keep_going = input('Continue? (y/N) ')
+        if keep_going.lower() != 'y':
+            print('Skipping.')
+            continue
+        shutil.copy(sample_config, workers_dir / sample_config.stem)
+        print(f'{sample_config.stem} enabled.\n')
+
+
 def main():
     parser = argparse.ArgumentParser(description='Pull latest release, update dependencies, update and validate the config files, update 3rd deps for the website.')
     parser.add_argument('--yes', default=False, action='store_true', help='Run all commands without asking.')
@@ -86,6 +118,10 @@ def main():
     print('* Update configuration files.')
     keep_going(args.yes)
     run_command(f'poetry run {(Path("tools") / "validate_config_files.py").as_posix()} --update')
+
+    print('* Check if new workers are available')
+    keep_going(args.yes)
+    check_unconfigured_workers(args.yes)
 
     print('* Update third party dependencies for the website.')
     keep_going(args.yes)
