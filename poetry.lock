@@ -1193,6 +1193,14 @@ check = ["mypy (>=0.812)", "mypy-extensions (>=0.4.3)", "check-manifest", "flake
 test = ["pytest (>=6.0)", "pytest-cov", "hypothesis", "coverage[toml] (>=5.2)"]
 
 [[package]]
+name = "pycdlib"
+version = "1.12.0"
+description = "Pure python ISO manipulation library"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pycparser"
 version = "2.21"
 description = "C parser in Python"
@@ -2003,7 +2011,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "cfb58df9c335e31078180d9bba1149875c90aa6a90ff66181d25ae75d35023cc"
+content-hash = "f53a65f0d3dc13de96beb2e652466553593c5420f6b62c050fda07bbbd10b1c8"
 
 [metadata.files]
 aiohttp = [
@@ -3076,6 +3084,10 @@ pybcj = [
     {file = "pybcj-0.6.0-cp39-cp39-win32.whl", hash = "sha256:c9bd388b73bec35c894bf520be9f02256a8a56a1deed97e2fd0c8ea4d38ecbf2"},
     {file = "pybcj-0.6.0-cp39-cp39-win_amd64.whl", hash = "sha256:b1d7901c8c26587fb2a40b8ab4f0abcdf7b5d3027f8ce6fd067d3f29026e3a04"},
     {file = "pybcj-0.6.0.tar.gz", hash = "sha256:9013522cc4a51a966bd7f430df9bf23693a5235bb36c7916cbe13f76aca62a0f"},
+]
+pycdlib = [
+    {file = "pycdlib-1.12.0-py2.py3-none-any.whl", hash = "sha256:b16fb79f552740c28d74314a6fcbab91b44f44f36a23041725adea11436512a6"},
+    {file = "pycdlib-1.12.0.tar.gz", hash = "sha256:6549f29f8d9b4ba6933b309c51ff6a4dc79ef5831a81e065cb6cc385c1ba7fe2"},
 ]
 pycparser = [
     {file = "pycparser-2.21-py2.py3-none-any.whl", hash = "sha256:8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9"},

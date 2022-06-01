@@ -82,6 +82,7 @@ class File:
         'application/x-lzma': ['ARC', 'lzma'],
         'application/x-7z-compressed': ['ARC', '7z'],
         'application/x-rar': ['ARC', 'rar'],
+        'application/x-iso9660-image': ['ARC', 'iso'],
         'text/css': ['CSS', 'css'],
         'text/csv': ['CSV', 'csv'],
         'application/msword': ['DOC', 'doc'],

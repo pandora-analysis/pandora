@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import py7zr  # type: ignore
+import pycdlib
 import rarfile  # type: ignore
 
 from ..default import safe_create_dir, PandoraException
@@ -51,6 +52,44 @@ class Extractor(BaseWorker):
     MAX_EXTRACT_FILES = 15
     MAX_EXTRACTED_FILE_SIZE = 100 * 1000000  # 100Mb
     ZIP_PASSWORDS = ['', 'virus', 'CERT_SOC', 'cert', 'pandora', 'infected', '123']
+
+    def _extract_iso(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
+        iso = pycdlib.PyCdlib()
+        extracted_files = []
+        try:
+            iso.open(archive_file.path)
+            for dirname, dirlist, filelist in iso.walk(iso_path='/'):
+                print(dirname, dirlist, filelist)
+                if len(extracted_files) > self.MAX_EXTRACT_FILES:
+                    break
+                if not filelist:
+                    continue
+                for filename in filelist:
+                    extracted = BytesIO()
+                    iso.get_file_from_iso_fp(extracted, iso_path=f'{dirname}/{filename}')
+                    if extracted.getbuffer().nbytes >= self.MAX_EXTRACTED_FILE_SIZE:
+                        self.logger.warning(f'File {archive_file.path.name} too big ({extracted.getbuffer().nbytes}).')
+                        report.status = Status.WARN
+                        report.add_details('Warning', f'File {archive_file.path.name} too big ({extracted.getbuffer().nbytes}).')
+                        continue
+                    if len(extracted_files) > self.MAX_EXTRACT_FILES:
+                        break
+                    tmp_dest_dir = dest_dir / f'.{dirname}'
+                    safe_create_dir(tmp_dest_dir)
+                    filepath = tmp_dest_dir / filename
+                    with filepath.open('wb') as f:
+                        f.write(extracted.getvalue())
+                    extracted_files.append(filepath)
+            if len(extracted_files) > self.MAX_EXTRACT_FILES:
+                self.logger.warning(f'Too many files in the archive (more than {self.MAX_EXTRACT_FILES}).')
+                report.status = Status.ALERT
+                report.add_details('Warning', f'Too many files in the archive (more than {self.MAX_EXTRACT_FILES}).')
+        finally:
+            try:
+                iso.close()
+            except Exception:
+                pass
+        return extracted_files
 
     def _extract_zip(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         found_password = False
@@ -293,6 +332,8 @@ class Extractor(BaseWorker):
                     extracted = self._extract_tar(task.file, report, extracted_dir)
                 elif task.file.mime_type == "application/x-lzma":
                     extracted = self._extract_lzma(task.file, report, extracted_dir)
+                elif task.file.mime_type == "application/x-iso9660-image":
+                    extracted = self._extract_iso(task.file, report, extracted_dir)
                 else:
                     extracted = self._extract_zip(task.file, report, extracted_dir)
             except BaseException as e:

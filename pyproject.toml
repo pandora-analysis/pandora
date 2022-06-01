@@ -58,6 +58,7 @@ imapclient = "^2.2.0"
 pyzipper = "^0.3.5"
 pymisp = {version = "^2.4.159", extras = ["fileobjects"]}
 python-dateutil = "^2.8.2"
+pycdlib = "^1.12.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.4.0"
