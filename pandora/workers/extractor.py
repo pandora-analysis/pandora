@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import py7zr  # type: ignore
-import pycdlib
+import pycdlib  # type: ignore
 import rarfile  # type: ignore
 
 from ..default import safe_create_dir, PandoraException
@@ -55,7 +55,7 @@ class Extractor(BaseWorker):
 
     def _extract_iso(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         iso = pycdlib.PyCdlib()
-        extracted_files = []
+        extracted_files: List[Path] = []
         try:
             iso.open(archive_file.path)
             for dirname, dirlist, filelist in iso.walk(iso_path='/'):
