@@ -375,6 +375,16 @@ def api_users():
     return render_template('users.html', users=users)
 
 
+@app.route('/users/clear', methods=['GET'], strict_slashes=False)
+@admin_required
+@html_answer
+def api_clear_users():
+
+    assert flask_login.current_user.role.can(Action.list_users), 'forbidden'
+    pandora.storage.del_users()
+    return redirect(url_for('api_submit_page'))
+
+
 @app.route('/roles', methods=['GET'], strict_slashes=False)
 @admin_required
 @html_answer

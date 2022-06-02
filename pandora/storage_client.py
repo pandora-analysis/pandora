@@ -54,6 +54,11 @@ class Storage():
         users.sort(key=operator.itemgetter('last_seen'), reverse=True)
         return users
 
+    def del_users(self):
+        to_delete = [f'users:{key}' for key in self.storage.smembers('users')]
+        to_delete.append('users')
+        self.storage.delete(*to_delete)
+
     # ##############
 
     # #### Role ####
