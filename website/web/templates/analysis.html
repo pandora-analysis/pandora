@@ -132,17 +132,23 @@
               <strong>Unexpected error during scan! </strong><br>Please contact your Pandora webmaster.
             </div>
             <div class="alert alert-danger d-none">
-              <strong>Malicious File! </strong> See reasons below. <br>
+              <strong>Malicious File! </strong> This file is know malicious, or
+              uses techniques seen in attacks, more details below. <br>
               <strong>Recommendations: </strong><br>
               We advise you to delete this file and maybe the linked message.<br>
-              If this file has been opened, please contact your system administrator.
+              If this file has been opened, please contact your system administrator.<br>
             </div>
             <div class="alert alert-warning d-none">
               <strong>Suspicious File! </strong> See reasons below.
+              <strong>Recommendations: </strong><br>
+              We advise you not to open the file on your computer and get in touch
+              with your system administrator if you want more details.<br>
             </div>
             <div class="alert alert-success d-none">
               <strong>Clean File! </strong><br>
-              No technical indicator for suspicious activity has been found in this file.
+              No technical indicator for suspicious activity has been found in this file.</br>
+              It doesn't mean it is for sure safe to open but you can be relatively confident.</br>
+              If looking at the preview is enough for you, no need to open it on your computer!
             </div>
             <div class="alert alert-info {% if task.done %} d-none {% endif %}">
               <strong>Pending task! </strong><br>
