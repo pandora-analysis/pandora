@@ -152,6 +152,19 @@ def get_warninglists() -> WarningLists:
 
 
 @lru_cache(64)
+def get_disclaimers() -> Dict[str, str]:
+    disclaimer_path = get_homedir() / 'config' / 'disclaimer.tmpl'
+    special_disclaimer_path = get_homedir() / 'config' / 'special_disclaimer.tmpl'
+    to_return = {'disclaimer': '', 'special_disclaimer': ''}
+    with disclaimer_path.open() as f:
+        to_return['disclaimer'] = f.read()
+    if special_disclaimer_path.exists():
+        with special_disclaimer_path.open() as f:
+            to_return['special_disclaimer'] = f.read()
+    return to_return
+
+
+@lru_cache(64)
 def get_email_template() -> str:
     with (get_homedir() / 'config' / 'email.tmpl').open() as f:
         return f.read()

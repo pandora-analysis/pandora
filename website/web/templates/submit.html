@@ -13,22 +13,13 @@
     <center>
     <div class="col-md-8">
       <div class="alert alert-warning" role="alert"><strong>DISCLAIMER</strong><br/>
-        The website, its software and all content found on it are provided on an
-        “as is” and “as available” basis. The administrator does not give any warranties,
-        whether express or implied, as to the suitability or usability of the
-        website, its software or any of its content.
-        The administrator will not be liable for any loss, whether such loss is direct,
-        indirect, special or consequential, suffered by any party as a result
-        of their use of the website, its software or content. Any
-        downloading or uploading of material to the website is done at the
-        user’s own risk and the user will be solely responsible for any
-        damage to any computer system or loss of data that results from such
-        activities.
-        Should you encounter any bugs, glitches, lack of functionality or
-        other problems on the website, please let us know immediately so we
-        can rectify these accordingly. Your help in this regard is greatly
-        appreciated.
+        {{generic_disclaimer}}
       </div>
+      {% if special_disclaimer %}
+      <div class="alert alert-danger" role="alert"><strong>Be extra careful, please.</strong><br/>
+        {{special_disclaimer}}
+      </div>
+      {% endif %}
     </div>
     </center>
   </div>

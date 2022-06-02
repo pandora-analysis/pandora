@@ -26,9 +26,9 @@ from pymisp.abstract import describe_types
 from werkzeug.security import check_password_hash
 
 from pandora.default import get_config
-from pandora.helpers import workers, get_homedir, Status
+from pandora.helpers import workers, get_homedir, Status, get_disclaimers
 from pandora.pandora import Pandora
-from pandora.role import Action, RoleName
+from pandora.role import Action
 from pandora.user import User
 
 from .generic_api import api as generic_api
@@ -190,12 +190,15 @@ def api_root():
 def api_submit_page():
     assert flask_login.current_user.role.can(Action.submit_file), 'forbidden'
     enaled_workers = pandora.get_enabled_workers()
+    disclaimers = get_disclaimers()
     return render_template(
         'submit.html', error=request.args.get('error', ''),
         max_file_size=get_config('generic', 'max_file_size'),
         workers={worker_name: config for worker_name, config in workers().items() if worker_name in enaled_workers},
         api=api,
-        api_resource=ApiSubmit
+        api_resource=ApiSubmit,
+        generic_disclaimer=disclaimers['disclaimer'],
+        special_disclaimer=disclaimers['special_disclaimer']
     )
 
 
