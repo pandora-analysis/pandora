@@ -154,6 +154,8 @@ def get_warninglists() -> WarningLists:
 @lru_cache(64)
 def get_disclaimers() -> Dict[str, str]:
     disclaimer_path = get_homedir() / 'config' / 'disclaimer.tmpl'
+    if not disclaimer_path.exists():
+        disclaimer_path = get_homedir() / 'config' / 'disclaimer.tmpl.sample'
     special_disclaimer_path = get_homedir() / 'config' / 'special_disclaimer.tmpl'
     to_return = {'disclaimer': '', 'special_disclaimer': ''}
     with disclaimer_path.open() as f:
