@@ -28,7 +28,8 @@ class Task:
     def new_task(cls, user: User, sample: BytesIO, filename: str, disabled_workers: List[str],
                  parent: Optional['Task']=None) -> 'Task':
         task_uuid = str(uuid4())
-        directory = get_homedir() / 'tasks' / task_uuid
+        today = datetime.now()
+        directory = get_homedir() / 'tasks' / str(today.year) / f'{today.month:02}' / task_uuid
         safe_create_dir(directory)
         filepath = directory / secure_filename(filename)
         with filepath.open('wb') as _f:
