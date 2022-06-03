@@ -290,6 +290,11 @@ class ApiTaskAction(Resource):
             except PandoraException as e:
                 return {'success': False, 'error': str(e)}, 400
             pandora.enqueue_task(new_task)
+            pubsub_config = get_config('generic', 'channels')
+            if pubsub_config['enabled'] and pubsub_config['channel_submission']:
+                misp_file_objs = new_task.file.misp_export()
+                if misp_file_objs:
+                    pandora.publish_on_channel(pubsub_config['channel_submission'], misp_file_objs[0].to_json())
             link = url_for('api_analysis', task_id=new_task.uuid)
             return {'success': True, 'task_id': new_task.uuid, 'link': link}
 

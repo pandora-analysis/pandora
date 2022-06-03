@@ -12,6 +12,10 @@
     "lookyloo_url": "",
     "users": {},
     "enable_imap_fetcher": false,
+    "channels": {
+        "enabled": false,
+        "channel_submission": "pandora_submissions"
+    },
     "misp": {
         "url": "",
         "apikey": "",
@@ -39,6 +43,7 @@
         "lookyloo_url": "The URL of the lookyloo instance you want to connect to. Use the *public* URL, not localhost (the browser blocks that).",
         "users": "Admin acount(s). Format: {username: password}",
         "enable_imap_fetcher": "If true, the imap fetcher is enabled.",
+        "channels": "If enabled, the submissions are published on the redis pubsub channels",
         "misp": "The MISP configuration",
         "email": "Email configuration",
         "weasyprint_fetch_ressources": "If true, weasyprint will fetch resources linked in HTML content",

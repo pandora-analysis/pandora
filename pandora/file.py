@@ -11,9 +11,9 @@ from datetime import datetime
 from functools import cached_property, lru_cache
 from io import BytesIO
 from pathlib import Path
-from pymisp import MISPEvent
-from pymisp.tools import make_binary_objects
-from typing import Optional, List, Union, Dict, cast, Set
+from pymisp import MISPEvent, MISPObject
+from pymisp.tools import make_binary_objects, FileObject
+from typing import Optional, List, Union, Dict, cast, Set, Tuple
 from uuid import uuid4
 from zipfile import ZipFile
 
@@ -767,25 +767,33 @@ class File:
         """
         return self.type == 'EXE'
 
-    def populate_misp_event(self, event: MISPEvent) -> None:
+    def misp_export(self) -> Optional[Tuple[FileObject, Optional[MISPObject], Optional[List[MISPObject]]]]:
         try:
             # Currently only extract indicators from binary files (PE, ELF, MachO)
-            fo, peo, seos = make_binary_objects(pseudofile=self.data, filename=self.original_filename)
+            return make_binary_objects(pseudofile=self.data, filename=self.original_filename)
         except Exception:
             traceback.print_exc()
+        return None
+
+    def populate_misp_event(self, event: MISPEvent) -> None:
+        objs = self.misp_export()
+        if not objs:
+            return None
+        fo, peo, seos = objs
 
         if seos:
             for s in seos:
                 event.add_object(s)
         if peo:
             if hasattr(peo, 'certificates') and hasattr(peo, 'signers'):
-                for c in peo.certificates:
+                for c in peo.certificates:  # type: ignore
                     event.add_object(c)
-                for s in peo.signers:
+                for s in peo.signers:  # type: ignore
                     event.add_object(s)
-                del peo.certificates
-                del peo.signers
-            del peo.sections
+                del peo.certificates  # type: ignore
+                del peo.signers  # type: ignore
+            if hasattr(peo, 'sections'):
+                del peo.sections  # type: ignore
             event.add_object(peo)
         if fo:
             event.add_object(fo)

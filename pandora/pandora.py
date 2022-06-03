@@ -211,3 +211,8 @@ class Pandora():
 
     def get_enabled_workers(self) -> Set[str]:
         return self.redis.smembers('enabled_workers')
+
+    # #### pubsub ####
+
+    def publish_on_channel(self, channel_name: str, data: str):
+        self.redis.publish(channel_name, data)
