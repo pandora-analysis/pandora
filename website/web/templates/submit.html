@@ -12,9 +12,6 @@
   <div class="row">
     <center>
     <div class="col-md-8">
-      <div class="alert alert-warning" role="alert"><strong>DISCLAIMER</strong><br/>
-        {{generic_disclaimer}}
-      </div>
       {% if special_disclaimer %}
       <div class="alert alert-danger" role="alert"><strong>Be extra careful, please.</strong><br/>
         {{special_disclaimer}}
@@ -58,6 +55,15 @@
         {% endfor %}
         </tbody>
       </table>
+    </div>
+  </div>
+  <div class="col-md-2" style="margin:20px"></div>
+  <div class="row">
+    <center>
+    <div class="col-md-8" style="font-size:12px">
+      <div class="alert alert-light" role="alert"><strong>DISCLAIMER</strong><br/>
+        {{generic_disclaimer}}
+      </div>
     </div>
   </div>
 </div>
