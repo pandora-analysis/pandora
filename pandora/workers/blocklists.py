@@ -21,9 +21,6 @@ malicious_exts: Tuple[str, ...] = (
     ".scf", ".lnk", ".inf",
     # Other
     ".reg", ".dll",
-    # Office macro (OOXML with macro enabled)
-    ".docm", ".dotm", ".xlsm", ".xltm", ".xlam", ".pptm", ".potm", ".ppam",
-    ".ppsm", ".sldm",
     # banned from wirecode
     ".asf", ".asx", ".au", ".htm", ".html", ".mht", ".vbs",
     ".wax", ".wm", ".wma", ".wmd", ".wmv", ".wmx", ".wmz", ".wvx",
