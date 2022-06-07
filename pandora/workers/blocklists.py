@@ -1,3 +1,5 @@
+import mimetypes
+
 from typing import Tuple
 
 from ..helpers import Status
@@ -57,12 +59,37 @@ malicious_exts: Tuple[str, ...] = (
     ".sparseimage", ".toast", ".udif",
 )
 
+malicious_types: Tuple[str, ...] = (
+    "application/octet-stream",  # no idea what the file is, not a good sign.
+)
+
 
 class Blocklists(BaseWorker):
 
+    enable_extensions: bool
+    enable_mimetypes: bool
+
     def analyse(self, task: Task, report: Report):
         report.status = Status.NOTAPPLICABLE
-        ext = task.file.original_filename.rsplit(".", 1)[-1]
-        if f'.{ext}' in malicious_exts:
-            report.status = Status.ALERT
-            report.add_details('Warning', f'The extension {ext} is considered as malicious by default.')
+        if self.enable_extensions:
+            ext = task.file.original_filename.rsplit(".", 1)[-1]
+            if f'.{ext}' in malicious_exts:
+                report.status = Status.ALERT
+                report.add_details('Warning', f'The extension {ext} is considered as malicious by default.')
+
+        if self.enable_mimetypes:
+            if not task.file.mime_type:
+                report.status = Status.ALERT
+                report.add_details('Warning', 'Unable to find a mime type.')
+            elif task.file.mime_type in malicious_types:
+                report.status = Status.ALERT
+                report.add_details('Warning', f'The mimetype {task.file.mime_type} is considered as malicious by default.')
+            else:
+                guessed_type, encoding = mimetypes.guess_type(task.file.original_filename)
+                if not guessed_type:
+                    report.status = Status.ALERT
+                    report.add_details('Warning', 'Unable to guess the mimetype based on the filename.')
+                elif guessed_type != task.file.mime_type:
+                    if report.status <= Status.CLEAN:
+                        report.status = Status.WARN
+                    report.add_details('Warning', f'The mimetype guessed from the filename ({guessed_type}) differs from the one guessed by magic ({task.file.mime_type}).')

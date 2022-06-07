@@ -15,7 +15,6 @@ class Storage():
     _instance = None
 
     def __new__(cls) -> 'Storage':
-        # NOTE: this will be a connector to kvrocks
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._redis_pool_storage: ConnectionPool = ConnectionPool(
@@ -35,8 +34,7 @@ class Storage():
 
     def set_user(self, user: Dict[str, str]) -> None:
         self.storage.hmset(f'users:{user["session_id"]}', user)
-        # NOTE: do we want to expire all of them?
-        self.storage.expire(f'users:{user["session_id"]}', 36000)
+        self.storage.expire(f'users:{user["session_id"]}', get_config('generic', 'session_expire'))
         self.storage.sadd('users', user["session_id"])
 
     def get_users(self):

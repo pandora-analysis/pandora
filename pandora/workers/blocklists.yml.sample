@@ -2,3 +2,7 @@ meta:
   name: Blocklists
   description: Mark some mimetypes and file extensions as malicious by default.
   replicas: 5
+
+settings:
+  enable_extensions: false
+  enable_mimetypes: false
