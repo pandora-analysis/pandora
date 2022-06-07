@@ -330,7 +330,7 @@ class Extractor(BaseWorker):
                     extracted = self._extract_gz(task.file, report, extracted_dir)
                 elif task.file.mime_type == "application/x-tar":
                     extracted = self._extract_tar(task.file, report, extracted_dir)
-                elif task.file.mime_type == "application/x-lzma":
+                elif task.file.mime_type in ["application/x-lzma", "application/x-xz", "application/x-lzip"]:
                     extracted = self._extract_lzma(task.file, report, extracted_dir)
                 elif task.file.mime_type == "application/x-iso9660-image":
                     extracted = self._extract_iso(task.file, report, extracted_dir)

@@ -80,6 +80,8 @@ class File:
         'application/x-tar': ['ARC', 'tar'],
         'application/gzip': ['ARC', 'gz'],
         'application/x-lzma': ['ARC', 'lzma'],
+        'application/x-xz': ['ARC', 'lzma'],
+        'application/x-lz': ['ARC', 'lzma'],
         'application/x-7z-compressed': ['ARC', '7z'],
         'application/x-rar': ['ARC', 'rar'],
         'application/x-iso9660-image': ['ARC', 'iso'],
