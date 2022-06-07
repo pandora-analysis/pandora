@@ -146,6 +146,7 @@ Install the package from the official repositories, and the default config will 
 
 ```bash
 sudo apt-get install clamav-daemon
+sudo systemctl stop clamav-freshclam.service
 sudo freshclam
 ```
 
