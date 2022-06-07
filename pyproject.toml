@@ -18,7 +18,7 @@ imap_fetcher = "bin.imap_fetcher:main"
 
 [tool.poetry.dependencies]
 python = "^3.8,<3.11"
-redis = {version = "^4.3.1", extras = ["hiredis"]}
+redis = {version = "^4.3.3", extras = ["hiredis"]}
 flask-restx = "^0.5.1"
 gunicorn = "^20.1.0"
 Flask-Session = "^0.4.0"
@@ -27,7 +27,7 @@ Flask-Login = "^0.6.1"
 Bootstrap-Flask = "^2.0.2"
 PyYAML = "^6.0"
 Flask-WTF = "^1.0.1"
-validators = "^0.19.0"
+validators = "^0.20.0"
 python-magic = "^0.4.26"
 PyMuPDF = "^1.19.6"
 requests = "^2.27.1"
@@ -36,10 +36,10 @@ PyExifTool = "<0.5"
 eml-parser = "^1.17.0"
 unoserver = "^1.2"
 weasyprint = "^55.0"
-extract-msg = "^0.30.14"
+extract-msg = "^0.31.1"
 Pillow = "^9.1.1"
 oletools = {version = "0.60.1", extras = ["full"]}
-py7zr = "^0.18.7"
+py7zr = "^0.18.9"
 jbxapi = "^3.17.2"
 defusedxml = "^0.7.1"
 mwdblib = "^4.2.1"
@@ -62,11 +62,11 @@ pycdlib = "^1.12.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.4.0"
-mypy = "^0.960"
+mypy = "^0.961"
 types-setuptools = "^57.4.17"
 types-redis = "^4.2.6"
-types-PyYAML = "^6.0.7"
-types-requests = "^2.27.29"
+types-PyYAML = "^6.0.8"
+types-requests = "^2.27.30"
 types-python-dateutil = "^2.8.17"
 
 [build-system]
