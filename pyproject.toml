@@ -28,7 +28,7 @@ Bootstrap-Flask = "^2.0.2"
 PyYAML = "^6.0"
 Flask-WTF = "^1.0.1"
 validators = "^0.20.0"
-python-magic = "^0.4.26"
+python-magic = "^0.4.27"
 PyMuPDF = "^1.19.6"
 requests = "^2.27.1"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
