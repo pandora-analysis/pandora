@@ -5,4 +5,9 @@ meta:
 
 settings:
   enable_extensions: false
+  overwrite_extensions:
+    # The extensions listed here will cause the report (and the task) to be marked as undecidable
+    # It is not recommended but can be useful if you have files you know are legitimate but
+    # will be flagged as malicious by the module, or any other module
+    - my_overwritten_ext
   enable_mimetypes: false

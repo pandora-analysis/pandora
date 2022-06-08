@@ -15,9 +15,9 @@ class Report:
         self.task_uuid = task_uuid
         self.worker_name = worker_name
         if status:
-            self.status = Status[status]
+            self._status = Status[status]
         else:
-            self.status = Status.WAITING
+            self._status = Status.WAITING
         self._details: Dict[str, Union[Dict[str, Any], Set[str], str]] = {}
         if details:
             for k, v in json.loads(details).items():
@@ -41,8 +41,17 @@ class Report:
         }.items() if v is not None}
 
     @property
+    def status(self) -> Status:
+        return self._status
+
+    @status.setter
+    def status(self, status: Status):
+        if self._status < status:
+            self._status = status
+
+    @property
     def is_done(self):
-        return self.status not in (Status.WAITING, Status.RUNNING)
+        return self._status not in (Status.WAITING, Status.RUNNING)
 
     @property
     def duration(self):

@@ -374,14 +374,10 @@ class Extractor(BaseWorker):
                 self.logger.exception(e)
 
         # wait for all the tasks to finish
-        while True:
-            if all(t.workers_done for t in tasks):
-                break
+        while not all(t.workers_done for t in tasks):
             time.sleep(1)
 
-        for t in tasks:
-            if t.status > report.status:
-                report.status = t.status
+        report.status = max(t.status for t in tasks)
 
         if report.status > Status.CLEAN:
             report.add_details('Warning', 'There are suspicious files in this archive, click on the "Extracted" tab for more.')

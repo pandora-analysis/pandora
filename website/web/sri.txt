@@ -21,7 +21,7 @@
       "skull.svg": "jVXBiN5aVJDJpcYfnDcCecHCL8mRl1Zc74QB0+bd6k4I46aCqMYBHUCRrA1KmCUE/ANwZjfvked+FJQJWR9NTA=="
     },
     "js": {
-      "analysis.js": "U6gONArKVdcv3BDuBDR3Fqdvl75I2Zcd0xpB6REvMJZseyEeZi08S6zIvQlnBXfbyJDV11iOPjUwiSYd5BH6lA==",
+      "analysis.js": "Gxb86PEzLtxZA06TMXBs/BFp/c2ECecnnJPmX9hMKmQ5umCvt+ea1cC8PM/8l5tgX2z7y//B2uzFthdO5k4kHQ==",
       "dashboard.js": "PX35MZEYebEdyiQ3a78gJeFx5kqT3k1fZwgflvWMMGCDW1SVT5QswAOGTOam7GWqdYaE6eGy2fa2ZcFaaZinYg==",
       "lib": {
         "bootstrap-datepicker.min.js": "T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==",

@@ -1,5 +1,7 @@
 {% macro display_status_badge(entry_status, status) %}
-{% if entry_status == status.ALERT %}
+{% if entry_status == status.OVERWRITE %}
+<span class="badge bg-secondary" title="Can't say, overwritten by admin.">
+{% elif entry_status == status.ALERT %}
 <span class="badge bg-danger" title="Consider this as malicious">
 {% elif entry_status == status.WARN %}
 <span class="badge bg-warning" title="Consider this as suspicious, act accordingly">

@@ -33,6 +33,7 @@ class Status(IntEnum):
     CLEAN = auto()
     WARN = auto()
     ALERT = auto()
+    OVERWRITE = auto()  # This one is used on a case-by-case basis, and it will force a report to that status
 
 
 @unique

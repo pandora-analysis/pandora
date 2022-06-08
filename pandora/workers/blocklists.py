@@ -1,6 +1,6 @@
 import mimetypes
 
-from typing import Tuple
+from typing import Tuple, List
 
 from ..helpers import Status
 from ..task import Task
@@ -11,6 +11,7 @@ from .base import BaseWorker
 
 # list from: https://github.com/CIRCL/PyCIRCLean/blob/main/filecheck/filecheck.py#L74
 
+# TODO: remove the "." before the extension.
 malicious_exts: Tuple[str, ...] = (
     # Applications
     ".exe", ".pif", ".application", ".gadget", ".msi", ".msp", ".com", ".scr",
@@ -68,11 +69,16 @@ class Blocklists(BaseWorker):
 
     enable_extensions: bool
     enable_mimetypes: bool
+    overwrite_extensions: List[str]
 
     def analyse(self, task: Task, report: Report):
         report.status = Status.NOTAPPLICABLE
         if self.enable_extensions:
             ext = task.file.original_filename.rsplit(".", 1)[-1]
+            if ext in self.overwrite_extensions:
+                report.status = Status.OVERWRITE
+                report.add_details('Info', f'The result for files with extension {ext} is overwritten bu the admin. It generally means we cannot decide on the status of the file. Contact your admin for more details.')
+
             if f'.{ext}' in malicious_exts:
                 report.status = Status.ALERT
                 report.add_details('Warning', f'The extension {ext} is considered as malicious by default.')
@@ -90,6 +96,5 @@ class Blocklists(BaseWorker):
                     report.status = Status.ALERT
                     report.add_details('Warning', 'Unable to guess the mimetype based on the filename.')
                 elif guessed_type != task.file.mime_type:
-                    if report.status <= Status.CLEAN:
-                        report.status = Status.WARN
+                    report.status = Status.WARN
                     report.add_details('Warning', f'The mimetype guessed from the filename ({guessed_type}) differs from the one guessed by magic ({task.file.mime_type}).')

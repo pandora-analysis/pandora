@@ -94,6 +94,7 @@ def default_icon():
 
 
 status_icons = defaultdict(default_icon, {
+    Status.OVERWRITE: 'question-octagon',
     Status.ERROR: 'exclamation-octagon',
     Status.ALERT: 'x-circle',
     Status.WARN: 'exclamation-triangle',
