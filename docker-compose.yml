@@ -9,13 +9,16 @@ services:
     ports:
         - 6101:6101
 
-
   redis:
     image: redis
     working_dir: /cache
     command: ./cache.conf --daemonize no
     volumes:
         - ./cache:/cache
+  clamav:
+    image: clamav/clamav
+    volumes:
+        - /tmp:/var/run/clamav
 
   pandora:
     build: .
@@ -25,6 +28,7 @@ services:
         - /bin/sh
         - -c
         - |
+            sleep 60
             poetry run start
             tail -F ./LICENSE
     volumes:
@@ -33,8 +37,11 @@ services:
         - ./pandora/workers:/pandora/pandora/workers
         - ./config:/pandora/config
         - ./yara_rules:/pandora/yara_rules
+        - ./yara_repos:/pandora/yara_repos
         - ./tasks:/pandora/tasks
+        - /tmp:/var/run/clamav
     links:
+        - "clamav"
         - "redis"
         - "kvrocks"
     ports:
