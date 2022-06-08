@@ -13,6 +13,10 @@ RUN apt-get -y install libreoffice-base-nogui libreoffice-calc-nogui libreoffice
 RUN apt-get -y install exiftool
 RUN apt-get -y install unrar
 RUN apt-get -y install libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig
+RUN apt-get -y install apparmor-utils
+
+RUN sed '/^profile libreoffice-soffice \/usr\/lib\/libreoffice\/program\/soffice.bin/a owner @{HOME}\/pandora\/tasks\/\*\* rwk,/' /etc/apparmor.d/usr.lib.libreoffice.program.soffice.bin -i
+
 RUN pip3 install poetry
 
 WORKDIR pandora
@@ -22,13 +26,12 @@ COPY tools tools/
 COPY bin bin/
 COPY doc doc/
 COPY website website/
-COPY yara_repos yara_repos/
 COPY pyproject.toml .
 COPY poetry.lock .
 COPY README.md .
 COPY LICENSE .
 
-RUN mkdir cache storage tasks yara_rules
+RUN mkdir cache storage tasks 
 RUN echo PANDORA_HOME="`pwd`" >> .env
 RUN poetry install
 RUN poetry run tools/3rdparty.py
