@@ -1,0 +1,41 @@
+version: '3'
+services:
+
+  kvrocks:
+    image: kvrocks/kvrocks
+    working_dir: /kvrocks
+    volumes:
+        - ./storage:/kvrocks/conf
+    ports:
+        - 6101:6101
+
+
+  redis:
+    image: redis
+    working_dir: /cache
+    command: ./cache.conf --daemonize no
+    volumes:
+        - ./cache:/cache
+
+  pandora:
+    build: .
+    working_dir: /pandora
+    tty: true
+    command:
+        - /bin/sh
+        - -c
+        - |
+            poetry run start
+            tail -F ./LICENSE
+    volumes:
+        - ./cache:/pandora/cache
+        - ./storage:/pandora/storage
+        - ./pandora/workers:/pandora/pandora/workers
+        - ./config:/pandora/config
+        - ./yara_rules:/pandora/yara_rules
+        - ./tasks:/pandora/tasks
+    links:
+        - "redis"
+        - "kvrocks"
+    ports:
+        - 6100:6100
