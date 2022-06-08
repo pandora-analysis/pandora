@@ -146,9 +146,13 @@ Install the package from the official repositories, and the default config will 
 
 ```bash
 sudo apt-get install clamav-daemon
-sudo systemctl stop clamav-freshclam.service
-sudo freshclam
-sudo systemctl start clamav-freshclam.service
+# In order for the module to work, you need the signatures. 
+# Running the command "freshclam" will do it but if the script is already running
+# (it is started by the systemd service clamav-freshclam)
+# You might want to run the commands below: 
+sudo systemctl stop clamav-freshclam.service  # Stop the service
+sudo freshclam  # Run the signatures update
+sudo systemctl start clamav-freshclam.service # Start the service so we keep getting the updates
 ```
 
 Then, check if `/var/run/clamav/clamd.ctl` exists. If it doesn't, start the service:
