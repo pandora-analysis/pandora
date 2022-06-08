@@ -148,6 +148,7 @@ Install the package from the official repositories, and the default config will 
 sudo apt-get install clamav-daemon
 sudo systemctl stop clamav-freshclam.service
 sudo freshclam
+sudo systemctl start clamav-freshclam.service
 ```
 
 Then, check if `/var/run/clamav/clamd.ctl` exists. If it doesn't, start the service:
