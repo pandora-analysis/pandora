@@ -32,7 +32,9 @@
         <td>{{ moment(task.save_date).format('lll') }}</td>
         <td style="text-align:center">
           <span class="img-thumbnail small-status-flag status-flag-{{ task.status.name.lower() }}">
-            {% if task.status == status.ERROR %}
+            {% if task.status == status.OVERWRITE %}
+              {{ render_icon('question-octagon') }}
+            {% elif task.status == status.ERROR %}
               {{ render_icon('exclamation-octagon') }}
             {% elif task.status == status.ALERT %}
               <img src="{{ url_for('static', filename='images/skull.svg') }}" width = "15" height = "15">

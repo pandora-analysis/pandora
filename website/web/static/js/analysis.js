@@ -50,8 +50,6 @@ Analysis.prototype.refreshStatus = function () {
     $("#taskStatusMessage").find(".alert").addClass("d-none");
     if (this.task.status === "OVERWRITE") {
         $("#taskStatusMessage").find(".alert-overwrite").removeClass("d-none");
-        $(`.status-flag-${this.task.status.toLowerCase()}`).addClass("alert-dark");
-        $("#taskStatusMessage").find(".alert-overwrite").addClass("alert-dark");
     } else if (this.task.status === "ERROR") {
         $("#taskStatusMessage").find(".alert-error").removeClass("d-none");
     } else if (this.task.status === "ALERT") {

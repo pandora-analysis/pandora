@@ -35,6 +35,10 @@ a, *[onclick], *[title] {
   padding:0 5px !important;
 }
 
+.status-flag-overwrite {
+  background-color:#808080 !important;
+}
+
 .status-flag-error {
   background-color:#000000 !important;
 }
