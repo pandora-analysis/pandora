@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_icon %}
+{% from "macros.html" import display_task_status %}
 
 {% block title %}
     My tasks
@@ -31,21 +32,7 @@
         </td>
         <td>{{ moment(task.save_date).format('lll') }}</td>
         <td style="text-align:center">
-          <span class="img-thumbnail small-status-flag status-flag-{{ task.status.name.lower() }}">
-            {% if task.status == status.OVERWRITE %}
-              {{ render_icon('question-octagon') }}
-            {% elif task.status == status.ERROR %}
-              {{ render_icon('exclamation-octagon') }}
-            {% elif task.status == status.ALERT %}
-              <img src="{{ url_for('static', filename='images/skull.svg') }}" width = "15" height = "15">
-            {% elif task.status == status.WARN %}
-            {{ render_icon('exclamation-triangle') }}
-            {% elif task.status == status.CLEAN %}
-            {{ render_icon('check-circle') }}
-            {% else %}
-              {{ render_icon('question') }}
-            {% endif %}
-          </span>
+          {{ display_task_status(task.status, status) }}
         </td>
         <td>{{ render_icon(task.file.icon) }}<b>{{ task.file.original_filename }}</b></td>
         <td class="text-break">{{ task.file.sha256 }}</td>
