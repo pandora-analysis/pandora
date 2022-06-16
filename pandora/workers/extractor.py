@@ -377,7 +377,12 @@ class Extractor(BaseWorker):
         while not all(t.workers_done for t in tasks):
             time.sleep(1)
 
-        report.status = max(t.status for t in tasks)
+        if tasks:
+            report.status = max(t.status for t in tasks)
+        else:
+            # Nothing was extracted
+            # FIXME: is that legit? probably need to throw a warning.
+            pass
 
         if report.status > Status.CLEAN:
             report.add_details('Warning', 'There are suspicious files in this archive, click on the "Extracted" tab for more.')
