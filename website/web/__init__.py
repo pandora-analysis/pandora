@@ -345,7 +345,7 @@ def api_tasks():
     if not search:
         # filter results by date, keep last 3 days,
         # TODO: up to a max amount of tasks
-        first_date: Union[datetime, int] = datetime.now() - timedelta(days=3)
+        first_date: Union[datetime, int] = datetime.now() - timedelta(days=get_config('generic', 'max_days_index'))
     else:
         # FIXME: This will be slow and the way to search must be improved.
         first_date = 0
