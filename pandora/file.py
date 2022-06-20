@@ -610,7 +610,7 @@ class File:
         # See https://github.com/TeamMsgExtractor/msg-extractor/blob/master/extract_msg/utils.py
         if not self.is_msg:
             return None
-        msg = openMsg(self.path)
+        msg = openMsg(self.path, delayAttachments=True)
         assert isinstance(msg, Message), f'msg file must be a message, other formats are not supported yet. Type: {type(msg)}'
         return msg
 

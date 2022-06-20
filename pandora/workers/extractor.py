@@ -356,7 +356,7 @@ class Extractor(BaseWorker):
             shutil.rmtree(extracted_dir)
 
         # Try to extract attachments from EML file
-        if task.file.is_eml or task.file.is_msg:
+        if task.file.is_eml:
             try:
                 if task.file.eml_data and task.file.eml_data.get('attachment'):
                     extracted_dir = task.file.directory / 'extracted'
@@ -370,6 +370,27 @@ class Extractor(BaseWorker):
                         pandora.enqueue_task(new_task)
                         tasks.append(new_task)
                     shutil.rmtree(extracted_dir)
+            except Exception as e:
+                self.logger.exception(e)
+        elif task.file.is_msg:
+            try:
+                if task.file.msg_data:
+                    msg_extract_dir = task.file.directory / 'extracted_msg_attachments'
+                    safe_create_dir(msg_extract_dir)
+                    task.file.msg_data.save(customPath=str(msg_extract_dir), attachmentsOnly=True)
+                    for filepath in msg_extract_dir.glob('**/*'):
+                        if not filepath.is_file():
+                            continue
+                        with filepath.open('rb') as _fb:
+                            attachment = BytesIO(_fb.read())
+                        new_task = Task.new_task(user=task.user, sample=attachment,
+                                                 filename=filepath.name,
+                                                 disabled_workers=task.disabled_workers,
+                                                 parent=task)
+                        pandora.add_extracted_reference(task, new_task)
+                        pandora.enqueue_task(new_task)
+                        tasks.append(new_task)
+                    # shutil.rmtree(msg_extract_dir)
             except Exception as e:
                 self.logger.exception(e)
 
