@@ -268,7 +268,7 @@ class ApiTaskAction(Resource):
             assert 'email' in data, "missing mandatory argument 'email'"
             assert 'message' in data, "missing mandatory argument 'message'"
             if not seed:
-                seed = pandora.add_seed(task, time=90000)  # Just a bit over a day
+                seed = pandora.add_seed(task, time=90000)[0]  # Just a bit over a day
             message = '\n'.join([
                 f'-- Message from {data["email"]} --',
                 f'-- Page {url_for("api_analysis", task_id=task.uuid, seed=seed)} --',
