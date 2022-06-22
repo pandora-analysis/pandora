@@ -216,7 +216,7 @@ def api_analysis(task_id, seed=None):
     task.linked_tasks = []
 
     if hasattr(task, 'parent') and task.parent and seed and not pandora.is_seed_valid(task.parent, seed):
-        del task.parent
+        task.parent = None
     return render_template('analysis.html', task=task, seed=seed, api=api,
                            zip_passwd=get_config('generic', 'sample_password'),
                            api_resource=ApiTaskAction)
