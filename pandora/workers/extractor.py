@@ -57,9 +57,8 @@ class Extractor(BaseWorker):
         iso = pycdlib.PyCdlib()
         extracted_files: List[Path] = []
         try:
-            iso.open(archive_file.path)
+            iso.open(str(archive_file.path))
             for dirname, dirlist, filelist in iso.walk(iso_path='/'):
-                print(dirname, dirlist, filelist)
                 if len(extracted_files) > self.MAX_EXTRACT_FILES:
                     break
                 if not filelist:
