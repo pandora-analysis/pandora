@@ -140,7 +140,7 @@ class ApiSubmit(Resource):
         except PandoraException as e:
             return {'success': False, 'error': str(e)}, 400
         pandora.enqueue_task(task)
-        if args.get('validity'):
+        if args.get('validity') is not None:
             seed, expire = pandora.add_seed(task, args['validity'])
             link = url_for('api_analysis', task_id=task.uuid, seed=seed)
             return {'success': True, 'taskId': task.uuid, 'seed': seed,
