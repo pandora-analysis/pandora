@@ -53,6 +53,14 @@ class Extractor(BaseWorker):
     MAX_EXTRACTED_FILE_SIZE = 100 * 1000000  # 100Mb
     ZIP_PASSWORDS = ['', 'virus', 'CERT_SOC', 'cert', 'pandora', 'infected', '123']
 
+    @property
+    def passwords(self):
+        return self._passwords
+
+    @passwords.setter
+    def passwords(self, passwords: List[str]):
+        self._passwords = passwords
+
     def _extract_iso(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         iso = pycdlib.PyCdlib()
         extracted_files: List[Path] = []
@@ -103,7 +111,7 @@ class Extractor(BaseWorker):
                     break
                 is_encrypted = info.flag_bits & 0x1  # from https://github.com/python/cpython/blob/3.10/Lib/zipfile.py
                 if is_encrypted and not found_password:
-                    for pwd in self.ZIP_PASSWORDS:
+                    for pwd in self.passwords:
                         try:
                             archive.read(info, pwd=pwd.encode())
                             archive.setpassword(pwd.encode())
@@ -142,7 +150,7 @@ class Extractor(BaseWorker):
                     report.add_details('Warning', f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive')
                     break
                 if info.needs_password() and not found_password:
-                    for pwd in self.ZIP_PASSWORDS:
+                    for pwd in self.passwords:
                         try:
                             with archive.open(info, pwd=pwd.encode()) as f:
                                 f.read()
@@ -173,7 +181,7 @@ class Extractor(BaseWorker):
         return extracted_files
 
     def _try_password_7z(self, path) -> Optional[str]:
-        for pwd in self.ZIP_PASSWORDS:
+        for pwd in self.passwords:
             try:
                 with py7zr.SevenZipFile(file=path, mode='r', password=pwd) as archive:
                     files_in_archive = archive.getnames()
@@ -316,6 +324,10 @@ class Extractor(BaseWorker):
         # Try to extract files from archive
         # TODO: Support other archive formats
         if task.file.is_archive:
+            if task.password:
+                self.passwords = [task.password]
+            else:
+                self.passwords = self.ZIP_PASSWORDS
             extracted_dir = task.file.directory / 'extracted'
             safe_create_dir(extracted_dir)
             try:

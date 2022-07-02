@@ -133,9 +133,11 @@ class ApiSubmit(Resource):
         if file_bytes.getvalue().strip() == b'':
             disabled_workers = list(workers())
         disabled_workers = request.form["workersDisabled"].split(",") if request.form.get("workersDisabled") else []
+        password = request.form['password'] if request.form.get('password') else ''
         try:
             task = Task.new_task(flask_login.current_user, sample=file_bytes,
                                  filename=submitted_file.filename,
+                                 password=password,
                                  disabled_workers=disabled_workers)
         except PandoraException as e:
             return {'success': False, 'error': str(e)}, 400

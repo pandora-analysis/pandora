@@ -8,33 +8,35 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="row">
+<div class="container">
+  <div class="mb-3">
+    {% if special_disclaimer %}
     <center>
-    <div class="col-md-8">
-      {% if special_disclaimer %}
-      <div class="alert alert-danger" role="alert"><strong>Be extra careful, please.</strong><br/>
-        {{special_disclaimer}}
-      </div>
-      {% endif %}
+    <div class="alert alert-danger" role="alert"><strong>Be extra careful, please.</strong><br/>
+      {{special_disclaimer}}
     </div>
     </center>
+    {% endif %}
   </div>
-  <div class="col-md-2"></div>
-  <div class="col-md-8" id="dropzone">
+
+  <div class="md-3" id="dropzone">
     <div class="dz-message" data-dz-message>
       <span><h2>Drop suspicious file here...</h2></span>
     </div>
   </div>
-  <div class="row">
-    <div class="col-md-2"></div>
-    <div class="text-right col-md-8">
-      <button class="btn btn-primary" onclick="$('#workers-selection').toggleClass('d-none');">Advanced</button>
-    </div>
+
+  <div class="row md-3">
+    <label for="encryption-password" class="col-sm-2 col-form-label">Encryption password</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="encryption-password" placeholder="String to use to decrypt the submission">
+     </div>
   </div>
-  <div class="row d-none" id="workers-selection">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
+
+  <div class="md-3">
+    <button class="btn btn-primary" onclick="$('#workers-selection').toggleClass('d-none');">Advanced</button>
+  </div>
+
+  <div class="md-3 d-none" id="workers-selection">
       <table class="table table-striped table-sm">
         <thead>
           <tr>
@@ -57,16 +59,15 @@
       </table>
     </div>
   </div>
-  <div class="col-md-2" style="margin:20px"></div>
-  <div class="row">
+
+  <div class="md-3" style="font-size:12px">
     <center>
-    <div class="col-md-8" style="font-size:12px">
       <div class="alert alert-light" role="alert"><strong>DISCLAIMER</strong><br/>
         {{generic_disclaimer}}
       </div>
-    </div>
+    </center>
   </div>
-</div>
+
 <div class="dz-preview dz-file-preview d-none" id="preview-template">
   <div class="dz-image"><img data-dz-thumbnail /></div>
   <div class="dz-details">
@@ -94,6 +95,7 @@
     previewTemplate: document.querySelector('#preview-template').innerHTML,
     sending: function(file, xhr, formData) {
       formData.append("workersDisabled", getDisabledWorkers());
+      formData.append("password", getPassword());
     },
     success: function(file, answer){
       if (file.previewElement) {

@@ -26,7 +26,7 @@ class Task:
 
     @classmethod
     def new_task(cls, user: User, sample: BytesIO, filename: str, disabled_workers: List[str],
-                 parent: Optional['Task']=None) -> 'Task':
+                 parent: Optional['Task']=None, password: Optional[str]=None) -> 'Task':
         task_uuid = str(uuid4())
         today = datetime.now()
         directory = get_homedir() / 'tasks' / str(today.year) / f'{today.month:02}' / task_uuid
@@ -38,7 +38,7 @@ class Task:
         file = File.new_file(filepath, filename=filename)
 
         task = cls(uuid=task_uuid, submitted_file=file, disabled_workers=disabled_workers,
-                   user=user, parent=parent)
+                   user=user, parent=parent, password=password)
         task.store(force=True)
         return task
 
@@ -48,7 +48,8 @@ class Task:
                  parent: Optional['Task']=None,
                  status: Optional[Status]=None,
                  done: bool=False,
-                 disabled_workers: List[str]=[]):
+                 disabled_workers: List[str]=[],
+                 password: Optional[str]=None):
         '''With python classes'''
         ...
 
@@ -57,7 +58,8 @@ class Task:
                  parent_id: Optional[str]=None,
                  status: Optional[str]=None,
                  done: bool=False,
-                 disabled_workers: Optional[str]=None):
+                 disabled_workers: Optional[str]=None,
+                 password: Optional[str]=None):
         '''From redis'''
         ...
 
@@ -66,7 +68,8 @@ class Task:
                  user=None, user_id=None, save_date=None,
                  parent=None, parent_id=None,
                  status=None, done=False,
-                 disabled_workers=[]):
+                 disabled_workers=[],
+                 password=None):
         """
         Generate a Task object.
         :param uuid: Unique identifier of the task.
@@ -120,6 +123,10 @@ class Task:
                 self.disabled_workers = disabled_workers
         else:
             self.disabled_workers = []
+        if password:
+            self.password = password
+        else:
+            self.password = ''
         self.store()
 
     @property
@@ -182,6 +189,7 @@ class Task:
             'file_id': self.file.uuid,
             'user_id': self.user.get_id() if self.user else None,
             'disabled_workers': json.dumps(self.disabled_workers) if hasattr(self, 'disabled_workers') else None,
+            'password': self.password if self.password else None,
             'status': self.status.name,
             'save_date': self.save_date.isoformat()
         }.items() if v is not None}
