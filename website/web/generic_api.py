@@ -115,6 +115,9 @@ upload_parser.add_argument('file', location='files',
 upload_parser.add_argument('validity', type=int, required=False,
                            location='args',
                            help="Number of seconds the seed will be valid (0 means forever, empty doesn't create a seed).")
+upload_parser.add_argument('password', type=str, required=False,
+                           location='args',
+                           help="User defined password to decrypt the file (generally used for archives).")
 
 
 @api.route('/submit', methods=['POST'], strict_slashes=False)
@@ -133,7 +136,7 @@ class ApiSubmit(Resource):
         if file_bytes.getvalue().strip() == b'':
             disabled_workers = list(workers())
         disabled_workers = request.form["workersDisabled"].split(",") if request.form.get("workersDisabled") else []
-        password = request.form['password'] if request.form.get('password') else ''
+        password = request.form['password'] if request.form.get('password') else args.get('password')
         try:
             task = Task.new_task(flask_login.current_user, sample=file_bytes,
                                  filename=submitted_file.filename,
