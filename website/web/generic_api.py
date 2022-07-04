@@ -288,11 +288,17 @@ class ApiTaskAction(Resource):
             return {'success': True}
 
         if action == 'rescan' and flask_login.current_user.role.can(Action.rescan_file):
+            try:
+                # FIXME this is disgusting
+                data: Dict[str, str] = request.get_json()  # type: ignore
+            except Exception:
+                data = {}
             # Here we create a brand new task.
             try:
                 new_task = Task.new_task(flask_login.current_user,
                                          sample=task.file.data,
                                          filename=task.file.original_filename,
+                                         password=data.get('password'),
                                          disabled_workers=task.disabled_workers)
             except PandoraException as e:
                 return {'success': False, 'error': str(e)}, 400

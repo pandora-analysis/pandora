@@ -122,6 +122,7 @@ class Extractor(BaseWorker):
                     else:
                         report.status = Status.WARN
                         report.add_details('Warning', 'File encrypted and unable to find password')
+                        report.add_extra('no_password', True)
                         break
                 if info.is_dir():
                     continue
@@ -164,6 +165,7 @@ class Extractor(BaseWorker):
                     else:
                         report.status = Status.WARN
                         report.add_details('Warning', 'File encrypted and unable to find password')
+                        report.add_extra('no_password', True)
                         break
                 if info.is_dir():
                     continue
@@ -212,6 +214,7 @@ class Extractor(BaseWorker):
             if password is None:
                 report.status = Status.WARN
                 report.add_details('Warning', 'Encypted archive, unable to find password')
+                report.add_extra('no_password', True)
                 return []
         else:
             password = None
@@ -350,6 +353,7 @@ class Extractor(BaseWorker):
             except BaseException as e:
                 report.status = Status.WARN
                 report.add_details('Warning', f'Unable to extract {task.file.path.name}: {e}.')
+                report.add_extra('no_password', True)
                 extracted = []
                 self.logger.exception(e)
 

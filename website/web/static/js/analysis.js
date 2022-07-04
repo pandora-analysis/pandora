@@ -225,8 +225,10 @@ Analysis.prototype.rescan = function (url) {
     fetch(url, {
       method: "POST",
       headers: {
-        "X-CSRF-Token": this.CSRFToken
-      }
+        "X-CSRF-Token": this.CSRFToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({password: $("#password").val()})
     })
     .then(response => response.json())
     .then(data => {

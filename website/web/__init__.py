@@ -488,7 +488,8 @@ def html_workers_result(task_id: str, worker_name: str, seed: Optional[str]=None
     return render_template(template_file,
                            worker_name=worker_name,
                            worker_meta=workers()[worker_name]['meta'],
-                           task=task, seed=seed, report=report)
+                           task=task, seed=seed, report=report, api=api,
+                           api_task_action=ApiTaskAction)
 
 
 @app.route('/stats', methods=['GET'], strict_slashes=False)

@@ -7,7 +7,7 @@ from .helpers import Status
 
 class Report:
     def __init__(self, task_uuid: str, worker_name: str, status: Optional[str]= None,
-                 details: Optional[str]=None):
+                 details: Optional[str]=None, extras: Optional[str]=None,):
         """
         Generate module report.
         :param kwargs: arguments to set in this report
@@ -24,6 +24,9 @@ class Report:
                 self._details[k] = json.loads(v)
                 if isinstance(self._details[k], list):
                     self._details[k] = set(self._details[k])
+        self._extras: Dict[str, Any] = {}
+        if extras:
+            self._extras = json.loads(extras)
 
     @property
     def to_dict(self):
@@ -38,6 +41,7 @@ class Report:
             'error': getattr(self, 'error', None),
             'error_trace': getattr(self, 'error_trace', None),
             'details': json.dumps({key: json.dumps(value) for key, value in self.details.items()}) if self.details else None,
+            'extras': json.dumps({key: value for key, value in self.extras.items()}) if self.extras else None,
         }.items() if v is not None}
 
     @property
@@ -69,6 +73,13 @@ class Report:
             else:
                 to_return[k] = v
         return to_return
+
+    @property
+    def extras(self) -> Dict[str, Any]:
+        return self._extras
+
+    def add_extra(self, key: str, value: Any):
+        self._extras[key] = value
 
     @overload
     def add_details(self, details_name: str, details: str):
