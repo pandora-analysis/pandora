@@ -32,7 +32,7 @@ You need poetry installed, see the [install guide](https://python-poetry.org/doc
 
 [Redis](https://redis.io/): An open source (BSD licensed), in-memory data structure store, used as a database, cache and message broker.
 
-NOTE: Redis should be installed from the source, and the repository must be in the same directory as the one you will be cloning Lookyloo into.
+NOTE: Redis should be installed from the source, and the repository must be in the same directory as the one you will be cloning Pandora into.
 
 In order to compile and test redis, you will need a few packages:
 
@@ -55,7 +55,7 @@ cd ..
 
 [Kvrocks](https://github.com/apache/incubator-kvrocks) is a distributed key value NoSQL database that uses RocksDB as storage engine and is compatible with Redis protocol. Kvrocks intends to decrease the cost of memory and increase the capability while compared to Redis.
 
-NOTE: Kvrocks should be installed from the source, and the repository must be in the same directory as the one you will be cloning Lookyloo into.
+NOTE: Kvrocks should be installed from the source, and the repository must be in the same directory as the one you will be cloning Pandora into.
 
 In order to compile kvrocks, you will need a few packages:
 
@@ -146,10 +146,10 @@ Install the package from the official repositories, and the default config will 
 
 ```bash
 sudo apt-get install clamav-daemon
-# In order for the module to work, you need the signatures. 
+# In order for the module to work, you need the signatures.
 # Running the command "freshclam" will do it but if the script is already running
 # (it is started by the systemd service clamav-freshclam)
-# You might want to run the commands below: 
+# You might want to run the commands below:
 sudo systemctl stop clamav-freshclam.service  # Stop the service
 sudo freshclam  # Run the signatures update
 sudo systemctl start clamav-freshclam.service # Start the service so we keep getting the updates
