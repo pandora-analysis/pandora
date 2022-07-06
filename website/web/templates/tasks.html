@@ -46,7 +46,7 @@
           {% else %}
             <span id="delete-{{ task.uuid }}" class="btn btn-danger mt-1"
                   onclick="javascript:deleteFile($(this).attr('data-url'), $(this).attr('data-uid'))"
-                  data-url="{{ api.url_for(api_resource, task_id=task.uuid, action='delete') }}" data-uid="{{ task.file_id }}">
+                  data-url="{{ api.url_for(api_resource, task_id=task.uuid, action='delete') }}" data-uid="{{ task.file.uuid }}">
                 Delete file
             </span>
           {% endif %}
@@ -73,7 +73,7 @@
             if (data.success === false) {
               throw new Error(data.error);
             }
-            $(`[data-uid=${uid}]`).attr("onclick", "").toggleClass("btn-default btn-danger").html('File deleted');
+            $(`[data-uid=${data.file_id}]`).attr("onclick", "").toggleClass("btn-default btn-danger").html('File deleted');
           })
           .catch((error) => {
             alert("An error has occurred while removing file : " + error);
