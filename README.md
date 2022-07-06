@@ -109,6 +109,7 @@ sudo apt install libreoffice-base-nogui libreoffice-calc-nogui libreoffice-draw-
 sudo apt install exiftool  # for extracting exif information
 sudo apt install unrar  # for extracting rar files
 sudo apt install libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig  # for textract
+sudo apt install libssl-dev  # seems required for yara-python
 ```
 
 Note: on Ubuntu 20.04, libreoffice-nogui cannot be installed due to some dependencies issues.
