@@ -114,6 +114,16 @@ sudo apt install libssl-dev  # seems required for yara-python
 
 Note: on Ubuntu 20.04, libreoffice-nogui cannot be installed due to some dependencies issues.
 
+### Important notes regarding libreoffice
+
+Some have issues when generating previews. It seems to be related to the version of libreoffice in the packages, and the headless version (`*-nogui` packages) that are sometimes failing. If you see error messages in the logs, install libreoffice from the PPA:
+
+```bash
+sudo add-apt-repository ppa:libreoffice/ppa 
+sudo apt-get update
+sudo apt-get install libreoffice
+```
+
 ### Pandora installation
 
 From the directory you cloned Pandora to, run:
