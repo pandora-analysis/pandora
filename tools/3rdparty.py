@@ -6,9 +6,9 @@ from pandora.default import get_homedir, safe_create_dir
 
 jquery_version = "3.6.0"
 dropzone_version = "6.0.0-beta.1"
-moments_version = "2.29.3"
+moments_version = "2.29.4"
 datepicker_version = "1.9.0"
-chart_version = "3.7.1"
+chart_version = "3.8.0"
 
 if __name__ == '__main__':
     dest_dir_js = get_homedir() / 'website' / 'web' / 'static' / 'js' / 'lib'
