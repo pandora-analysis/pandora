@@ -219,6 +219,7 @@ def api_analysis(task_id, seed=None):
         task.parent = None
     return render_template('analysis.html', task=task, seed=seed, api=api,
                            zip_passwd=get_config('generic', 'sample_password'),
+                           default_share_time=get_config('generic', 'default_share_time'),
                            api_resource=ApiTaskAction)
 
 

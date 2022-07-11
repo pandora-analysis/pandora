@@ -263,7 +263,8 @@ class ApiTaskAction(Resource):
 
         if action == 'share' and flask_login.current_user.role.can(Action.share_analysis):
             data: Dict[str, str] = request.get_json()  # type: ignore
-            assert 'validity' in data, "missing mandatory argument 'validity'"
+            if "validity" not in data:
+                data['validity'] = get_config('generic', 'default_share_time')
             seed, expire = pandora.add_seed(task, data['validity'])
             link = url_for('api_analysis', task_id=task.uuid, seed=seed)
             return {'success': True, 'seed': seed, 'lifetime': expire, 'link': link}
