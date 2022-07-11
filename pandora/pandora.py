@@ -186,6 +186,7 @@ class Pandora():
         if expire:
             self.redis.setex(name=f'seed:{seed}', time=expire, value=task.uuid)
         else:
+            # When seed is False (0, None)
             self.redis.set(name=f'seed:{seed}', value=task.uuid)
         return seed, expire
 
