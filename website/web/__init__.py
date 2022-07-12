@@ -170,12 +170,16 @@ def html_answer(func):
 
 @app.errorhandler(404)
 def api_error_404(_):
-    return render_template('error.html', status=404), 404
+    return render_template('error.html',
+                           show_project_page=get_config('generic', 'show_project_page'),
+                           status=404), 404
 
 
 @app.errorhandler(403)
 def api_error_403(_):
-    return render_template('error.html', status=403), 403
+    return render_template('error.html',
+                           show_project_page=get_config('generic', 'show_project_page'),
+                           status=403), 403
 
 
 @app.route('/', strict_slashes=False)
@@ -194,6 +198,7 @@ def api_submit_page():
     disclaimers = get_disclaimers()
     return render_template(
         'submit.html', error=request.args.get('error', ''),
+        show_project_page=get_config('generic', 'show_project_page'),
         max_file_size=get_config('generic', 'max_file_size'),
         workers={worker_name: config for worker_name, config in workers().items() if worker_name in enaled_workers},
         api=api,
@@ -220,6 +225,7 @@ def api_analysis(task_id, seed=None):
     return render_template('analysis.html', task=task, seed=seed, api=api,
                            zip_passwd=get_config('generic', 'sample_password'),
                            default_share_time=get_config('generic', 'default_share_time'),
+                           show_project_page=get_config('generic', 'show_project_page'),
                            api_resource=ApiTaskAction)
 
 
@@ -294,7 +300,9 @@ def api_task_download(task_id, source, seed=None, idx=None):
 @html_answer
 def api_admin_page(error=None):
     error_messages = {1: 'Invalid Credentials', 2: 'Unable to initialize credentials, see logs.'}
-    return render_template('admin.html', error=error_messages.get(error))
+    return render_template('admin.html',
+                           show_project_page=get_config('generic', 'show_project_page'),
+                           error=error_messages.get(error))
 
 
 @app.route('/admin', methods=['POST'], strict_slashes=False)
@@ -364,7 +372,9 @@ def api_tasks():
                     filtered_tasks.append(task)
                     continue
         tasks = filtered_tasks
-    return render_template('tasks.html', tasks=tasks, search=search or '', status=Status, api=api, api_resource=ApiTaskAction)
+    return render_template('tasks.html', tasks=tasks, search=search or '',
+                           show_project_page=get_config('generic', 'show_project_page'),
+                           status=Status, api=api, api_resource=ApiTaskAction)
 
 
 @app.route('/users', methods=['GET'], strict_slashes=False)
@@ -374,7 +384,9 @@ def api_users():
 
     assert flask_login.current_user.role.can(Action.list_users), 'forbidden'
     users = pandora.get_users()
-    return render_template('users.html', users=users)
+    return render_template('users.html',
+                           show_project_page=get_config('generic', 'show_project_page'),
+                           users=users)
 
 
 @app.route('/users/clear', methods=['GET'], strict_slashes=False)
@@ -394,7 +406,9 @@ def api_roles():
 
     assert flask_login.current_user.role.can(Action.list_roles), 'forbidden'
     roles = pandora.get_roles()
-    return render_template('roles.html', roles=roles, api=api, api_resource=ApiRole)
+    return render_template('roles.html',
+                           show_project_page=get_config('generic', 'show_project_page'),
+                           roles=roles, api=api, api_resource=ApiRole)
 
 
 @app.route('/observables_lists', methods=['GET'], strict_slashes=False)
@@ -406,7 +420,9 @@ def observables_lists():
     suspicious = pandora.get_suspicious_observables()
     legitimate = pandora.get_legitimate_observables()
     observable_types = [t for t in describe_types['types'] if '|' not in t]
-    return render_template('observables_lists.html', types=observable_types, suspicious=suspicious, legitimate=legitimate)
+    return render_template('observables_lists.html',
+                           show_project_page=get_config('generic', 'show_project_page'),
+                           types=observable_types, suspicious=suspicious, legitimate=legitimate)
 
 
 @app.route('/observables_lists/insert', methods=['POST'], strict_slashes=False)
@@ -498,7 +514,8 @@ def html_workers_result(task_id: str, worker_name: str, seed: Optional[str]=None
 @html_answer
 def api_stats():
     assert flask_login.current_user.role.can(Action.list_stats), 'forbidden'
-    return render_template('stats.html')
+    return render_template('stats.html',
+                           show_project_page=get_config('generic', 'show_project_page'))
 
 
 # NOTE: this one must be at the end, it adds a route to / that will break the default one.
