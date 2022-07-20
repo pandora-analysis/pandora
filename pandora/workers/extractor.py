@@ -1,3 +1,4 @@
+import logging
 import zipfile
 import base64
 import shutil
@@ -49,9 +50,14 @@ from .base import BaseWorker
 
 class Extractor(BaseWorker):
 
-    MAX_EXTRACT_FILES = 15
-    MAX_EXTRACTED_FILE_SIZE = 100 * 1000000  # 100Mb
-    ZIP_PASSWORDS = ['', 'virus', 'CERT_SOC', 'cert', 'pandora', 'infected', '123']
+    max_files_in_archive: int
+    max_extracted_filesize_in_mb: int
+    zip_passwords: List[str]
+
+    def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
+                 loglevel: int=logging.INFO, **options):
+        super().__init__(module, worker_id, cache, timeout, loglevel, **options)
+        self.max_extracted_filesize = self.max_extracted_filesize_in_mb * 1000000
 
     @property
     def passwords(self):
@@ -67,19 +73,19 @@ class Extractor(BaseWorker):
         try:
             iso.open(str(archive_file.path))
             for dirname, dirlist, filelist in iso.walk(iso_path='/'):
-                if len(extracted_files) > self.MAX_EXTRACT_FILES:
+                if len(extracted_files) > self.max_files_in_archive:
                     break
                 if not filelist:
                     continue
                 for filename in filelist:
                     extracted = BytesIO()
                     iso.get_file_from_iso_fp(extracted, iso_path=f'{dirname}/{filename}')
-                    if extracted.getbuffer().nbytes >= self.MAX_EXTRACTED_FILE_SIZE:
+                    if extracted.getbuffer().nbytes >= self.max_extracted_filesize:
                         self.logger.warning(f'File {archive_file.path.name} too big ({extracted.getbuffer().nbytes}).')
                         report.status = Status.WARN
                         report.add_details('Warning', f'File {archive_file.path.name} too big ({extracted.getbuffer().nbytes}).')
                         continue
-                    if len(extracted_files) > self.MAX_EXTRACT_FILES:
+                    if len(extracted_files) > self.max_files_in_archive:
                         break
                     tmp_dest_dir = dest_dir / f'.{dirname}'
                     safe_create_dir(tmp_dest_dir)
@@ -87,10 +93,10 @@ class Extractor(BaseWorker):
                     with filepath.open('wb') as f:
                         f.write(extracted.getvalue())
                     extracted_files.append(filepath)
-            if len(extracted_files) > self.MAX_EXTRACT_FILES:
-                self.logger.warning(f'Too many files in the archive (more than {self.MAX_EXTRACT_FILES}).')
+            if len(extracted_files) > self.max_files_in_archive:
+                self.logger.warning(f'Too many files in the archive (more than {self.max_files_in_archive}).')
                 report.status = Status.ALERT
-                report.add_details('Warning', f'Too many files in the archive (more than {self.MAX_EXTRACT_FILES}).')
+                report.add_details('Warning', f'Too many files in the archive (more than {self.max_files_in_archive}).')
         finally:
             try:
                 iso.close()
@@ -103,8 +109,8 @@ class Extractor(BaseWorker):
         extracted_files: List[Path] = []
         with zipfile.ZipFile(archive_file.path) as archive:
             for file_number, info in enumerate(archive.infolist()):
-                if file_number >= self.MAX_EXTRACT_FILES:
-                    warning_msg = f'Too many files ({len(archive.infolist())}) in the archive, stoping at {self.MAX_EXTRACT_FILES}.'
+                if file_number >= self.max_files_in_archive:
+                    warning_msg = f'Too many files ({len(archive.infolist())}) in the archive, stoping at {self.max_files_in_archive}.'
                     self.logger.warning(warning_msg)
                     report.status = Status.ALERT
                     report.add_details('Warning', warning_msg)
@@ -126,7 +132,7 @@ class Extractor(BaseWorker):
                         break
                 if info.is_dir():
                     continue
-                if info.file_size > self.MAX_EXTRACTED_FILE_SIZE:
+                if info.file_size > self.max_extracted_filesize:
                     warning_msg = f'Skipping file {info.filename}, too big ({info.file_size}).'
                     self.logger.warning(warning_msg)
                     report.status = Status.WARN
@@ -145,10 +151,10 @@ class Extractor(BaseWorker):
         extracted_files: List[Path] = []
         with rarfile.RarFile(archive_file.path) as archive:
             for file_number, info in enumerate(archive.infolist()):
-                if file_number >= self.MAX_EXTRACT_FILES:
-                    self.logger.warning(f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive, stop extracting.')
+                if file_number >= self.max_files_in_archive:
+                    self.logger.warning(f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive, stop extracting.')
                     report.status = Status.ALERT
-                    report.add_details('Warning', f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive')
+                    report.add_details('Warning', f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive')
                     break
                 if info.needs_password() and not found_password:
                     for pwd in self.passwords:
@@ -169,7 +175,7 @@ class Extractor(BaseWorker):
                         break
                 if info.is_dir():
                     continue
-                if info.file_size > self.MAX_EXTRACTED_FILE_SIZE:
+                if info.file_size > self.max_extracted_filesize:
                     self.logger.warning(f'Skipping file {info.filename}, too big ({info.file_size}).')
                     report.status = Status.WARN
                     report.add_details('Warning', f'Skipping file {info.filename}, too big ({info.file_size}).')
@@ -220,16 +226,16 @@ class Extractor(BaseWorker):
             password = None
 
         with py7zr.SevenZipFile(file=archive_file.path, mode='r', password=password) as archive:
-            if archive.archiveinfo().uncompressed >= self.MAX_EXTRACTED_FILE_SIZE:
+            if archive.archiveinfo().uncompressed >= self.max_extracted_filesize:
                 self.logger.warning(f'File {archive_file.path.name} too big ({archive.archiveinfo().uncompressed}).')
                 report.status = Status.WARN
                 report.add_details('Warning', f'File {archive_file.path.name} too big ({archive.archiveinfo().uncompressed}).')
                 return []
 
-            if len(archive.getnames()) > self.MAX_EXTRACT_FILES:
-                self.logger.warning(f'Too many files ({len(archive.getnames())}/{self.MAX_EXTRACT_FILES}) in the archive.')
+            if len(archive.getnames()) > self.max_files_in_archive:
+                self.logger.warning(f'Too many files ({len(archive.getnames())}/{self.max_files_in_archive}) in the archive.')
                 report.status = Status.ALERT
-                report.add_details('Warning', f'Too many files ({len(archive.getnames())}/{self.MAX_EXTRACT_FILES}) in the archive')
+                report.add_details('Warning', f'Too many files ({len(archive.getnames())}/{self.max_files_in_archive}) in the archive')
                 return []
 
             archive.extractall(path=str(dest_dir))
@@ -241,8 +247,8 @@ class Extractor(BaseWorker):
         # No password can be used to protect a bz2, so we don't need to check for passwords this time
         # Sometimes the bz2 won't contain a TAR, but the way to unzip bz2 stays the same either way
         bz2file = BZ2File(archive_file.path)  # open the file
-        data = bz2file.read(self.MAX_EXTRACTED_FILE_SIZE + 1)  # get the decompressed data
-        if len(data) > self.MAX_EXTRACTED_FILE_SIZE:
+        data = bz2file.read(self.max_extracted_filesize + 1)  # get the decompressed data
+        if len(data) > self.max_extracted_filesize:
             self.logger.warning(f'File {archive_file.path.name} too big ({len(data)}).')
             report.status = Status.WARN
             report.add_details('Warning', f'File {archive_file.path.name} too big ({len(data)}).')
@@ -261,14 +267,14 @@ class Extractor(BaseWorker):
         extracted_files: List[Path] = []
         tar = TarFile(archive_file.path)  # open the file
         for file_number, tarinfo in enumerate(tar.getmembers()):
-            if file_number >= self.MAX_EXTRACT_FILES:
-                self.logger.warning(f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive, stop extracting.')
+            if file_number >= self.max_files_in_archive:
+                self.logger.warning(f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive, stop extracting.')
                 report.status = Status.ALERT
-                report.add_details('Warning', f'Too many files ({file_number}/{self.MAX_EXTRACT_FILES}) in the archive')
+                report.add_details('Warning', f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive')
                 break
             if not tarinfo.isfile():
                 continue
-            if tarinfo.size >= self.MAX_EXTRACTED_FILE_SIZE:
+            if tarinfo.size >= self.max_extracted_filesize:
                 self.logger.warning(f'File {archive_file.path.name} too big ({tarinfo.size}).')
                 report.status = Status.WARN
                 report.add_details('Warning', f'File {archive_file.path.name} too big ({tarinfo.size}).')
@@ -281,8 +287,8 @@ class Extractor(BaseWorker):
     def _extract_gz(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         # gz is just like bz2, a compressed archive with a TAR directory inside
         gz_file = GzipFile(archive_file.path)
-        data = gz_file.read(self.MAX_EXTRACTED_FILE_SIZE + 1)
-        if len(data) > self.MAX_EXTRACTED_FILE_SIZE:
+        data = gz_file.read(self.max_extracted_filesize + 1)
+        if len(data) > self.max_extracted_filesize:
             self.logger.warning(f'File {archive_file.path.name} too big ({len(data)}).')
             report.status = Status.WARN
             report.add_details('Warning', f'File {archive_file.path.name} too big ({len(data)}).')
@@ -298,8 +304,8 @@ class Extractor(BaseWorker):
     def _extract_lzma(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         # lzma is just like bz2 and gz, a compressed archive with a TAR directory inside
         lzma_file = LZMAFile(archive_file.path)
-        data = lzma_file.read(self.MAX_EXTRACTED_FILE_SIZE + 1)
-        if len(data) > self.MAX_EXTRACTED_FILE_SIZE:
+        data = lzma_file.read(self.max_extracted_filesize + 1)
+        if len(data) > self.max_extracted_filesize:
             self.logger.warning(f'File {archive_file.path.name} too big ({len(data)}).')
             report.status = Status.WARN
             report.add_details('Warning', f'File {archive_file.path.name} too big ({len(data)}).')
@@ -330,7 +336,7 @@ class Extractor(BaseWorker):
             if task.password:
                 self.passwords = [task.password]
             else:
-                self.passwords = self.ZIP_PASSWORDS
+                self.passwords = self.zip_passwords
             extracted_dir = task.file.directory / 'extracted'
             safe_create_dir(extracted_dir)
             try:
