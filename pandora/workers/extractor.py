@@ -10,10 +10,11 @@ from gzip import GzipFile
 from lzma import LZMAFile
 from io import BytesIO
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import py7zr  # type: ignore
 import pycdlib  # type: ignore
+from pycdlib.facade import PyCdlibJoliet, PyCdlibUDF, PyCdlibRockRidge, PyCdlibISO9660  # type: ignore
 import rarfile  # type: ignore
 
 from ..default import safe_create_dir, PandoraException
@@ -71,7 +72,10 @@ class Extractor(BaseWorker):
         iso = pycdlib.PyCdlib()
         extracted_files: List[Path] = []
         try:
+            if not archive_file.data:
+                return extracted_files
             iso.open_fp(archive_file.data)
+            facade: Union[PyCdlibJoliet, PyCdlibUDF, PyCdlibRockRidge, PyCdlibISO9660]
             if iso.has_udf():
                 facade = iso.get_udf_facade()
             elif iso.has_joliet():
