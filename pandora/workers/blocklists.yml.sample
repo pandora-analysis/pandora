@@ -10,4 +10,21 @@ settings:
     # It is not recommended but can be useful if you have files you know are legitimate but
     # will be flagged as malicious by the module, or any other module
     - my_overwritten_ext
+  malicious_extensions:
+    - exe
+    - iso
+    - msi
+    - jar
+    - lnk
+    - reg
+    - dll
+    - scr
+    - bat
+    - cmd
+    - vb
+    - vbs
+    - vbe
+    - rev
   enable_mimetypes: false
+  malicious_mimetypes:
+    - application/octet-stream

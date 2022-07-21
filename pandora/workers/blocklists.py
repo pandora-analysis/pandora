@@ -1,3 +1,4 @@
+import logging
 import mimetypes
 
 from typing import Tuple, List
@@ -68,8 +69,14 @@ malicious_types: Tuple[str, ...] = (
 class Blocklists(BaseWorker):
 
     enable_extensions: bool
+    malicious_extensions: List[str]
     enable_mimetypes: bool
+    malicious_mimetypes: List[str]
     overwrite_extensions: List[str]
+
+    def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
+                 loglevel: int=logging.INFO, **options):
+        super().__init__(module, worker_id, cache, timeout, loglevel, **options)
 
     def analyse(self, task: Task, report: Report):
         report.status = Status.NOTAPPLICABLE
@@ -79,7 +86,7 @@ class Blocklists(BaseWorker):
                 report.status = Status.OVERWRITE
                 report.add_details('Info', f'The result for files with extension {ext} is overwritten bu the admin. It generally means we cannot decide on the status of the file. Contact your admin for more details.')
 
-            if f'.{ext}' in malicious_exts:
+            if ext in self.malicious_extensions:
                 report.status = Status.ALERT
                 report.add_details('Warning', f'The extension {ext} is considered as malicious by default.')
 
@@ -87,7 +94,7 @@ class Blocklists(BaseWorker):
             if not task.file.mime_type:
                 report.status = Status.ALERT
                 report.add_details('Warning', 'Unable to find a mime type.')
-            elif task.file.mime_type in malicious_types:
+            elif task.file.mime_type in self.malicious_mimetypes:
                 report.status = Status.ALERT
                 report.add_details('Warning', f'The mimetype {task.file.mime_type} is considered as malicious by default.')
             else:

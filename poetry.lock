@@ -415,7 +415,7 @@ python-versions = "*"
 
 [[package]]
 name = "extract-msg"
-version = "0.36.0"
+version = "0.36.1"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 category = "main"
 optional = false
@@ -1737,7 +1737,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-redis"
-version = "4.3.6"
+version = "4.3.7"
 description = "Typing stubs for redis"
 category = "dev"
 optional = false
@@ -1745,7 +1745,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-requests"
-version = "2.28.2"
+version = "2.28.3"
 description = "Typing stubs for requests"
 category = "dev"
 optional = false
@@ -1756,7 +1756,7 @@ types-urllib3 = "<1.27"
 
 [[package]]
 name = "types-setuptools"
-version = "63.2.0"
+version = "63.2.1"
 description = "Typing stubs for setuptools"
 category = "dev"
 optional = false
@@ -2036,7 +2036,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "9c6990d8280a01156cc40ffeaad38849b4bf90eeb73df0cab296e9518c9e3954"
+content-hash = "962786bc2c97e7baaa637a95438bc3568eadf85143de13277510510765eb39a2"
 
 [metadata.files]
 aiohttp = [
@@ -2446,8 +2446,8 @@ executing = [
     {file = "executing-0.8.3.tar.gz", hash = "sha256:c6554e21c6b060590a6d3be4b82fb78f8f0194d809de5ea7df1c093763311501"},
 ]
 extract-msg = [
-    {file = "extract_msg-0.36.0-py2.py3-none-any.whl", hash = "sha256:46c0f1d3b8d2aaf0a8048399e8e1a9cdf87e5ba89902a94bf336c5c9ac3d0fca"},
-    {file = "extract_msg-0.36.0.tar.gz", hash = "sha256:9ebca37acbd31cba11bae8916ddc1b67a834fe5e54484356ef45f861ae4d7e59"},
+    {file = "extract_msg-0.36.1-py2.py3-none-any.whl", hash = "sha256:05b5d5a9f6596c57077c7b9a19f46a31b42f60e67076efa13fb94851ae623280"},
+    {file = "extract_msg-0.36.1.tar.gz", hash = "sha256:55729a591fecd97c3cb24ab375f0f762a34db850a397291670c428fbbc2504f6"},
 ]
 flask = [
     {file = "Flask-2.1.3-py3-none-any.whl", hash = "sha256:9013281a7402ad527f8fd56375164f3aa021ecfaff89bfe3825346c24f87e04c"},
@@ -3675,16 +3675,16 @@ types-pyyaml = [
     {file = "types_PyYAML-6.0.10-py3-none-any.whl", hash = "sha256:18985a382c93fb12187daae6f57ce7787e3651cd590291c907d3e757919689ff"},
 ]
 types-redis = [
-    {file = "types-redis-4.3.6.tar.gz", hash = "sha256:079713f14f6adc886561e02d6ca9aa6857db8cbbc0c56f6c36eacfd547b66f7c"},
-    {file = "types_redis-4.3.6-py3-none-any.whl", hash = "sha256:2e943cb3476ca0d7a45b97955448541e053f6fec24bedd3d482883891e0c5822"},
+    {file = "types-redis-4.3.7.tar.gz", hash = "sha256:9f9711bffff816ff420678d829ea86f4beabc914b29c801f38053bdbfbb82575"},
+    {file = "types_redis-4.3.7-py3-none-any.whl", hash = "sha256:18457d49ba4a6880be123a90eb46408091176cd8611932833ef598c6c496af55"},
 ]
 types-requests = [
-    {file = "types-requests-2.28.2.tar.gz", hash = "sha256:398f88cd9302c796cb63d1021af2a1fb7ae507741a3d508edf8e0746d8c16a04"},
-    {file = "types_requests-2.28.2-py3-none-any.whl", hash = "sha256:c164696bfdce0123901165c5f097a6cc4f6326268c65815d4b6a57eacfec5e81"},
+    {file = "types-requests-2.28.3.tar.gz", hash = "sha256:fb9ea69311766967f9e91861211ec7449f6484025b766ea709689c0dbb29d7ba"},
+    {file = "types_requests-2.28.3-py3-none-any.whl", hash = "sha256:66f0e427708588d4dac2f365a0b2c1ad8f31780429fd8ad193fec93139b22112"},
 ]
 types-setuptools = [
-    {file = "types-setuptools-63.2.0.tar.gz", hash = "sha256:fc9a6c4776a398d0f57b259ca893748342174c52a35d593d08b56f52aa99c1a4"},
-    {file = "types_setuptools-63.2.0-py3-none-any.whl", hash = "sha256:f9d0d0443dd344cad78da04320a3fb7837d4dd3f3ef4b25d3e0958edea6da812"},
+    {file = "types-setuptools-63.2.1.tar.gz", hash = "sha256:2957a40addfca5c7125fd8d386a9efda5379098c6e66a08e02257fd1cea42131"},
+    {file = "types_setuptools-63.2.1-py3-none-any.whl", hash = "sha256:eca7cbdd8db15e0ec37174a7dcfc9c8cbc87106f453066340e31729ec853cd63"},
 ]
 types-urllib3 = []
 typing-extensions = [

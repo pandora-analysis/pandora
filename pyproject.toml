@@ -36,7 +36,7 @@ PyExifTool = "<0.5"
 eml-parser = "^1.17.0"
 unoserver = "^1.2"
 weasyprint = "^56.0"
-extract-msg = {version = "0.36.0", extras = ["all"]}
+extract-msg = {version = "0.36.1", extras = ["all"]}
 Pillow = "^9.2.0"
 oletools = {version = "0.60.1", extras = ["full"]}
 py7zr = "^0.19.0"
@@ -63,10 +63,10 @@ pycdlib = "^1.13.0"
 [tool.poetry.dev-dependencies]
 ipython = "^8.4.0"
 mypy = "^0.971"
-types-setuptools = "^63.2.0"
-types-redis = "^4.3.6"
+types-setuptools = "^63.2.1"
+types-redis = "^4.3.7"
 types-PyYAML = "^6.0.10"
-types-requests = "^2.28.2"
+types-requests = "^2.28.3"
 types-python-dateutil = "^2.8.19"
 
 [build-system]
