@@ -159,6 +159,12 @@ class Extractor(BaseWorker):
         found_password = False
         extracted_files: List[Path] = []
         with rarfile.RarFile(archive_file.path) as archive:
+            if not archive.infolist():
+                # Looks like there are no files in the archive, this is suspicious
+                # Also, might be a REV file, which is potentially not supported
+                self.logger.warning(f'Looks like the archive {archive_file.path} is empty.')
+                # NOTE: There is a catchall for that.
+
             for file_number, info in enumerate(archive.infolist()):
                 if file_number >= self.max_files_in_archive:
                     self.logger.warning(f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive, stop extracting.')
@@ -430,10 +436,9 @@ class Extractor(BaseWorker):
 
         if tasks:
             report.status = max(t.status for t in tasks)
+            if report.status > Status.CLEAN:
+                report.add_details('Warning', 'There are suspicious files in this archive, click on the "Extracted" tab for more.')
         else:
             # Nothing was extracted
-            # FIXME: is that legit? probably need to throw a warning.
-            pass
-
-        if report.status > Status.CLEAN:
-            report.add_details('Warning', 'There are suspicious files in this archive, click on the "Extracted" tab for more.')
+            report.status = Status.WARN
+            report.add_details('Warning', 'Looks like the archive is empty (?). This is suspicious.')
