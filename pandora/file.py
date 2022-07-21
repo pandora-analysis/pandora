@@ -348,7 +348,7 @@ class File:
     def data(self) -> Optional[BytesIO]:
         """
         Property to get file content in binary format.
-        :return (bytes|None): file content or None if file is not reachable
+        :return (BytesIO|None): file content or None if file is not reachable
         """
         if not self.path.exists():
             return None

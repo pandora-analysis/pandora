@@ -71,15 +71,24 @@ class Extractor(BaseWorker):
         iso = pycdlib.PyCdlib()
         extracted_files: List[Path] = []
         try:
-            iso.open(str(archive_file.path))
-            for dirname, dirlist, filelist in iso.walk(iso_path='/'):
+            iso.open_fp(archive_file.data)
+            if iso.has_udf():
+                facade = iso.get_udf_facade()
+            elif iso.has_joliet():
+                facade = iso.get_joliet_facade()
+            elif iso.has_rock_ridge():
+                facade = iso.get_rock_ridge_facade()
+            else:
+                facade = iso.get_iso9660_facade()
+            for dirname, dirlist, filelist in facade.walk('/'):
                 if len(extracted_files) > self.max_files_in_archive:
                     break
                 if not filelist:
                     continue
                 for filename in filelist:
+                    filename = filename.lstrip('/')
                     extracted = BytesIO()
-                    iso.get_file_from_iso_fp(extracted, iso_path=f'{dirname}/{filename}')
+                    facade.get_file_from_iso_fp(extracted, f'{dirname}/{filename}')
                     if extracted.getbuffer().nbytes >= self.max_extracted_filesize:
                         self.logger.warning(f'File {archive_file.path.name} too big ({extracted.getbuffer().nbytes}).')
                         report.status = Status.WARN
