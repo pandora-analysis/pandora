@@ -503,9 +503,8 @@ def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
     # NOTE: the actual source of the submission isn't stored yet.
     to_return['submit'] = defaultdict(int)
     to_return['file'] = defaultdict(int)
-    to_return['metrics'] = defaultdict()
+    to_return['metrics'] = {'alert_ratio': 0, 'submits': 0, 'malicious': 0, 'suspicious': 0, 'clean': 0, 'overwritten': 0}
     to_return['submit_size'] = {'min': 0, 'max': 0, 'avg': 0}
-    nb_alert = 0
     for first, last in intervals:
         tasks = pandora.storage.get_tasks(first_date=first.timestamp(), last_date=last.timestamp())
         to_return['submit']['unknown'] += len(tasks)
@@ -516,16 +515,19 @@ def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
             to_return['submit_size']['min'] = min(to_return['submit_size']['min'], task.file.size)
             to_return['submit_size']['max'] = max(to_return['submit_size']['max'], task.file.size)
             to_return['submit_size']['avg'] += task.file.size
-            if task.status >= Status.WARN:
-                nb_alert += 1
+            if task.status == Status.CLEAN:
+                to_return['metrics']['clean'] += 1
+            elif task.status == Status.WARN:
+                to_return['metrics']['suspicious'] += 1
+            elif task.status == Status.ALERT:
+                to_return['metrics']['malicious'] += 1
+            elif task.status == Status.OVERWRITE:
+                to_return['metrics']['overwritten'] += 1
+    nb_alert = to_return['metrics']['malicious'] + to_return['metrics']['suspicious']
     if to_return['submit']['total']:
         to_return['submit_size']['avg'] = to_return['submit_size']['avg'] / to_return['submit']['total']
         to_return['metrics']['alert_ratio'] = nb_alert / to_return['submit']['total'] * 100
-    else:
-        to_return['submit_size']['avg'] = 0
-        to_return['metrics']['alert_ratio'] = 0
     to_return['metrics']['submits'] = to_return['submit']['total']
-    to_return['metrics']['malicious'] = nb_alert
     return to_return
 
 

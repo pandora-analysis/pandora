@@ -164,11 +164,17 @@ function updateMetrics(metrics){
     const ratioMetric = $("#alert-ratio .metric")
     const totalMetrics = $("#total-submits .metric")
     const maliciousMetric = $("#malicious-submits .metric")
+    const suspiciousMetric = $("#suspicious-submits .metric")
+    const overwrittenMetric = $("#overwritten-submits .metric")
+    const cleanMetric = $("#clean-submits .metric")
     ratioDiv.removeClass()
 
     const nbf = Intl.NumberFormat("en",{ notation: "compact" , compactDisplay: "short" })
     ratioMetric.text(nbf.format(metrics.alert_ratio))
     maliciousMetric.text(nbf.format(metrics.malicious))
+    suspiciousMetric.text(nbf.format(metrics.suspicious))
+    overwrittenMetric.text(nbf.format(metrics.overwritten))
+    cleanMetric.text(nbf.format(metrics.clean))
     totalMetrics.text(nbf.format(metrics.submits))
 
     if(metrics.alert_ratio > 80){

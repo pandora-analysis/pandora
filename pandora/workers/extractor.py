@@ -13,8 +13,8 @@ from pathlib import Path
 from typing import List, Optional, Union
 
 import py7zr  # type: ignore
-import pycdlib  # type: ignore
-from pycdlib.facade import PyCdlibJoliet, PyCdlibUDF, PyCdlibRockRidge, PyCdlibISO9660  # type: ignore
+import pycdlib
+from pycdlib.facade import PyCdlibJoliet, PyCdlibUDF, PyCdlibRockRidge, PyCdlibISO9660
 import rarfile  # type: ignore
 
 from ..default import safe_create_dir, PandoraException
