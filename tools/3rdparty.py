@@ -9,6 +9,7 @@ dropzone_version = "6.0.0-beta.1"
 moments_version = "2.29.4"
 datepicker_version = "1.9.0"
 chart_version = "3.8.0"
+datatables_version = '1.12.1'
 
 if __name__ == '__main__':
     dest_dir_js = get_homedir() / 'website' / 'web' / 'static' / 'js' / 'lib'
@@ -52,5 +53,15 @@ if __name__ == '__main__':
     with (dest_dir_css / 'dropzone.css').open('wb') as f:
         f.write(dropzone_css.content)
         print(f'Downloaded dropzone css v{dropzone_version}')
+
+    datatables_css = requests.get(f'https://cdn.datatables.net/{datatables_version}/css/jquery.dataTables.min.css')
+    with (dest_dir_css / 'datatables.css').open('wb') as f:
+        f.write(datatables_css.content)
+        print(f'Downloaded datatables css v{datatables_version}')
+
+    datatables_js = requests.get(f'https://cdn.datatables.net/{datatables_version}/js/jquery.dataTables.min.js')
+    with (dest_dir_js / 'datatables.js').open('wb') as f:
+        f.write(datatables_js.content)
+        print(f'Downloaded datatables js v{datatables_version}')
 
     print('All 3rd party modules for the website were downloaded.')

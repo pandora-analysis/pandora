@@ -23,7 +23,7 @@ from pandora.role import Action
 from pandora.task import Task
 from pandora.helpers import roles_from_config, workers, Status
 
-from .helpers import admin_required, update_user_role, build_users_table, load_user_from_request
+from .helpers import admin_required, update_user_role, build_users_table, load_user_from_request, sizeof_fmt
 
 API_LOG_TRACEBACK = get_config('generic', 'debug_web')
 API_VERBOSE_JSON = get_config('generic', 'debug_web')
@@ -525,7 +525,9 @@ def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
                 to_return['metrics']['overwritten'] += 1
     nb_alert = to_return['metrics']['malicious'] + to_return['metrics']['suspicious']
     if to_return['submit']['total']:
-        to_return['submit_size']['avg'] = to_return['submit_size']['avg'] / to_return['submit']['total']
+        to_return['submit_size']['avg'] = sizeof_fmt(to_return['submit_size']['avg'] / to_return['submit']['total'])
+        to_return['submit_size']['min'] = sizeof_fmt(to_return['submit_size']['min'])
+        to_return['submit_size']['max'] = sizeof_fmt(to_return['submit_size']['max'])
         to_return['metrics']['alert_ratio'] = nb_alert / to_return['submit']['total'] * 100
     to_return['metrics']['submits'] = to_return['submit']['total']
     return to_return

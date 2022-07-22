@@ -85,11 +85,11 @@ Pandora - statistics
         <div id="files-info" class="col-md-6">
             <h3>Type informations</h3>
             <div class="table-responsive">
-                <table class="table table-striped table-sm">
+                <table class="table table-striped table-sm" id="type_table">
                     <thead>
                     <tr>
                         <th scope="col">Type</th>
-                        <th scope="col"></th>
+                        <th scope="col">Submissions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -136,11 +136,17 @@ Pandora - statistics
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"
         integrity="{{get_sri('static/js', 'dashboard.js')}}"
         crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/lib/datatables.js') }}"
+        integrity="{{get_sri('static/js/lib', 'datatables.js')}}"
+        crossorigin="anonymous"></script>
 {% endblock %}
 
 {% block styles %}
   {{ super() }}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap-datepicker.min.css') }}"
         integrity="{{get_sri('static/css/lib', 'bootstrap-datepicker.min.css')}}"
+        crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/datatables.css') }}"
+        integrity="{{get_sri('static/css/lib', 'datatables.css')}}"
         crossorigin="anonymous">
 {% endblock %}

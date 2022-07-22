@@ -152,6 +152,9 @@ function updateSizeInfos(infos){
     tr.append(`<td>${infos.min}</td>`);
     tr.append(`<td>${infos.max}</td>`);
     tr.append(`<td>${infos.avg}</td>`);
+    $('#type_table').DataTable({
+      order: [[1, 'desc']],
+    });
 }
 
 function updateInterval(start, end){

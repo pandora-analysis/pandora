@@ -18,6 +18,16 @@ from pandora.role import RoleName
 from pandora.task import Task
 
 
+# Method to make sizes in bytes human readable
+# Source: https://stackoverflow.com/questions/1094841/reusable-library-to-get-human-readable-version-of-file-size
+def sizeof_fmt(num, suffix='B'):
+    for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
+        if abs(num) < 1024.0:
+            return f"{num:3.1f}{unit}{suffix}"
+        num /= 1024.0
+    return ("{:.1f}{}{}".format(num, 'Yi', suffix)).strip()
+
+
 def src_request_ip(request) -> str:
     # NOTE: X-Real-IP is the IP passed by the reverse proxy in the headers.
     real_ip = request.headers.get('X-Real-IP')

@@ -35,7 +35,7 @@ from .generic_api import api as generic_api
 from .generic_api import ApiRole, ApiSubmit, ApiTaskAction
 from .helpers import (get_secret_key, update_user_role, admin_required,
                       src_request_ip, load_user_from_request, build_users_table,
-                      sri_load)
+                      sri_load, sizeof_fmt)
 from .proxied import ReverseProxied
 
 pandora: Pandora = Pandora()
@@ -107,6 +107,8 @@ def inject_enums():
     '''All the templates have the Action and Status enum'''
     return dict(action=Action, status=Status, status_icons=status_icons)
 
+# ##### Global methods passed to jinja
+
 
 def get_sri(directory: str, filename: str) -> str:
     sha512 = functools.reduce(operator.getitem, directory.split('/'), sri_load())[filename]  # type: ignore
@@ -114,6 +116,7 @@ def get_sri(directory: str, filename: str) -> str:
 
 
 app.jinja_env.globals.update(get_sri=get_sri)
+app.jinja_env.globals.update(sizeof_fmt=sizeof_fmt)
 
 
 @login_manager.user_loader
