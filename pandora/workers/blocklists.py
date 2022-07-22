@@ -84,7 +84,7 @@ class Blocklists(BaseWorker):
             ext = task.file.original_filename.rsplit(".", 1)[-1]
             if ext in self.overwrite_extensions:
                 report.status = Status.OVERWRITE
-                report.add_details('Info', f'The result for files with extension {ext} is overwritten bu the admin. It generally means we cannot decide on the status of the file. Contact your admin for more details.')
+                report.add_details('Info', f'The result for files with extension {ext} is overwritten by the admin. It generally means we cannot decide on the status of the file. Contact your admin for more details.')
 
             if ext in self.malicious_extensions:
                 report.status = Status.ALERT
