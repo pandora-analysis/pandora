@@ -60,6 +60,9 @@ class Extractor(BaseWorker):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         self.max_extracted_filesize = self.max_extracted_filesize_in_mb * 1000000
 
+        # We might be getting integers from the config file
+        self.zip_passwords = [str(pwd) for pwd in self.zip_passwords]
+
     @property
     def passwords(self):
         return self._passwords
