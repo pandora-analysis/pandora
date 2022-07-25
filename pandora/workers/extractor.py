@@ -15,6 +15,7 @@ from typing import List, Optional, Union
 import py7zr  # type: ignore
 import pycdlib
 from pycdlib.facade import PyCdlibJoliet, PyCdlibUDF, PyCdlibRockRidge, PyCdlibISO9660
+import pyzipper  # type: ignore
 import rarfile  # type: ignore
 
 from ..default import safe_create_dir, PandoraException
@@ -120,10 +121,10 @@ class Extractor(BaseWorker):
                 pass
         return extracted_files
 
-    def _extract_zip(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
+    def _extract_zip(self, archive_file: File, report: Report, dest_dir: Path, zip_reader=zipfile.ZipFile) -> List[Path]:
         found_password = False
         extracted_files: List[Path] = []
-        with zipfile.ZipFile(archive_file.path) as archive:
+        with zip_reader(str(archive_file.path)) as archive:
             for file_number, info in enumerate(archive.infolist()):
                 if file_number >= self.max_files_in_archive:
                     warning_msg = f'Too many files ({len(archive.infolist())}) in the archive, stoping at {self.max_files_in_archive}.'
@@ -376,8 +377,12 @@ class Extractor(BaseWorker):
                     extracted = self._extract_lzma(task.file, report, extracted_dir)
                 elif task.file.mime_type == "application/x-iso9660-image":
                     extracted = self._extract_iso(task.file, report, extracted_dir)
-                else:
+                elif task.file.mime_type == "application/zip":
                     extracted = self._extract_zip(task.file, report, extracted_dir)
+                    if not extracted:
+                        extracted = self._extract_zip(task.file, report, extracted_dir, pyzipper.AESZipFile)
+                else:
+                    raise PandoraException(f'Unsupported mimetype: {task.file.mime_type}')
             except BaseException as e:
                 report.status = Status.WARN
                 report.add_details('Warning', f'Unable to extract {task.file.path.name}: {e}.')
