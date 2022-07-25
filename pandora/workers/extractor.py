@@ -380,6 +380,8 @@ class Extractor(BaseWorker):
                 elif task.file.mime_type == "application/zip":
                     extracted = self._extract_zip(task.file, report, extracted_dir)
                     if not extracted:
+                        report.clear_extras()
+                        report.clear_details()
                         extracted = self._extract_zip(task.file, report, extracted_dir, pyzipper.AESZipFile)
                 else:
                     raise PandoraException(f'Unsupported mimetype: {task.file.mime_type}')

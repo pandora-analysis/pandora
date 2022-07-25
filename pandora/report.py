@@ -108,3 +108,9 @@ class Report:
             if isinstance(details, str):
                 details = {details, }
             self._details[details_name] |= details
+
+    def clear_details(self):
+        self._details = {}
+
+    def clear_extras(self):
+        self._extras = {}

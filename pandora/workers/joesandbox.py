@@ -5,7 +5,7 @@ import traceback
 
 from jbxapi import JoeSandbox, JoeException  # type: ignore
 
-from ..helpers import Status
+from ..helpers import Status, get_useragent_for_requests
 from ..task import Task
 from ..report import Report
 
@@ -26,7 +26,7 @@ class JoeSandboxWorker(BaseWorker):
             return
 
         self.joesb = JoeSandbox(apikey=self.apikey, apiurl=self.apiurl,
-                                accept_tac=True)
+                                accept_tac=True, user_agent=get_useragent_for_requests())
         try:
             response = self.joesb.account_info()
             self.logger.debug(response)

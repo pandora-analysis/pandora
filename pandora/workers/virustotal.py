@@ -6,7 +6,7 @@ import traceback
 import vt  # type: ignore
 from vt import error
 
-from ..helpers import Status
+from ..helpers import Status, get_useragent_for_requests
 from ..task import Task
 from ..report import Report
 
@@ -23,7 +23,7 @@ class VirusTotal(BaseWorker):
             self.disabled = True
             self.logger.warning('Disabled, missing apikey.')
             return
-        self.client = vt.Client(self.apikey)
+        self.client = vt.Client(self.apikey, agent=get_useragent_for_requests())
 
     def analyse(self, task: Task, report: Report):
         try:

@@ -6,7 +6,7 @@ import traceback
 
 from urllib.parse import urljoin
 
-from ..helpers import Status
+from ..helpers import Status, get_useragent_for_requests
 from ..task import Task
 from ..report import Report
 
@@ -29,7 +29,7 @@ class HybridAnalysis(BaseWorker):
         self._session = requests.Session()
         self._session.headers.update(
             {'api-key': self.apikey,
-             'user-agent': 'Pandora',
+             'user-agent': get_useragent_for_requests(),
              'accept': 'application/json',
              'Content-Type': 'application/x-www-form-urlencoded'  # This is wrong, but the API wants it.
              }

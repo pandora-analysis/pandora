@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
+import pkg_resources
 import re
 
 from datetime import timedelta
@@ -171,3 +172,9 @@ def get_disclaimers() -> Dict[str, str]:
 def get_email_template() -> str:
     with (get_homedir() / 'config' / 'email.tmpl').open() as f:
         return f.read()
+
+
+@lru_cache(64)
+def get_useragent_for_requests():
+    version = pkg_resources.get_distribution('pandora').version
+    return f'Pandora / {version}'

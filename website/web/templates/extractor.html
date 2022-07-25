@@ -42,7 +42,7 @@
         </table>
       </td>
     </tr>
-     {% if 'no_password' in report.extras %}
+     {% if 'no_password' in report.extras and report.extras['no_password'] %}
      <tr>
        <td>
          The sample is encrypted and the password is unknown. Try again with an other one?
