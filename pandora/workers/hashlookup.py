@@ -6,7 +6,7 @@ from typing import Dict, Any, Tuple, Optional
 
 from pyhashlookup import Hashlookup
 
-from ..helpers import Status
+from ..helpers import Status, get_useragent_for_requests
 from ..task import Task
 from ..report import Report
 
@@ -20,7 +20,7 @@ class HashlookupWorker(BaseWorker):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
 
         try:
-            self.hashlookup = Hashlookup()
+            self.hashlookup = Hashlookup(useragent=get_useragent_for_requests())
             self.hashlookup.info()
         except Exception as e:
             self.logger.warning(e)
