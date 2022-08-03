@@ -1,7 +1,6 @@
 import hashlib
 import importlib
 import logging
-import os
 import re
 import shutil
 import sys
@@ -455,12 +454,6 @@ class File:
         Guess file type from mimeType or extension.
         :return (str): file type or None if file is not reachable
         """
-        # NOTE: maybe store it in the db, same as size
-        # EML type file by extension to avoid magic library detection trouble
-        extension = os.path.splitext(self.path)[1]
-        if extension == ".eml":
-            return "EML"
-
         # Guess type from mime-type
         if self.mime_type in self.MIME_TYPE_EQUAL:
             return self.MIME_TYPE_EQUAL[self.mime_type][0]

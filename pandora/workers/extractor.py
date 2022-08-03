@@ -420,6 +420,9 @@ class Extractor(BaseWorker):
                         pandora.enqueue_task(new_task)
                         tasks.append(new_task)
                     shutil.rmtree(extracted_dir)
+                else:
+                    report.status = Status.NOTAPPLICABLE
+                    return
             except Exception as e:
                 self.logger.exception(e)
         elif task.file.is_msg:
@@ -440,7 +443,10 @@ class Extractor(BaseWorker):
                         pandora.add_extracted_reference(task, new_task)
                         pandora.enqueue_task(new_task)
                         tasks.append(new_task)
-                    # shutil.rmtree(msg_extract_dir)
+                    shutil.rmtree(msg_extract_dir)
+                else:
+                    report.status = Status.NOTAPPLICABLE
+                    return
             except Exception as e:
                 self.logger.exception(e)
 
