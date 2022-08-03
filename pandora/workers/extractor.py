@@ -444,7 +444,7 @@ class Extractor(BaseWorker):
                         pandora.enqueue_task(new_task)
                         tasks.append(new_task)
                     shutil.rmtree(msg_extract_dir)
-                else:
+                if not tasks:
                     report.status = Status.NOTAPPLICABLE
                     return
             except Exception as e:
