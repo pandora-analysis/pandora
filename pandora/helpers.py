@@ -23,17 +23,19 @@ logger = logging.getLogger('Helpers')
 #       the keys in the enum must stay in this order
 @unique
 class Status(IntEnum):
-    WAITING = auto()
-    RUNNING = auto()
-    DELETED = auto()
-    NOTAPPLICABLE = auto()
+    WAITING = auto()  # Worker not started yet
+    RUNNING = auto()  # Worker started
+    DELETED = auto()  # Sample deleted
+    NOTAPPLICABLE = auto()  # Worker not applicable for this sample
+    MANUAL = auto()  # Worker needs to be run manually
+    UNKNOWN = auto()  # Worker cannot decide
     DEACTIVATE = auto()  # Deprecated
-    DISABLED = auto()
-    ERROR = auto()
+    DISABLED = auto()  # Worker disabled
+    ERROR = auto()  # Worker failed
     OKAY = auto()  # Deprecated, needs to be deleted
-    CLEAN = auto()
-    WARN = auto()
-    ALERT = auto()
+    CLEAN = auto()  # Sample marked as clean by worker
+    WARN = auto()  # Sample suspicious
+    ALERT = auto()  # Sample malicious
     OVERWRITE = auto()  # This one is used on a case-by-case basis, and it will force a report to that status
 
 

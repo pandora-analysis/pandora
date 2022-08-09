@@ -1,0 +1,26 @@
+{% from 'bootstrap5/utils.html' import render_icon %}
+{% from "macros.html" import display_status_badge %}
+
+<div class="col-md-12" id="{{worker_name}}">
+  <div>
+    <span class="h3">{{worker_meta.name}}</span>
+    <span style="vertical-align:top;" data-bs-toggle="tooltip" title="{{worker_meta.description}}">{{render_icon('question-circle')}}</span>
+  </div>
+  <table class="table table-hover table-bordered">
+    <tr>
+    {% if report.status == status.MANUAL %}
+      <th scope="row"> The module needs to be triggered manually. Manual submission will be implemented soon.</th>
+    {% elif report.status == status.UNKNOWN %}
+      <th scope="row" style="width:30%">This file was submitted to a lookyloo instance</th>
+      <td>
+        <a href="{{report.details['permaurl']}}" target="_blank">See capture</a>
+      </td>
+    {% else %}
+      <th scope="row" style="width:30%">Status</th>
+      <td>
+          {{ display_status_badge(report.status, status) }}
+      </td>
+    {% endif %}
+    </tr>
+  </table>
+</div>
