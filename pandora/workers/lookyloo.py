@@ -2,6 +2,8 @@
 
 import logging
 
+from typing import Dict, Optional
+
 from pylookyloo import Lookyloo
 
 from ..helpers import Status, get_useragent_for_requests
@@ -15,6 +17,12 @@ class LookylooWorker(BaseWorker):
 
     apiurl: str
     autosubmit: bool
+    public_listing: bool
+    referer: Optional[str]
+    user_agent: Optional[str]
+    http_headers: Dict[str, str]
+    cookies: Dict[str, str]
+    proxy: Optional[str]
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
                  loglevel: int=logging.INFO, **options):
@@ -25,17 +33,24 @@ class LookylooWorker(BaseWorker):
             self.logger.warning(f'Unable to connect to the Lookyloo instance: {self.apiurl}.')
             return
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         if not task.file.data:
             report.status = Status.NOTAPPLICABLE
             return
         if not task.file.is_html:
             report.status = Status.NOTAPPLICABLE
             return
-        if not self.autosubmit:
+        if not self.autosubmit and not manual_trigger:
             report.status = Status.MANUAL
             return
 
-        lookyloo_report = self.client.enqueue(document=task.file.data, document_name=task.file.path.name)
+        lookyloo_report = self.client.enqueue(document=task.file.data,
+                                              document_name=task.file.path.name,
+                                              listing=self.public_listing,
+                                              referer=self.referer,
+                                              user_agent=self.user_agent,
+                                              http_headers=self.http_headers,
+                                              cookies=self.cookies,
+                                              proxy=self.proxy)
         report.status = Status.UNKNOWN
         report.add_details('permaurl', lookyloo_report)

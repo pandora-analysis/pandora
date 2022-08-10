@@ -4,12 +4,21 @@
 <div class="col-md-12" id="{{worker_name}}">
   <div>
     <span class="h3">{{worker_meta.name}}</span>
-    <span style="vertical-align:top;" data-bs-toggle="tooltip" title="{{worker_meta.description}}">{{render_icon('question-circle')}}</span>
+    <span style="vertical-align:top;" data-bs-toggle="tooltip" title="{{worker_meta.description}}">
+      {{render_icon('question-circle')}}
+    </span>
   </div>
   <table class="table table-hover table-bordered">
     <tr>
     {% if report.status == status.MANUAL %}
-      <th scope="row"> The module needs to be triggered manually. Manual submission will be implemented soon.</th>
+      <th scope="row">As it is sending the sample to a 3rd party service,
+                      the module needs to be triggered manually.
+                      If you wish to do so,
+                      <a href="{{url_for('manual_trigger_worker', task_id=task.uuid, seed=seed, worker_name=worker_name)}}">
+                        click here
+                      </a>
+                      .
+      </th>
     {% elif report.status == status.UNKNOWN %}
       <th scope="row" style="width:30%">This file was submitted to a lookyloo instance</th>
       <td>

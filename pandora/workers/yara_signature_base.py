@@ -31,7 +31,7 @@ class YaraSignatureBaseWorker(YaraWorker):
                                         'owner': owner})
         return rules
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         if not task.file.data:
             report.status = Status.NOTAPPLICABLE
             return

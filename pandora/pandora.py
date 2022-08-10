@@ -128,6 +128,14 @@ class Pandora():
                         maxlen=get_config('generic', 'tasks_max_len'))
         return task.uuid
 
+    def trigger_manual_worker(self, task: Task, worker: str):
+        fields = {
+            'task_uuid': task.uuid,
+            'manual_worker': worker
+        }
+        self.redis.xadd(name='tasks_queue', fields=fields, id='*',
+                        maxlen=get_config('generic', 'tasks_max_len'))
+
     def add_extracted_reference(self, task: Task, extracted_task: Task):
         self.storage.add_extracted_reference(task.uuid, extracted_task.uuid)
 

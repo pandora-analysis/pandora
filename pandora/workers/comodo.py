@@ -27,7 +27,7 @@ class ComodoWorker(BaseWorker):
             self.disabled = True
             return
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         self.logger.debug(f'analysing file {task.file.path}...')
         args = [self.comodo_path, '-v', '-s', str(task.file.path)]
         process = subprocess.run(args, capture_output=True, timeout=self.timeout, check=False)

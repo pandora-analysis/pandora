@@ -78,7 +78,7 @@ class Blocklists(BaseWorker):
                  loglevel: int=logging.INFO, **options):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         report.status = Status.NOTAPPLICABLE
         if self.enable_extensions:
             ext = task.file.original_filename.rsplit(".", 1)[-1]

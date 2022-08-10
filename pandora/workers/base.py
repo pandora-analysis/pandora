@@ -5,7 +5,7 @@ import multiprocessing
 import signal
 import traceback
 
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
@@ -90,7 +90,7 @@ class BaseWorker(multiprocessing.Process):
         else:
             yield
 
-    def analyse(self, task: Task, report: Report) -> None:
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         """
         Analyse task and save results in task object.
         This method has to be overwritten in a subclass.
@@ -105,13 +105,15 @@ class BaseWorker(multiprocessing.Process):
         #    update cache if relevant. Do not store cache on error
         raise NotImplementedError('Stuff this module is doing with this task')
 
-    def _read_stream(self) -> Tuple[str, List[str]]:
+    def _read_stream(self) -> Tuple[str, List[str], Optional[str]]:
         _, entries = self.redis.xreadgroup(
             groupname=self.module, consumername=self.name, streams={'tasks_queue': '>'},
             block=0, count=1
         )[0]
         rid, values = entries[0]
-        return values['task_uuid'], json.loads(values['disabled_workers'])
+        return (values['task_uuid'],
+                json.loads(values['disabled_workers']) if values.get('disabled_workers') else [],
+                values.get('manual_worker'))
 
     def run(self):
         """
@@ -122,7 +124,7 @@ class BaseWorker(multiprocessing.Process):
         while True:
             try:
                 self.logger.debug('Waiting for new task...')
-                task_uuid, disabled_workers = self._read_stream()
+                task_uuid, disabled_workers, manual_worker = self._read_stream()
                 self.logger.debug(f'Got new task {task_uuid}')
 
                 if self.module in disabled_workers:
@@ -146,7 +148,7 @@ class BaseWorker(multiprocessing.Process):
                         # Store report to make status available to UI
                         self.storage.set_report(report.to_dict)
                         with self._timeout_context():
-                            self.analyse(task, report)
+                            self.analyse(task, report, self.module == manual_worker)
                 except TimeoutError:
                     e = f'timeout on analyse call after {self.timeout}s'
                     self.logger.error(e)

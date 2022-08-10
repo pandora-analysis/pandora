@@ -25,7 +25,7 @@ class ClamAVWorker(BaseWorker):
             return
         self._socket = clamd.ClamdUnixSocket(path=self.socket_path)
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         self.logger.debug(f'analysing file {task.file.path}...')
         res = self._socket.instream(task.file.data)
         status, message = res['stream']

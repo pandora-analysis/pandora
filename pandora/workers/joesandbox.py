@@ -34,7 +34,7 @@ class JoeSandboxWorker(BaseWorker):
             self.logger.warning(e)
             self.disabled = True
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         try:
             self.logger.debug(f'analysing file {task.file.path}...')
             result = self.joesb.analysis_search(task.file.sha256)

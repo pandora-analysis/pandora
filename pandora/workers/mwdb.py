@@ -32,7 +32,7 @@ class Mwdb(BaseWorker):
             self.logger.warning(e)
             self.disabled = True
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         try:
             self.logger.debug(f'analysing file {task.file.path}...')
             result = self.mymwdb.query_file(task.file.sha256)

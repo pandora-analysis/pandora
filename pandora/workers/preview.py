@@ -8,7 +8,7 @@ from .base import BaseWorker
 
 class Preview(BaseWorker):
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         try:
             task.file.convert()
             task.file.make_previews()

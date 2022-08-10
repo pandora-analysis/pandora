@@ -41,7 +41,7 @@ class Irma(BaseWorker):
                 report.status = Status.ALERT
             report.add_details('Click on "Sign in anonymously" button to reach IRMA report.', link)
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         if task.file.is_archive:
             report.status = Status.NOTAPPLICABLE
             return

@@ -56,7 +56,7 @@ class YaraWorker(BaseWorker):
             self.disabled = True
             self.logger.critical(f'Unable to initialize rules: {e}')
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         if not task.file.data:
             # Empty file
             report.status = Status.NOTAPPLICABLE

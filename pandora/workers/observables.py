@@ -8,7 +8,7 @@ from .base import BaseWorker
 
 class Observables(BaseWorker):
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         try:
             task.init_observables_from_file()
             for observable in task.observables:

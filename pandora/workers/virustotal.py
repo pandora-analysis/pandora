@@ -25,7 +25,7 @@ class VirusTotal(BaseWorker):
             return
         self.client = vt.Client(self.apikey, agent=get_useragent_for_requests())
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         try:
             self.logger.debug(f'analysing file {task.file.path}...')
             response = self.client.get_json(f'/files/{task.file.sha256}')

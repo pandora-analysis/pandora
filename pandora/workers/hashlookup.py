@@ -48,7 +48,7 @@ class HashlookupWorker(BaseWorker):
                 legit = True
         return legit, details
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         self.logger.debug(f'analysing file {task.file.path}...')
         # Run a lookup against all the hashes, as hashlookup gaters multiple
         # sources with different hashes available

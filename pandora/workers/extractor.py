@@ -341,7 +341,7 @@ class Extractor(BaseWorker):
             f.write(data)  # write an uncompressed file
         return [new_file_path]
 
-    def analyse(self, task: Task, report: Report):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         if not (task.file.is_archive or task.file.is_eml or task.file.is_msg):
             report.status = Status.NOTAPPLICABLE
             return

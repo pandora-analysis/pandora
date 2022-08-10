@@ -512,6 +512,19 @@ def html_workers_result(task_id: str, worker_name: str, seed: Optional[str]=None
                            api_task_action=ApiTaskAction)
 
 
+@app.route('/manual_trigger_worker/<task_id>/<worker_name>', methods=['GET'], strict_slashes=False)
+@app.route('/manual_trigger_worker/<task_id>/<worker_name>/seed-<seed>', methods=['GET'], strict_slashes=False)
+@html_answer
+def manual_trigger_worker(task_id: str, worker_name: str, seed: Optional[str]=None):
+    task = pandora.get_task(task_id=task_id)
+    assert task is not None, 'analysis not found'
+    assert worker_name in workers(), f'unknown worker name: {worker_name}'
+    update_user_role(pandora, task, seed)
+    assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
+    pandora.trigger_manual_worker(task, worker_name)
+    return redirect(url_for('api_analysis', task_id=task_id, seed=seed))
+
+
 @app.route('/stats', methods=['GET'], strict_slashes=False)
 @admin_required
 @html_answer

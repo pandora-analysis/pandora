@@ -5,3 +5,9 @@ meta:
 settings:
   apiurl: https://lookyloo.circl.lu/
   autosubmit: false
+  public_listing: false
+  referer: null
+  user_agent: null
+  http_headers: {}
+  cookies: {}
+  proxy: null
