@@ -1325,7 +1325,7 @@ docs = ["Sphinx (>=5.1.1,<6.0.0)"]
 
 [[package]]
 name = "pymisp"
-version = "2.4.160"
+version = "2.4.160.1"
 description = "Python API for MISP."
 category = "main"
 optional = false
@@ -1346,7 +1346,7 @@ email = ["extract_msg (>=0.36.1,<0.37.0)", "RTFDE (>=0.0.2,<0.0.3)", "oletools (
 fileobjects = ["python-magic (>=0.4.27,<0.5.0)", "pydeep2 (>=0.5.1,<0.6.0)", "lief (>=0.12.1,<0.13.0)"]
 openioc = ["beautifulsoup4 (>=4.11.1,<5.0.0)"]
 virustotal = ["validators (>=0.20.0,<0.21.0)"]
-docs = ["sphinx-autodoc-typehints (>=1.19.1,<2.0.0)", "recommonmark (>=0.7.1,<0.8.0)"]
+docs = ["sphinx-autodoc-typehints (>=1.19.2,<2.0.0)", "recommonmark (>=0.7.1,<0.8.0)"]
 pdfexport = ["reportlab (>=3.6.11,<4.0.0)"]
 url = ["pyfaup (>=1.2,<2.0)", "chardet (>=5.0.0,<6.0.0)"]
 brotli = ["urllib3[brotli] (>=1.26.11,<2.0.0)"]
@@ -2016,7 +2016,7 @@ python-versions = ">=3.4"
 
 [[package]]
 name = "yara-python"
-version = "4.2.0"
+version = "4.2.3"
 description = "Python interface for YARA"
 category = "main"
 optional = false
@@ -2060,7 +2060,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "a0b787b7638023f54dce8a811dac640ff583aced5a6eba378357504d2d0498b1"
+content-hash = "d98fae77230f0057f3f0841404b361defda869177a5fe7ca0588bf3738884e40"
 
 [metadata.files]
 aiohttp = [
@@ -3336,8 +3336,8 @@ pylookyloo = [
     {file = "pylookyloo-1.14.1.tar.gz", hash = "sha256:a73c3a1ecfbf3290392e723000d913071795563006784d112673fad1124d9311"},
 ]
 pymisp = [
-    {file = "pymisp-2.4.160-py3-none-any.whl", hash = "sha256:ba4b2a0a1333e9c757cf31965e8e0f0592eee2f05418f591e6f592ec2c19f2a2"},
-    {file = "pymisp-2.4.160.tar.gz", hash = "sha256:018c6d384af2bde151f09893c04399982c9048109c7d54ffd07ff7688e9ba506"},
+    {file = "pymisp-2.4.160.1-py3-none-any.whl", hash = "sha256:3499dc55819e874eeecd7d1b10229cb957600a52452ca5360db3b32f21714718"},
+    {file = "pymisp-2.4.160.1.tar.gz", hash = "sha256:d6cf306100d7c936951db9cb1bff53276a94d75b3ff5ae4c35a952f001169021"},
 ]
 pymispwarninglists = [
     {file = "pymispwarninglists-1.4-py3-none-any.whl", hash = "sha256:b1e0b01cbe655a931d3739bd860ad9d74356ac8899e4eec9d6404d5e4a17dbc1"},
@@ -3895,19 +3895,19 @@ xlsxwriter = [
     {file = "XlsxWriter-3.0.3.tar.gz", hash = "sha256:e89f4a1d2fa2c9ea15cde77de95cd3fd8b0345d0efb3964623f395c8c4988b7f"},
 ]
 yara-python = [
-    {file = "yara-python-4.2.0.tar.gz", hash = "sha256:d02f239f429c6c94e60b500246d376595fbed8d9124209d332b6f8e7cfb5ec6e"},
-    {file = "yara_python-4.2.0-cp310-cp310-win32.whl", hash = "sha256:1faec6480be87964056ac19cddae052da4c88755426c81c83bce53ed7d57ebfe"},
-    {file = "yara_python-4.2.0-cp310-cp310-win_amd64.whl", hash = "sha256:76f711603de6a66a42be4501219288353397b032d6239b01a34e2bbcce4a2e50"},
-    {file = "yara_python-4.2.0-cp35-cp35m-win32.whl", hash = "sha256:cabef9144d35357ba9815f6ecacfaeed05fa2cc2a2ae0a0c37766839500555d9"},
-    {file = "yara_python-4.2.0-cp35-cp35m-win_amd64.whl", hash = "sha256:300581837e17114432d52599075bb8348dc2ce3e9ec8d3c325f5a797424791a4"},
-    {file = "yara_python-4.2.0-cp36-cp36m-win32.whl", hash = "sha256:c4c147495267a26b2d5fc39a486e1561bc501b170f973ab1ab0f39f2c00791da"},
-    {file = "yara_python-4.2.0-cp36-cp36m-win_amd64.whl", hash = "sha256:9d43bb5a5148f1c50e972e8fc4653620d63bb0d1cb02701d41fa580eb44a1bcf"},
-    {file = "yara_python-4.2.0-cp37-cp37m-win32.whl", hash = "sha256:0de9d9482a6def6ef719ac9024dceae89809fa05d02656518a146374df93eb94"},
-    {file = "yara_python-4.2.0-cp37-cp37m-win_amd64.whl", hash = "sha256:963e089f5d70d614408d08830a9244f3146a63c87a2daedc130af72f6569d2af"},
-    {file = "yara_python-4.2.0-cp38-cp38-win32.whl", hash = "sha256:5da322141985e95f5018856603761ad908c3eb6dd8add566066c082fca8b4541"},
-    {file = "yara_python-4.2.0-cp38-cp38-win_amd64.whl", hash = "sha256:4853d0bf9a320fd98f5a0beb94eb651639073f8ccc2e2f40c132c66f3ed64d74"},
-    {file = "yara_python-4.2.0-cp39-cp39-win32.whl", hash = "sha256:e5adfdcf01e2cc6bc07603eaadb314cf3515cab577e529db86c4de7bf9b327dd"},
-    {file = "yara_python-4.2.0-cp39-cp39-win_amd64.whl", hash = "sha256:a92dc977e5e6add276ebdf5c8e0ddae7a79a85993c407a9c1d198dab518116e6"},
+    {file = "yara-python-4.2.3.tar.gz", hash = "sha256:31f6f6f2fdca4c5ddfeed7cc6d29afad6af7dc259dde284df2d7ea5ae15ee69a"},
+    {file = "yara_python-4.2.3-cp310-cp310-win32.whl", hash = "sha256:d7543ff7eb7e21a815d7bc1bf2fcca24cab3548184d3257c58916628f3c89b37"},
+    {file = "yara_python-4.2.3-cp310-cp310-win_amd64.whl", hash = "sha256:26ec1042017b3c4e12d2999ed6a33d7807013ae16c487048464b98dabfe3a7b0"},
+    {file = "yara_python-4.2.3-cp35-cp35m-win32.whl", hash = "sha256:47a7de4d7dae04e5e146b79f26b7f0b7e9430cb92459b85db7f4341843974aac"},
+    {file = "yara_python-4.2.3-cp35-cp35m-win_amd64.whl", hash = "sha256:113f430c5189519e13fc07d8493e3f29a1464a9be06eb7ba1b76451da620a391"},
+    {file = "yara_python-4.2.3-cp36-cp36m-win32.whl", hash = "sha256:98040aa88d242632c75be87ac3a9958eb407ca30e85b513b9e22807af82ab1c8"},
+    {file = "yara_python-4.2.3-cp36-cp36m-win_amd64.whl", hash = "sha256:aaad4cd4495b7605cb4e039473710ee87a151082171c4bb720086adbe548fb36"},
+    {file = "yara_python-4.2.3-cp37-cp37m-win32.whl", hash = "sha256:bef2f079acd459b852c0634f72cd41058766110d8900573b2d55be12d35d55db"},
+    {file = "yara_python-4.2.3-cp37-cp37m-win_amd64.whl", hash = "sha256:feac02291a584b846615aa9265f01fa458ec7e7087317ffa679bbb1a2baec85b"},
+    {file = "yara_python-4.2.3-cp38-cp38-win32.whl", hash = "sha256:90db22a471b512d1adb49cec97a1356a1cf7791beeb0acab74c3187f6e8679a6"},
+    {file = "yara_python-4.2.3-cp38-cp38-win_amd64.whl", hash = "sha256:9f17e0572c49906d0b2a8f6ac20fcb46f17820a7408a5511744a844df4b2ec61"},
+    {file = "yara_python-4.2.3-cp39-cp39-win32.whl", hash = "sha256:d6c2de71b368da053599d734c031389815a70df4b667d6dc386d1335689717d6"},
+    {file = "yara_python-4.2.3-cp39-cp39-win_amd64.whl", hash = "sha256:87125ede7fbc18ae65aab550f1a36f4ebf73bb828c5d7a3dd2bb99176f0faa15"},
 ]
 yarl = [
     {file = "yarl-1.8.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:abc06b97407868ef38f3d172762f4069323de52f2b70d133d096a48d72215d28"},
