@@ -8,6 +8,13 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  SEMGREP_RULES: >-  # https://semgrep.dev/explore
+    p/security-audit
+    p/secrets
+    p/flask
+    p/python
+
 jobs:
   build:
 
@@ -25,7 +32,7 @@ jobs:
 
     - name: Install test dependencies
       run: |
-        python -m pip install flake8 black bandit mypy lxml pylint
+        python -m pip install flake8 black bandit mypy lxml pylint semgrep
     - name: bandit
       run: |
         bandit -r .
@@ -44,4 +51,8 @@ jobs:
     - name: pylint
       run: |
         pylint bin pandora website
+      if: ${{ always() }}
+    - name: semgrep
+      run: |
+        semgrep --config auto
       if: ${{ always() }}
