@@ -26,9 +26,16 @@ jobs:
     - name: Install test dependencies
       run: |
         python -m pip install flake8 black bandit mypy lxml pylint
+      - name: bandit
+        run: |
+          bandit -r .
+        if: ${{ always() }}
     - name: black
       run: |
         black --diff --check .
+      if: ${{ always() }}
+    - name: codespell
+      uses: codespell-project/actions-codespell@master
       if: ${{ always() }}
     - name: flake8
       run: |
