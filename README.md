@@ -139,6 +139,12 @@ Initialize the `.env` file:
 echo PANDORA_HOME="`pwd`" >> .env
 ```
 
+Get web dependencies (css, font, js)
+```bash
+python tools/3rdparty.py
+```
+Be aware that those are version-constrained because [SubResource Integrity (SRI)](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) is used (set in website/web/sri.txt).
+
 ### Configuration
 
 Copy the config file:
