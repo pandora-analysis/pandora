@@ -49,7 +49,7 @@
         "default_share_time": "Default time (in days) the sharing seed will be valid. 0 means forever.",
         "show_project_page": "If true, display a ribbon with a link to the githug projects page at the top right side of the screen",
         "lookyloo_url": "The URL of the lookyloo instance you want to connect to. Use the *public* URL, not localhost (the browser blocks that).",
-        "users": "Admin acount(s). Format: {username: password}",
+        "users": "Admin account(s). Format: {username: password}",
         "enable_imap_fetcher": "If true, the imap fetcher is enabled.",
         "channels": "If enabled, the submissions are published on the redis pubsub channels",
         "misp": "The MISP configuration",
