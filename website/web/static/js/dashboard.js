@@ -133,9 +133,11 @@ function updateSubmitInfos(infos){
 }
 
 function updateFilesInfos(infos){
-    const tbody = $('#files-info .table tbody')
     $("#files-info .table tbody tr").remove();
-    Object.keys(infos).forEach(key => {
+    const tbody = $('#files-info .table tbody')
+    Object.keys(infos).sort(function(a, b) {
+        return infos[a] - infos[b]
+    }).reverse().forEach(key => {
         if(key != "total") {
             const newRowContent = `<tr><td>${key}</td><td>${infos[key]}</td></tr>`
             tbody.append(newRowContent);
@@ -152,9 +154,6 @@ function updateSizeInfos(infos){
     tr.append(`<td>${infos.min}</td>`);
     tr.append(`<td>${infos.max}</td>`);
     tr.append(`<td>${infos.avg}</td>`);
-    $('#type_table').DataTable({
-      order: [[1, 'desc']],
-    });
 }
 
 function updateInterval(start, end){
