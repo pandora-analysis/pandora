@@ -20,7 +20,7 @@ imap_fetcher = "bin.imap_fetcher:main"
 python = "^3.8,<3.11"
 redis = {version = "^4.3.4", extras = ["hiredis"]}
 flask-restx = "^0.5.1"
-gunicorn = "^20.1.0"
+gunicorn = {version = "^20.1.0", extras = ["setproctitle"]}
 Flask-Session = "^0.4.0"
 Flask-Moment = "^1.0.4"
 Flask-Login = "^0.6.2"
