@@ -1798,14 +1798,6 @@ python-versions = "*"
 types-urllib3 = "<1.27"
 
 [[package]]
-name = "types-setuptools"
-version = "65.3.0"
-description = "Typing stubs for setuptools"
-category = "dev"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "types-urllib3"
 version = "1.26.23"
 description = "Typing stubs for urllib3"
@@ -2082,7 +2074,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "629e97287f1c9c470db93ac06e9cbb61a2da17ec43c3a67880ebe49c76779ce8"
+content-hash = "ce1d101fd5ad0a030014875c5dcb1bc1da8e4cf4628b0b7eb8d1f41cdd9de09f"
 
 [metadata.files]
 aiohttp = [
@@ -3805,10 +3797,6 @@ types-redis = [
 types-requests = [
     {file = "types-requests-2.28.9.tar.gz", hash = "sha256:feaf581bd580497a47fe845d506fa3b91b484cf706ff27774e87659837de9962"},
     {file = "types_requests-2.28.9-py3-none-any.whl", hash = "sha256:86cb66d3de2f53eac5c09adc42cf6547eefbd0c7e1210beca1ee751c35d96083"},
-]
-types-setuptools = [
-    {file = "types-setuptools-65.3.0.tar.gz", hash = "sha256:c26779cbba3947823c260354adaab4e91ca8c18888aa2b740f503844b88f1813"},
-    {file = "types_setuptools-65.3.0-py3-none-any.whl", hash = "sha256:f69210049580939c70386252b776eb75ff4b6de488e7d766b9398669b7de68af"},
 ]
 types-urllib3 = [
     {file = "types-urllib3-1.26.23.tar.gz", hash = "sha256:b78e819f0e350221d0689a5666162e467ba3910737bafda14b5c2c85e9bb1e56"},

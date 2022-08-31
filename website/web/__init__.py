@@ -2,11 +2,11 @@
 
 import functools
 import operator
-import pkg_resources
 import traceback
 
 from collections import defaultdict
 from datetime import datetime, timedelta
+from importlib.metadata import version
 from io import BytesIO
 from pathlib import Path
 from typing import Optional, Union
@@ -84,7 +84,7 @@ api = Api(title='Pandora API',
           description='API to query Pandora.',
           doc='/doc/',
           authorizations=authorizations,
-          version=pkg_resources.get_distribution('pandora').version)
+          version=version('pandora'))
 
 api.add_namespace(generic_api)
 
