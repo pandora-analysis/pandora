@@ -415,7 +415,7 @@ python-versions = "*"
 
 [[package]]
 name = "extract-msg"
-version = "0.36.2"
+version = "0.36.3"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 category = "main"
 optional = false
@@ -1764,7 +1764,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-redis"
-version = "4.3.18"
+version = "4.3.19"
 description = "Typing stubs for redis"
 category = "dev"
 optional = false
@@ -2063,7 +2063,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "318aecfc232c88832729e53048ffbda46762f88f393ceb944ced017e80542edc"
+content-hash = "81ba111e12a8f7fb163f247a1ec5ed836aec6b6989052ee053a2dd84731c718d"
 
 [metadata.files]
 aiohttp = [
@@ -2496,8 +2496,8 @@ executing = [
     {file = "executing-1.0.0.tar.gz", hash = "sha256:98daefa9d1916a4f0d944880d5aeaf079e05585689bebd9ff9b32e31dd5e1017"},
 ]
 extract-msg = [
-    {file = "extract_msg-0.36.2-py2.py3-none-any.whl", hash = "sha256:36ba5aff9855c7689c44ca39b653a8193d9dc014842c9af961b6a8c063842bc4"},
-    {file = "extract_msg-0.36.2.tar.gz", hash = "sha256:bfac03b9eaced7f4a4e7f7006650c0ee8841e6e16d2350f44147e594571af902"},
+    {file = "extract_msg-0.36.3-py2.py3-none-any.whl", hash = "sha256:12e0c7ba7fb7b5ad75b3dba05c1e4b5d7a4622229db54f388fb8b4551e870374"},
+    {file = "extract_msg-0.36.3.tar.gz", hash = "sha256:eb5726ecf9f482aec2323dd06250d76dc514c8dc6f87804fb835bd0106e221c8"},
 ]
 flask = [
     {file = "Flask-2.1.3-py3-none-any.whl", hash = "sha256:9013281a7402ad527f8fd56375164f3aa021ecfaff89bfe3825346c24f87e04c"},
@@ -3776,8 +3776,8 @@ types-pyyaml = [
     {file = "types_PyYAML-6.0.11-py3-none-any.whl", hash = "sha256:8f890028123607379c63550179ddaec4517dc751f4c527a52bb61934bf495989"},
 ]
 types-redis = [
-    {file = "types-redis-4.3.18.tar.gz", hash = "sha256:2260532c157d4f64f6e266de67b0aaa1979cfb969e409a16445ec6976c4a1de6"},
-    {file = "types_redis-4.3.18-py3-none-any.whl", hash = "sha256:ba4dffd5f804af849ddd5399164abd04fbf87fa5295680d89ccec010c66bb110"},
+    {file = "types-redis-4.3.19.tar.gz", hash = "sha256:c881ffb94bd47dca21ed503328544a56bb315851575eebb27fb371bff735844a"},
+    {file = "types_redis-4.3.19-py3-none-any.whl", hash = "sha256:c74262197487a65e3f02db37d3f0e0f3bb2d5d370f7e6ba390814e865a45e56e"},
 ]
 types-requests = [
     {file = "types-requests-2.28.9.tar.gz", hash = "sha256:feaf581bd580497a47fe845d506fa3b91b484cf706ff27774e87659837de9962"},
