@@ -2082,7 +2082,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "81ba111e12a8f7fb163f247a1ec5ed836aec6b6989052ee053a2dd84731c718d"
+content-hash = "629e97287f1c9c470db93ac06e9cbb61a2da17ec43c3a67880ebe49c76779ce8"
 
 [metadata.files]
 aiohttp = [

@@ -61,6 +61,7 @@ pycdlib = "^1.13.0"
 werkzeug = "2.1.2"
 pyhashlookup = "^1.2.0"
 pylookyloo = "^1.14.2"
+setuptools = "^65.3.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.4.0"
