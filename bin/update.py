@@ -50,6 +50,7 @@ def check_poetry_version():
     process = subprocess.run(args, cwd=homedir, capture_output=True)
     poetry_version_str = process.stdout.decode()
     version = poetry_version_str.split()[2]
+    version = version.strip(')')
     version_details = tuple(int(i) for i in version.split('.'))
     if version_details < (1, 1, 0):
         print('The project requires poetry >= 1.1.0, please update.')
