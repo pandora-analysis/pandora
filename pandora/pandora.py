@@ -157,7 +157,7 @@ class Pandora():
     # #### Observable ####
 
     def get_observables(self) -> List[Observable]:
-        # TODO: get most recent observables, optionnally filter
+        # TODO: get most recent observables, optionally filter
         pass
 
     # #### Observables Lists ####

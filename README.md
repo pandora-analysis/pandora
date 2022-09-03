@@ -139,6 +139,12 @@ Initialize the `.env` file:
 echo PANDORA_HOME="`pwd`" >> .env
 ```
 
+Get web dependencies (css, font, js)
+```bash
+python tools/3rdparty.py
+```
+Be aware that those are version-constrained because [SubResource Integrity (SRI)](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) is used (set in website/web/sri.txt).
+
 ### Configuration
 
 Copy the config file:
@@ -302,7 +308,7 @@ Stack:
 /usr/lib/libreoffice/program/soffice.bin(+0x10ee)[0x55edfc86e0ee]
 ```
 
-Install the full `libreoffice` package, the `*-nogui` onces cause crashes like that, on some files.
+Install the full `libreoffice` package, the `*-nogui` once cause crashes like that, on some files.
 
 
 # Contributing

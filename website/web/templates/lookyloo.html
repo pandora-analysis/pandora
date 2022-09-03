@@ -22,7 +22,7 @@
     {% elif report.status == status.UNKNOWN %}
       <th scope="row" style="width:30%">This file was submitted to a lookyloo instance</th>
       <td>
-        <a href="{{report.details['permaurl']}}" target="_blank">See capture</a>
+        <a href="{{report.details['permaurl']}}" target="_blank" rel="noopener noreferrer">See capture</a>
       </td>
     {% else %}
       <th scope="row" style="width:30%">Status</th>

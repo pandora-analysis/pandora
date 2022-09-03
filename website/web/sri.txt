@@ -23,7 +23,7 @@
     },
     "js": {
       "analysis.js": "uxIVRInLpB1VGiUGiqNh0xqDxawJFGEsELWApmhURDsKT38H9OGQ+vFGnXI0s6SloJkRdzEVetn6ZCfKJHR2og==",
-      "dashboard.js": "+bRY7yvnuPq6jP5wC5uAKsPGT8HuvI8sqBRaM8aNP7HXLhClwieK7SJ9cQnNlIlEeHO0qzgKz6SWhtDmHX7jMw==",
+      "dashboard.js": "uHb6Q3vAkd294RVoP9botK0XiUqMPa0qtb0XdOxawHobm2TeEzYqjTAlQ9p9Drz3E4VU04ctVmM60EjsMfjdog==",
       "lib": {
         "bootstrap-datepicker.min.js": "T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==",
         "chart.min.js": "sW/w8s4RWTdFFSduOTGtk4isV1+190E/GghVffMA9XczdJ2MDzSzLEubKAs5h0wzgSJOQTRYyaz73L3d6RtJSg==",

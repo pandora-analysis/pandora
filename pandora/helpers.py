@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 import logging
-import pkg_resources
 import re
 
 from datetime import timedelta
 from enum import IntEnum, Enum, unique, auto
 from functools import lru_cache
+from importlib.metadata import version
 from typing import Dict, List, Optional, Union, Any
 
 from publicsuffix2 import PublicSuffixList, fetch  # type: ignore
@@ -178,5 +178,4 @@ def get_email_template() -> str:
 
 @lru_cache(64)
 def get_useragent_for_requests():
-    version = pkg_resources.get_distribution('pandora').version
-    return f'Pandora / {version}'
+    return f'Pandora / {version("pandora")}'

@@ -127,7 +127,7 @@ class Extractor(BaseWorker):
         with zip_reader(str(archive_file.path)) as archive:
             for file_number, info in enumerate(archive.infolist()):
                 if file_number >= self.max_files_in_archive:
-                    warning_msg = f'Too many files ({len(archive.infolist())}) in the archive, stoping at {self.max_files_in_archive}.'
+                    warning_msg = f'Too many files ({len(archive.infolist())}) in the archive, stopping at {self.max_files_in_archive}.'
                     self.logger.warning(warning_msg)
                     report.status = Status.ALERT
                     report.add_details('Warning', warning_msg)
