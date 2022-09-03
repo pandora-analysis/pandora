@@ -43,6 +43,8 @@ jobs:
       if: ${{ always() }}
     - name: codespell
       uses: codespell-project/actions-codespell@master
+      with:
+        ignore_words_file: .codespellignore
       if: ${{ always() }}
     - name: flake8
       run: |
