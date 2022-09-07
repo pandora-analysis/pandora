@@ -252,7 +252,7 @@ class File:
         if save_date:
             if isinstance(save_date, str):
                 self.save_date = datetime.fromisoformat(save_date)
-                self.save_date.astimezone(timezone.utc)
+                self.save_date = self.save_date.astimezone(timezone.utc)
             else:
                 self.save_date = save_date
         else:
