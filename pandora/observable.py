@@ -65,11 +65,13 @@ class Observable:
 
         if isinstance(first_seen, str):
             self.first_seen = datetime.fromisoformat(first_seen)
+            self.first_seen = self.first_seen.astimezone(timezone.utc)
         else:
             self.first_seen = first_seen
 
         if isinstance(last_seen, str):
             self.last_seen = datetime.fromisoformat(last_seen)
+            self.last_seen = self.first_seen.astimezone(timezone.utc)
         else:
             self.last_seen = last_seen
 
