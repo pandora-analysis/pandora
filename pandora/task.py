@@ -1,6 +1,6 @@
 import json
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from typing import Dict, Any, Optional, List, overload, Tuple
 from uuid import uuid4
@@ -28,7 +28,7 @@ class Task:
     def new_task(cls, user: User, sample: BytesIO, filename: str, disabled_workers: List[str],
                  parent: Optional['Task']=None, password: Optional[str]=None) -> 'Task':
         task_uuid = str(uuid4())
-        today = datetime.now()
+        today = datetime.now(timezone.utc)
         directory = get_homedir() / 'tasks' / str(today.year) / f'{today.month:02}' / task_uuid
         safe_create_dir(directory)
         filepath = directory / secure_filename(filename)
@@ -214,7 +214,7 @@ class Task:
 
     @property
     def workers_done(self) -> bool:
-        if self.save_date <= datetime.now() - timedelta(hours=1):
+        if self.save_date <= datetime.now(timezone.utc) - timedelta(hours=1):
             # NOTE Failsafe. If the task was started more than 1h ago, it is
             # either done, or it failed.
             return True
@@ -255,7 +255,7 @@ class Task:
             # At least one worker isn't done yet
             self._status = Status.WAITING
 
-        if self._status in [Status.WAITING, Status.RUNNING] and self.save_date <= datetime.now() - timedelta(hours=1):
+        if self._status in [Status.WAITING, Status.RUNNING] and self.save_date <= datetime.now(timezone.utc) - timedelta(hours=1):
             # NOTE Failsafe. If the task was started more than 1h ago, it is
             # either done, or it failed.
             self._status = Status.ERROR
@@ -268,7 +268,7 @@ class Task:
 
     def add_observable(self, value: str, observable_type: str, seen: Optional[datetime]=None):
         if not seen:
-            seen = datetime.now()
+            seen = datetime.now(timezone.utc)
         observable = Observable.new_observable(value, observable_type, seen)
         self.storage.add_task_observable(self.uuid, observable.sha256, observable.observable_type)
 

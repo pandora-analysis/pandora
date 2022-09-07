@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Optional, Union
 
 from .role import RoleName, Role
@@ -26,8 +26,8 @@ class User:
         self.name = name
         self.last_ip = last_ip
         if not first_seen:
-            self.first_seen: datetime = datetime.now()
-            self.last_seen: datetime = datetime.now()
+            self.first_seen: datetime = datetime.now(timezone.utc)
+            self.last_seen: datetime = datetime.now(timezone.utc)
         else:
             if isinstance(first_seen, str):
                 self.first_seen = datetime.fromisoformat(first_seen)
@@ -35,7 +35,7 @@ class User:
                 self.first_seen = first_seen
 
             if not last_seen:
-                self.last_seen = datetime.now()
+                self.last_seen = datetime.now(timezone.utc)
             elif isinstance(last_seen, str):
                 self.last_seen = datetime.fromisoformat(last_seen)
             else:

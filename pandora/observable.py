@@ -2,7 +2,7 @@ import hashlib
 import json
 import logging
 
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import cached_property
 from typing import Optional, overload, List
 
@@ -18,7 +18,7 @@ class Observable:
     @classmethod
     def new_observable(cls, value: str, observable_type: str, seen: Optional[datetime]=None):
         if not seen:
-            seen = datetime.now()
+            seen = datetime.now(timezone.utc)
         # NOTE: observable_type must be a valid MISP Type, we need to check that.
         sha256 = hashlib.sha256(value.encode()).hexdigest()
         # Check if it already exists, update if needed
