@@ -6,7 +6,7 @@ import shutil
 import sys
 import traceback
 
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import cached_property, lru_cache
 from io import BytesIO
 from pathlib import Path
@@ -252,10 +252,11 @@ class File:
         if save_date:
             if isinstance(save_date, str):
                 self.save_date = datetime.fromisoformat(save_date)
+                self.save_date = self.save_date.astimezone(timezone.utc)
             else:
                 self.save_date = save_date
         else:
-            self.save_date = datetime.now()
+            self.save_date = datetime.now(timezone.utc)
 
     def store(self) -> None:
         self.storage.set_file(self.to_dict)

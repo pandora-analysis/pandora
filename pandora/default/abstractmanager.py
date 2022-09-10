@@ -37,6 +37,14 @@ class AbstractManager(ABC):
             return []
 
     @staticmethod
+    def clear_running():
+        try:
+            r = Redis(unix_socket_path=get_socket_path('cache'), db=1, decode_responses=True)
+            r.delete('running')
+        except ConnectionError:
+            print('Unable to connect to redis, the system is down.')
+
+    @staticmethod
     def force_shutdown():
         try:
             r = Redis(unix_socket_path=get_socket_path('cache'), db=1, decode_responses=True)
