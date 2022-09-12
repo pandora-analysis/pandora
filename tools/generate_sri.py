@@ -5,7 +5,7 @@ import hashlib
 import json
 
 from pathlib import Path
-from typing import Dict, Union, Any
+from typing import Dict, Any
 
 from pandora.default import get_homedir
 
