@@ -242,7 +242,7 @@ class Extractor(BaseWorker):
             password = self._try_password_7z(archive_file.path)
             if password is None:
                 report.status = Status.WARN
-                report.add_details('Warning', 'Encypted archive, unable to find password')
+                report.add_details('Warning', 'Encrypted archive, unable to find password')
                 report.add_extra('no_password', True)
                 return []
         else:
