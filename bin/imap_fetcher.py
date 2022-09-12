@@ -59,7 +59,7 @@ class IMAPFetcher(AbstractManager):
                 recipient = recipient.addresses[0].display_name
         except Exception as e:
             self.logger.warning(e)
-        sender = get_config('mail', 'from')
+        # sender = get_config('mail', 'from')
         body = body.format(recipient=recipient, permaurl=permaurl,
                            sender=msg['From'].addresses[0].display_name)
         msg.set_content(body)
