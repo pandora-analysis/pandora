@@ -30,6 +30,16 @@ jobs:
       with:
         python-version: ${{matrix.python-version}}
 
+    - name: Install with poetry
+      run: |
+        sudo apt install python3-dev  # for compiling things
+        sudo apt install libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0  # For HTML -> PDF
+        sudo apt install libreoffice-base-nogui libreoffice-calc-nogui libreoffice-draw-nogui libreoffice-impress-nogui libreoffice-math-nogui libreoffice-writer-nogui  # For Office -> PDF
+        sudo apt install exiftool  # for extracting exif information
+        python -m pip install --upgrade pip poetry
+        poetry install
+        poetry add pylint
+
     - name: Install test dependencies
       run: |
         python -m pip install flake8 black bandit mypy lxml pylint semgrep
@@ -48,11 +58,11 @@ jobs:
       if: ${{ always() }}
     - name: flake8
       run: |
-        flake8 . --show-source --statistics --max-line-length=120
+        flake8 . --show-source --statistics
       if: ${{ always() }}
     - name: pylint
       run: |
-        pylint bin pandora website
+        poetry run pylint -ry bin pandora tools website
       if: ${{ always() }}
     - name: semgrep
       run: |
