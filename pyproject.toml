@@ -42,7 +42,7 @@ oletools = {version = "0.60.1", extras = ["full"]}
 py7zr = "^0.20.0"
 jbxapi = "^3.18.0"
 defusedxml = "^0.7.1"
-mwdblib = "^4.2.1"
+mwdblib = "^4.3.0"
 vt-py = "^0.15.0"
 malwarebazaar = "^0.1.4"
 irmacl-async = "^3.4.1"
