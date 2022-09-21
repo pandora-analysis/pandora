@@ -984,7 +984,7 @@ type = ["mypy", "mypy-extensions"]
 
 [[package]]
 name = "mwdblib"
-version = "4.3.0"
+version = "4.3.1"
 description = "MWDB API bindings for Python"
 category = "main"
 optional = false
@@ -1889,11 +1889,14 @@ devenv = ["black", "flake8", "pyroma", "pytest", "pytest-cov", "zest.releaser"]
 
 [[package]]
 name = "untangle"
-version = "1.1.1"
-description = "Convert XML documents into Python objects"
+version = "1.2.1"
+description = "Converts XML to Python objects"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7,<4.0"
+
+[package.dependencies]
+defusedxml = ">=0.7.1,<0.8.0"
 
 [[package]]
 name = "urllib3"
@@ -2017,7 +2020,7 @@ email = ["email-validator"]
 
 [[package]]
 name = "XLMMacroDeobfuscator"
-version = "0.2.6"
+version = "0.2.7"
 description = "XLMMacroDeobfuscator is an XLM Emulation engine written in Python 3, designed to analyze and deobfuscate malicious XLM macros, also known as Excel 4.0 macros, contained in MS Excel files (XLS, XLSM, and XLSB)."
 category = "main"
 optional = false
@@ -2028,7 +2031,7 @@ lark-parser = "*"
 msoffcrypto-tool = "*"
 pyxlsb2 = "*"
 roman = "*"
-untangle = "1.1.1"
+untangle = "1.2.1"
 xlrd2 = "*"
 
 [package.extras]
@@ -2109,7 +2112,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "915173590bdb8c3668ed3794affb50ccd9db5f7a8e8740d9f6d7f9730b616c5a"
+content-hash = "2224710a4693276adfc0d7f250dc94a0f2dff64e1fad508b082cede7095a8be2"
 
 [metadata.files]
 aiohttp = [
@@ -3053,7 +3056,7 @@ multivolumefile = [
     {file = "multivolumefile-0.2.3.tar.gz", hash = "sha256:a0648d0aafbc96e59198d5c17e9acad7eb531abea51035d08ce8060dcad709d6"},
 ]
 mwdblib = [
-    {file = "mwdblib-4.3.0-py3-none-any.whl", hash = "sha256:412f98823dd61609f2487c99bcd6748d2a5fea5fda13bab023c11233c96c3924"},
+    {file = "mwdblib-4.3.1-py3-none-any.whl", hash = "sha256:5b94747694681de617c6c02cb1e70bf81bc5dfa8ae84dc60c61a42936f4903f2"},
 ]
 mypy = [
     {file = "mypy-0.971-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:f2899a3cbd394da157194f913a931edfd4be5f274a88041c9dc2d9cdcb1c315c"},
@@ -3931,7 +3934,8 @@ unoserver = [
     {file = "unoserver-1.2.tar.gz", hash = "sha256:832f0646d2a9bfa36109ebdf23968bfb0fbc67617ec4ee9f45dadd2aa943c6be"},
 ]
 untangle = [
-    {file = "untangle-1.1.1.tar.gz", hash = "sha256:e7cfa1ad57707e6b74cfea8b9fc50f7cbe9bbaf18401cc9d72192002bcd80bcb"},
+    {file = "untangle-1.2.1-py3-none-any.whl", hash = "sha256:1e783bb75996daf46ff7239ba049ee0eb54c056e235ac34809d74ea9e9898dd1"},
+    {file = "untangle-1.2.1.tar.gz", hash = "sha256:ae76522472722b31b303d5100c3c6f8b7dd4952b7b6c9d31e6d7b4a56f1a6d30"},
 ]
 urllib3 = [
     {file = "urllib3-1.26.12-py2.py3-none-any.whl", hash = "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997"},
@@ -4034,8 +4038,8 @@ WTForms = [
     {file = "WTForms-3.0.1.tar.gz", hash = "sha256:6b351bbb12dd58af57ffef05bc78425d08d1914e0fd68ee14143b7ade023c5bc"},
 ]
 XLMMacroDeobfuscator = [
-    {file = "XLMMacroDeobfuscator-0.2.6-py3-none-any.whl", hash = "sha256:c657ce8f7c91a5d40fad73263fc1558d0cc17c1ede4f5d160aaf769fae55b8da"},
-    {file = "XLMMacroDeobfuscator-0.2.6.tar.gz", hash = "sha256:2200828ec15b83517b9f6e085808a682c0d3c4ba802b4c48d2f7b3b9c84c58b1"},
+    {file = "XLMMacroDeobfuscator-0.2.7-py3-none-any.whl", hash = "sha256:b73d6448892e4b14a9f521b027f16186a056edc514f27286175d024ec3966caa"},
+    {file = "XLMMacroDeobfuscator-0.2.7.tar.gz", hash = "sha256:7c75755faac31c139a92b41756a0d05b9d9903d5224507f2edf36adc14f4783e"},
 ]
 xlrd = [
     {file = "xlrd-2.0.1-py2.py3-none-any.whl", hash = "sha256:6a33ee89877bd9abc1158129f6e94be74e2679636b8a205b43b85206c3f0bbdd"},
