@@ -24,7 +24,7 @@ jobs:
 
     - name: Cache kvrocks
       id: kvrocks
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ../kvrocks
         key: ${{ runner.os }}-kvrocks
