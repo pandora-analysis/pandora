@@ -390,7 +390,7 @@ class File:
 
     @md5.setter
     def md5(self, value: str):
-        self._md5 = value
+        self._md5 = value  # nosec B303
 
     @property
     def sha1(self) -> str:
@@ -404,7 +404,7 @@ class File:
 
     @sha1.setter
     def sha1(self, value: str):
-        self._sha1 = value
+        self._sha1 = value  # nosec B303
 
     @property
     def sha256(self) -> str:
