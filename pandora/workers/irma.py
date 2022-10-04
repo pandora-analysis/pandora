@@ -4,8 +4,9 @@ import logging
 
 import asyncio
 import pathlib
-import irmacl_async  # type: ignore
 import urllib.parse
+
+import irmacl_async  # type: ignore
 
 from ..helpers import Status, expire_in_sec
 from ..task import Task

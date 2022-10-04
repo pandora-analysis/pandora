@@ -83,8 +83,8 @@ class BaseWorker(multiprocessing.Process):
             signal.alarm(self.timeout)
             try:
                 yield
-            except TimeoutError:
-                raise
+            except TimeoutError as e:
+                raise e
             finally:
                 signal.signal(signal.SIGALRM, signal.SIG_IGN)
         else:
@@ -110,7 +110,7 @@ class BaseWorker(multiprocessing.Process):
             groupname=self.module, consumername=self.name, streams={'tasks_queue': '>'},
             block=0, count=1
         )[0]
-        rid, values = entries[0]
+        _, values = entries[0]
         return (values['task_uuid'],
                 json.loads(values['disabled_workers']) if values.get('disabled_workers') else [],
                 values.get('manual_worker'))

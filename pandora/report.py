@@ -41,7 +41,7 @@ class Report:
             'error': getattr(self, 'error', None),
             'error_trace': getattr(self, 'error_trace', None),
             'details': json.dumps({key: json.dumps(value) for key, value in self.details.items()}) if self.details else None,
-            'extras': json.dumps({key: value for key, value in self.extras.items()}) if self.extras else None,
+            'extras': json.dumps(self.extras) if self.extras else None,
         }.items() if v is not None}
 
     @property

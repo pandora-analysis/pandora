@@ -107,7 +107,7 @@ class Ole(BaseWorker):
         # Code copied from: https://github.com/decalage2/oletools/blob/master/oletools/oleid.py#L415
         details = defaultdict(list)
         vba_parser = VBA_Parser(filetype.filepath)
-        for type_entry, keyword, description in vba_parser.analyze_macros(show_decoded_strings=True, deobfuscate=False):
+        for type_entry, _, description in vba_parser.analyze_macros(show_decoded_strings=True, deobfuscate=False):
             details[type_entry].append(description)
         return Status.ALERT, details
 

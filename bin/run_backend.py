@@ -22,7 +22,7 @@ def check_running(name: str) -> bool:
             return False
         r = Redis(unix_socket_path=socket_path)
     try:
-        return True if r.ping() else False
+        return bool(r.ping())
     except ConnectionError:
         return False
 
@@ -34,9 +34,7 @@ def launch_cache(storage_directory: Optional[Path]=None):
         Popen(["./run_redis.sh"], cwd=(storage_directory / 'cache'))
 
 
-def shutdown_cache(storage_directory: Optional[Path]=None):
-    if not storage_directory:
-        storage_directory = get_homedir()
+def shutdown_cache():
     r = Redis(unix_socket_path=get_socket_path('cache'))
     r.shutdown(save=True)
     print('Redis cache database shutdown.')
@@ -49,7 +47,7 @@ def launch_storage(storage_directory: Optional[Path]=None):
         Popen(["./run_kvrocks.sh"], cwd=(storage_directory / 'storage'))
 
 
-def shutdown_storage(storage_directory: Optional[Path]=None):
+def shutdown_storage():
     redis = Redis(get_config('generic', 'storage_db_hostname'), get_config('generic', 'storage_db_port'))
     redis.shutdown()
     print('Kvrocks storage database shutdown.')
@@ -63,7 +61,7 @@ def launch_all():
 def check_all(stop: bool=False):
     backends: Dict[str, bool] = {'cache': False, 'storage': False}
     while True:
-        for db_name in backends.keys():
+        for db_name in backends:
             try:
                 backends[db_name] = check_running(db_name)
             except Exception:

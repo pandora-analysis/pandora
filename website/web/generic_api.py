@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import calendar
 import functools
 import traceback
@@ -175,7 +176,7 @@ class ApiTaskStatus(Resource):
         args = status_parser.parse_args(request)
         task_id = args['task_id']
         seed = args['seed'] if args.get('seed') else None
-        details = True if args.get('details') else False
+        details = bool(args.get('details'))
         task = pandora.get_task(task_id=task_id)
         update_user_role(pandora, task, seed)
         assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
@@ -213,8 +214,8 @@ class ApiWorkerDetails(Resource):
         task_id = args['task_id']
         seed = args['seed'] if args.get('seed') else None
         worker_name = args['worker_name'] if args.get('worker_name') else None
-        details = True if args.get('details') else False
-        all_workers = True if args.get('all_workers') else False
+        details = bool(args.get('details'))
+        all_workers = bool(args.get('all_workers'))
 
         if not any(worker_name, all_workers):
             return {'error': 'either all_workers must be set, or we need a worker name'}

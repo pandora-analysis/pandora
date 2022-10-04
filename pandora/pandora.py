@@ -94,28 +94,6 @@ class Pandora():
         # FIXME: get rid of that typing ignore
         return Task(**t)  # type: ignore
 
-    """
-    def get_task_reports(self, task_id: str) -> List[Report]:
-        # get all the reports from workers associated to the task
-        pass
-
-    def get_related_tasks(self, linked_with: Task, extracted_from: Task, user: User):
-        # get the linked and extracted tasks from the current task.
-        pass
-
-    def new_task(self, task_file, user: User, disabled_workers: List[str]) -> str:"""
-    """
-        Add new task in queue.
-        :param (Stream) task_file: stream from flask
-        :param (User) user: User triggering the task
-        :param disabled_workers: List of disabled workers for this task
-        :returns: The task ID.
-        """
-    """
-        _file = File(stream=task_file, client_name=task_file.filename)
-        _file.save()
-        return self.enqueue_task(_file, user, disabled_workers)
-    """
     def enqueue_task(self, task: Task) -> str:
         """
         Enqueue a task for processing.

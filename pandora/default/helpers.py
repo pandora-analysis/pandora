@@ -47,7 +47,7 @@ def load_configs(path_to_config_files: Optional[Union[str, Path]]=None):
         config_path = get_homedir() / 'config'
     if not config_path.exists():
         raise ConfigError(f'Configuration directory {config_path} does not exists.')
-    elif not config_path.is_dir():
+    if not config_path.is_dir():
         raise ConfigError(f'Configuration directory {config_path} is not a directory.')
 
     configs = {}
@@ -59,15 +59,13 @@ def load_configs(path_to_config_files: Optional[Union[str, Path]]=None):
 @lru_cache(64)
 def get_config(config_type: str, entry: str, quiet: bool=False) -> Any:
     """Get an entry from the given config_type file. Automatic fallback to the sample file"""
-    global configs
     if not configs:
         load_configs()
     if config_type in configs:
         if entry in configs[config_type]:
             return configs[config_type][entry]
-        else:
-            if not quiet:
-                logger.warning(f'Unable to find {entry} in config file.')
+        if not quiet:
+            logger.warning(f'Unable to find {entry} in config file.')
     else:
         if not quiet:
             logger.warning(f'No {config_type} config file available.')

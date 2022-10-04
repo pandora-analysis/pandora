@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 import logging
-import requests
 import traceback
 
 from urllib.parse import urljoin
+
+import requests
 
 from ..helpers import Status, get_useragent_for_requests
 from ..task import Task
