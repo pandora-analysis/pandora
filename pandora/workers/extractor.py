@@ -88,7 +88,7 @@ class Extractor(BaseWorker):
                 facade = iso.get_rock_ridge_facade()
             else:
                 facade = iso.get_iso9660_facade()
-            for dirname, dirlist, filelist in facade.walk('/'):
+            for dirname, _, filelist in facade.walk('/'):
                 if len(extracted_files) > self.max_files_in_archive:
                     break
                 if not filelist:
@@ -224,8 +224,7 @@ class Extractor(BaseWorker):
             except Exception:
                 # TODO: notify that to the user?
                 continue
-        else:
-            return None
+        return None
 
     def _extract_7z(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         # 7z can be encrypted at 2 places, headers, or files. if headers, we have to try.
@@ -288,23 +287,23 @@ class Extractor(BaseWorker):
     def _extract_tar(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         # tar is not a compressed archive but a directory mainly used to regroup other directories
         extracted_files: List[Path] = []
-        tar = TarFile(archive_file.path)  # open the file
-        for file_number, tarinfo in enumerate(tar.getmembers()):
-            if file_number >= self.max_files_in_archive:
-                self.logger.warning(f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive, stop extracting.')
-                report.status = Status.ALERT
-                report.add_details('Warning', f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive')
-                break
-            if not tarinfo.isfile():
-                continue
-            if tarinfo.size >= self.max_extracted_filesize:
-                self.logger.warning(f'File {archive_file.path.name} too big ({tarinfo.size}).')
-                report.status = Status.WARN
-                report.add_details('Warning', f'File {archive_file.path.name} too big ({tarinfo.size}).')
-                continue
-            tar.extract(tarinfo, dest_dir)
-            file_path = dest_dir / tarinfo.name
-            extracted_files.append(Path(file_path))
+        with TarFile(archive_file.path) as tar:
+            for file_number, tarinfo in enumerate(tar.getmembers()):
+                if file_number >= self.max_files_in_archive:
+                    self.logger.warning(f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive, stop extracting.')
+                    report.status = Status.ALERT
+                    report.add_details('Warning', f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive')
+                    break
+                if not tarinfo.isfile():
+                    continue
+                if tarinfo.size >= self.max_extracted_filesize:
+                    self.logger.warning(f'File {archive_file.path.name} too big ({tarinfo.size}).')
+                    report.status = Status.WARN
+                    report.add_details('Warning', f'File {archive_file.path.name} too big ({tarinfo.size}).')
+                    continue
+                tar.extract(tarinfo, dest_dir)
+                file_path = dest_dir / tarinfo.name
+                extracted_files.append(Path(file_path))
         return extracted_files
 
     def _extract_gz(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:

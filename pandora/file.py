@@ -10,8 +10,6 @@ from datetime import datetime, timezone
 from functools import cached_property, lru_cache
 from io import BytesIO
 from pathlib import Path
-from pymisp import MISPEvent, MISPObject
-from pymisp.tools import make_binary_objects, FileObject
 from typing import Optional, List, Union, Dict, cast, Set, Tuple
 from uuid import uuid4
 from zipfile import ZipFile
@@ -22,6 +20,8 @@ import magic
 import pikepdf
 
 from PIL import Image, ImageDraw, ImageFont  # type: ignore
+from pymisp import MISPEvent, MISPObject
+from pymisp.tools import make_binary_objects, FileObject
 from svglib.svglib import svg2rlg  # type: ignore
 from reportlab.graphics import renderPDF  # type: ignore
 import textract  # type: ignore
@@ -215,6 +215,10 @@ class File:
 
         self.storage = Storage()
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
+
+        # NOTE: they're alny used by the text conversion method, is it expected?
+        self.error = ''
+        self.error_trace = ''
 
         if isinstance(path, str):
             self.path: Path = Path(path)
@@ -473,9 +477,9 @@ class File:
         :return (str): file type or None if file is not reachable
         """
         # Guess extension from mime-type
-        for mime_type in self.MIME_TYPE_EQUAL:
+        for mime_type, p_type in self.MIME_TYPE_EQUAL.items():
             if self.mime_type == mime_type:
-                return self.MIME_TYPE_EQUAL[mime_type][1]
+                return p_type[1]
 
         # Guess type from extension
         if self.path.suffix:
@@ -495,9 +499,8 @@ class File:
                 if self.data:
                     return self.data.getvalue().decode(errors='replace')
                 return ''
-            else:
-                # Use of textract module for all file types
-                return textract.process(self.path, extension=self._extension_for_textract).decode(errors='replace')
+            # Use of textract module for all file types
+            return textract.process(self.path, extension=self._extension_for_textract).decode(errors='replace')
 
         except textract.exceptions.ShellError:
             if self.is_doc:
@@ -773,7 +776,7 @@ class File:
     def populate_misp_event(self, event: MISPEvent) -> None:
         objs = self.misp_export()
         if not objs:
-            return None
+            return
         fo, peo, seos = objs
 
         if seos:

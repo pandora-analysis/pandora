@@ -54,8 +54,7 @@ app.config['SESSION_KEY_PREFIX'] = 'session:'
 
 if not app.template_folder:
     raise Exception('Folder template not defined')
-else:
-    template_dir: Path = Path(app.root_path) / app.template_folder
+template_dir: Path = Path(app.root_path) / app.template_folder
 
 Bootstrap5(app)
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
@@ -125,10 +124,10 @@ def load_user(user_id):
 
 
 @login_manager.request_loader
-def _load_user_from_request(request):
-    user_name = load_user_from_request(request)
+def _load_user_from_request(req):
+    user_name = load_user_from_request(req)
     if user_name:
-        return User(session.sid, last_ip=src_request_ip(request),
+        return User(session.sid, last_ip=src_request_ip(req),
                     name=user_name, role='admin')
     return None
 
@@ -267,8 +266,7 @@ def api_task_download(task_id, source, seed=None, idx=None):
             raise AssertionError('content not available')
         if idx is not None:
             return send_file(task.file.previews[idx])
-        else:
-            return send_file(task.file.previews_archive)
+        return send_file(task.file.previews_archive)
 
     if source == 'pdf' and flask_login.current_user.role.can(Action.download_pdf):
         # NOTE: need to also return a PDF of office doc.
@@ -330,8 +328,7 @@ def api_admin_submit():
             flask_login.current_user.store
             flask_login.login_user(flask_login.current_user)
             return redirect(url_for('api_admin_page'))
-        else:
-            return redirect(url_for('api_admin_page', error=1), 302)
+        return redirect(url_for('api_admin_page', error=1), 302)
 
     except AssertionError:
         return redirect(url_for('api_admin_page', error=1), 302)

@@ -72,8 +72,8 @@ def check_unconfigured_workers(default_yes: bool=False):
             print(f'{sample_config.stem} enabled.')
             continue
         print('Do you want to configure it? If not, it will not be enabled.')
-        keep_going = input('Continue? (y/N) ')
-        if keep_going.lower() != 'y':
+        keep_going_str = input('Continue? (y/N) ')
+        if keep_going_str.lower() != 'y':
             print('Skipping.')
             continue
         print('Sample config:')
@@ -82,8 +82,8 @@ def check_unconfigured_workers(default_yes: bool=False):
             print(f.read())
             print('----------')
         print('Do you want to use it?')
-        keep_going = input('Continue? (y/N) ')
-        if keep_going.lower() != 'y':
+        keep_going_str = input('Continue? (y/N) ')
+        if keep_going_str.lower() != 'y':
             print('Skipping.')
             continue
         shutil.copy(sample_config, workers_dir / sample_config.stem)

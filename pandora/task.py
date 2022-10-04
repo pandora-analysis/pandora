@@ -48,7 +48,7 @@ class Task:
                  parent: Optional['Task']=None,
                  status: Optional[Status]=None,
                  done: bool=False,
-                 disabled_workers: List[str]=[],
+                 disabled_workers: Optional[List[str]]=None,
                  password: Optional[str]=None):
         '''With python classes'''
         ...
@@ -68,7 +68,7 @@ class Task:
                  user=None, user_id=None, save_date=None,
                  parent=None, parent_id=None,
                  status=None, done=False,
-                 disabled_workers=[],
+                 disabled_workers=None,
                  password=None):
         """
         Generate a Task object.
@@ -133,7 +133,7 @@ class Task:
     def user(self) -> Optional[User]:
         if hasattr(self, '_user'):
             return self._user
-        elif hasattr(self, '_user_id'):
+        if hasattr(self, '_user_id'):
             if (u := self.storage.get_user(self._user_id)):
                 self._user = User(**u)  # type: ignore
                 return self._user
@@ -147,7 +147,7 @@ class Task:
     def file(self) -> File:
         if hasattr(self, '_file'):
             return self._file
-        elif hasattr(self, '_file_id'):
+        if hasattr(self, '_file_id'):
             if (f := self.storage.get_file(self._file_id)):
                 self._file = File(**f)  # type: ignore
                 return self._file
@@ -161,7 +161,7 @@ class Task:
     def parent(self) -> Optional['Task']:
         if hasattr(self, '_parent'):
             return self._parent
-        elif hasattr(self, '_parent_id'):
+        if hasattr(self, '_parent_id'):
             if (parent_task := self.storage.get_task(self._parent_id)):
                 self._parent = Task(**parent_task)  # type: ignore
                 return self._parent
@@ -218,7 +218,7 @@ class Task:
             # NOTE Failsafe. If the task was started more than 1h ago, it is
             # either done, or it failed.
             return True
-        for report_name, report in self.reports.items():
+        for _, report in self.reports.items():
             if not report.is_done:
                 return False
         return True
@@ -243,7 +243,7 @@ class Task:
             if self._status < Status.CLEAN:
                 self._status = Status.CLEAN
             # All the workers are done, return success/error
-            for report_name, report in self.reports.items():
+            for _, report in self.reports.items():
                 # Status code order: ALERT - WARN - CLEAN - ERROR
                 # NOTE: when a report is Status.DISABLED or Status.NOTAPPLICABLE,
                 #       it has no impact on the general status of the task
