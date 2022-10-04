@@ -41,8 +41,7 @@ class WorkersManager(AbstractManager):
                 continue
             if issubclass(worker, BaseWorker):
                 return worker
-        else:
-            raise MissingWorker(f'The worker class is missing in {module}')
+        raise MissingWorker(f'The worker class is missing in {module}')
 
     def _init_worker(self, module_name: str, worker_conf: Dict[str, Dict[str, str]], restart: bool=False) -> List[BaseWorker]:
         """
@@ -67,7 +66,7 @@ class WorkersManager(AbstractManager):
         # [re]Create workers
         if restart:
             replicas = 1
-        workers = []
+        workers_list = []
         for i in range(1, replicas + 1):
             try:
                 worker = self._get_worker_class(module)(
@@ -81,11 +80,11 @@ class WorkersManager(AbstractManager):
                     self.redis.sadd('enabled_workers', worker.module)
 
             except TypeError as e:
-                key = str(e).split(': ')[-1]
-                raise AssertionError(f"missing mandatory key {key} for worker in config")
+                key = str(e).rsplit(': ', maxsplit=1)[-1]
+                raise AssertionError(f"missing mandatory key {key} for worker in config") from e
             else:
-                workers.append(worker)
-        return workers
+                workers_list.append(worker)
+        return workers_list
 
     def _manager(self):
         """
@@ -97,7 +96,7 @@ class WorkersManager(AbstractManager):
             self.logger.info(f'restart dead worker {worker.module}')
             self._workers.remove(worker)
             # Restart module worker
-            module_name, index = worker.module.split('-')
+            module_name, _ = worker.module.split('-')
             new_worker = self._init_worker(module_name, worker_conf=workers()[module_name], restart=True)[0]
             self._workers.append(new_worker)
             new_worker.start()

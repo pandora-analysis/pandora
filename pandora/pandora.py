@@ -201,7 +201,7 @@ class Pandora():
     def is_seed_valid(self, task: Task, seed: str) -> bool:
         if task.uuid == self.get_seed_uuid(seed):
             return True
-        elif hasattr(task, 'parent') and task.parent:
+        if hasattr(task, 'parent') and task.parent:
             return self.is_seed_valid(task.parent, seed)
         return False
 

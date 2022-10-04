@@ -27,8 +27,8 @@ def compute_hash_self():
 def keep_going(ignore: bool=False):
     if ignore:
         return
-    keep_going = input('Continue? (y/N) ')
-    if keep_going.lower() != 'y':
+    keep_going_str = input('Continue? (y/N) ')
+    if keep_going_str.lower() != 'y':
         print('Okay, quitting.')
         sys.exit()
 

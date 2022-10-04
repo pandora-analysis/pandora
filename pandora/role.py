@@ -47,7 +47,7 @@ class Action(Enum):
 class Role:
 
     def __init__(self, name: str, description: str, actions: Union[Dict[str, bool], str]):
-        assert name in RoleName.__members__.keys(), f"unexpected role name '{name}'"
+        assert name in RoleName.__members__, f"unexpected role name '{name}'"
         self.storage = Storage()
         self.name = RoleName[name]
         self.description = description
@@ -55,7 +55,7 @@ class Role:
             actions = cast(Dict[str, bool], json.loads(actions))
         self.actions: Dict[Action, bool] = {}
         for action_name, perm in actions.items():
-            assert action_name in Action.__members__.keys(), f"unexpected action name '{action_name}'"
+            assert action_name in Action.__members__, f"unexpected action name '{action_name}'"
             self.actions[Action[action_name]] = perm
 
     @property
@@ -74,7 +74,7 @@ class Role:
         :param (bool) value: model value
         """
         if isinstance(action, str):
-            assert action in Action.__members__.keys(), f"unexpected action name '{action}'"
+            assert action in Action.__members__, f"unexpected action name '{action}'"
             action = Action[action]
         self.actions[action] = value
 
@@ -90,13 +90,11 @@ class Role:
             actions = Action[actions]
         if isinstance(actions, list):
             if operator == 'and':
-                return all([self.can(action) for action in actions])
-            else:
-                return any([self.can(action) for action in actions])
+                return all(self.can(action) for action in actions)
+            return any(self.can(action) for action in actions)
         if actions in self.actions:
             return self.actions[actions]
-        else:
-            return False
+        return False
 
     @property
     def is_admin(self) -> bool:

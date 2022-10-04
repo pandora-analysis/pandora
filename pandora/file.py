@@ -68,7 +68,7 @@ def office_to_pdf(source: Union[Path, bytes], dest: str) -> None:
             converter.convert(indata=source, outpath=dest)
     except AttributeError as e:
         # Happens when the file is password protected, might be happening on other occasions
-        raise Unsupported(f"The Office document is probably password protected, this feature isn't supported yet - Error message: {e}.")
+        raise Unsupported(f"The Office document is probably password protected, this feature isn't supported yet - Error message: {e}.") from e
 
 
 class File:
@@ -128,7 +128,7 @@ class File:
         'DOC': {'.doc', '.docx', '.odt'},
         'EML': {'.eml'},
         'EXE': {'.exe', '.dll'},
-        'HTM': {'.htm', '.html', '.html', '.xht', '.xhtml'},
+        'HTM': {'.htm', '.html', '.xht', '.xhtml'},
         'IMG': {'.png', '.gif', '.bmp', '.jpg', '.jpeg', '.ico'},
         'JSC': {'.js'},
         'MSG': {'.msg'},
@@ -385,7 +385,7 @@ class File:
         :return (str|None): hexadecimal string or None if file is not reachable
         """
         if self._md5 is None and self.data:
-            self._md5 = hashlib.md5(self.data.getvalue()).hexdigest() if self.data is not None else None
+            self._md5 = hashlib.md5(self.data.getvalue()).hexdigest() if self.data is not None else None  # nosec B303
         return self._md5 if self._md5 else ''
 
     @md5.setter
@@ -399,7 +399,7 @@ class File:
         :return (str): hexadecimal string or None if file is not reachable
         """
         if self._sha1 is None and self.data:
-            self._sha1 = hashlib.sha1(self.data.getvalue()).hexdigest() if self.data is not None else None
+            self._sha1 = hashlib.sha1(self.data.getvalue()).hexdigest() if self.data is not None else None  # nosec B303
         return self._sha1 if self._sha1 else ''
 
     @sha1.setter
@@ -424,8 +424,7 @@ class File:
     def mime_type(self) -> str:
         if self.data:
             return magic.from_buffer(self.data.getvalue(), mime=True)
-        else:
-            return ''
+        return ''
 
     def delete(self) -> None:
         """

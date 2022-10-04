@@ -50,8 +50,7 @@ class Report:
 
     @status.setter
     def status(self, status: Status):
-        if self._status < status:
-            self._status = status
+        self._status = max(self._status, status)
 
     @property
     def is_done(self):
