@@ -89,7 +89,7 @@ class Observable:
     def __lt__(self, obj: 'Observable') -> bool:
         if self.observable_type < obj.observable_type:
             return True
-        elif self.observable_type == obj.observable_type:
+        if self.observable_type == obj.observable_type:
             return self.value < obj.value
         return False
 
@@ -100,10 +100,9 @@ class Observable:
     def status(self) -> Status:
         if self.value in self.storage.get_suspicious_observables():
             return Status.ALERT
-        elif self.value in self.storage.get_legitimate_observables():
+        if self.value in self.storage.get_legitimate_observables():
             return Status.CLEAN
-        else:
-            return Status.NOTAPPLICABLE
+        return Status.NOTAPPLICABLE
 
     @property
     def to_dict(self):

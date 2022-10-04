@@ -68,7 +68,7 @@ def office_to_pdf(source: Union[Path, bytes], dest: str) -> None:
             converter.convert(indata=source, outpath=dest)
     except AttributeError as e:
         # Happens when the file is password protected, might be happening on other occasions
-        raise Unsupported(f"The Office document is probably password protected, this feature isn't supported yet - Error message: {e}.")
+        raise Unsupported(f"The Office document is probably password protected, this feature isn't supported yet - Error message: {e}.") from e
 
 
 class File:
@@ -128,7 +128,7 @@ class File:
         'DOC': {'.doc', '.docx', '.odt'},
         'EML': {'.eml'},
         'EXE': {'.exe', '.dll'},
-        'HTM': {'.htm', '.html', '.html', '.xht', '.xhtml'},
+        'HTM': {'.htm', '.html', '.xht', '.xhtml'},
         'IMG': {'.png', '.gif', '.bmp', '.jpg', '.jpeg', '.ico'},
         'JSC': {'.js'},
         'MSG': {'.msg'},
@@ -424,8 +424,7 @@ class File:
     def mime_type(self) -> str:
         if self.data:
             return magic.from_buffer(self.data.getvalue(), mime=True)
-        else:
-            return ''
+        return ''
 
     def delete(self) -> None:
         """

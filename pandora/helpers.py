@@ -129,11 +129,11 @@ def expire_in_sec(time: Union[str, int]) -> int:
     assert match is not None, f"impossible to parse cache '{time}'"
     if not match.group(2) or match.group(2) == 's':
         return int(timedelta(seconds=int(match.group(1))).total_seconds())
-    elif match.group(2) == 'm':
+    if match.group(2) == 'm':
         return int(timedelta(minutes=int(match.group(1))).total_seconds())
-    elif match.group(2) == 'h':
+    if match.group(2) == 'h':
         return int(timedelta(hours=int(match.group(1))).total_seconds())
-    elif match.group(2) == 'd':
+    if match.group(2) == 'd':
         return int(timedelta(days=int(match.group(1))).total_seconds())
     return 0
 
