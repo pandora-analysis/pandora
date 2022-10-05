@@ -3,6 +3,7 @@ import json
 from enum import Enum, unique, auto
 from typing import Union, List, Dict, cast
 
+from .exceptions import Unsupported
 from .storage_client import Storage
 
 
@@ -47,7 +48,8 @@ class Action(Enum):
 class Role:
 
     def __init__(self, name: str, description: str, actions: Union[Dict[str, bool], str]):
-        assert name in RoleName.__members__, f"unexpected role name '{name}'"
+        if name not in RoleName.__members__:
+            raise Unsupported(f"unexpected role name '{name}'")
         self.storage = Storage()
         self.name = RoleName[name]
         self.description = description
@@ -55,7 +57,8 @@ class Role:
             actions = cast(Dict[str, bool], json.loads(actions))
         self.actions: Dict[Action, bool] = {}
         for action_name, perm in actions.items():
-            assert action_name in Action.__members__, f"unexpected action name '{action_name}'"
+            if action_name not in Action.__members__:
+                raise Unsupported(f"unexpected action name '{action_name}'")
             self.actions[Action[action_name]] = perm
 
     @property
@@ -74,7 +77,8 @@ class Role:
         :param (bool) value: model value
         """
         if isinstance(action, str):
-            assert action in Action.__members__, f"unexpected action name '{action}'"
+            if action not in Action.__members__:
+                raise Unsupported(f"unexpected action name '{action}'")
             action = Action[action]
         self.actions[action] = value
 
@@ -85,7 +89,8 @@ class Role:
         :param operator: and/or operator
         :return: whether if the role is allowed to do the action
         """
-        assert operator in ('and', 'or'), f"unexpected operator '{operator}'"
+        if operator not in ('and', 'or'):
+            raise Unsupported(f"unexpected operator '{operator}'")
         if isinstance(actions, str):
             actions = Action[actions]
         if isinstance(actions, list):

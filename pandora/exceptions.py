@@ -17,3 +17,7 @@ class MissingWorker(PandoraException):
 
 class TooManyObservables(PandoraException):
     pass
+
+
+class ConfigError(PandoraException):
+    pass

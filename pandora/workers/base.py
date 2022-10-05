@@ -166,11 +166,11 @@ class BaseWorker(multiprocessing.Process):
                     self.storage.set_report(report.to_dict)
                     self.logger.debug(f'Done with task {task_uuid}.')
 
-            except AssertionError as e:
-                self.logger.critical(f'assertion error with current task : {e}')
+            except PandoraException as e:
+                self.logger.critical(f'Error with current task : {e}')
             except ConnectionError:
                 self.logger.critical('Redis is gone, shutting down.')
             except FileNotFoundError as e:
                 self.logger.critical(f'unable to reach redis socket, shutting down : {e}')
-            except BaseException as e:
+            except Exception as e:
                 self.logger.critical(f'unknown error with current task : {repr(e)}\n{traceback.format_exc()}')

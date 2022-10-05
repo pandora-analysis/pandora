@@ -9,7 +9,7 @@ from typing import List, Dict, Type
 from redis import Redis
 
 from pandora.default import AbstractManager, get_socket_path
-from pandora.exceptions import MissingWorker
+from pandora.exceptions import MissingWorker, ConfigError
 from pandora.helpers import workers
 from pandora.workers.base import BaseWorker
 
@@ -81,7 +81,7 @@ class WorkersManager(AbstractManager):
 
             except TypeError as e:
                 key = str(e).rsplit(': ', maxsplit=1)[-1]
-                raise AssertionError(f"missing mandatory key {key} for worker in config") from e
+                raise ConfigError(f"missing mandatory key {key} for worker in config") from e
             else:
                 workers_list.append(worker)
         return workers_list

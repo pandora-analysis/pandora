@@ -607,7 +607,8 @@ class File:
         if not self.is_msg:
             return None
         msg = openMsg(self.path, delayAttachments=True)
-        assert isinstance(msg, Message), f'msg file must be a message, other formats are not supported yet. Type: {type(msg)}'
+        if not isinstance(msg, Message):
+            raise Unsupported(f'msg file must be a message, other formats are not supported yet. Type: {type(msg)}')
         return msg
 
     @cached_property
