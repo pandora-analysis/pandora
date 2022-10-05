@@ -14,6 +14,7 @@ from pymispwarninglists import WarningLists
 import yaml
 
 from .default import get_homedir
+from .exceptions import Unsupported
 from .role import Role
 
 logger = logging.getLogger('Helpers')
@@ -125,16 +126,17 @@ def expire_in_sec(time: Union[str, int]) -> int:
     """
     if not time:
         return 0
-    match = re.fullmatch(r'(\d+)([smhd]?)', str(time))
-    assert match is not None, f"impossible to parse cache '{time}'"
-    if not match.group(2) or match.group(2) == 's':
-        return int(timedelta(seconds=int(match.group(1))).total_seconds())
-    if match.group(2) == 'm':
-        return int(timedelta(minutes=int(match.group(1))).total_seconds())
-    if match.group(2) == 'h':
-        return int(timedelta(hours=int(match.group(1))).total_seconds())
-    if match.group(2) == 'd':
-        return int(timedelta(days=int(match.group(1))).total_seconds())
+    t_match = re.fullmatch(r'(\d+)([smhd]?)', str(time))
+    if t_match is None:
+        raise Unsupported(f"impossible to parse cache '{time}'")
+    if not t_match.group(2) or t_match.group(2) == 's':
+        return int(timedelta(seconds=int(t_match.group(1))).total_seconds())
+    if t_match.group(2) == 'm':
+        return int(timedelta(minutes=int(t_match.group(1))).total_seconds())
+    if t_match.group(2) == 'h':
+        return int(timedelta(hours=int(t_match.group(1))).total_seconds())
+    if t_match.group(2) == 'd':
+        return int(timedelta(days=int(t_match.group(1))).total_seconds())
     return 0
 
 

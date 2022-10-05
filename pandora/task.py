@@ -9,7 +9,7 @@ from pymisp import MISPEvent, MISPAttribute
 from werkzeug.utils import secure_filename
 
 from .default import get_homedir, safe_create_dir, PandoraException, get_config
-from .exceptions import TooManyObservables
+from .exceptions import TooManyObservables, Unsupported
 from .file import File
 from .helpers import Status, workers
 from .observable import Observable
@@ -87,7 +87,8 @@ class Task:
             # New task
             self.uuid = str(uuid4())
 
-        assert submitted_file is not None or file_id is not None, 'submitted_file or file_id is required'
+        if submitted_file is None and file_id is None:
+            raise Unsupported('submitted_file or file_id is required')
 
         if submitted_file:
             self.file = submitted_file

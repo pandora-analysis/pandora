@@ -3,6 +3,7 @@ import smtplib
 from email.message import EmailMessage
 
 from .default import get_config
+from .exceptions import Unsupported
 
 
 class Mail:
@@ -20,7 +21,8 @@ class Mail:
         """
         email_config = get_config('generic', 'email')
 
-        assert subject, 'subject cannot be empty'
+        if not subject:
+            raise Unsupported('subject cannot be empty')
 
         msg = EmailMessage()
         msg['Subject'] = subject
