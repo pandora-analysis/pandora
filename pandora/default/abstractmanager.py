@@ -10,7 +10,7 @@ from subprocess import Popen
 from typing import List, Optional, Tuple
 
 from redis import Redis
-from redis.exceptions import ConnectionError
+from redis.exceptions import ConnectionError as RedisConnectionError
 
 from .helpers import get_socket_path
 
@@ -32,7 +32,7 @@ class AbstractManager(ABC):
         try:
             r = Redis(unix_socket_path=get_socket_path('cache'), db=1, decode_responses=True)
             return r.zrangebyscore('running', '-inf', '+inf', withscores=True)
-        except ConnectionError:
+        except RedisConnectionError:
             print('Unable to connect to redis, the system is down.')
             return []
 
@@ -41,7 +41,7 @@ class AbstractManager(ABC):
         try:
             r = Redis(unix_socket_path=get_socket_path('cache'), db=1, decode_responses=True)
             r.delete('running')
-        except ConnectionError:
+        except RedisConnectionError:
             print('Unable to connect to redis, the system is down.')
 
     @staticmethod
@@ -49,7 +49,7 @@ class AbstractManager(ABC):
         try:
             r = Redis(unix_socket_path=get_socket_path('cache'), db=1, decode_responses=True)
             r.set('shutdown', 1)
-        except ConnectionError:
+        except RedisConnectionError:
             print('Unable to connect to redis, the system is down.')
 
     def set_running(self) -> None:
@@ -83,7 +83,7 @@ class AbstractManager(ABC):
             return bool(self.__redis.exists('shutdown'))
         except ConnectionRefusedError:
             return True
-        except ConnectionError:
+        except RedisConnectionError:
             return True
 
     def _to_run_forever(self) -> None:
