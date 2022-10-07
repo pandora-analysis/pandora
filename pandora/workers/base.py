@@ -9,7 +9,7 @@ from typing import Tuple, List, Optional
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
-from redis.exceptions import ResponseError, ConnectionError
+from redis.exceptions import ResponseError, ConnectionError as RedisConnectionError
 
 from ..default import get_socket_path
 from ..exceptions import PandoraException
@@ -48,7 +48,7 @@ class BaseWorker(multiprocessing.Process):
             self.logger.debug('Redis stream group created.')
         except ResponseError:
             self.logger.debug('Redis stream group already exists.')
-        except ConnectionError:
+        except RedisConnectionError:
             self.logger.critical('Redis not started, shutting down.')
             self.disabled = True
         except Exception as e:

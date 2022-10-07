@@ -16,8 +16,10 @@ from flask import request, url_for
 from flask_restx import Namespace, Resource, abort  # type: ignore
 from werkzeug.datastructures import FileStorage
 from werkzeug.security import check_password_hash
+from werkzeug.exceptions import Forbidden
 
 from pandora.default import get_config, PandoraException
+from pandora.exceptions import Unsupported
 from pandora.pandora import Pandora
 from pandora.mail import Mail
 from pandora.role import Action
@@ -52,10 +54,13 @@ def json_answer(func):
     def wrapper(*args, **kwargs):
         try:
             res = func(*args, **kwargs)
-        except AssertionError as e:
+        except PandoraException as e:
             err = str(e) if API_VERBOSE_JSON else None
             return {'success': False, 'error': err}, 400
-        except BaseException as e:
+        except Forbidden as e:
+            err = str(e) if API_VERBOSE_JSON else None
+            return {'success': False, 'error': err}, 403
+        except Exception as e:
             if API_LOG_TRACEBACK:
                 traceback.print_exc()
             err = repr(e) if API_VERBOSE_JSON else None
@@ -90,12 +95,18 @@ class ApiRole(Resource):
     @json_answer
     def post(self, action):
 
-        assert action in ('update', 'reload'), f"unknown action '{action}'"
+        if action not in ('update', 'reload'):
+            raise Unsupported(f"unknown action '{action}'")
+        if not flask_login.current_user.role.can(Action.update_role):
+            raise Forbidden("Your user isn't allowed to edit the roles.")
         if action == 'update' and flask_login.current_user.role.can(Action.update_role):
             data: Dict[str, str] = request.get_json()  # type: ignore
-            assert 'role_name' in data, "missing mandatory key 'role_name'"
-            assert 'permission' in data, "missing mandatory key 'permission'"
-            assert 'value' in data, "missing mandatory key 'value'"
+            if 'role_name' not in data:
+                raise Unsupported("missing mandatory key 'role_name'")
+            if 'permission' not in data:
+                raise Unsupported("missing mandatory key 'permission'")
+            if 'value' not in data:
+                raise Unsupported("missing mandatory key 'value'")
             role = pandora.get_role(data['role_name'])
             role.actions[Action[data['permission']]] = bool(int(data['value']))
             role.store()
@@ -105,8 +116,6 @@ class ApiRole(Resource):
             for role in roles_from_config().values():
                 role.store()
             return {'success': True}
-
-        raise AssertionError('forbidden')
 
 
 upload_parser = api.parser()
@@ -127,10 +136,12 @@ class ApiSubmit(Resource):
 
     @json_answer
     def post(self):
-        assert flask_login.current_user.role.can(Action.submit_file), 'forbidden'
+        if not flask_login.current_user.role.can(Action.submit_file):
+            raise Forbidden('User not allowed to submit a file')
         args = upload_parser.parse_args(request)
         submitted_file = args['file']
-        assert submitted_file.filename, 'file required'
+        if not submitted_file.filename:
+            raise Unsupported('file required')
 
         file_bytes = BytesIO(submitted_file.read())
         # check if file is empty. Do not run any worker if it is the case.
@@ -179,7 +190,8 @@ class ApiTaskStatus(Resource):
         details = bool(args.get('details'))
         task = pandora.get_task(task_id=task_id)
         update_user_role(pandora, task, seed)
-        assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
+        if not flask_login.current_user.role.can(Action.read_analysis):
+            raise Forbidden('Not allowed to read the report')
         to_return = {'success': True, 'taskId': task.uuid, 'status': task.status.name}
         if details:
             to_return['workersStatus'] = task.workers_status
@@ -222,7 +234,8 @@ class ApiWorkerDetails(Resource):
 
         task = pandora.get_task(task_id=task_id)
         update_user_role(pandora, task, seed)
-        assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
+        if not flask_login.current_user.role.can(Action.read_analysis):
+            raise Forbidden('Not allowed to read the report')
         to_return = {}
         if all_workers:
             for r in task.reports.values():
@@ -246,9 +259,11 @@ class ApiTaskAction(Resource):
 
     @json_answer
     def post(self, task_id, action, seed=None):
-        assert action in ('refresh', 'share', 'notify', 'rescan', 'delete'), f"unexpected action '{action}'"
+        if action not in ('refresh', 'share', 'notify', 'rescan', 'delete'):
+            raise Unsupported(f"unexpected action '{action}'")
         task = pandora.get_task(task_id=task_id)
-        assert task is not None, 'analysis not found'
+        if not task:
+            raise PandoraException('analysis not found')
         update_user_role(pandora, task, seed)
 
         if action == 'refresh' and flask_login.current_user.role.can(Action.refresh_analysis):
@@ -272,8 +287,10 @@ class ApiTaskAction(Resource):
 
         if action == 'notify' and flask_login.current_user.role.can(Action.notify_cert):
             data: Dict[str, str] = request.get_json()  # type: ignore
-            assert 'email' in data, "missing mandatory argument 'email'"
-            assert 'message' in data, "missing mandatory argument 'message'"
+            if 'email' not in data:
+                raise Unsupported("missing mandatory key 'email'")
+            if 'message' not in data:
+                raise Unsupported("missing mandatory key 'message'")
             if not seed:
                 seed = pandora.add_seed(task, time=90000)[0]  # Just a bit over a day
             message = '\n'.join([
@@ -286,7 +303,8 @@ class ApiTaskAction(Resource):
                 subject='Pandora - Analysis Notify',
                 message=message,
             )
-            assert sent, "an error has occurred when trying to send message"
+            if not sent:
+                raise PandoraException("an error has occurred when trying to send message")
             return {'success': True}
 
         if action == 'rescan' and flask_login.current_user.role.can(Action.rescan_file):
@@ -318,7 +336,7 @@ class ApiTaskAction(Resource):
             task.file.store
             return {'success': True, 'file_id': task.file.uuid}
 
-        raise AssertionError('forbidden')
+        raise Forbidden('You are not allowed to do that')
 
 
 @api.route('/api/search/<query>',

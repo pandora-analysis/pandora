@@ -24,8 +24,10 @@ from flask_bootstrap import Bootstrap5  # type: ignore
 from pymisp import MISPEvent, PyMISP
 from pymisp.abstract import describe_types
 from werkzeug.security import check_password_hash
+from werkzeug.exceptions import Forbidden
 
 from pandora.default import get_config
+from pandora.exceptions import PandoraException, Unsupported
 from pandora.helpers import workers, get_homedir, Status, get_disclaimers
 from pandora.pandora import Pandora
 from pandora.role import Action
@@ -160,7 +162,7 @@ def html_answer(func):
     def wrapper(*args, **kwargs):
         try:
             res = func(*args, **kwargs)
-        except (AssertionError, BaseException):
+        except (PandoraException, Exception):
             if API_LOG_TRACEBACK:
                 traceback.print_exc()
             return abort(404)
@@ -195,7 +197,8 @@ def api_root():
 @app.route('/submit', methods=['GET'], strict_slashes=False)
 @html_answer
 def api_submit_page():
-    assert flask_login.current_user.role.can(Action.submit_file), 'forbidden'
+    if not flask_login.current_user.role.can(Action.submit_file):
+        raise Forbidden('User not allowed to submit a file')
     enaled_workers = pandora.get_enabled_workers()
     disclaimers = get_disclaimers()
     return render_template(
@@ -215,10 +218,12 @@ def api_submit_page():
 @html_answer
 def api_analysis(task_id, seed=None):
     task = pandora.get_task(task_id=task_id)
-    assert task is not None, 'analysis not found'
+    if not task:
+        raise PandoraException('analysis not found')
 
     update_user_role(pandora, task, seed)
-    assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
+    if not flask_login.current_user.role.can(Action.read_analysis):
+        raise Forbidden('Not allowed to read the report')
 
     task.linked_tasks = []
 
@@ -236,11 +241,12 @@ def api_analysis(task_id, seed=None):
 @html_answer
 def task_misp_submit(task_id, seed=None):
     task = pandora.get_task(task_id=task_id)
-    assert task is not None, 'analysis not found'
+    if not task:
+        raise PandoraException('analysis not found')
     update_user_role(pandora, task, seed)
 
     if not flask_login.current_user.role.can(Action.submit_to_misp):
-        raise AssertionError('forbidden')
+        raise Forbidden('Not allowed to submit the report to MISP')
 
     event: MISPEvent = task.misp_export()
     misp_settings = get_config('generic', 'misp')
@@ -256,25 +262,29 @@ def task_misp_submit(task_id, seed=None):
 @app.route('/task-download/<task_id>/<source>/<int:idx>', methods=['GET'], strict_slashes=False)
 @html_answer
 def api_task_download(task_id, source, seed=None, idx=None):
-    assert source in ('img', 'pdf', 'txt', 'zip', 'txt_preview', 'misp'), f"unexpected source '{source}'"
+    if source not in ('img', 'pdf', 'txt', 'zip', 'txt_preview', 'misp'):
+        raise Unsupported(f"unexpected source '{source}'")
     task = pandora.get_task(task_id=task_id)
-    assert task is not None, 'analysis not found'
+    if not task:
+        raise PandoraException('analysis not found')
     update_user_role(pandora, task, seed)
 
     if source == 'img' and flask_login.current_user.role.can(Action.download_images):
         if not task.file.previews:
-            raise AssertionError('content not available')
+            raise PandoraException('content not available')
         if idx is not None:
             return send_file(task.file.previews[idx])
         return send_file(task.file.previews_archive)
 
     if source == 'pdf' and flask_login.current_user.role.can(Action.download_pdf):
         # NOTE: need to also return a PDF of office doc.
-        assert task.file.is_pdf, 'PDF not available'
+        if not task.file.is_pdf:
+            raise Unsupported('PDF not available')
         return send_file(task.file.path)
 
     if source == 'txt' and flask_login.current_user.role.can(Action.download_text):
-        assert task.file.text, 'text content not available'
+        if not task.file.text:
+            raise Unsupported('text content not available')
         return send_file(BytesIO(task.file.text.encode()), download_name=f'{task.file.path.name}.txt', mimetype='plain/text')
 
     if source == 'txt_preview' and flask_login.current_user.role.can(Action.see_text_preview):
@@ -293,7 +303,7 @@ def api_task_download(task_id, source, seed=None, idx=None):
         event = task.misp_export()
         return send_file(BytesIO(event.to_json().encode()), download_name=f'{task.uuid}.json', mimetype='application/json', as_attachment=True)
 
-    raise AssertionError('forbidden')
+    raise Forbidden('You do not have the right to get {source}')
 
 
 @app.route('/admin/<int:error>', methods=['GET'], strict_slashes=False)
@@ -313,8 +323,10 @@ def api_admin_submit():
         return redirect(url_for('api_admin_page'))
 
     try:
-        assert 'username' in request.form, "missing mandatory key 'username'"
-        assert 'password' in request.form, "missing mandatory key 'password'"
+        if 'username' not in request.form:
+            raise Unsupported("missing mandatory key 'username'")
+        if 'password' not in request.form:
+            raise Unsupported("missing mandatory key 'password'")
         try:
             users_table = build_users_table()
         except Exception as e:
@@ -330,14 +342,13 @@ def api_admin_submit():
             return redirect(url_for('api_admin_page'))
         return redirect(url_for('api_admin_page', error=1), 302)
 
-    except AssertionError:
+    except PandoraException:
         return redirect(url_for('api_admin_page', error=1), 302)
 
 
 @app.route('/admin/logout', methods=['GET'], strict_slashes=False)
 @html_answer
 def api_logout():
-    assert flask_login.current_user.is_admin, 'forbidden'
     flask_login.logout_user()
     flask_login.current_user.name = None
     session.clear()
@@ -348,7 +359,8 @@ def api_logout():
 @html_answer
 def api_tasks():
 
-    assert flask_login.current_user.role.can([Action.list_own_tasks, Action.list_all_tasks], 'or'), 'forbidden'
+    if not flask_login.current_user.role.can([Action.list_own_tasks, Action.list_all_tasks], 'or'):
+        raise Forbidden('Not allowed to list tasks')
     search = request.args.get('query')
     search = search.strip() if search is not None else None
     if not search:
@@ -382,7 +394,8 @@ def api_tasks():
 @html_answer
 def api_users():
 
-    assert flask_login.current_user.role.can(Action.list_users), 'forbidden'
+    if not flask_login.current_user.role.can(Action.list_users):
+        raise Forbidden('Not allowed to list users')
     users = pandora.get_users()
     return render_template('users.html',
                            show_project_page=get_config('generic', 'show_project_page'),
@@ -394,7 +407,8 @@ def api_users():
 @html_answer
 def api_clear_users():
 
-    assert flask_login.current_user.role.can(Action.list_users), 'forbidden'
+    if not flask_login.current_user.role.can(Action.list_users):
+        raise Forbidden('Not allowed to list users')
     pandora.storage.del_users()
     return redirect(url_for('api_submit_page'))
 
@@ -404,7 +418,8 @@ def api_clear_users():
 @html_answer
 def api_roles():
 
-    assert flask_login.current_user.role.can(Action.list_roles), 'forbidden'
+    if not flask_login.current_user.role.can(Action.list_roles):
+        raise Forbidden('Not allowed to list roles')
     roles = pandora.get_roles()
     return render_template('roles.html',
                            show_project_page=get_config('generic', 'show_project_page'),
@@ -416,7 +431,8 @@ def api_roles():
 @html_answer
 def observables_lists():
 
-    assert flask_login.current_user.role.can(Action.manage_observables_lists), 'forbidden'
+    if not flask_login.current_user.role.can(Action.manage_observables_lists):
+        raise Forbidden('Not allowed to manage observables list')
     suspicious = pandora.get_suspicious_observables()
     legitimate = pandora.get_legitimate_observables()
     observable_types = [t for t in describe_types['types'] if '|' not in t]
@@ -431,10 +447,14 @@ def observables_lists():
 def observables_lists_insert():
 
     data = request.form
-    assert 'observable' in data, "missing mandatory key 'observable'"
-    assert 'type' in data, "missing mandatory key 'type'"
-    assert data['type'].strip() in [t for t in describe_types['types'] if '|' not in t], "invalid type"
-    assert 'list_type' in data, "missing mandatory key 'list_type'"
+    if 'observable' not in data:
+        raise Unsupported("missing mandatory key 'observable'")
+    if 'type' not in data:
+        raise Unsupported("missing mandatory key 'type'")
+    if data['type'].strip() not in [t for t in describe_types['types'] if '|' not in t]:
+        raise Unsupported(f"invalid type: {data['type'].strip()}")
+    if 'list_type' not in data:
+        raise Unsupported("missing mandatory key 'list_type'")
     if int(data['list_type']) == 0:
         pandora.add_legitimate_observable(data['observable'].strip(), data['type'].strip())
     else:
@@ -458,9 +478,11 @@ def observables_lists_delete(list_type, observable):
 @html_answer
 def html_previews(task_id: str, seed: Optional[str]=None):
     task = pandora.get_task(task_id=task_id)
-    assert task is not None, 'analysis not found'
+    if not task:
+        raise PandoraException('analysis not found')
     update_user_role(pandora, task, seed)
-    assert flask_login.current_user.role.can(Action.download_images), 'forbidden'
+    if not flask_login.current_user.role.can(Action.download_images):
+        raise Forbidden('Not allowed to download images')
     report = pandora.get_report(task_id, 'preview')
     return render_template('previews.html', task=task, seed=seed, report=report)
 
@@ -470,7 +492,8 @@ def html_previews(task_id: str, seed: Optional[str]=None):
 @html_answer
 def html_observables(task_id: str, seed: Optional[str]=None):
     task = pandora.get_task(task_id=task_id)
-    assert task is not None, 'analysis not found'
+    if not task:
+        raise PandoraException('analysis not found')
     update_user_role(pandora, task, seed)
     return render_template('observables_list.html',
                            lookyloo_url=get_config('generic', 'lookyloo_url'),
@@ -482,7 +505,8 @@ def html_observables(task_id: str, seed: Optional[str]=None):
 @html_answer
 def html_extracted(task_id: str, seed: Optional[str]=None):
     task = pandora.get_task(task_id=task_id)
-    assert task is not None, 'analysis not found'
+    if not task:
+        raise PandoraException('analysis not found')
     update_user_role(pandora, task, seed)
     report = pandora.get_report(task_id, 'extractor')
     return render_template('extracted.html', task=task, seed=seed, report=report)
@@ -493,10 +517,13 @@ def html_extracted(task_id: str, seed: Optional[str]=None):
 @html_answer
 def html_workers_result(task_id: str, worker_name: str, seed: Optional[str]=None):
     task = pandora.get_task(task_id=task_id)
-    assert task is not None, 'analysis not found'
-    assert worker_name in workers(), 'unknown worker name'
+    if not task:
+        raise PandoraException('analysis not found')
+    if worker_name not in workers():
+        raise Unsupported(f'unknown worker name: {worker_name}')
     update_user_role(pandora, task, seed)
-    assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
+    if not flask_login.current_user.role.can(Action.read_analysis):
+        raise Forbidden('Not allowed to read the report')
     report = pandora.get_report(task_id, worker_name)
     if (template_dir / f'{worker_name}.html').exists():
         template_file = f'{worker_name}.html'
@@ -514,10 +541,13 @@ def html_workers_result(task_id: str, worker_name: str, seed: Optional[str]=None
 @html_answer
 def manual_trigger_worker(task_id: str, worker_name: str, seed: Optional[str]=None):
     task = pandora.get_task(task_id=task_id)
-    assert task is not None, 'analysis not found'
-    assert worker_name in workers(), f'unknown worker name: {worker_name}'
+    if not task:
+        raise PandoraException('analysis not found')
+    if worker_name not in workers():
+        raise Unsupported(f'unknown worker name: {worker_name}')
     update_user_role(pandora, task, seed)
-    assert flask_login.current_user.role.can(Action.read_analysis), 'forbidden'
+    if not flask_login.current_user.role.can(Action.read_analysis):
+        raise Forbidden('Not allowed to read the report')
     pandora.trigger_manual_worker(task, worker_name)
     return redirect(url_for('api_analysis', task_id=task_id, seed=seed))
 
@@ -526,7 +556,8 @@ def manual_trigger_worker(task_id: str, worker_name: str, seed: Optional[str]=No
 @admin_required
 @html_answer
 def api_stats():
-    assert flask_login.current_user.role.can(Action.list_stats), 'forbidden'
+    if not flask_login.current_user.role.can(Action.list_stats):
+        raise Forbidden('Not allowed to show stats')
     return render_template('stats.html',
                            show_project_page=get_config('generic', 'show_project_page'))
 

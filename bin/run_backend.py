@@ -8,7 +8,7 @@ from subprocess import Popen
 from typing import Optional, Dict
 
 from redis import Redis
-from redis.exceptions import ConnectionError
+from redis.exceptions import ConnectionError as RedisConnectionError
 
 from pandora.default import get_homedir, get_socket_path, get_config
 
@@ -23,7 +23,7 @@ def check_running(name: str) -> bool:
         r = Redis(unix_socket_path=socket_path)
     try:
         return bool(r.ping())
-    except ConnectionError:
+    except RedisConnectionError:
         return False
 
 
