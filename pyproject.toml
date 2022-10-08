@@ -89,12 +89,6 @@ warn_unreachable = true
 show_error_context = true
 pretty = true
 
-[tool.black]
-line-length = 160
-# single vs double quotes?
-# https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html#strings
-# skip-string-normalization = true
-
 [tool.pylint.main]
 # Analyse import fallback blocks. This can be used to support both Python 2 and 3
 # compatible code, which means that the block might have code that exists only in
