@@ -389,7 +389,7 @@ class File:
         :return (str|None): hexadecimal string or None if file is not reachable
         """
         if self._md5 is None and self.data:
-            self._md5 = hashlib.md5(self.data.getvalue()).hexdigest() if self.data is not None else None  # nosec B303
+            self._md5 = hashlib.md5(self.data.getvalue()).hexdigest() if self.data is not None else None  # nosec B324
         return self._md5 if self._md5 else ''
 
     @md5.setter
@@ -403,7 +403,7 @@ class File:
         :return (str): hexadecimal string or None if file is not reachable
         """
         if self._sha1 is None and self.data:
-            self._sha1 = hashlib.sha1(self.data.getvalue()).hexdigest() if self.data is not None else None  # nosec B303
+            self._sha1 = hashlib.sha1(self.data.getvalue()).hexdigest() if self.data is not None else None  # nosec B324
         return self._sha1 if self._sha1 else ''
 
     @sha1.setter

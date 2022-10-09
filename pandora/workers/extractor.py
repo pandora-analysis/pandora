@@ -117,7 +117,7 @@ class Extractor(BaseWorker):
         finally:
             try:
                 iso.close()
-            except Exception:
+            except Exception:  # nosec B110
                 pass
         return extracted_files
 
@@ -221,7 +221,7 @@ class Extractor(BaseWorker):
                         return pwd
             except py7zr.exceptions.PasswordRequired:
                 continue
-            except Exception:
+            except Exception:  # nosec B112
                 # TODO: notify that to the user?
                 continue
         return None

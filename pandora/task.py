@@ -127,7 +127,7 @@ class Task:
         if password:
             self.password = password
         else:
-            self.password = ''
+            self.password = ''  # nosec B105
         self.store()
 
     @property

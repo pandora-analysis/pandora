@@ -32,35 +32,38 @@ jobs:
 
     - name: Install with poetry
       run: |
+        sudo apt update
         sudo apt install python3-dev  # for compiling things
         sudo apt install libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0  # For HTML -> PDF
         sudo apt install libreoffice-base-nogui libreoffice-calc-nogui libreoffice-draw-nogui libreoffice-impress-nogui libreoffice-math-nogui libreoffice-writer-nogui  # For Office -> PDF
         sudo apt install exiftool  # for extracting exif information
         python -m pip install --upgrade pip poetry
+        poetry add -D flake8 bandit pylint semgrep
         poetry install
-        poetry add pylint
 
-    - name: Install test dependencies
-      run: |
-        python -m pip install flake8 bandit mypy lxml pylint semgrep
     - name: bandit
       run: |
-        bandit -r .
+        poetry run bandit -r .
       if: ${{ always() }}
+
     - name: codespell
       uses: codespell-project/actions-codespell@master
       with:
+        exclude_file: ./cache/cache.conf
         ignore_words_file: .codespellignore
       if: ${{ always() }}
+
     - name: flake8
       run: |
-        flake8 . --show-source --statistics
+        poetry run flake8 . --show-source --statistics --exclude yara_repos
       if: ${{ always() }}
+
     - name: pylint
       run: |
         poetry run pylint -ry bin pandora tools website
       if: ${{ always() }}
+
     - name: semgrep
       run: |
-        semgrep --config auto
+        poetry run semgrep --config auto
       if: ${{ always() }}
