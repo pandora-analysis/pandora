@@ -24,11 +24,16 @@ jobs:
         python-version: ['3.8']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+
+    - name: Install poetry
+      run: pipx install poetry
+
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{matrix.python-version}}
+        cache: 'poetry'
 
     - name: Install with poetry
       run: |
@@ -38,7 +43,7 @@ jobs:
         sudo apt install libreoffice-base-nogui libreoffice-calc-nogui libreoffice-draw-nogui libreoffice-impress-nogui libreoffice-math-nogui libreoffice-writer-nogui  # For Office -> PDF
         sudo apt install exiftool  # for extracting exif information
         python -m pip install --upgrade pip poetry
-        poetry add -D flake8 bandit pylint semgrep
+        poetry add -D flake8 pylint semgrep
         poetry install
 
     - name: bandit
