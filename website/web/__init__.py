@@ -144,11 +144,11 @@ def update_user():
             csrf.protect()
         flask_login.current_user.last_ip = src_request_ip(request)
         flask_login.current_user.last_seen = datetime.now()
-        flask_login.current_user.store
+        flask_login.current_user.store()
     else:
         # Note: session.sid comes from flask_session
         user = User(session_id=session.sid, last_ip=src_request_ip(request))  # type: ignore
-        user.store
+        user.store()
         flask_login.login_user(user)
 
 
@@ -337,7 +337,7 @@ def api_admin_submit():
         if username in users_table and check_password_hash(users_table[username]['password'], request.form['password']):
             flask_login.current_user.name = username
             flask_login.current_user.role = pandora.get_role('admin')
-            flask_login.current_user.store
+            flask_login.current_user.store()
             flask_login.login_user(flask_login.current_user)
             return redirect(url_for('api_admin_page'))
         return redirect(url_for('api_admin_page', error=1), 302)

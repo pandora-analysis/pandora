@@ -48,7 +48,7 @@ jobs:
 
     - name: bandit
       run: |
-        poetry run bandit -r .
+        poetry run bandit -c pyproject.toml -r .
       if: ${{ always() }}
 
     - name: codespell

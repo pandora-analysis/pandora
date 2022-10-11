@@ -120,7 +120,7 @@ pretty = true
 # fail-on =
 
 # Specify a score threshold under which the program will exit with error.
-fail-under = 10.0
+fail-under = 9.0
 
 # Interpret the stdin as a python script, whose filename needs to be passed as
 # the module_or_package argument.

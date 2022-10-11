@@ -79,7 +79,6 @@ class User:
                 if v
                 }
 
-    @property
     def store(self):
         self.storage.set_user(self.to_dict)
 
