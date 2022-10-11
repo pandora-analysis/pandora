@@ -1,0 +1,29 @@
+[master]
+disable=
+    # doc
+    C0114,
+    C0115,
+    C0116,
+    W1203, # lazy formatting in logging
+    C0301, # Long line
+    C0103, # var names,
+    W1510, # Subprocess check
+    # comments
+    W0511,
+    # too many/few of something
+    R0902,
+    R0914,
+    R0904,
+    R0902,
+    R0913,
+    R0902,
+    R0912,
+    R0915,
+    R0903,
+    R0911,
+    R1702,
+    # Unable to load watever
+    I1101,
+    W0703, # Too boad exception
+    W3101, # missing timeout
+    R1732, # Use "with"
