@@ -77,7 +77,7 @@ class IMAPFetcher(AbstractManager):
             messages = client.search("UNSEEN")
             # FIXME: make that cleaner
             user = User('email_submitter', last_ip='127.0.0.1', name='email')
-            user.store
+            user.store()
             for uid, message_data in client.fetch(messages, "RFC822").items():
                 email_message = email.message_from_bytes(message_data[b"RFC822"], policy=policy.default)
                 # TODO: Add disabled workers? set filename to some identifier?

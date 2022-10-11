@@ -136,7 +136,7 @@ class AbstractManager(ABC):
                 self._kill_process()
             try:
                 self.unset_running()
-            except Exception:
+            except Exception:  # nosec B110
                 # the services can already be down at that point.
                 pass
             self.logger.info(f'Shutting down {self.__class__.__name__}')
@@ -174,7 +174,7 @@ class AbstractManager(ABC):
                 self._kill_process()
             try:
                 self.unset_running()
-            except Exception:
+            except Exception:  # nosec B110
                 # the services can already be down at that point.
                 pass
             self.logger.info(f'Shutting down {self.__class__.__name__}')
