@@ -71,8 +71,8 @@ types-PyYAML = "^6.0.12"
 types-requests = "^2.28.11.2"
 types-python-dateutil = "^2.8.19"
 bandit = {extras = ["toml"], version = "^1.7.4"}
-
-
+flake8 = "^5.0.4"
+semgrep = "^0.116.0"
 
 [build-system]
 requires = ["poetry-core>=1.1.0"]
@@ -92,6 +92,15 @@ warn_unreachable = true
 
 show_error_context = true
 pretty = true
+
+[tool.bandit]
+exclude_dirs = ["tasks"]
+skips = [
+    "B101",
+    "B603", # subprocess call - check for execution of untrusted input.
+    "B404", # Import subprocess
+    "B607" # Start a subprocess
+]
 
 [tool.pylint.main]
 # Analyse import fallback blocks. This can be used to support both Python 2 and 3
@@ -621,12 +630,3 @@ ignored-argument-names = "_.*|^ignored_|^unused_"
 # List of qualified module names which can have objects that can redefine
 # builtins.
 redefining-builtins-modules = ["six.moves", "past.builtins", "future.builtins", "builtins", "io"]
-
-[tool.bandit]
-exclude_dirs = ["tasks"]
-skips = [
-    "B101",
-    "B603", # subprocess call - check for execution of untrusted input.
-    "B404", # Import subprocess
-    "B607" # Start a subprocess
-]
