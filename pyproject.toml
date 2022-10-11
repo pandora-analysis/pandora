@@ -63,7 +63,7 @@ pyhashlookup = "^1.2.1"
 pylookyloo = "^1.15.0"
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^2.15.3"
+pylint = "^2.15.4"
 ipython = "^8.5.0"
 mypy = "^0.982"
 types-redis = "^4.3.21.1"
