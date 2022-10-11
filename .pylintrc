@@ -27,3 +27,14 @@ disable=
     W0703, # Too boad exception
     W3101, # missing timeout
     R1732, # Use "with"
+    # Unused stuff
+    W0613,
+    W0612,
+    R0801, # duplicates
+    # Other incorect stuff to maybe look at?
+    E1134,
+    W2301,
+    E1101,
+    R1710,
+    C0209,
+    R0401
