@@ -61,7 +61,7 @@ test = ["coverage", "flake8", "pexpect", "wheel"]
 
 [[package]]
 name = "astroid"
-version = "2.12.10"
+version = "2.12.11"
 description = "An abstract syntax tree for Python with inference support."
 category = "dev"
 optional = false
@@ -623,7 +623,7 @@ smmap = ">=3.0.1,<6"
 
 [[package]]
 name = "GitPython"
-version = "3.1.28"
+version = "3.1.29"
 description = "GitPython is a python library used to interact with Git repositories"
 category = "dev"
 optional = false
@@ -1414,7 +1414,7 @@ python-versions = "*"
 
 [[package]]
 name = "pydyf"
-version = "0.3.0"
+version = "0.5.0"
 description = "A low-level PDF generator."
 category = "main"
 optional = false
@@ -1422,7 +1422,7 @@ python-versions = ">=3.7"
 
 [package.extras]
 doc = ["sphinx", "sphinx_rtd_theme"]
-test = ["coverage[toml]", "pillow", "pytest", "pytest-cov", "pytest-flake8", "pytest-isort", "pytest-xdist"]
+test = ["flake8", "isort", "pillow", "pytest"]
 
 [[package]]
 name = "PyExifTool"
@@ -1460,14 +1460,14 @@ docs = ["Sphinx (>=5.1.1,<6.0.0)"]
 
 [[package]]
 name = "pylint"
-version = "2.15.3"
+version = "2.15.4"
 description = "python code static checker"
 category = "dev"
 optional = false
 python-versions = ">=3.7.2"
 
 [package.dependencies]
-astroid = ">=2.12.10,<=2.14.0-dev0"
+astroid = ">=2.12.11,<=2.14.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
 dill = ">=0.2"
 isort = ">=4.2.5,<6"
@@ -2289,7 +2289,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "dd2af031d8ef27c970e91fe3fe35bbffa498202cb323c1cd3677b204f5d70070"
+content-hash = "6c22ad10162698e284940509b9bf655d40b9040d8dcda6bad0f0b9bb75505fe3"
 
 [metadata.files]
 aiohttp = [
@@ -2383,8 +2383,8 @@ argcomplete = [
     {file = "argcomplete-2.0.0.tar.gz", hash = "sha256:6372ad78c89d662035101418ae253668445b391755cfe94ea52f1b9d22425b20"},
 ]
 astroid = [
-    {file = "astroid-2.12.10-py3-none-any.whl", hash = "sha256:997e0c735df60d4a4caff27080a3afc51f9bdd693d3572a4a0b7090b645c36c5"},
-    {file = "astroid-2.12.10.tar.gz", hash = "sha256:81f870105d892e73bf535da77a8261aa5bde838fa4ed12bb2f435291a098c581"},
+    {file = "astroid-2.12.11-py3-none-any.whl", hash = "sha256:867a756bbf35b7bc07b35bfa6522acd01f91ad9919df675e8428072869792dce"},
+    {file = "astroid-2.12.11.tar.gz", hash = "sha256:2df4f9980c4511474687895cbfdb8558293c1a826d9118bb09233d7c2bff1c83"},
 ]
 asttokens = [
     {file = "asttokens-2.0.8-py2.py3-none-any.whl", hash = "sha256:e3305297c744ae53ffa032c45dc347286165e4ffce6875dc662b205db0623d86"},
@@ -2835,8 +2835,8 @@ gitdb = [
     {file = "gitdb-4.0.9.tar.gz", hash = "sha256:bac2fd45c0a1c9cf619e63a90d62bdc63892ef92387424b855792a6cabe789aa"},
 ]
 GitPython = [
-    {file = "GitPython-3.1.28-py3-none-any.whl", hash = "sha256:77bfbd299d8709f6af7e0c70840ef26e7aff7cf0c1ed53b42dd7fc3a310fcb02"},
-    {file = "GitPython-3.1.28.tar.gz", hash = "sha256:6bd3451b8271132f099ceeaf581392eaf6c274af74bb06144307870479d0697c"},
+    {file = "GitPython-3.1.29-py3-none-any.whl", hash = "sha256:41eea0deec2deea139b459ac03656f0dd28fc4a3387240ec1d3c259a2c47850f"},
+    {file = "GitPython-3.1.29.tar.gz", hash = "sha256:cc36bfc4a3f913e66805a28e84703e419d9c264c1077e537b54f0e1af85dbefd"},
 ]
 gunicorn = [
     {file = "gunicorn-20.1.0-py3-none-any.whl", hash = "sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e"},
@@ -3665,8 +3665,8 @@ pydeep2 = [
     {file = "pydeep2-0.5.1.tar.gz", hash = "sha256:44ce447e3253a69d3393f3cc53e3a87a48fe3ff9861793736a7bc218a1b95d77"},
 ]
 pydyf = [
-    {file = "pydyf-0.3.0-py3-none-any.whl", hash = "sha256:5d0aedc95f5fa040b62016ed40820b07008efbff2ebbdd328572ae635bad0952"},
-    {file = "pydyf-0.3.0.tar.gz", hash = "sha256:1aea6c0c97cc7b809efb5427147e168a5404ed76a53d76a3aea590d4ca1b04a3"},
+    {file = "pydyf-0.5.0-py3-none-any.whl", hash = "sha256:116bc4b057822dc72d6afc826cad33444f7dcde8059aa85534380fb63e3e306f"},
+    {file = "pydyf-0.5.0.tar.gz", hash = "sha256:51e751ae1504037c1fc1f4815119137b011802cd5f6c3539db066c455b14a7e1"},
 ]
 PyExifTool = [
     {file = "PyExifTool-0.4.13-py3-none-any.whl", hash = "sha256:fda35484325eecd150364160665baadc90cf330288d2048665505ad8ba5b4fc2"},
@@ -3681,8 +3681,8 @@ pyhashlookup = [
     {file = "pyhashlookup-1.2.1.tar.gz", hash = "sha256:eb514cc1a5559a013a8882e101849fa52a37641f2a7d9dc21c0d266b37607aa5"},
 ]
 pylint = [
-    {file = "pylint-2.15.3-py3-none-any.whl", hash = "sha256:7f6aad1d8d50807f7bc64f89ac75256a9baf8e6ed491cc9bc65592bc3f462cf1"},
-    {file = "pylint-2.15.3.tar.gz", hash = "sha256:5fdfd44af182866999e6123139d265334267339f29961f00c89783155eacc60b"},
+    {file = "pylint-2.15.4-py3-none-any.whl", hash = "sha256:629cf1dbdfb6609d7e7a45815a8bb59300e34aa35783b5ac563acaca2c4022e9"},
+    {file = "pylint-2.15.4.tar.gz", hash = "sha256:5441e9294335d354b7bad57c1044e5bd7cce25c433475d76b440e53452fa5cb8"},
 ]
 pylookyloo = [
     {file = "pylookyloo-1.15.0-py3-none-any.whl", hash = "sha256:ab717f8d05d8165cdfae8d47b13928de3f72b6322294dcff7881e757c343127f"},

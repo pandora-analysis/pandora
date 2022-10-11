@@ -584,7 +584,7 @@ class File:
 
         # Try to extract observables from text
         if self.text:
-            tp = TextParser(self.text.replace('\r\n', ''))
+            tp = TextParser(self.text.replace('\r\n', '\n'))
             observables['ip-dst'].update(tp.ips)
             observables['iban'].update(tp.ibans)
             observables['url'].update(tp.urls)
