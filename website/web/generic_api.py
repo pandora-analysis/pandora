@@ -333,7 +333,7 @@ class ApiTaskAction(Resource):
 
         if action == 'delete' and flask_login.current_user.role.can(Action.delete_file):
             task.file.delete()
-            task.file.store
+            task.file.store()
             return {'success': True, 'file_id': task.file.uuid}
 
         raise Forbidden('You are not allowed to do that')
