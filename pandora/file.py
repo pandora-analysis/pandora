@@ -620,14 +620,21 @@ class File:
         metadata: Dict[str, str] = {}
         if not self.path.exists():
             return {}
-        with exiftool.ExifTool() as et:
-            for key, value in et.get_metadata_batch([str(self.path)])[0].items():
-                if any(key.lower().startswith(word) for word in ('sourcefile', 'exiftool:', 'file:')):
-                    continue
-                key = key.split(':')[-1]
-                key = re.sub(r"([A-Z]+)([A-Z][a-z])", r'\1 \2', key)
-                key = re.sub(r"([a-z\d])([A-Z])", r'\1 \2', key)
-                metadata[key] = value
+        exiftool_path = get_config('generic', 'exiftool_path')
+        if not exiftool_path or not Path(exiftool_path).exists():
+            exiftool_path = None
+        try:
+            with exiftool.ExifTool(executable=exiftool_path) as et:
+                for key, value in et.get_metadata_batch([str(self.path)])[0].items():
+                    if any(key.lower().startswith(word) for word in ('sourcefile', 'exiftool:', 'file:')):
+                        continue
+                    key = key.split(':')[-1]
+                    key = re.sub(r"([A-Z]+)([A-Z][a-z])", r'\1 \2', key)
+                    key = re.sub(r"([a-z\d])([A-Z])", r'\1 \2', key)
+                    metadata[key] = value
+        except Exception as e:
+            self.logger.critical(f'Unable to use exiftool, probably because the version is too old: {e}')
+            metadata = {}
         return metadata
 
     @property
