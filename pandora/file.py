@@ -624,8 +624,8 @@ class File:
         if not exiftool_path or not Path(exiftool_path).exists():
             exiftool_path = None
         try:
-            with exiftool.ExifTool(executable=exiftool_path) as et:
-                for key, value in et.get_metadata_batch([str(self.path)])[0].items():
+            with exiftool.ExifToolHelper(executable=exiftool_path) as et:
+                for key, value in et.get_metadata([str(self.path)])[0].items():
                     if any(key.lower().startswith(word) for word in ('sourcefile', 'exiftool:', 'file:')):
                         continue
                     key = key.split(':')[-1]
