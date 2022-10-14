@@ -213,8 +213,9 @@ class File:
         :param deleted: whether if the file has been deleted
         """
 
-        self.storage = Storage()
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
+        self.logger.setLevel(get_config('generic', 'loglevel'))
+        self.storage = Storage()
 
         # NOTE: they're alny used by the text conversion method, is it expected?
         self.error = ''

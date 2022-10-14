@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import functools
+import logging
 import operator
 import traceback
 
@@ -70,6 +71,8 @@ login_manager = flask_login.LoginManager(app=app)
 flask_moment.Moment(app=app)
 app.config['WTF_CSRF_CHECK_DEFAULT'] = False
 csrf = flask_wtf.CSRFProtect(app=app)
+
+logging.basicConfig(level=get_config('generic', 'loglevel'))
 
 # Query API
 
