@@ -32,6 +32,7 @@
         "from": "Pandora <pandora@myorg.local>"
     },
     "weasyprint_fetch_ressources": false,
+    "exiftool_path": "",
     "systemd_service_name": "pandora",
     "_notes": {
         "loglevel": "(pandora) Can be one of the value listed here: https://docs.python.org/3/library/logging.html#levels",
@@ -55,6 +56,7 @@
         "misp": "The MISP configuration",
         "email": "Email configuration",
         "weasyprint_fetch_ressources": "If true, weasyprint will fetch resources linked in HTML content",
+        "exiftool_path": "Pandora requires exiftool >=12.15 (check with exiftool -ver), if you have an older version see: https://github.com/sylikc/pyexiftool#pyexiftool-dependencies",
         "systemd_service_name": "(Optional) Name of the systemd service if your project has one."
     }
 }
