@@ -4,7 +4,7 @@
       "lib": {
         "bootstrap-datepicker.min.css": "mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==",
         "datatables.css": "pzE7jxB7oeaq/hZP2NCFIKlcLxbUsJwMVzmDmPtWUcXWaBb9IYonZ7aVunR76jEJjWcdmcdJKvtSMCSUmEtkXg==",
-        "dropzone.css": "3XCkGeASl53asPugXJGPyH9mXEXRxYNUWojkV6twcSbSkpkAQZQt4wmG9WebDUq1Z/HX2j8Vw5nIlKAR/MJ3kg=="
+        "dropzone.css": "b3Wb3Os4sxJRdYkfCWtFjvuN/OlfBNtBGJknON+zbxU6M7GRYdII8m1W7TMsls/kwuwtq1wt7TvuF58Sd/4AGg=="
       },
       "ribbon.css": "2hAsQwCClHQ7b6VthbKYIkUPam4Ef6wbSxa3+nK0UuqCHezvPMr3aqpz16gD0lyYop55VEd/dhzZJLA4WMAplQ==",
       "style.css": "P+uDhEXPpEd6kypt5NaBQOP7fT+4NkM98Wqu+w0FsQu+aucA8xVMQwJp/nY2ZW8++LeQFC+rhPv8FZ4fI+89xA=="
@@ -22,14 +22,14 @@
       "skull.svg": "jVXBiN5aVJDJpcYfnDcCecHCL8mRl1Zc74QB0+bd6k4I46aCqMYBHUCRrA1KmCUE/ANwZjfvked+FJQJWR9NTA=="
     },
     "js": {
-      "analysis.js": "uxIVRInLpB1VGiUGiqNh0xqDxawJFGEsELWApmhURDsKT38H9OGQ+vFGnXI0s6SloJkRdzEVetn6ZCfKJHR2og==",
+      "analysis.js": "00ztYMQNFJfaWE/e0GvkF11NjhaUBI/FYMZD7zBwZZMHGKeeHH6haAJZwhM2MT+0ygkjMGgjddeYJBZ3JjCsjw==",
       "dashboard.js": "uHb6Q3vAkd294RVoP9botK0XiUqMPa0qtb0XdOxawHobm2TeEzYqjTAlQ9p9Drz3E4VU04ctVmM60EjsMfjdog==",
       "lib": {
         "bootstrap-datepicker.min.js": "T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==",
-        "chart.min.js": "sW/w8s4RWTdFFSduOTGtk4isV1+190E/GghVffMA9XczdJ2MDzSzLEubKAs5h0wzgSJOQTRYyaz73L3d6RtJSg==",
+        "chart.min.js": "ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==",
         "datatables.js": "MOsicOaJyNWPgwMOE1q4sTPZK6KuUQTMBhkmzb0tFVSRxgx3VnGTwIyRme/IhBJQdWJkfTcIKozchO11ILrmSg==",
-        "dropzone-min.js": "kLQ8y6epwwH5HA1M6K0bw2erLB1+Vz+7HOUepLaKRecyGXaP0K/9b6kq2+MZlyWt6E/AH6dtnxDom8lniz5BWw==",
-        "jquery.min.js": "894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==",
+        "dropzone-min.js": "FFyHlfr2vLvm0wwfHTNluDFFhHaorucvwbpr0sZYmxciUj3NoW1lYpveAQcx2B+MnbXbSrRasqp43ldP9BKJcg==",
+        "jquery.min.js": "aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==",
         "moment-with-locales.min.js": "42PE0rd+wZ2hNXftlM78BSehIGzezNeQuzihiBCvUEB3CVxHvsShF86wBWwQORNxNINlBPuq7rG4WWhNiTVHFg=="
       },
       "role.js": "BTP7CW18uIGpKdx7zwll71xZsb7UDjKk3I+AGeWLtyj4olvazpWslfZWqmE0rsamhtvUC6pjm6F5vC4hwTPs9Q==",

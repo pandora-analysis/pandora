@@ -290,7 +290,7 @@ Analysis.prototype.share = function (url) {
       }
       $("#shareLink").attr("href", new URL(data.link, location.href));
       if (data.lifetime > 0) {
-          $("#sharePeriod").text(`during ${parseInt(data.lifetime / (3600*24))} day(s)`);
+          $("#sharePeriod").text(`for ${parseInt(data.lifetime / (3600*24))} day(s)`);
       } else {
           $("#sharePeriod").text("permanently");
       }

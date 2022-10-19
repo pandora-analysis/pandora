@@ -387,6 +387,9 @@
                   <!-- Emails -->
                   {% if (task.file.is_msg and task.file.msg_data)
                         or (task.file.is_eml and task.file.eml_data)%}
+                  <p class="lead">The information below are extracted from the email,
+                      the fields shouldn't be trusted as they can have been
+                      tempered with by the sender</p>
                   <table class="table table-hover table-bordered"
                          id="emailContent">
                     <tr>
@@ -657,34 +660,33 @@
                   </span>
                 </div>
               </div>
-              <button type="submit" class="btn btn-secondary" id="shareBuild" style="float: right;">Build URL</button>
+              <button type="submit" class="btn btn-secondary" id="shareBuild" style="float: right;">Create a sharable link</button>
               </form>
 
               </br>
 
               <div class="row">
                 <div class="col d-none alert alert-info" id="shareSuccess">
-                  This analysis will be available publicly
-                  <b><span id="sharePeriod"></span></b> with
-                  <a href="" id="shareLink" class="alert-link">this link</a>
-                  <button type="button" class="btn btn-link" style="padding:0"
+                  This analysis will be available <b><span id="sharePeriod"></span></b> with
+                  <a href="" id="shareLink" class="alert-link">this link</a> -
+                  <button type="button" class="btn alert-link" style="padding:0"
                           title="Copy to clipboard"
                           onclick="navigator.clipboard.writeText(shareLink).then(
                                     function() {document.getElementById('copySuccess').classList.remove('d-none')},
                                     function() {document.getElementById('copyError').classList.remove('d-none')})">
-                      {{ render_icon('clipboard-plus', color='black') }}
+                      (copy to clipboard {{ render_icon('clipboard-plus', color='black') }})
                   </button>
                 </div>
                 <div class="col d-none alert alert-danger" id="shareError">
-                  An error has occurred while building a public link:
+                  An error has occurred while creating the sharable link:
                   <span id="shareErrorReason"></span>
                 </div>
               </div>
               <div class="col d-none alert alert-success" id="copySuccess">
-                Sharing link successfully copied to clipboard.
+                Sharable link successfully copied to clipboard.
               </div>
               <div class="col d-none alert alert-danger" id="copyError">
-                Unable to copy the sharing link.
+                Unable to copy the sharing link to the clipboard.
               </div>
             </div>
             <div class="modal-footer">
