@@ -10,6 +10,11 @@
 {% block content %}
 <div class="container">
   <div class="mb-3">
+    <center>
+      <h4>Pandora opens the box so you don't have to!</h4>
+    </center>
+  </div>
+  <div class="mb-3">
     {% if special_disclaimer %}
     <center>
     <div class="alert alert-danger" role="alert"><strong>Be extra careful, please.</strong><br/>
@@ -19,18 +24,31 @@
     {% endif %}
   </div>
 
+
+  <div class="md-3" onclick="toggle_password()">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" value="" id="checkPassword">
+      <label class="form-check-label" for="checkPassword">
+        The file is password protected
+      </label>
+    </div>
+  </div>
+  <div class="row g-3 align-items-center d-none" id="enable-password">
+    <div class="col-auto">
+      <label for="encryption-password" class="col-form-label">Password</label>
+    </div>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="encryption-password" placeholder="String to use to decrypt the submission">
+     </div>
+  </div>
+  </br>
+
   <div class="md-3" id="dropzone">
     <div class="dz-message" data-dz-message>
       <span><h2>Upload file, document, email or other</h2></span>
     </div>
   </div>
 
-  <div class="row md-3">
-    <label for="encryption-password" class="col-sm-2 col-form-label">Encryption password</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="encryption-password" placeholder="String to use to decrypt the submission">
-     </div>
-  </div>
 
   <div class="md-3">
     <button class="btn btn-primary" onclick="$('#workers-selection').toggleClass('d-none');">Advanced</button>
@@ -62,7 +80,8 @@
 
   <div class="md-3" style="font-size:12px">
     <center>
-      <div class="alert alert-light" role="alert"><strong>DISCLAIMER</strong><br/>
+      <div class="alert alert-light" role="alert">
+        <strong>DISCLAIMER</strong><br/>
         {{generic_disclaimer}}
       </div>
     </center>
@@ -110,5 +129,17 @@
       return
     }
   });
+</script>
+
+<script>
+function toggle_password() {
+  var checkBox = document.getElementById("checkPassword");
+  var text = document.getElementById("enable-password");
+  if (checkBox.checked == true){
+    text.classList.remove("d-none");
+  } else {
+     text.classList.add("d-none");
+  }
+}
 </script>
 {% endblock %}
