@@ -85,7 +85,7 @@ class User:
         return {k: v for k, v in {'session_id': self.session_id, 'name': self.name,
                                   'first_seen': self.first_seen.isoformat(),
                                   'last_seen': self.last_seen.isoformat(),
-                                  'detailed_view': int(self.detailed_view),
+                                  'detailed_view': str(int(self.detailed_view)),
                                   'role': self.role.name.name if self.role else RoleName.other.name,
                                   'last_ip': self.last_ip}.items()
                 if v is not None
