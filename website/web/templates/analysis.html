@@ -232,6 +232,7 @@
               {% endif %}
             </table>
           </div>
+          {% if current_user.detailed_view %}
           <div id="workers_results_overwrite"></div>
           <div id="workers_results_alert"></div>
           <div id="workers_results_warn"></div>
@@ -239,6 +240,17 @@
           <div id="workers_results_unknown"></div>
           <div id="workers_results_manual"></div>
           <div id="workers_results_error"></div>
+          {%else%}
+          <div class="md-3" onclick="toggle_detailed_view()">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" value=""
+                     id="detailedView" {% if current_user.detailed_view %}checked{% endif %}>
+              <label class="form-check-label" for="detailedView">
+                Show details
+              </label>
+            </div>
+          </div>
+          {% endif %}
         </div>
       </div>
 

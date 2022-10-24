@@ -11,7 +11,7 @@
 <div class="container">
   <div class="mb-3">
     <center>
-      <h4>Pandora opens the box so you don't have to!</h4>
+      <h4>Pandora opens the box, so you don't have to!</h4>
     </center>
   </div>
   <div class="mb-3">
@@ -49,10 +49,11 @@
     </div>
   </div>
 
-
+  {% if current_user.detailed_view %}
   <div class="md-3">
     <button class="btn btn-primary" onclick="$('#workers-selection').toggleClass('d-none');">Advanced</button>
   </div>
+  {% endif %}
 
   <div class="md-3 d-none" id="workers-selection">
       <table class="table table-striped table-sm">

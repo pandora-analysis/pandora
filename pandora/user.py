@@ -8,6 +8,7 @@ from .storage_client import Storage
 class User:
 
     def __init__(self, session_id: str, *, last_ip: str, name: Optional[str]=None,
+                 detailed_view: Union[bool, int, str]=False,
                  first_seen: Optional[Union[str, datetime]]=None,
                  last_seen: Optional[Union[str, datetime]]=None,
                  role: Union[str, RoleName, Role]=RoleName.other):
@@ -24,6 +25,9 @@ class User:
 
         self.session_id = session_id
         self.name = name
+        if isinstance(detailed_view, str):
+            detailed_view = int(detailed_view)
+        self._detailed_view: bool = bool(detailed_view)
         self.last_ip = last_ip
         if not first_seen:
             self.first_seen: datetime = datetime.now(timezone.utc)
@@ -50,6 +54,13 @@ class User:
                 stored_role = self.storage.get_role(role)
             self.role = Role(**stored_role)
 
+    def toggle_detailed_view(self):
+        self._detailed_view = not self._detailed_view
+
+    @property
+    def detailed_view(self) -> bool:
+        return self._detailed_view
+
     def get_id(self) -> str:
         return self.session_id
 
@@ -74,9 +85,10 @@ class User:
         return {k: v for k, v in {'session_id': self.session_id, 'name': self.name,
                                   'first_seen': self.first_seen.isoformat(),
                                   'last_seen': self.last_seen.isoformat(),
+                                  'detailed_view': int(self.detailed_view),
                                   'role': self.role.name.name if self.role else RoleName.other.name,
                                   'last_ip': self.last_ip}.items()
-                if v
+                if v is not None
                 }
 
     def store(self):

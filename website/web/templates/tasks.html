@@ -7,6 +7,29 @@
 {% endblock %}
 
 {% block content %}
+  {% if current_user.role.can(['search_file_name', 'search_file_hash'], 'or') %}
+    {% if current_user.role.can(['search_file_name', 'search_file_hash'], 'and') %}
+        {% set placeholder = 'Filename or hash...' %}
+    {% elif current_user.role.can('search_file_hash') %}
+        {% set placeholder = 'MD5, SHA1, SHA256...' %}
+    {% else %}
+        {% set placeholder = 'Filename' %}
+    {% endif %}
+    <form class="row g-3 align-items-center" role="search" title="Search for hash"
+        action={{ url_for('api_tasks') }} method="get">
+        <div class="col-auto">
+          <label class="form-label" for="searchInput">Search a submission</label>
+        </div>
+        <div class="col-auto">
+          <input class="form-control me-2" name="query" class="search" id="searchInput"
+                 style="width:400px" type="text" value="{{ search }}" required
+                 placeholder="{{ placeholder }}">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
+  {% endif %}
   <table class="table table-hover table-responsive">
     <thead>
       <tr>

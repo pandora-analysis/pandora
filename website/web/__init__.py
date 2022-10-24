@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import functools
+import json
 import logging
 import operator
 import traceback
@@ -195,6 +196,17 @@ def api_root():
         # Just returns ack if the webserver is running
         return 'Ack'
     return redirect(url_for('api_submit_page'), 301)
+
+
+@app.route('/toggle_detailed_view', methods=['POST'], strict_slashes=False)
+def api_toggle_detailed_view():
+    try:
+        flask_login.current_user.toggle_detailed_view()
+        flask_login.current_user.store()
+        return json.dumps(True)
+    except Exception as e:
+        print(f'Unable to toggle view: {e}')
+        return json.dumps(False)
 
 
 @app.route('/submit', methods=['GET'], strict_slashes=False)
