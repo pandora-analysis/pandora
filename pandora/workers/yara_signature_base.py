@@ -18,6 +18,7 @@ class YaraSignatureBaseWorker(YaraWorker):
     rulespath = get_homedir() / 'yara_repos' / 'signature-base'
     savepath = rulespath / 'yara.compiled'
     needs_external = ['generic_anomalies.yar', 'general_cloaking.yar',
+                      'gen_webshells_ext_vars.yar',
                       'thor_inverse_matches.yar', 'yara_mixed_ext_vars.yar']
     last_change: Optional[float] = None
 
