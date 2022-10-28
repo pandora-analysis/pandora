@@ -60,7 +60,7 @@ python-dateutil = "^2.8.2"
 pycdlib = "^1.13.0"
 werkzeug = "2.1.2"
 pyhashlookup = "^1.2.1"
-pylookyloo = "^1.15.0"
+pylookyloo = "^1.16.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.15.5"
