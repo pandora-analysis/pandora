@@ -33,7 +33,7 @@ PyMuPDF = "^1.20.2"
 requests = "^2.28.1"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.4"
-eml-parser = "^1.17.0"
+eml-parser = "^1.17.1"
 unoserver = "^1.2"
 weasyprint = "^57.0"
 extract-msg = {version = "^0.36.4", extras = ["all"]}
