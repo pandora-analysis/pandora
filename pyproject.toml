@@ -37,7 +37,7 @@ eml-parser = "^1.17.1"
 unoserver = "^1.2"
 weasyprint = "^57.0"
 extract-msg = {version = "^0.36.4", extras = ["all"]}
-Pillow = "^9.2.0"
+Pillow = "^9.3.0"
 oletools = {version = "0.60.1", extras = ["full"]}
 py7zr = "^0.20.0"
 jbxapi = "^3.18.0"
@@ -64,7 +64,7 @@ pylookyloo = "^1.16.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.15.5"
-ipython = "^8.5.0"
+ipython = "^8.6.0"
 mypy = "^0.982"
 types-redis = "^4.3.21.3"
 types-PyYAML = "^6.0.12.1"
