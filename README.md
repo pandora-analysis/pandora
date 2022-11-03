@@ -119,7 +119,7 @@ Note: on Ubuntu 20.04, libreoffice-nogui cannot be installed due to some depende
 Some have issues when generating previews. It seems to be related to the version of libreoffice in the packages, and the headless version (`*-nogui` packages) that are sometimes failing. If you see error messages in the logs, install libreoffice from the PPA:
 
 ```bash
-sudo add-apt-repository ppa:libreoffice/ppa 
+sudo add-apt-repository ppa:libreoffice/ppa
 sudo apt-get update
 sudo apt-get install libreoffice
 ```
@@ -141,7 +141,7 @@ echo PANDORA_HOME="`pwd`" >> .env
 
 Get web dependencies (css, font, js)
 ```bash
-python tools/3rdparty.py
+poetry run python tools/3rdparty.py
 ```
 Be aware that those are version-constrained because [SubResource Integrity (SRI)](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) is used (set in website/web/sri.txt).
 
