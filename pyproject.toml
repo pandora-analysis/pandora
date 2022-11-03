@@ -19,7 +19,7 @@ imap_fetcher = "bin.imap_fetcher:main"
 [tool.poetry.dependencies]
 python = "^3.8,<3.11"
 redis = {version = "^4.3.4", extras = ["hiredis"]}
-flask-restx = "^1.0.1"
+flask-restx = "^1.0.3"
 gunicorn = {version = "^20.1.0", extras = ["setproctitle"]}
 Flask-Session = "^0.4.0"
 Flask-Moment = "^1.0.5"
@@ -72,7 +72,7 @@ types-requests = "^2.28.11.2"
 types-python-dateutil = "^2.8.19.2"
 bandit = {extras = ["toml"], version = "^1.7.4"}
 flake8 = "^5.0.4"
-semgrep = "^0.118.0"
+semgrep = "^0.120.0"
 
 [build-system]
 requires = ["poetry-core>=1.1.0"]
