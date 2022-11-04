@@ -45,7 +45,7 @@
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav mx-5">
                 {% if current_user.role.can([action.list_all_tasks, action.list_own_tasks], 'or') %}
                     <li id="tasks-nav" class="nav-item">
                         <a class="nav-link active" href="{{ url_for('api_tasks') }}">Recent</a>
@@ -83,7 +83,7 @@
                     </li>
                 {% endif %}
             </ul>
-            <ul class="navbar-nav mx-auto">
+            <ul class="navbar-nav mx-5">
               <li class="nav-item">
                 <div onclick="toggle_detailed_view()">
                   <div class="form-check form-switch">
