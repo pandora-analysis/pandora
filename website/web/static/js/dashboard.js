@@ -168,6 +168,7 @@ function updateMetrics(metrics){
     const maliciousMetric = $("#malicious-submits .metric")
     const suspiciousMetric = $("#suspicious-submits .metric")
     const overwrittenMetric = $("#overwritten-submits .metric")
+    const errorMetric = $("#error-submits .metric")
     const cleanMetric = $("#clean-submits .metric")
     ratioDiv.removeClass()
 
@@ -176,6 +177,7 @@ function updateMetrics(metrics){
     maliciousMetric.text(nbf.format(metrics.malicious))
     suspiciousMetric.text(nbf.format(metrics.suspicious))
     overwrittenMetric.text(nbf.format(metrics.overwritten))
+    errorMetric.text(nbf.format(metrics.error))
     cleanMetric.text(nbf.format(metrics.clean))
     totalMetrics.text(nbf.format(metrics.submits))
 

@@ -522,7 +522,7 @@ def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
     # NOTE: the actual source of the submission isn't stored yet.
     to_return['submit'] = defaultdict(int)
     to_return['file'] = defaultdict(int)
-    to_return['metrics'] = {'alert_ratio': 0, 'submits': 0, 'malicious': 0, 'suspicious': 0, 'clean': 0, 'overwritten': 0}
+    to_return['metrics'] = {'alert_ratio': 0, 'submits': 0, 'malicious': 0, 'suspicious': 0, 'clean': 0, 'overwritten': 0, 'error': 0}
     to_return['submit_size'] = {'min': 0, 'max': 0, 'avg': 0}
     for first, last in intervals:
         tasks = pandora.storage.get_tasks(first_date=first.timestamp(), last_date=last.timestamp())
@@ -542,6 +542,8 @@ def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
                 to_return['metrics']['malicious'] += 1
             elif task.status == Status.OVERWRITE:
                 to_return['metrics']['overwritten'] += 1
+            elif task.status == Status.ERROR:
+                to_return['metrics']['error'] += 1
     nb_alert = to_return['metrics']['malicious'] + to_return['metrics']['suspicious']
     if to_return['submit']['total']:
         to_return['submit_size']['avg'] = sizeof_fmt(to_return['submit_size']['avg'] / to_return['submit']['total'])
