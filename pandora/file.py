@@ -369,6 +369,7 @@ class File:
             'sha1': self.sha1,
             'sha256': self.sha256,
             'size': self.size,
+            'mime_type': self.mime_type,
             'original_filename': self.original_filename,
             'save_date': self.save_date.isoformat(),
             'deleted': make_bool_for_redis(self.deleted)

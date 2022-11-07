@@ -24,6 +24,7 @@ from pandora.pandora import Pandora
 from pandora.mail import Mail
 from pandora.role import Action
 from pandora.task import Task
+from pandora.file import File
 from pandora.helpers import roles_from_config, workers, Status
 
 from .helpers import admin_required, update_user_role, build_users_table, load_user_from_request, sizeof_fmt
@@ -529,20 +530,26 @@ def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
         to_return['submit']['unknown'] += len(tasks)
         to_return['submit']['total'] += len(tasks)
         for t in tasks:
-            task = Task(**t)  # type: ignore
-            to_return['file'][task.file.mime_type] += 1
-            to_return['submit_size']['min'] = min(to_return['submit_size']['min'], task.file.size)
-            to_return['submit_size']['max'] = max(to_return['submit_size']['max'], task.file.size)
-            to_return['submit_size']['avg'] += task.file.size
-            if task.status == Status.CLEAN:
+            f = pandora.storage.get_file(t['file_id'])
+            if 'mime_type' not in f or 'size' not in f:
+                # old caching format, re-store the thing
+                file = File(**f)
+                file.store()
+                f = pandora.storage.get_file(t['file_id'])
+            to_return['file'][f['mime_type']] += 1
+            size = int(f['size'])
+            to_return['submit_size']['min'] = min(to_return['submit_size']['min'], size)
+            to_return['submit_size']['max'] = max(to_return['submit_size']['max'], size)
+            to_return['submit_size']['avg'] += size
+            if Status[t['status']] == Status.CLEAN:
                 to_return['metrics']['clean'] += 1
-            elif task.status == Status.WARN:
+            elif Status[t['status']] == Status.WARN:
                 to_return['metrics']['suspicious'] += 1
-            elif task.status == Status.ALERT:
+            elif Status[t['status']] == Status.ALERT:
                 to_return['metrics']['malicious'] += 1
-            elif task.status == Status.OVERWRITE:
+            elif Status[t['status']] == Status.OVERWRITE:
                 to_return['metrics']['overwritten'] += 1
-            elif task.status == Status.ERROR:
+            elif Status[t['status']] == Status.ERROR:
                 to_return['metrics']['error'] += 1
     nb_alert = to_return['metrics']['malicious'] + to_return['metrics']['suspicious']
     if to_return['submit']['total']:
