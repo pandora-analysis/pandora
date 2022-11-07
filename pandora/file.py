@@ -199,6 +199,7 @@ class File:
                  save_date: Optional[Union[str, datetime]]=None,
                  md5: Optional[str]=None, sha1: Optional[str]=None, sha256: Optional[str]=None,
                  size: Optional[Union[int, str]]=None,
+                 mime_type: Optional[str]=None,
                  deleted: Union[bool, int, str]=False):
         """
         Generate File object.
@@ -241,6 +242,7 @@ class File:
         self._sha256: Optional[str] = None
         self._text: Optional[str] = None
         self._size: int = 0
+        self._mime_type: str = ''
         if self.deleted:
             # Hashes should have been stored and must be present in the parameter
             # If the file is still on disk, they're initialized ondemand
@@ -248,11 +250,14 @@ class File:
                 raise Exception(f'The hashes should have been initialized. md5: {md5}, sha1: {sha1}, sha256: {sha256}')
             if not size:
                 raise Exception(f'The size {size} should have been initialized.')
+            if not mime_type:
+                raise Exception(f'The mime_type {mime_type} should have been initialized.')
 
             self.md5: str = md5
             self.sha1: str = sha1
             self.sha256: str = sha256
             self.size: int = int(size)
+            self.mime_type: str = mime_type
 
         if save_date:
             if isinstance(save_date, str):
@@ -426,11 +431,15 @@ class File:
     def sha256(self, value: str):
         self._sha256 = value
 
-    @cached_property
+    @property
     def mime_type(self) -> str:
-        if self.data:
-            return magic.from_buffer(self.data.getvalue(), mime=True)
-        return ''
+        if not self._mime_type and self.data:
+            self._mime_type = magic.from_buffer(self.data.getvalue(), mime=True)
+        return self._mime_type
+
+    @mime_type.setter
+    def mime_type(self, mime_type: str):
+        self._mime_type = mime_type
 
     def delete(self) -> None:
         """
