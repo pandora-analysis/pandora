@@ -52,7 +52,7 @@ clamd = "^1.0.2"
 rarfile = "^4.0"
 publicsuffix2 = "^2.20191221"
 pymispwarninglists = "^1.4"
-pikepdf = "^6.2.1"
+pikepdf = "^6.2.2"
 imapclient = "^2.3.1"
 pyzipper = "^0.3.6"
 pymisp = {version = "^2.4.162.2", extras = ["fileobjects"]}
