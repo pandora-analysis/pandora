@@ -24,6 +24,11 @@ class Observable:
         # Check if it already exists, update if needed
         stored_observable = Storage().get_observable(sha256, observable_type)
         if stored_observable:
+            if 'warninglist' in stored_observable:
+                wl = stored_observable.pop('warninglist')
+                if 'warninglists' not in stored_observable:
+                    # Old format, was ignored.
+                    stored_observable['warninglists'] = json.dumps([wl])
             observable = cls(**stored_observable)
             changed = False
             if seen < observable.first_seen:
