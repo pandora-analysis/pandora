@@ -86,6 +86,9 @@ class Storage():
         identifier = f'{observable["sha256"]}-{observable["observable_type"]}'
 
         self.storage.hmset(f'observables:{identifier}', observable)
+        if self.storage.hexists(f'observables:{identifier}', 'warninglist'):
+            # Clear old way to store WLs
+            self.storage.hdel(f'observables:{identifier}', 'warninglist')
         # TODO: use that in search page for observables.
         # Note: scan doesn't return the entries in any order, so we need to paginate manually
         self.storage.zadd('observables', {identifier: timestamp})

@@ -23,12 +23,11 @@ class Observable:
         sha256 = hashlib.sha256(value.encode()).hexdigest()
         # Check if it already exists, update if needed
         stored_observable = Storage().get_observable(sha256, observable_type)
-        if stored_observable:
-            if 'warninglist' in stored_observable:
-                wl = stored_observable.pop('warninglist')
-                if 'warninglists' not in stored_observable:
+        if stored_observable is not None:
+            if (wl := stored_observable.pop('warninglist', None)):
+                if not stored_observable.get('warninglists'):
                     # Old format, was ignored.
-                    stored_observable['warninglists'] = json.dumps([wl])
+                    stored_observable['warninglists'] = json.dumps([wl])  # pylint: disable=E1137
             observable = cls(**stored_observable)
             changed = False
             if seen < observable.first_seen:
@@ -62,7 +61,8 @@ class Observable:
 
     def __init__(self, sha256: str, value: str, observable_type: str,
                  first_seen: Union[str, datetime], last_seen: Union[str, datetime],
-                 warninglists: Optional[Union[str, List[WarningList]]]=None):
+                 warninglists: Optional[Union[str, List[WarningList]]]=None,
+                 warninglist: Optional[str]=None):
         self.storage = Storage()
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
 
@@ -81,6 +81,10 @@ class Observable:
             self.last_seen = self.first_seen.astimezone(timezone.utc)
         else:
             self.last_seen = last_seen
+
+        if warninglist and not warninglists:
+            # cleaning up old data
+            warninglists = json.dumps([warninglist])
 
         self.warninglists: List[WarningList] = []
         if warninglists:
