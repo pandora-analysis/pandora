@@ -254,7 +254,7 @@ def api_analysis(task_id, seed=None):
 @app.route('/task-misp-submit/<task_id>', methods=['GET'], strict_slashes=False)
 @app.route('/task-misp-submit/<task_id>/seed-<seed>', methods=['GET'], strict_slashes=False)
 @html_answer
-def task_misp_submit(task_id, seed=None):
+def task_misp_submit(task_id, seed: Optional[str]=None):
     task = pandora.get_task(task_id=task_id)
     if not task:
         raise PandoraException('analysis not found')
@@ -372,7 +372,7 @@ def api_logout():
 
 @app.route('/tasks', methods=['GET'], strict_slashes=False)
 @html_answer
-def api_tasks():
+def api_tasks() -> str:
 
     if not flask_login.current_user.role.can([Action.list_own_tasks, Action.list_all_tasks], 'or'):
         raise Forbidden('Not allowed to list tasks')

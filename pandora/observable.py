@@ -4,7 +4,7 @@ import logging
 
 from datetime import datetime, timezone
 from functools import cached_property
-from typing import Optional, overload, List
+from typing import Optional, overload, List, Union
 
 # NOTE: remove .api on next package release.
 from pymispwarninglists.api import WarningList
@@ -55,7 +55,9 @@ class Observable:
         '''From python'''
         ...
 
-    def __init__(self, sha256, value, observable_type, first_seen, last_seen, warninglists=None, warninglist=None):
+    def __init__(self, sha256: str, value: str, observable_type: str,
+                 first_seen: Union[str, datetime], last_seen: Union[str, datetime],
+                 warninglists: Optional[Union[str, List[WarningList]]]=None):
         self.storage = Storage()
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
 
@@ -83,7 +85,7 @@ class Observable:
                         self.warninglists.append(get_warninglists()[wl])
                     else:
                         self.logger.warning(f'Unable to find warning list {wl}')
-            else:
+            elif isinstance(warninglists, list):
                 self.warninglists = warninglists
 
     def __lt__(self, obj: 'Observable') -> bool:
