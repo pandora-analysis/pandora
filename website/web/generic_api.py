@@ -525,6 +525,7 @@ def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
     to_return['file'] = defaultdict(int)
     to_return['metrics'] = {'alert_ratio': 0, 'submits': 0, 'malicious': 0, 'suspicious': 0, 'clean': 0, 'overwritten': 0, 'error': 0}
     to_return['submit_size'] = {'min': 0, 'max': 0, 'avg': 0}
+    to_return['workers_stats'] = {name: defaultdict(dict) for name in pandora.get_enabled_workers()}
     for first, last in intervals:
         tasks = pandora.storage.get_tasks(first_date=first.timestamp(), last_date=last.timestamp())
         to_return['submit']['unknown'] += len(tasks)
@@ -551,6 +552,13 @@ def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
                 to_return['metrics']['overwritten'] += 1
             elif Status[t['status']] == Status.ERROR:
                 to_return['metrics']['error'] += 1
+            for name in to_return['workers_stats'].keys():
+                report = pandora.storage.get_report(t['uuid'], name)
+                if not report:
+                    continue
+                if report['status'] not in to_return['workers_stats'][name][f['mime_type']]:
+                    to_return['workers_stats'][name][f['mime_type']][report['status']] = 0
+                to_return['workers_stats'][name][f['mime_type']][report['status']] += 1
     nb_alert = to_return['metrics']['malicious'] + to_return['metrics']['suspicious']
     if to_return['submit']['total']:
         to_return['submit_size']['avg'] = sizeof_fmt(to_return['submit_size']['avg'] / to_return['submit']['total'])
