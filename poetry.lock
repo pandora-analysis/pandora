@@ -1580,7 +1580,7 @@ docs = ["Sphinx (>=5.3.0,<6.0.0)"]
 
 [[package]]
 name = "pymisp"
-version = "2.4.165"
+version = "2.4.165.1"
 description = "Python API for MISP."
 category = "main"
 optional = false
@@ -1999,7 +1999,7 @@ tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 
 [[package]]
 name = "stevedore"
-version = "4.1.0"
+version = "4.1.1"
 description = "Manage dynamic plugins for Python applications"
 category = "dev"
 optional = false
@@ -2465,7 +2465,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "890901831cfa22145b0071109e0c30ac0d6e12deb5a5694052655d9a00d37d8d"
+content-hash = "739c0c0a390f21e09e413f035f0e8049f3efaac5e004c37bbbf58238db8f1780"
 
 [metadata.files]
 aiohttp = [
@@ -3854,8 +3854,8 @@ pylookyloo = [
     {file = "pylookyloo-1.16.0.tar.gz", hash = "sha256:cfd07e8765d2d9b83f9bcb1509e1d31a70be625b3cde80fe8d42b276d4af2162"},
 ]
 pymisp = [
-    {file = "pymisp-2.4.165-py3-none-any.whl", hash = "sha256:000e191416c40837bcb2ba6b3c77b698c2cae09315c607e546a6b6a255b69723"},
-    {file = "pymisp-2.4.165.tar.gz", hash = "sha256:daea4ac414ea0d9873743b4517e20947206c11a277340c6aa5f51ffab6af5802"},
+    {file = "pymisp-2.4.165.1-py3-none-any.whl", hash = "sha256:0bdf056c263e6cf26d2e668ee59ac851d014d032f453b1d0c4ab1ee68034282d"},
+    {file = "pymisp-2.4.165.1.tar.gz", hash = "sha256:75dc26f212229293590124c208fc3e1f318cbd89fa5890bd7118dc9b15f3e92d"},
 ]
 pymispwarninglists = [
     {file = "pymispwarninglists-1.4-py3-none-any.whl", hash = "sha256:b1e0b01cbe655a931d3739bd860ad9d74356ac8899e4eec9d6404d5e4a17dbc1"},
@@ -4370,8 +4370,8 @@ stack-data = [
     {file = "stack_data-0.6.0.tar.gz", hash = "sha256:8e515439f818efaa251036af72d89e4026e2b03993f3453c000b200fb4f2d6aa"},
 ]
 stevedore = [
-    {file = "stevedore-4.1.0-py3-none-any.whl", hash = "sha256:3b1cbd592a87315f000d05164941ee5e164899f8fc0ce9a00bb0f321f40ef93e"},
-    {file = "stevedore-4.1.0.tar.gz", hash = "sha256:02518a8f0d6d29be8a445b7f2ac63753ff29e8f2a2faa01777568d5500d777a6"},
+    {file = "stevedore-4.1.1-py3-none-any.whl", hash = "sha256:aa6436565c069b2946fe4ebff07f5041e0c8bf18c7376dd29edf80cf7d524e4e"},
+    {file = "stevedore-4.1.1.tar.gz", hash = "sha256:7f8aeb6e3f90f96832c301bff21a7eb5eefbe894c88c506483d355565d88cc1a"},
 ]
 svglib = [
     {file = "svglib-1.4.1.tar.gz", hash = "sha256:48c24706c23bb4262173b6fa49eabb10afa15b8412f14283120549517ccfa314"},

@@ -23,7 +23,7 @@ class Observable:
         sha256 = hashlib.sha256(value.encode()).hexdigest()
         # Check if it already exists, update if needed
         stored_observable = Storage().get_observable(sha256, observable_type)
-        if stored_observable is not None:
+        if stored_observable:
             if (wl := stored_observable.pop('warninglist', None)):
                 if not stored_observable.get('warninglists'):
                     # Old format, was ignored.
