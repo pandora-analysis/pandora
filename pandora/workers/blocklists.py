@@ -21,7 +21,8 @@ class Blocklists(BaseWorker):
     # we sometimes have differences between magic and mimetypes from python
     # Example: text/x-python from mimetypes.guess_type and text/x-script.python from magic
     synonyms: Dict[str, List[str]] = {
-        'text/x-python': ['text/x-script.python']
+        'text/x-python': ['text/x-script.python'],
+        'application/x-cab': ['application/vnd.ms-cab-compressed']
     }
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
