@@ -88,8 +88,22 @@ class File:
         'text/css': ['CSS', 'css'],
         'text/csv': ['CSV', 'csv'],
         'application/msword': ['DOC', 'doc'],
-        'application/vnd.oasis.opendocument.text': ['DOC', 'odt'],
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['DOC', 'docx'],
+        'application/vnd.oasis.opendocument.text': ['ODF', 'odt'],
+        'application/vnd.oasis.opendocument.text-template': ['ODF', 'ott'],
+        'application/vnd.oasis.opendocument.text-web': ['ODF', 'oth'],
+        'application/vnd.oasis.opendocument.text-master': ['ODF', 'odm'],
+        'application/vnd.oasis.opendocument.spreadsheet': ['ODF', 'ods'],
+        'application/vnd.oasis.opendocument.spreadsheet-template': ['ODF', 'ots'],
+        'application/vnd.oasis.opendocument.chart': ['ODF', 'odc'],
+        'application/vnd.oasis.opendocument.presentation': ['ODF', 'odp'],
+        'application/vnd.oasis.opendocument.presentation-template': ['ODF', 'otp'],
+        'application/vnd.oasis.opendocument.graphics': ['ODF', 'odg'],
+        'application/vnd.oasis.opendocument.graphics-template': ['ODF', 'otg'],
+        'application/vnd.oasis.opendocument.formula': ['ODF', 'otf'],
+        'application/vnd.oasis.opendocument.database': ['ODF', 'odb'],
+        'application/vnd.oasis.opendocument.image': ['ODF', 'odi'],
+        'application/vnd.openofficeorg.extension': ['ODF', 'oxt'],
         'message/rfc822': ['EML', 'eml'],
         'text/html': ['HTM', 'html'],
         'application/xhtml+xml': ['HTM', 'html'],
@@ -103,7 +117,6 @@ class File:
         'image/webp': ['IMG', 'webp'],
         'application/vnd.ms-outlook': ['MSG', 'msg'],
         'application/pdf': ['PDF', 'pdf'],
-        'application/vnd.oasis.opendocument.presentation': ['PPT', 'ppt'],
         'application/vnd.ms-powerpoint': ['PPT', 'ppt'],
         'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['PPT', 'pptx'],
         'application/mspowerpoint': ['PPT', 'ppt'],
@@ -117,7 +130,6 @@ class File:
         'text/xml': ['TXT', 'xml'],
         'text/x-php': ['TXT', 'php'],
         'application/vnd.ms-excel': ['XLS', 'xls'],
-        'application/vnd.oasis.opendocument.spreadsheet': ['XLS', 'xls'],
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['XLS', 'xlsx']
     }
 
@@ -736,6 +748,14 @@ class File:
         :return (bool): boolean
         """
         return self.type == 'DOC'
+
+    @property
+    def is_odf(self) -> bool:
+        """
+        Whether this file is an OpenDocument.
+        :return (bool): boolean
+        """
+        return self.type == 'ODF'
 
     @property
     def is_svg(self) -> bool:
