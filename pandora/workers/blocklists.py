@@ -22,7 +22,8 @@ class Blocklists(BaseWorker):
     # Example: text/x-python from mimetypes.guess_type and text/x-script.python from magic
     synonyms: Dict[str, List[str]] = {
         'text/x-python': ['text/x-script.python'],
-        'application/x-cab': ['application/vnd.ms-cab-compressed']
+        'application/x-cab': ['application/vnd.ms-cab-compressed'],
+        'application/x-msdos-program': ['application/x-dosexec']
     }
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,

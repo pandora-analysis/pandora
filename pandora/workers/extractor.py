@@ -12,6 +12,8 @@ from io import BytesIO
 from pathlib import Path
 from typing import List, Optional, Union
 
+from hachoir.stream import StringInputStream  # type: ignore
+from hachoir.parser.archive import CabFile  # type: ignore
 import py7zr  # type: ignore
 import pycdlib
 from pycdlib.facade import PyCdlibJoliet, PyCdlibUDF, PyCdlibRockRidge, PyCdlibISO9660
@@ -307,6 +309,31 @@ class Extractor(BaseWorker):
                 extracted_files.append(Path(file_path))
         return extracted_files
 
+    def _extract_cab(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
+        extracted_files: List[Path] = []
+        # Code from https://github.com/vstinner/hachoir/issues/65#issuecomment-866965090
+        if not archive_file.data:
+            return extracted_files
+        cab = CabFile(StringInputStream(archive_file.data.getvalue()))
+        cab["folder_data[0]"].getSubIStream()
+        folder_data = BytesIO(cab["folder_data[0]"].uncompressed_data)
+        for file_number, file in enumerate(cab.array("file")):
+            if file_number >= self.max_files_in_archive:
+                self.logger.warning(f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive, stop extracting.')
+                report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                report.add_details('Warning', f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive')
+                break
+            if file["filesize"].value >= self.max_extracted_filesize:
+                self.logger.warning(f'File {archive_file.path.name} too big ({file["filesize"].value}).')
+                report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                report.add_details('Warning', f'File {archive_file.path.name} too big ({file["filesize"].value}).')
+                continue
+            file_path = dest_dir / file["filename"].value
+            with file_path.open('wb') as f:
+                f.write(folder_data.read(file["filesize"].value))
+            extracted_files.append(Path(file_path))
+        return extracted_files
+
     def _extract_gz(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         # gz is just like bz2, a compressed archive with a TAR directory inside
         gz_file = GzipFile(archive_file.path)
@@ -365,6 +392,8 @@ class Extractor(BaseWorker):
             try:
                 if task.file.mime_type == "application/x-7z-compressed":
                     extracted = self._extract_7z(task.file, report, extracted_dir)
+                elif task.file.mime_type == "application/vnd.ms-cab-compressed":
+                    extracted = self._extract_cab(task.file, report, extracted_dir)
                 elif task.file.mime_type == "application/x-rar":
                     extracted = self._extract_rar(task.file, report, extracted_dir)
                 elif task.file.mime_type == "application/x-bzip2":

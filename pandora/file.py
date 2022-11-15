@@ -84,6 +84,7 @@ class File:
         'application/x-7z-compressed': ['ARC', '7z'],
         'application/x-rar': ['ARC', 'rar'],
         'application/x-iso9660-image': ['ARC', 'iso'],
+        'application/vnd.ms-cab-compressed': ['ARC', 'cab'],
         'text/css': ['CSS', 'css'],
         'text/csv': ['CSV', 'csv'],
         'application/msword': ['DOC', 'doc'],
