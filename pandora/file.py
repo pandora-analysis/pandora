@@ -19,7 +19,7 @@ import fitz  # type: ignore
 import magic
 import pikepdf
 
-from oletools.msodde import process_file
+from oletools.msodde import process_file  # type: ignore
 from PIL import Image, ImageDraw, ImageFont  # type: ignore
 from pymisp import MISPEvent, MISPObject
 from pymisp.tools import make_binary_objects, FileObject
