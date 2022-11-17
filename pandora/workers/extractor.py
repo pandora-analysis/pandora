@@ -265,7 +265,7 @@ class Extractor(BaseWorker):
 
             archive.extractall(path=str(dest_dir))
 
-        return [path for path in dest_dir.iterdir() if path.is_file()]
+        return [path for path in dest_dir.glob('**/*') if path.is_file()]
 
     def _extract_bz2(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
         # bz2 is a TAR archive, we basically need to unzip it and then extract the files from the TAR
