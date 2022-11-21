@@ -305,8 +305,11 @@ class File:
             if self.msg_data.body:
                 office_to_pdf(self.msg_data.body.encode(), f'{self.path}_body_txt.pdf')
 
-            if self.msg_data.htmlBody:
-                html_to_pdf(self.msg_data.htmlBody, f'{self.path}_body_html.pdf')
+            try:
+                if self.msg_data.htmlBody:
+                    html_to_pdf(self.msg_data.htmlBody, f'{self.path}_body_html.pdf')
+            except Exception as e:
+                self.logger.warning(f'Unable to generate a preview of the HTML body: {e}')
 
         if self.eml_data:
             # get all content -> make it a PDF
