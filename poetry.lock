@@ -61,7 +61,7 @@ test = ["coverage", "flake8", "pexpect", "wheel"]
 
 [[package]]
 name = "astroid"
-version = "2.12.12"
+version = "2.12.13"
 description = "An abstract syntax tree for Python with inference support."
 category = "dev"
 optional = false
@@ -172,7 +172,7 @@ python-versions = "*"
 
 [[package]]
 name = "bootstrap-flask"
-version = "2.1.0"
+version = "2.2.0"
 description = "Bootstrap 4 & 5 helper for your Flask projects."
 category = "main"
 optional = false
@@ -475,7 +475,7 @@ tests = ["asttokens", "littleutils", "pytest", "rich"]
 
 [[package]]
 name = "extract-msg"
-version = "0.36.5"
+version = "0.37.0"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 category = "main"
 optional = false
@@ -1555,7 +1555,7 @@ docs = ["Sphinx (>=5.1.1,<6.0.0)"]
 
 [[package]]
 name = "pylint"
-version = "2.15.5"
+version = "2.15.6"
 description = "python code static checker"
 category = "dev"
 optional = false
@@ -1950,7 +1950,7 @@ test = ["pytest"]
 
 [[package]]
 name = "setuptools"
-version = "65.5.1"
+version = "65.6.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "main"
 optional = false
@@ -2066,8 +2066,8 @@ resolved_reference = "2d320fc1b7b065ad88c160063259864f6fd82958"
 
 [[package]]
 name = "texttable"
-version = "1.6.4"
-description = "module for creating simple ASCII tables"
+version = "1.6.5"
+description = "module to create simple ASCII tables"
 category = "main"
 optional = false
 python-versions = "*"
@@ -2278,7 +2278,7 @@ test = ["flake8 (>=2.4.0)", "isort (>=4.2.2)", "pytest (>=2.2.3)"]
 
 [[package]]
 name = "vt-py"
-version = "0.17.2"
+version = "0.17.3"
 description = "The official Python client library for VirusTotal"
 category = "main"
 optional = false
@@ -2477,7 +2477,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "22030dd698c286dbd821b5154f76fd65ae74cab4f9346a90ec29fc2d5ad595d4"
+content-hash = "31fbd789822a8a394ecd39b29f3099e96a45b1bc2507793b4d7a2fac98647503"
 
 [metadata.files]
 aiohttp = [
@@ -2571,8 +2571,8 @@ argcomplete = [
     {file = "argcomplete-2.0.0.tar.gz", hash = "sha256:6372ad78c89d662035101418ae253668445b391755cfe94ea52f1b9d22425b20"},
 ]
 astroid = [
-    {file = "astroid-2.12.12-py3-none-any.whl", hash = "sha256:72702205200b2a638358369d90c222d74ebc376787af8fb2f7f2a86f7b5cc85f"},
-    {file = "astroid-2.12.12.tar.gz", hash = "sha256:1c00a14f5a3ed0339d38d2e2e5b74ea2591df5861c0936bb292b84ccf3a78d83"},
+    {file = "astroid-2.12.13-py3-none-any.whl", hash = "sha256:10e0ad5f7b79c435179d0d0f0df69998c4eef4597534aae44910db060baeb907"},
+    {file = "astroid-2.12.13.tar.gz", hash = "sha256:1493fe8bd3dfd73dc35bd53c9d5b6e49ead98497c47b2307662556a5692d29d7"},
 ]
 asttokens = [
     {file = "asttokens-2.1.0-py2.py3-none-any.whl", hash = "sha256:1b28ed85e254b724439afc783d4bee767f780b936c3fe8b3275332f42cf5f561"},
@@ -2621,8 +2621,8 @@ boltons = [
     {file = "boltons-21.0.0.tar.gz", hash = "sha256:65e70a79a731a7fe6e98592ecfb5ccf2115873d01dbc576079874629e5c90f13"},
 ]
 bootstrap-flask = [
-    {file = "Bootstrap-Flask-2.1.0.tar.gz", hash = "sha256:dc4f9c463727f3a59a6bfb17b7f9d13fd07646ba852f94285542c6a1e4e457e3"},
-    {file = "Bootstrap_Flask-2.1.0-py2.py3-none-any.whl", hash = "sha256:52e360421aafbf117f59ed8237391b2a4c77592e35ab7b4566d4fde3b277825a"},
+    {file = "Bootstrap-Flask-2.2.0.tar.gz", hash = "sha256:40f3bf7d5802e429b2fca286a548bdde816c1185c28aa8df3051cff35cd05cac"},
+    {file = "Bootstrap_Flask-2.2.0-py2.py3-none-any.whl", hash = "sha256:b1fd9be1d22f4f1714a8a596ea2a4a5db9c957ba6db4aea4cb38ae90555233f3"},
 ]
 bracex = [
     {file = "bracex-2.3.post1-py3-none-any.whl", hash = "sha256:351b7f20d56fb9ea91f9b9e9e7664db466eb234188c175fd943f8f755c807e73"},
@@ -2904,8 +2904,8 @@ executing = [
     {file = "executing-1.2.0.tar.gz", hash = "sha256:19da64c18d2d851112f09c287f8d3dbbdf725ab0e569077efb6cdcbd3497c107"},
 ]
 extract-msg = [
-    {file = "extract_msg-0.36.5-py2.py3-none-any.whl", hash = "sha256:9ce358ab515bfc7b558d175ee6cd8ea61d9a35f934b9d5d927119d20e6b180f9"},
-    {file = "extract_msg-0.36.5.tar.gz", hash = "sha256:3d4044aeab3b5d35d91d3791fbe6ebaf5a414bd3d4437c46e6920d7b9340b482"},
+    {file = "extract_msg-0.37.0-py2.py3-none-any.whl", hash = "sha256:c7bd5187bafcbd04b37919e58b872cd647af2b18c1e922add6e2386a763e05ba"},
+    {file = "extract_msg-0.37.0.tar.gz", hash = "sha256:b0ad4ab44e4e180c858ea2c327f714a20160c41ba432053477c07b1c481f0cd8"},
 ]
 face = [
     {file = "face-22.0.0-py3-none-any.whl", hash = "sha256:344fe31562d0f6f444a45982418f3793d4b14f9abb98ccca1509d22e0a3e7e35"},
@@ -3862,8 +3862,8 @@ pyhashlookup = [
     {file = "pyhashlookup-1.2.1.tar.gz", hash = "sha256:eb514cc1a5559a013a8882e101849fa52a37641f2a7d9dc21c0d266b37607aa5"},
 ]
 pylint = [
-    {file = "pylint-2.15.5-py3-none-any.whl", hash = "sha256:c2108037eb074334d9e874dc3c783752cc03d0796c88c9a9af282d0f161a1004"},
-    {file = "pylint-2.15.5.tar.gz", hash = "sha256:3b120505e5af1d06a5ad76b55d8660d44bf0f2fc3c59c2bdd94e39188ee3a4df"},
+    {file = "pylint-2.15.6-py3-none-any.whl", hash = "sha256:15060cc22ed6830a4049cf40bc24977744df2e554d38da1b2657591de5bcd052"},
+    {file = "pylint-2.15.6.tar.gz", hash = "sha256:25b13ddcf5af7d112cf96935e21806c1da60e676f952efb650130f2a4483421c"},
 ]
 pylookyloo = [
     {file = "pylookyloo-1.16.0-py3-none-any.whl", hash = "sha256:2c39e26eae61144e6bb986fbcb58604e9804b4d6b2fe1ff844d8b429db2628d2"},
@@ -4363,8 +4363,8 @@ setproctitle = [
     {file = "setproctitle-1.3.2.tar.gz", hash = "sha256:b9fb97907c830d260fa0658ed58afd48a86b2b88aac521135c352ff7fd3477fd"},
 ]
 setuptools = [
-    {file = "setuptools-65.5.1-py3-none-any.whl", hash = "sha256:d0b9a8433464d5800cbe05094acf5c6d52a91bfac9b52bcfc4d41382be5d5d31"},
-    {file = "setuptools-65.5.1.tar.gz", hash = "sha256:e197a19aa8ec9722928f2206f8de752def0e4c9fc6953527360d1c36d94ddb2f"},
+    {file = "setuptools-65.6.0-py3-none-any.whl", hash = "sha256:6211d2f5eddad8757bd0484923ca7c0a6302ebc4ab32ea5e94357176e0ca0840"},
+    {file = "setuptools-65.6.0.tar.gz", hash = "sha256:d1eebf881c6114e51df1664bc2c9133d022f78d12d5f4f665b9191f084e2862d"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
@@ -4394,8 +4394,8 @@ svglib = [
 ]
 textract = []
 texttable = [
-    {file = "texttable-1.6.4-py2.py3-none-any.whl", hash = "sha256:dd2b0eaebb2a9e167d1cefedab4700e5dcbdb076114eed30b58b97ed6b37d6f2"},
-    {file = "texttable-1.6.4.tar.gz", hash = "sha256:42ee7b9e15f7b225747c3fa08f43c5d6c83bc899f80ff9bae9319334824076e9"},
+    {file = "texttable-1.6.5-py2.py3-none-any.whl", hash = "sha256:a169c9a3598f2ef3721123c2951fdaa954dae4593a4adef0a855eb02955f83ff"},
+    {file = "texttable-1.6.5.tar.gz", hash = "sha256:fc3f763a89796ae03789a02343bd4e8fed9735935123b1bfb9537a5935852315"},
 ]
 tinycss2 = [
     {file = "tinycss2-1.2.1-py3-none-any.whl", hash = "sha256:2b80a96d41e7c3914b8cda8bc7f705a4d9c49275616e886103dd839dfc847847"},
@@ -4536,8 +4536,8 @@ validators = [
     {file = "validators-0.20.0.tar.gz", hash = "sha256:24148ce4e64100a2d5e267233e23e7afeb55316b47d30faae7eb6e7292bc226a"},
 ]
 vt-py = [
-    {file = "vt-py-0.17.2.tar.gz", hash = "sha256:ef8b7da02771111bdbb32d7f02db6e14ed81a17625cdfc0337847ed6842396f1"},
-    {file = "vt_py-0.17.2-py3-none-any.whl", hash = "sha256:b154fb2130f88fb2fd46a1f1472739b3eb028886fc3254bacbe65c9225e66ab5"},
+    {file = "vt-py-0.17.3.tar.gz", hash = "sha256:2f96fe86c7213dda9e45ab06bf18f7843f9513c1a073b1606fe238ea624a5b32"},
+    {file = "vt_py-0.17.3-py3-none-any.whl", hash = "sha256:c6cb4e134dcf12683de97993ef7e1daedd7e548acfdc5dc6b730db92c3207610"},
 ]
 wcmatch = [
     {file = "wcmatch-8.4.1-py3-none-any.whl", hash = "sha256:3476cd107aba7b25ba1d59406938a47dc7eec6cfd0ad09ff77193f21a964dee7"},
