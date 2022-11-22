@@ -21,3 +21,7 @@ class TooManyObservables(PandoraException):
 
 class ConfigError(PandoraException):
     pass
+
+
+class InvalidPandoraObject(PandoraException):
+    pass

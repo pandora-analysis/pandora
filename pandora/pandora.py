@@ -11,6 +11,7 @@ from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
 
 from .default import get_config, get_socket_path
+from .exceptions import InvalidPandoraObject
 from .helpers import roles_from_config, expire_in_sec
 # from .observable import Observable
 from .report import Report
@@ -75,7 +76,7 @@ class Pandora():
             role_name = role_name.name
         r = self.storage.storage.hgetall(f'roles:{role_name}')
         if not r:
-            raise Exception(f'Unknown role: "{role_name}"')
+            raise InvalidPandoraObject(f'Unknown role: "{role_name}"')
         return Role(**r)
 
     def get_roles(self) -> List[Role]:
@@ -90,7 +91,7 @@ class Pandora():
     def get_task(self, task_id: str) -> Task:
         t = self.storage.get_task(task_id)
         if not t:
-            raise Exception(f'Unknown task ID: "{task_id}"')
+            raise InvalidPandoraObject(f'Unknown task ID: "{task_id}"')
         # FIXME: get rid of that typing ignore
         return Task(**t)  # type: ignore
 
@@ -190,7 +191,7 @@ class Pandora():
     def get_report(self, task_id: str, worker_name: str) -> Report:
         r = self.storage.get_report(task_id, worker_name)
         if not r:
-            raise Exception(f'Unknown Report ID: "{task_id}-{worker_name}"')
+            raise InvalidPandoraObject(f'Unknown Report ID: "{task_id}-{worker_name}"')
         # FIXME: get rid of that typing ignore
         return Report(**r)
 

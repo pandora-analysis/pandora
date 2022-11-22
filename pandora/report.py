@@ -2,6 +2,7 @@ import json
 
 from typing import Optional, Dict, Union, List, Set, Any, overload
 
+from .exceptions import PandoraException
 from .helpers import Status
 
 
@@ -102,7 +103,7 @@ class Report:
         else:
             if isinstance(self._details[details_name], str):
                 if isinstance(details, dict):
-                    raise Exception('Unable to concatenate a str with a dict')
+                    raise PandoraException('The details exist and are a dict, impossible to add string details.')
                 self._details[details_name] = {self._details[details_name], }
             if isinstance(details, str):
                 details = {details, }

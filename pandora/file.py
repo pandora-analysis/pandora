@@ -32,7 +32,7 @@ from eml_parser import EmlParser
 from extract_msg import openMsg, Message
 
 from .default import get_config
-from .exceptions import Unsupported, NoPreview
+from .exceptions import Unsupported, NoPreview, InvalidPandoraObject
 from .helpers import make_bool, make_bool_for_redis
 from .storage_client import Storage
 from .text_parser import TextParser
@@ -261,17 +261,18 @@ class File:
             # Hashes should have been stored and must be present in the parameter
             # If the file is still on disk, they're initialized ondemand
             if not md5 or not sha1 or not sha256:
-                raise Exception(f'The hashes should have been initialized. md5: {md5}, sha1: {sha1}, sha256: {sha256}')
+                raise InvalidPandoraObject(f'The hashes should have been initialized. md5: {md5}, sha1: {sha1}, sha256: {sha256}')
             if not size:
-                raise Exception(f'The size {size} should have been initialized.')
+                raise InvalidPandoraObject(f'The size {size} should have been initialized.')
             if not mime_type:
-                raise Exception(f'The mime_type {mime_type} should have been initialized.')
+                self.mime_type = 'Unknown'
+            else:
+                self.mime_type = mime_type
 
-            self.md5: str = md5
-            self.sha1: str = sha1
-            self.sha256: str = sha256
-            self.size: int = int(size)
-            self.mime_type: str = mime_type
+            self.md5 = md5
+            self.sha1 = sha1
+            self.sha256 = sha256
+            self.size = int(size)
 
         if save_date:
             if isinstance(save_date, str):
