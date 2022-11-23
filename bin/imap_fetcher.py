@@ -69,7 +69,7 @@ class IMAPFetcher(AbstractManager):
         return msg
 
     def _imap_fetcher(self):
-        self.logger.info('fetching mails...')
+        self.logger.debug('fetching mails...')
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
@@ -82,6 +82,7 @@ class IMAPFetcher(AbstractManager):
             user = User('email_submitter', last_ip='127.0.0.1', name='email')
             user.store()
             for uid, message_data in client.fetch(messages, "RFC822").items():
+                self.logger.info('Processing new mail...')
                 email_message = email.message_from_bytes(message_data[b"RFC822"], policy=policy.default)
                 # TODO: Add disabled workers? set filename to some identifier?
                 new_task = Task.new_task(user=user, sample=BytesIO(email_message.as_bytes()),
@@ -111,7 +112,7 @@ class IMAPFetcher(AbstractManager):
                         client.append(sent_dir, reply.as_string())
                 client.add_flags(uid, ('\\Answered'))
 
-        self.logger.info('Done with fetching mails.')
+        self.logger.debug('Done with fetching mails.')
 
 
 def main():
