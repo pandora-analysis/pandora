@@ -2,6 +2,7 @@
 
 import email
 import logging
+import logging.config
 import ssl
 
 from email.message import EmailMessage
@@ -17,6 +18,8 @@ from pandora.helpers import get_email_template
 from pandora.pandora import Pandora
 from pandora.task import Task
 from pandora.user import User
+
+logging.config.dictConfig(get_config('logging'))
 
 
 class IMAPFetcher(AbstractManager):

@@ -3,6 +3,7 @@
 import functools
 import json
 import logging
+import logging.config
 import operator
 import traceback
 
@@ -42,11 +43,10 @@ from .helpers import (get_secret_key, update_user_role, admin_required,
                       sri_load, sizeof_fmt)
 from .proxied import ReverseProxied
 
+logging.config.dictConfig(get_config('logging'))
 pandora: Pandora = Pandora()
 
 app: Flask = Flask(__name__)
-
-
 app.wsgi_app = ReverseProxied(app.wsgi_app)  # type: ignore
 
 app.config['SECRET_KEY'] = get_secret_key()
@@ -73,7 +73,6 @@ flask_moment.Moment(app=app)
 app.config['WTF_CSRF_CHECK_DEFAULT'] = False
 csrf = flask_wtf.CSRFProtect(app=app)
 
-logging.basicConfig(level=get_config('generic', 'loglevel'))
 
 # Query API
 

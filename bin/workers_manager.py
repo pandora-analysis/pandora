@@ -3,18 +3,18 @@
 import importlib
 import inspect
 import logging
+import logging.config
 
 from typing import List, Dict, Type
 
 from redis import Redis
 
-from pandora.default import AbstractManager, get_socket_path
+from pandora.default import AbstractManager, get_socket_path, get_config
 from pandora.exceptions import MissingWorker, ConfigError
 from pandora.helpers import workers
 from pandora.workers.base import BaseWorker
 
-logging.basicConfig(format='%(asctime)s %(name)s %(levelname)s:%(message)s',
-                    level=logging.INFO)
+logging.config.dictConfig(get_config('logging'))
 
 
 class WorkersManager(AbstractManager):

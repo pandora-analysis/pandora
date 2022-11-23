@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
 import logging
+import logging.config
 
 from datetime import datetime, timedelta
 
 from unoserver.server import UnoServer  # type: ignore
 
-from pandora.default import AbstractManager
+from pandora.default import AbstractManager, get_config
 
-logging.basicConfig(format='%(asctime)s %(name)s %(levelname)s:%(message)s',
-                    level=logging.INFO)
+logging.config.dictConfig(get_config('logging'))
 
 
 class UnoserverLauncher(AbstractManager):
