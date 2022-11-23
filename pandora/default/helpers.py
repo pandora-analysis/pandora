@@ -65,9 +65,8 @@ def get_config(config_type: str, entry: Optional[str]=None, quiet: bool=False) -
         if entry:
             if entry in configs[config_type]:
                 return configs[config_type][entry]
-            else:
-                if not quiet:
-                    logger.warning(f'Unable to find {entry} in config file.')
+            if not quiet:
+                logger.warning(f'Unable to find {entry} in config file.')
         else:
             return configs[config_type]
     else:
