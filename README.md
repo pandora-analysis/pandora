@@ -1,3 +1,7 @@
+
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/pandora-analysis/pandora/badge)](https://api.securityscorecards.dev/projects/github.com/pandora-analysis/pandora)
+
+
 # Pandora
 
 <img src="https://pandora.circl.lu/static/images/logo.svg" width="250" height="250">
