@@ -19,7 +19,7 @@ import fitz  # type: ignore
 import magic
 import pikepdf
 
-from oletools.msodde import process_file  # type: ignore
+from oletools.msodde import process_maybe_encrypted  # type: ignore
 from PIL import Image, ImageDraw, ImageFont  # type: ignore
 from pymisp import MISPEvent, MISPObject
 from pymisp.tools import make_binary_objects, FileObject
@@ -611,17 +611,23 @@ class File:
             except Exception as e:
                 self.logger.warning(f'Unable to process PDF in file {self.uuid}: {e}')
         elif self.is_oletools_concerned:
-            oid = process_file(self.path)
-            # This call returns a string. If we're lucky, it's going to be one indicator/line
-            # and we can try to add them in the proper type
-            for line in oid.split('\n'):
-                splitted_line = line.strip().split(' ', 1)
-                if len(splitted_line) == 2 and splitted_line[0] == "HYPERLINK":
-                    url = re.findall('"(.*)" .*', splitted_line[1])
-                    if url:
-                        observables['url'].add(url[0])
-                else:
-                    self.logger.warning(f'Unknown indicator: {line}')
+            try:
+                oid = process_maybe_encrypted(self.path)
+                # This call returns a string. If we're lucky, it's going to be one indicator/line
+                # and we can try to add them in the proper type
+                for line in oid.split('\n'):
+                    line = line.strip()
+                    if not line:
+                        continue
+                    splitted_line = line.split(' ', 1)
+                    if len(splitted_line) == 2 and splitted_line[0] == "HYPERLINK":
+                        url = re.findall('"(.*)" .*', splitted_line[1])
+                        if url:
+                            observables['url'].add(url[0])
+                    else:
+                        self.logger.warning(f'Unknown indicator: {line}')
+            except Exception as e:
+                self.logger.warning(f'Unable to process OLE file: {e}')
 
         # Try to extract observables from text
         if self.text:
