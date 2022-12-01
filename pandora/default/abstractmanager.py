@@ -28,6 +28,8 @@ class AbstractManager(ABC):
         self.process: Optional[Popen] = None
         self.__redis = Redis(unix_socket_path=get_socket_path('cache'), db=1, decode_responses=True)
 
+        self.force_stop = False
+
     @staticmethod
     def is_running() -> List[Tuple[str, float]]:
         try:
@@ -101,7 +103,7 @@ class AbstractManager(ABC):
             return True
 
     def _to_run_forever(self) -> None:
-        pass
+        raise NotImplementedError('This method must be implemented by the child')
 
     def _kill_process(self):
         if self.process is None:
@@ -123,7 +125,7 @@ class AbstractManager(ABC):
     def run(self, sleep_in_sec: int) -> None:
         self.logger.info(f'Launching {self.__class__.__name__}')
         try:
-            while True:
+            while not self.force_stop:
                 if self.shutdown_requested():
                     break
                 try:
@@ -134,7 +136,7 @@ class AbstractManager(ABC):
                     else:
                         self.set_running()
                         self._to_run_forever()
-                except Exception:
+                except Exception:  # nosec B110
                     self.logger.exception(f'Something went terribly wrong in {self.__class__.__name__}.')
                 finally:
                     if not self.process:
@@ -155,13 +157,25 @@ class AbstractManager(ABC):
                 pass
             self.logger.info(f'Shutting down {self.__class__.__name__}')
 
+    async def stop(self):
+        self.force_stop = True
+
     async def _to_run_forever_async(self) -> None:
-        pass
+        raise NotImplementedError('This method must be implemented by the child')
+
+    async def _wait_to_finish(self) -> None:
+        self.logger.info('Not implemented, nothing to wait for.')
+
+    async def stop_async(self):
+        """Method to pass the signal handler:
+            loop.add_signal_handler(signal.SIGTERM, lambda: loop.create_task(p.stop()))
+        """
+        self.force_stop = True
 
     async def run_async(self, sleep_in_sec: int) -> None:
         self.logger.info(f'Launching {self.__class__.__name__}')
         try:
-            while True:
+            while not self.force_stop:
                 if self.shutdown_requested():
                     break
                 try:
@@ -172,7 +186,7 @@ class AbstractManager(ABC):
                     else:
                         self.set_running()
                         await self._to_run_forever_async()
-                except Exception:
+                except Exception:  # nosec B110
                     self.logger.exception(f'Something went terribly wrong in {self.__class__.__name__}.')
                 finally:
                     if not self.process:
@@ -183,7 +197,10 @@ class AbstractManager(ABC):
                     break
         except KeyboardInterrupt:
             self.logger.warning(f'{self.script_name} killed by user.')
+        except Exception as e:  # nosec B110
+            self.logger.exception(e)
         finally:
+            await self._wait_to_finish()
             if self.process:
                 self._kill_process()
             try:
