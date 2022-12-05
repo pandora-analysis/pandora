@@ -18,7 +18,7 @@ imap_fetcher = "bin.imap_fetcher:main"
 
 [tool.poetry.dependencies]
 python = "^3.8.1,<3.11"
-redis = {version = "^4.3.5", extras = ["hiredis"]}
+redis = {version = "^4.4.0", extras = ["hiredis"]}
 flask-restx = "^1.0.3"
 gunicorn = {version = "^20.1.0", extras = ["setproctitle"]}
 Flask-Session = "^0.4.0"
@@ -36,7 +36,7 @@ PyExifTool = "^0.5.4"
 eml-parser = "^1.17.5"
 unoserver = "^1.2"
 weasyprint = "^57.1"
-extract-msg = {version = "^0.37.1", extras = ["all"]}
+extract-msg = {version = "^0.38.4", extras = ["all"]}
 Pillow = "^9.3.0"
 oletools = {version = "0.60.1", extras = ["full"]}
 py7zr = "^0.20.2"
@@ -44,7 +44,7 @@ jbxapi = "^3.19.0"
 defusedxml = "^0.7.1"
 mwdblib = "^4.3.1"
 vt-py = "^0.17.3"
-malwarebazaar = "^0.1.5"
+malwarebazaar = "^0.1.6"
 irmacl-async = "^3.4.1"
 yara-python = "^4.2.3"
 svglib = "^1.4.1"
@@ -52,7 +52,7 @@ clamd = "^1.0.2"
 rarfile = "^4.0"
 publicsuffix2 = "^2.20191221"
 pymispwarninglists = "^1.4"
-pikepdf = "^6.2.4"
+pikepdf = "^6.2.5"
 imapclient = "^2.3.1"
 pyzipper = "^0.3.6"
 pymisp = {version = "^2.4.166", extras = ["fileobjects"]}
