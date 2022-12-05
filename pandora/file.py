@@ -29,7 +29,7 @@ import textract  # type: ignore
 from weasyprint import HTML, default_url_fetcher  # type: ignore
 
 from eml_parser import EmlParser
-from extract_msg import openMsg, Message
+from extract_msg import openMsg, Message, MessageSigned
 
 from .default import get_config
 from .exceptions import Unsupported, NoPreview, InvalidPandoraObject
@@ -648,13 +648,13 @@ class File:
         return ep.decode_email(eml_file=self.path)
 
     @cached_property
-    def msg_data(self) -> Optional[Message]:
+    def msg_data(self) -> Optional[Union[Message, MessageSigned]]:
         # NOTE: the msg file can be other things than a message.
         # See https://github.com/TeamMsgExtractor/msg-extractor/blob/master/extract_msg/utils.py
         if not self.is_msg:
             return None
         msg = openMsg(self.path, delayAttachments=True)
-        if not isinstance(msg, Message):
+        if not isinstance(msg, (Message, MessageSigned)):
             raise Unsupported(f'msg file must be a message, other formats are not supported yet. Type: {type(msg)}')
         return msg
 
