@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
+import contextlib
 import email
 import logging
 import logging.config
+import signal
 import ssl
 
 from email.message import EmailMessage
@@ -40,8 +42,33 @@ class IMAPFetcher(AbstractManager):
         self.smtp_requires_login = get_config('mail', 'smtp_requires_login')
         self.pandora = Pandora()
 
+        self.timeout = 60
+
+    @staticmethod
+    def _raise_timeout(_, __):
+        raise TimeoutError
+
+    @contextlib.contextmanager
+    def _timeout_context(self):
+        if self.timeout != 0:
+            # Register a function to raise a TimeoutError on the signal.
+            signal.signal(signal.SIGALRM, self._raise_timeout)
+            signal.alarm(self.timeout)
+            try:
+                yield
+            except TimeoutError as e:
+                raise e
+            finally:
+                signal.signal(signal.SIGALRM, signal.SIG_IGN)
+        else:
+            yield
+
     def _to_run_forever(self):
-        self._imap_fetcher()
+        try:
+            with self._timeout_context():
+                self._imap_fetcher()
+        except TimeoutError:
+            self.warning('The imap fetcher raised a timeout after {self.timeout}s, kill it and retry.')
 
     def _prepare_reply(self, initial_message: EmailMessage, permaurl: str) -> Optional[EmailMessage]:
         msg = EmailMessage()

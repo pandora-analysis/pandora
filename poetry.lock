@@ -1557,7 +1557,7 @@ docs = ["Sphinx (>=5.1.1,<6.0.0)"]
 
 [[package]]
 name = "pylint"
-version = "2.15.7"
+version = "2.15.8"
 description = "python code static checker"
 category = "dev"
 optional = false
@@ -1916,7 +1916,7 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.0.0"
+version = "1.1.0"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 category = "dev"
 optional = false
@@ -2488,7 +2488,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8.1,<3.11"
-content-hash = "c7caaaf5a5922992dbdfe9e9daac1a8c1d91341cbffdfc622ff5b7c46ab2a68a"
+content-hash = "821d4b429aa2e5b88f31a0ad20dc6518cd647c1ea0bef7a3ca4563e5fc63e7cd"
 
 [metadata.files]
 aiohttp = [
@@ -3884,8 +3884,8 @@ pyhashlookup = [
     {file = "pyhashlookup-1.2.1.tar.gz", hash = "sha256:eb514cc1a5559a013a8882e101849fa52a37641f2a7d9dc21c0d266b37607aa5"},
 ]
 pylint = [
-    {file = "pylint-2.15.7-py3-none-any.whl", hash = "sha256:1d561d1d3e8be9dd880edc685162fbdaa0409c88b9b7400873c0cf345602e326"},
-    {file = "pylint-2.15.7.tar.gz", hash = "sha256:91e4776dbcb4b4d921a3e4b6fec669551107ba11f29d9199154a01622e460a57"},
+    {file = "pylint-2.15.8-py3-none-any.whl", hash = "sha256:ea82cd6a1e11062dc86d555d07c021b0fb65afe39becbe6fe692efd6c4a67443"},
+    {file = "pylint-2.15.8.tar.gz", hash = "sha256:ec4a87c33da054ab86a6c79afa6771dc8765cb5631620053e727fcf3ef8cbed7"},
 ]
 pylookyloo = [
     {file = "pylookyloo-1.16.0-py3-none-any.whl", hash = "sha256:2c39e26eae61144e6bb986fbcb58604e9804b4d6b2fe1ff844d8b429db2628d2"},
@@ -4320,10 +4320,10 @@ secretstorage = [
     {file = "SecretStorage-3.3.3.tar.gz", hash = "sha256:2403533ef369eca6d2ba81718576c5e0f564d5cca1b58f73a8b23e7d4eeebd77"},
 ]
 semgrep = [
-    {file = "semgrep-1.0.0-cp37.cp38.cp39.py37.py38.py39-none-any.whl", hash = "sha256:000bd2ac5923132a9112633451aa5b028fc723dcfde73a983d10f20dea3dce44"},
-    {file = "semgrep-1.0.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_10_14_x86_64.whl", hash = "sha256:5769236dc60587ae86638272b968330d0e3334df1db30ea7ec81e237e9d63b36"},
-    {file = "semgrep-1.0.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_11_0_arm64.whl", hash = "sha256:3f4cdbfbf2c55402fdee39758bdeeb3d21e9cda22b8b3bd0401d33dcca89a52f"},
-    {file = "semgrep-1.0.0.tar.gz", hash = "sha256:5b5119b694f9336f1c8d68bfaceee3ff51581a0bc1a6c21a6933cd5c1879c8c3"},
+    {file = "semgrep-1.1.0-cp37.cp38.cp39.py37.py38.py39-none-any.whl", hash = "sha256:d555758796f9a5da88ec9a1fa2aeed1575ce73833908e50327ff24ce51cc9c17"},
+    {file = "semgrep-1.1.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_10_14_x86_64.whl", hash = "sha256:0c96f26394a551b94def440a2746227d7e4d2bdb6f306f1faaea68b27015ed8c"},
+    {file = "semgrep-1.1.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_11_0_arm64.whl", hash = "sha256:0f8f007ad76086b4a1890e8326eb5b9949ce499c9732970c623133e030317ffa"},
+    {file = "semgrep-1.1.0.tar.gz", hash = "sha256:608b1406a6772b2ecba03f71ec4eeeb0a8003bd19aac27c40b960c76a3251ece"},
 ]
 setproctitle = [
     {file = "setproctitle-1.3.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:288943dec88e178bb2fd868adf491197cc0fc8b6810416b1c6775e686bab87fe"},
