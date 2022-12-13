@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+import contextlib
 import logging
 import logging.config
+import signal
 
 from datetime import datetime, timedelta
 
@@ -17,10 +19,30 @@ class UnoserverLauncher(AbstractManager):
     def __init__(self, loglevel: int=logging.INFO):
         super().__init__(loglevel)
         self.script_name = 'unoserver'
+        self.timeout = 3600
 
     def _launch_unoserver(self):
         unoserver = UnoServer()
         return unoserver.start(), datetime.now()
+
+    @staticmethod
+    def _raise_timeout(_, __):
+        raise TimeoutError
+
+    @contextlib.contextmanager
+    def _timeout_context(self):
+        if self.timeout != 0:
+            # Register a function to raise a TimeoutError on the signal.
+            signal.signal(signal.SIGALRM, self._raise_timeout)
+            signal.alarm(self.timeout)
+            try:
+                yield
+            except TimeoutError:
+                self.process.kill()
+            finally:
+                signal.signal(signal.SIGALRM, signal.SIG_IGN)
+        else:
+            yield
 
     def safe_run(self):
         # it sometimes fails but simply restarting the server fixes it
@@ -28,7 +50,8 @@ class UnoserverLauncher(AbstractManager):
         self.set_running()
         retry = 0
         while True:
-            self.run(sleep_in_sec=10)
+            with self._timeout_context():
+                self.run(sleep_in_sec=10)
             if self.shutdown_requested():
                 break
             if retry >= 3:
