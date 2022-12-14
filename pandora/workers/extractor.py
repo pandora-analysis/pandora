@@ -10,7 +10,14 @@ from gzip import GzipFile
 from lzma import LZMAFile
 from io import BytesIO
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple, Sequence
+
+from dfvfs.analyzer import analyzer  # type: ignore
+from dfvfs.lib import definitions, raw_helper, errors  # type: ignore
+from dfvfs.path import factory as path_spec_factory  # type: ignore
+from dfvfs.resolver import resolver  # type: ignore
+from dfvfs.volume import tsk_volume_system  # type: ignore
+
 
 from hachoir.stream import StringInputStream  # type: ignore
 from hachoir.parser.archive import CabFile  # type: ignore
@@ -368,8 +375,39 @@ class Extractor(BaseWorker):
             f.write(data)  # write an uncompressed file
         return [new_file_path]
 
+    def check_dfvfs(self, submitted_file: File) -> Optional[Tuple[path_spec_factory.Factory.NewPathSpec, tsk_volume_system.TSKVolumeSystem]]:
+        path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_OS,
+                                                          location=submitted_file.path)
+
+        type_indicators = analyzer.Analyzer.GetStorageMediaImageTypeIndicators(path_spec)
+        if type_indicators:
+            # NOTE: type_indicators can be a list, we pick the 1st one, but might want to loop
+            path_spec = path_spec_factory.Factory.NewPathSpec(type_indicators[0], parent=path_spec)
+        else:
+            # The RAW storage media image type cannot be detected based on
+            # a signature so we try to detect it based on common file naming
+            # schemas.
+            file_system = resolver.Resolver.OpenFileSystem(path_spec)
+            raw_path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_RAW,
+                                                                  parent=path_spec)
+            glob_results = raw_helper.RawGlobPathSpec(file_system, raw_path_spec)
+            if glob_results:
+                path_spec = raw_path_spec
+
+        volume_path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK_PARTITION,
+                                                                 location='/', parent=path_spec)
+
+        try:
+            volume_system = tsk_volume_system.TSKVolumeSystem()
+            volume_system.Open(volume_path_spec)
+            return path_spec, volume_system
+        except (OSError, errors.BackEndError):
+            return None
+
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
-        if not (task.file.is_archive or task.file.is_eml or task.file.is_msg):
+        # The files supported by dfvfs generally don't have proper mime types, so we just try it on everything.
+        dfvfs_info = self.check_dfvfs(task.file)
+        if not (task.file.is_archive or task.file.is_eml or task.file.is_msg or dfvfs_info):
             report.status = Status.NOTAPPLICABLE
             return
 
@@ -378,7 +416,10 @@ class Extractor(BaseWorker):
 
         pandora = Pandora()
 
-        tasks = []
+        tasks: List[Task] = []
+        extracted_dir = task.file.directory / 'extracted'
+        safe_create_dir(extracted_dir)
+        extracted: Sequence[Union[Path, Tuple[str, BytesIO]]] = []
 
         # Try to extract files from archive
         # TODO: Support other archive formats
@@ -387,8 +428,6 @@ class Extractor(BaseWorker):
                 self.passwords = [task.password]
             else:
                 self.passwords = self.zip_passwords
-            extracted_dir = task.file.directory / 'extracted'
-            safe_create_dir(extracted_dir)
             try:
                 if task.file.mime_type == "application/x-7z-compressed":
                     extracted = self._extract_7z(task.file, report, extracted_dir)
@@ -421,34 +460,12 @@ class Extractor(BaseWorker):
                 extracted = []
                 self.logger.exception(e)
 
-            if extracted:
-                for ef in extracted:
-                    with ef.open('rb') as f:
-                        sample = f.read()
-                    new_task = Task.new_task(user=task.user, sample=BytesIO(sample),
-                                             filename=ef.name,
-                                             disabled_workers=task.disabled_workers,
-                                             parent=task)
-                    pandora.add_extracted_reference(task, new_task)
-                    pandora.enqueue_task(new_task)
-                    tasks.append(new_task)
-            shutil.rmtree(extracted_dir)
-
         # Try to extract attachments from EML file
         if task.file.is_eml:
             try:
                 if task.file.eml_data and task.file.eml_data.get('attachment'):
-                    extracted_dir = task.file.directory / 'extracted'
-                    safe_create_dir(extracted_dir)
                     for attachment in task.file.eml_data['attachment']:
-                        new_task = Task.new_task(user=task.user, sample=BytesIO(base64.b64decode(attachment['raw'])),
-                                                 filename=attachment['filename'],
-                                                 disabled_workers=task.disabled_workers,
-                                                 parent=task)
-                        pandora.add_extracted_reference(task, new_task)
-                        pandora.enqueue_task(new_task)
-                        tasks.append(new_task)
-                    shutil.rmtree(extracted_dir)
+                        extracted.append((attachment['filename'], BytesIO(base64.b64decode(attachment['raw']))))  # type: ignore
                 else:
                     report.status = Status.NOTAPPLICABLE
                     return
@@ -457,28 +474,73 @@ class Extractor(BaseWorker):
         elif task.file.is_msg:
             try:
                 if task.file.msg_data:
-                    msg_extract_dir = task.file.directory / 'extracted_msg_attachments'
-                    safe_create_dir(msg_extract_dir)
-                    task.file.msg_data.save(customPath=str(msg_extract_dir), attachmentsOnly=True)
-                    for filepath in msg_extract_dir.glob('**/*'):
-                        if not filepath.is_file():
-                            continue
-                        with filepath.open('rb') as _fb:
-                            attachment = BytesIO(_fb.read())
-                        new_task = Task.new_task(user=task.user, sample=attachment,
-                                                 filename=filepath.name,
-                                                 disabled_workers=task.disabled_workers,
-                                                 parent=task)
-                        pandora.add_extracted_reference(task, new_task)
-                        pandora.enqueue_task(new_task)
-                        tasks.append(new_task)
-                    shutil.rmtree(msg_extract_dir)
+                    task.file.msg_data.save(customPath=str(extracted_dir), attachmentsOnly=True)
+                    for filepath in extracted_dir.glob('**/*'):
+                        if filepath.is_file():
+                            extracted.append(filepath)  # type: ignore
                 if not tasks:
                     report.status = Status.NOTAPPLICABLE
                     return
             except Exception as e:
                 self.logger.exception(e)
 
+        elif dfvfs_info:
+            # this is a dfvfs supported file
+            try:
+                def process_dir(file_entry: resolver.Resolver.OpenFileEntry, extract_dir: Path, extracted: Sequence[Path]) -> Sequence[Path]:
+                    for sub_file_entry in file_entry.sub_file_entries:
+                        if sub_file_entry.IsFile():
+                            safe_create_dir(extract_dir)
+                            filepath = extract_dir / sub_file_entry.name
+                            with filepath.open('wb') as f:
+                                file_object = sub_file_entry.GetFileObject()
+                                f.write(file_object.read())
+                            extracted.append(filepath)  # type: ignore
+                        elif sub_file_entry.IsDirectory():
+                            process_dir(sub_file_entry, extract_dir / sub_file_entry.name, extracted)  # type: ignore
+                    return extracted
+
+                path_spec, volume_system = dfvfs_info
+                for volume in volume_system.volumes:
+                    if volume_identifier := getattr(volume, 'identifier'):
+                        volume = volume_system.GetVolumeByIdentifier(volume_identifier)
+                        if not volume:
+                            self.logger.warning(f'Unable to find volume {volume_identifier}')
+                            continue
+
+                        # We check the current partition
+                        path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK_PARTITION,
+                                                                          location=f'/{volume.identifier}', parent=path_spec)
+
+                        # We directly mount the /
+                        mft_path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK,
+                                                                              location='/', parent=path_spec)
+
+                        file_entry = resolver.Resolver.OpenFileEntry(mft_path_spec)
+                        extracted = process_dir(file_entry, extracted_dir, extracted)  # type: ignore
+                    else:
+                        self.logger.warning('Missing volume identifier, cannot do anything.')
+
+            except Exception:
+                self.logger.exception('dfVFS dislikes it.')
+                pass
+
+        for ef in extracted:
+            if isinstance(ef, Path):
+                filename = ef.name
+                with ef.open('rb') as f:
+                    sample = BytesIO(f.read())
+            else:
+                filename, sample = ef
+            new_task = Task.new_task(user=task.user, sample=sample,
+                                     filename=filename,
+                                     disabled_workers=task.disabled_workers,
+                                     parent=task)
+            pandora.add_extracted_reference(task, new_task)
+            pandora.enqueue_task(new_task)
+            tasks.append(new_task)
+
+        shutil.rmtree(extracted_dir)
         # wait for all the tasks to finish
         while not all(t.workers_done for t in tasks):
             time.sleep(1)
