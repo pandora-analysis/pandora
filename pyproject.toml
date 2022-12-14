@@ -29,7 +29,7 @@ PyYAML = "^6.0"
 Flask-WTF = "^1.0.1"
 validators = "^0.20.0"
 python-magic = "^0.4.27"
-PyMuPDF = "^1.21.0"
+PyMuPDF = "^1.21.1"
 requests = "^2.28.1"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.4"
@@ -62,6 +62,7 @@ werkzeug = "^2.2.2"
 pyhashlookup = "^1.2.1"
 pylookyloo = "^1.16.0"
 hachoir = "^3.2.0"
+dfvfs = "^20221207"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.15.8"
