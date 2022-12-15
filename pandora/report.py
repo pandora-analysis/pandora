@@ -114,3 +114,6 @@ class Report:
 
     def clear_extras(self):
         self._extras = {}
+
+    def reset_status(self):
+        self._status = Status.WAITING
