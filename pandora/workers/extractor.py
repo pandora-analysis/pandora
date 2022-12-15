@@ -390,9 +390,15 @@ class Extractor(BaseWorker):
             file_system = resolver.Resolver.OpenFileSystem(path_spec)
             raw_path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_RAW,
                                                                   parent=path_spec)
-            glob_results = raw_helper.RawGlobPathSpec(file_system, raw_path_spec)
-            if glob_results:
-                path_spec = raw_path_spec
+            try:
+                glob_results = raw_helper.RawGlobPathSpec(file_system, raw_path_spec)
+            except errors.PathSpecError:
+                return None
+            if not glob_results:
+                return None
+            else:
+                # NOTE: what are we supposed to do if we have more?
+                path_spec = raw_path_spec[0]
 
         volume_path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK_PARTITION,
                                                                  location='/', parent=path_spec)
@@ -402,6 +408,7 @@ class Extractor(BaseWorker):
             volume_system.Open(volume_path_spec)
             return path_spec, volume_system
         except (OSError, errors.BackEndError):
+            self.logger.exception('Not supported')
             return None
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
@@ -450,6 +457,7 @@ class Extractor(BaseWorker):
                     if not extracted:
                         report.clear_extras()
                         report.clear_details()
+                        report.reset_status()
                         extracted = self._extract_zip(task.file, report, extracted_dir, pyzipper.AESZipFile)
                 else:
                     raise PandoraException(f'Unsupported mimetype: {task.file.mime_type}')
@@ -487,18 +495,13 @@ class Extractor(BaseWorker):
         elif dfvfs_info:
             # this is a dfvfs supported file
             try:
-                def process_dir(file_entry: resolver.Resolver.OpenFileEntry, extract_dir: Path, extracted: Sequence[Path]) -> Sequence[Path]:
+                def process_dir(file_entry: resolver.Resolver.OpenFileEntry):
                     for sub_file_entry in file_entry.sub_file_entries:
                         if sub_file_entry.IsFile():
-                            safe_create_dir(extract_dir)
-                            filepath = extract_dir / sub_file_entry.name
-                            with filepath.open('wb') as f:
-                                file_object = sub_file_entry.GetFileObject()
-                                f.write(file_object.read())
-                            extracted.append(filepath)  # type: ignore
+                            file_object = sub_file_entry.GetFileObject()
+                            extracted.append((sub_file_entry.name, BytesIO(file_object.read())))  # type: ignore
                         elif sub_file_entry.IsDirectory():
-                            process_dir(sub_file_entry, extract_dir / sub_file_entry.name, extracted)  # type: ignore
-                    return extracted
+                            process_dir(sub_file_entry)
 
                 path_spec, volume_system = dfvfs_info
                 for volume in volume_system.volumes:
@@ -509,21 +512,22 @@ class Extractor(BaseWorker):
                             continue
 
                         # We check the current partition
-                        path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK_PARTITION,
-                                                                          location=f'/{volume.identifier}', parent=path_spec)
+                        _path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK_PARTITION,
+                                                                           location=f'/{volume.identifier}', parent=path_spec)
 
                         # We directly mount the /
                         mft_path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK,
-                                                                              location='/', parent=path_spec)
+                                                                              location='/', parent=_path_spec)
 
                         file_entry = resolver.Resolver.OpenFileEntry(mft_path_spec)
-                        extracted = process_dir(file_entry, extracted_dir, extracted)  # type: ignore
+                        process_dir(file_entry)
                     else:
                         self.logger.warning('Missing volume identifier, cannot do anything.')
 
-            except Exception:
+            except Exception as e:
                 self.logger.exception('dfVFS dislikes it.')
-                pass
+                report.status = Status.WARN
+                report.add_details('Warning', f'Unable to extract {task.file.path.name}: {e}.')
 
         for ef in extracted:
             if isinstance(ef, Path):
