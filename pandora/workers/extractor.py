@@ -10,15 +10,18 @@ from gzip import GzipFile
 from lzma import LZMAFile
 from io import BytesIO
 from pathlib import Path
-from typing import List, Optional, Union, Tuple, Sequence
+from typing import List, Optional, Union, Tuple, Sequence, Dict
 
 from dfvfs.analyzer import analyzer  # type: ignore
 from dfvfs.lib import definitions, raw_helper, errors  # type: ignore
-from dfvfs.path import factory as path_spec_factory  # type: ignore
+from dfvfs.path import factory  # type: ignore
 from dfvfs.resolver import resolver  # type: ignore
 from dfvfs.volume import tsk_volume_system  # type: ignore
+from dfvfs.vfs.file_entry import FileEntry  # type: ignore
+from dfvfs.path.path_spec import PathSpec   # type: ignore
 
 
+from extract_msg import Message, MessageSigned, MSGFile
 from hachoir.stream import StringInputStream  # type: ignore
 from hachoir.parser.archive import CabFile  # type: ignore
 import py7zr  # type: ignore
@@ -375,21 +378,18 @@ class Extractor(BaseWorker):
             f.write(data)  # write an uncompressed file
         return [new_file_path]
 
-    def check_dfvfs(self, submitted_file: File) -> Optional[Tuple[path_spec_factory.Factory.NewPathSpec, tsk_volume_system.TSKVolumeSystem]]:
-        path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_OS,
-                                                          location=submitted_file.path)
+    def check_dfvfs(self, submitted_file: File) -> Optional[Tuple[PathSpec, tsk_volume_system.TSKVolumeSystem]]:
+        path_spec = factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_OS, location=submitted_file.path)
 
-        type_indicators = analyzer.Analyzer.GetStorageMediaImageTypeIndicators(path_spec)
-        if type_indicators:
+        if type_indicators := analyzer.Analyzer.GetStorageMediaImageTypeIndicators(path_spec):
             # NOTE: type_indicators can be a list, we pick the 1st one, but might want to loop
-            path_spec = path_spec_factory.Factory.NewPathSpec(type_indicators[0], parent=path_spec)
+            path_spec = factory.Factory.NewPathSpec(type_indicators[0], parent=path_spec)
         else:
             # The RAW storage media image type cannot be detected based on
             # a signature so we try to detect it based on common file naming
             # schemas.
             file_system = resolver.Resolver.OpenFileSystem(path_spec)
-            raw_path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_RAW,
-                                                                  parent=path_spec)
+            raw_path_spec = factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_RAW, parent=path_spec)
             try:
                 glob_results = raw_helper.RawGlobPathSpec(file_system, raw_path_spec)
             except errors.PathSpecError:
@@ -400,8 +400,7 @@ class Extractor(BaseWorker):
                 # NOTE: what are we supposed to do if we have more?
                 path_spec = raw_path_spec[0]
 
-        volume_path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK_PARTITION,
-                                                                 location='/', parent=path_spec)
+        volume_path_spec = factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK_PARTITION, location='/', parent=path_spec)
 
         try:
             volume_system = tsk_volume_system.TSKVolumeSystem()
@@ -410,6 +409,56 @@ class Extractor(BaseWorker):
         except (OSError, errors.BackEndError):
             self.logger.exception('Not supported')
             return None
+
+    def extract_with_dfvfs(self, dfvfs_info: Tuple[PathSpec, tsk_volume_system.TSKVolumeSystem]) -> List[Tuple[str, BytesIO]]:
+        path_spec, volume_system = dfvfs_info
+        extracted: List[Tuple[str, BytesIO]] = []
+
+        def process_dir(file_entry: FileEntry):
+            for sub_file_entry in file_entry.sub_file_entries:
+                if sub_file_entry.IsFile():
+                    file_object = sub_file_entry.GetFileObject()
+                    extracted.append((sub_file_entry.name, BytesIO(file_object.read())))
+                elif sub_file_entry.IsDirectory():
+                    process_dir(sub_file_entry)
+
+        for volume in volume_system.volumes:
+            if volume_identifier := getattr(volume, 'identifier'):
+                volume = volume_system.GetVolumeByIdentifier(volume_identifier)
+                if not volume:
+                    self.logger.warning(f'Unable to find volume {volume_identifier}')
+                    continue
+
+                # We check the current partition
+                _path_spec = factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK_PARTITION,
+                                                         location=f'/{volume.identifier}', parent=path_spec)
+
+                # We directly mount the /
+                mft_path_spec = factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK,
+                                                            location='/', parent=_path_spec)
+
+                file_entry = resolver.Resolver.OpenFileEntry(mft_path_spec)
+                process_dir(file_entry)
+            else:
+                self.logger.warning('Missing volume identifier, cannot do anything.')
+        return extracted
+
+    def extract_eml(self, eml_data: Dict) -> List[Tuple[str, BytesIO]]:
+        extracted: List[Tuple[str, BytesIO]] = []
+        for attachment in eml_data['attachment']:
+            extracted.append((attachment['filename'], BytesIO(base64.b64decode(attachment['raw']))))
+        return extracted
+
+    def extract_msg(self, msg_data: Union[Message, MessageSigned]) -> List[Tuple[str, BytesIO]]:
+        extracted: List[Tuple[str, BytesIO]] = []
+        for attachment in msg_data.attachments:
+            if isinstance(attachment.data, bytes):
+                blob = BytesIO(attachment.data)
+            elif isinstance(attachment.data, MSGFile):
+                blob = BytesIO()
+                attachment.data.export(blob)
+            extracted.append((attachment.getFilename(), blob))
+        return extracted
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         # The files supported by dfvfs generally don't have proper mime types, so we just try it on everything.
@@ -470,64 +519,34 @@ class Extractor(BaseWorker):
 
         # Try to extract attachments from EML file
         if task.file.is_eml:
-            try:
-                if task.file.eml_data and task.file.eml_data.get('attachment'):
-                    for attachment in task.file.eml_data['attachment']:
-                        extracted.append((attachment['filename'], BytesIO(base64.b64decode(attachment['raw']))))  # type: ignore
-                else:
-                    report.status = Status.NOTAPPLICABLE
-                    return
-            except Exception as e:
-                self.logger.exception(e)
+            if not task.file.eml_data or 'attachment' not in task.file.eml_data or not task.file.eml_data['attachment']:
+                report.status = Status.NOTAPPLICABLE
+            else:
+                try:
+                    extracted = self.extract_eml(task.file.eml_data)
+                except Exception as e:
+                    self.logger.exception(e)
+
         elif task.file.is_msg:
-            try:
-                if task.file.msg_data:
-                    task.file.msg_data.save(customPath=str(extracted_dir), attachmentsOnly=True)
-                    for filepath in extracted_dir.glob('**/*'):
-                        if filepath.is_file():
-                            extracted.append(filepath)  # type: ignore
-                if not tasks:
-                    report.status = Status.NOTAPPLICABLE
-                    return
-            except Exception as e:
-                self.logger.exception(e)
+            if not task.file.msg_data or not task.file.msg_data.attachments:
+                report.status = Status.NOTAPPLICABLE
+            else:
+                try:
+                    extracted = self.extract_msg(task.file.msg_data)
+                except Exception as e:
+                    self.logger.exception(e)
 
         elif dfvfs_info:
             # this is a dfvfs supported file
             try:
-                def process_dir(file_entry: resolver.Resolver.OpenFileEntry):
-                    for sub_file_entry in file_entry.sub_file_entries:
-                        if sub_file_entry.IsFile():
-                            file_object = sub_file_entry.GetFileObject()
-                            extracted.append((sub_file_entry.name, BytesIO(file_object.read())))  # type: ignore
-                        elif sub_file_entry.IsDirectory():
-                            process_dir(sub_file_entry)
-
-                path_spec, volume_system = dfvfs_info
-                for volume in volume_system.volumes:
-                    if volume_identifier := getattr(volume, 'identifier'):
-                        volume = volume_system.GetVolumeByIdentifier(volume_identifier)
-                        if not volume:
-                            self.logger.warning(f'Unable to find volume {volume_identifier}')
-                            continue
-
-                        # We check the current partition
-                        _path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK_PARTITION,
-                                                                           location=f'/{volume.identifier}', parent=path_spec)
-
-                        # We directly mount the /
-                        mft_path_spec = path_spec_factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK,
-                                                                              location='/', parent=_path_spec)
-
-                        file_entry = resolver.Resolver.OpenFileEntry(mft_path_spec)
-                        process_dir(file_entry)
-                    else:
-                        self.logger.warning('Missing volume identifier, cannot do anything.')
-
+                extracted = self.extract_with_dfvfs(dfvfs_info)
             except Exception as e:
                 self.logger.exception('dfVFS dislikes it.')
                 report.status = Status.WARN
-                report.add_details('Warning', f'Unable to extract {task.file.path.name}: {e}.')
+                report.add_details('Warning', f'Unable to process with dfVFS {task.file.path.name}: {e}.')
+        else:
+            report.status = Status.WARN
+            report.add_details('Warning', 'Nothing to extract.')
 
         for ef in extracted:
             if isinstance(ef, Path):
@@ -553,7 +572,7 @@ class Extractor(BaseWorker):
             report.status = max(t.status for t in tasks)
             if report.status > Status.CLEAN:
                 report.add_details('Warning', 'There are suspicious files in this archive, click on the "Extracted" tab for more.')
-        else:
+        elif not report.status == Status.NOTAPPLICABLE:
             # Nothing was extracted
             report.status = Status.WARN
             report.add_details('Warning', 'Looks like the archive is empty (?). This is suspicious.')
