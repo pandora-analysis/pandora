@@ -23,7 +23,8 @@ class Blocklists(BaseWorker):
     synonyms: Dict[str, List[str]] = {
         'text/x-python': ['text/x-script.python'],
         'application/x-cab': ['application/vnd.ms-cab-compressed'],
-        'application/x-msdos-program': ['application/x-dosexec']
+        'application/x-msdos-program': ['application/x-dosexec'],
+        'message/rfc822': ['application/vnd.ms-outlook', 'text/plain']
     }
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
