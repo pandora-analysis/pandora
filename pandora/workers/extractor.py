@@ -396,9 +396,8 @@ class Extractor(BaseWorker):
                 return None
             if not glob_results:
                 return None
-            else:
-                # NOTE: what are we supposed to do if we have more?
-                path_spec = raw_path_spec[0]
+            # NOTE: what are we supposed to do if we have more?
+            path_spec = raw_path_spec[0]
 
         volume_path_spec = factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_TSK_PARTITION, location='/', parent=path_spec)
 
