@@ -409,14 +409,25 @@ class Extractor(BaseWorker):
             self.logger.exception('Not supported')
             return None
 
-    def extract_with_dfvfs(self, dfvfs_info: Tuple[PathSpec, tsk_volume_system.TSKVolumeSystem]) -> List[Tuple[str, BytesIO]]:
+    def extract_with_dfvfs(self, dfvfs_info: Tuple[PathSpec, tsk_volume_system.TSKVolumeSystem], archive_file: File, report: Report) -> List[Tuple[str, BytesIO]]:
         path_spec, volume_system = dfvfs_info
         extracted: List[Tuple[str, BytesIO]] = []
 
         def process_dir(file_entry: FileEntry):
             for sub_file_entry in file_entry.sub_file_entries:
+                if len(extracted) >= self.max_files_in_archive:
+                    self.logger.warning(f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive, stop extracting.')
+                    report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                    report.add_details('Warning', f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive')
+                    break
                 if sub_file_entry.IsFile():
                     file_object = sub_file_entry.GetFileObject()
+                    file_content = BytesIO(file_object.read())
+                    if file_content.getbuffer().nbytes >= self.max_extracted_filesize:
+                        self.logger.warning(f'File {sub_file_entry.name} from {archive_file.path.name} too big ({file_content.getbuffer().nbytes}).')
+                        report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                        report.add_details('Warning', f'File {archive_file.path.name} too big ({file_content.getbuffer().nbytes}).')
+                        continue
                     extracted.append((sub_file_entry.name, BytesIO(file_object.read())))
                 elif sub_file_entry.IsDirectory():
                     process_dir(sub_file_entry)
@@ -538,7 +549,7 @@ class Extractor(BaseWorker):
         elif dfvfs_info:
             # this is a dfvfs supported file
             try:
-                extracted = self.extract_with_dfvfs(dfvfs_info)
+                extracted = self.extract_with_dfvfs(dfvfs_info, task.file, report)
             except Exception as e:
                 self.logger.exception('dfVFS dislikes it.')
                 report.status = Status.WARN
