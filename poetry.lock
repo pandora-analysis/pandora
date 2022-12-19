@@ -791,14 +791,14 @@ packaging = "*"
 
 [[package]]
 name = "dfdatetime"
-version = "20221112"
+version = "20221218"
 description = "Digital Forensics date and time (dfDateTime)."
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "dfdatetime-20221112-py2.py3-none-any.whl", hash = "sha256:3b258594342ed5963f02cf87ca100197e9052130fffd76abeb7ea7b392f9b4ee"},
-    {file = "dfdatetime-20221112.tar.gz", hash = "sha256:4d7b58e229b2381704b69d51b01fe7ae920b7b18f8d29e8b19e050fa26209b5e"},
+    {file = "dfdatetime-20221218-py2.py3-none-any.whl", hash = "sha256:f6c0a017c25910bae981de0a761b92b31c7eb6ff554d10faf4b6b5e01db28e12"},
+    {file = "dfdatetime-20221218.tar.gz", hash = "sha256:96230a5aa22960d2d2c49aca9b2d0284a0783fe8b290c74abc64b466582584b1"},
 ]
 
 [package.dependencies]
@@ -806,14 +806,14 @@ pip = ">=7.0.0"
 
 [[package]]
 name = "dfvfs"
-version = "20221212"
+version = "20221218"
 description = "Digital Forensics Virtual File System (dfVFS)."
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "dfvfs-20221212-py2.py3-none-any.whl", hash = "sha256:26f605803300b289dfc70c1db6b76d0646ca3fdcbbba8164a5db0ad275b5b97d"},
-    {file = "dfvfs-20221212.tar.gz", hash = "sha256:0d7bc65f916785ffb98f2a66d4af44badf85f7d7220ad7bbbd53d21227e650a2"},
+    {file = "dfvfs-20221218-py2.py3-none-any.whl", hash = "sha256:12f02c1988aa72f233abae93a8ae120c2e69959904aac7e5bbbf83b7b6651267"},
+    {file = "dfvfs-20221218.tar.gz", hash = "sha256:e38267a0a3342510aa5972616d1e0e8066de196e24ca7b2f130ddb0d2ce40751"},
 ]
 
 [package.dependencies]
@@ -896,13 +896,13 @@ files = [
 
 [[package]]
 name = "dtfabric"
-version = "20220219"
+version = "20221218"
 description = "Data type fabric (dtfabric)"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "dtfabric-20220219.tar.gz", hash = "sha256:a6b5898707013c0972357291f1517e8cd4d9c70b8c1143ca033ba89a2ffc6739"},
+    {file = "dtfabric-20221218.tar.gz", hash = "sha256:1381ce748063d0c732fcf3434adc179ac8f05b75a96496261430d6bd16933e55"},
 ]
 
 [package.dependencies]
@@ -1503,21 +1503,21 @@ test = ["mock (>=1.3.0)"]
 
 [[package]]
 name = "importlib-metadata"
-version = "5.1.0"
+version = "5.2.0"
 description = "Read metadata from Python packages"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "importlib_metadata-5.1.0-py3-none-any.whl", hash = "sha256:d84d17e21670ec07990e1044a99efe8d615d860fd176fc29ef5c306068fda313"},
-    {file = "importlib_metadata-5.1.0.tar.gz", hash = "sha256:d5059f9f1e8e41f80e9c56c2ee58811450c31984dfa625329ffd7c0dad88a73b"},
+    {file = "importlib_metadata-5.2.0-py3-none-any.whl", hash = "sha256:0eafa39ba42bf225fc00e67f701d71f85aead9f878569caf13c3724f704b970f"},
+    {file = "importlib_metadata-5.2.0.tar.gz", hash = "sha256:404d48d62bba0b7a77ff9d405efd91501bef2e67ff4ace0bed40a0cf28c3c7cd"},
 ]
 
 [package.dependencies]
 zipp = ">=0.5"
 
 [package.extras]
-docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)"]
+docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
 perf = ["ipython"]
 testing = ["flake8 (<5)", "flufl.flake8", "importlib-resources (>=1.3)", "packaging", "pyfakefs", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)", "pytest-perf (>=0.9.2)"]
 
@@ -1697,14 +1697,14 @@ pyyaml = "*"
 
 [[package]]
 name = "isort"
-version = "5.11.2"
+version = "5.11.3"
 description = "A Python utility / library to sort Python imports."
 category = "dev"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "isort-5.11.2-py3-none-any.whl", hash = "sha256:e486966fba83f25b8045f8dd7455b0a0d1e4de481e1d7ce4669902d9fb85e622"},
-    {file = "isort-5.11.2.tar.gz", hash = "sha256:dd8bbc5c0990f2a095d754e50360915f73b4c26fc82733eb5bfc6b48396af4d2"},
+    {file = "isort-5.11.3-py3-none-any.whl", hash = "sha256:83155ffa936239d986b0f190347a3f2285f42a9b9e1725c89d865b27dd0627e5"},
+    {file = "isort-5.11.3.tar.gz", hash = "sha256:a8ca25fbfad0f7d5d8447a4314837298d9f6b23aed8618584c894574f626b64b"},
 ]
 
 [package.extras]
@@ -1838,24 +1838,26 @@ format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-
 
 [[package]]
 name = "keyring"
-version = "23.11.0"
+version = "23.13.1"
 description = "Store and access your passwords safely."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "keyring-23.11.0-py3-none-any.whl", hash = "sha256:3dd30011d555f1345dec2c262f0153f2f0ca6bca041fb1dc4588349bb4c0ac1e"},
-    {file = "keyring-23.11.0.tar.gz", hash = "sha256:ad192263e2cdd5f12875dedc2da13534359a7e760e77f8d04b50968a821c2361"},
+    {file = "keyring-23.13.1-py3-none-any.whl", hash = "sha256:771ed2a91909389ed6148631de678f82ddc73737d85a927f382a8a1b157898cd"},
+    {file = "keyring-23.13.1.tar.gz", hash = "sha256:ba2e15a9b35e21908d0aaf4e0a47acc52d6ae33444df0da2b49d41a46ef6d678"},
 ]
 
 [package.dependencies]
 importlib-metadata = {version = ">=4.11.4", markers = "python_version < \"3.12\""}
+importlib-resources = {version = "*", markers = "python_version < \"3.9\""}
 "jaraco.classes" = "*"
 jeepney = {version = ">=0.4.2", markers = "sys_platform == \"linux\""}
-pywin32-ctypes = {version = "<0.1.0 || >0.1.0,<0.1.1 || >0.1.1", markers = "sys_platform == \"win32\""}
+pywin32-ctypes = {version = ">=0.2.0", markers = "sys_platform == \"win32\""}
 SecretStorage = {version = ">=3.2", markers = "sys_platform == \"linux\""}
 
 [package.extras]
+completion = ["shtab"]
 docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)"]
 testing = ["flake8 (<5)", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)"]
 
@@ -2126,18 +2128,15 @@ files = [
 
 [[package]]
 name = "libsigscan-python"
-version = "20221027"
+version = "20221218"
 description = "Python bindings module for libsigscan"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "libsigscan-python-20221027.tar.gz", hash = "sha256:de1109f8a47209b4e26a222efe1cdda0dcb19f00ddc943e3c13919a173ed937c"},
-    {file = "libsigscan_python-20221027-cp27-cp27m-win32.whl", hash = "sha256:5df7fc0e074e47916398dac36fd9ec14dcc07dd9d2da875d7c301bc085fdb759"},
-    {file = "libsigscan_python-20221027-cp27-cp27m-win_amd64.whl", hash = "sha256:7a8b3e0a0928a06c2061ede3b1e92fc28b6cb58b9575eb9644a5e4a8164637bb"},
-    {file = "libsigscan_python-20221027-cp310-cp310-macosx_12_0_x86_64.whl", hash = "sha256:69059b50e1bf998649544c2b2cee62454070ce09f49a8e4518a441218327677c"},
-    {file = "libsigscan_python-20221027-cp310-cp310-win32.whl", hash = "sha256:ef54d7ac6c5424a3a08de1683d56dea9bece1832b95f26373f81e271fe1942ca"},
-    {file = "libsigscan_python-20221027-cp310-cp310-win_amd64.whl", hash = "sha256:b679e692c70093bbf167efc5e072c220293a41461375ff7041804fb5b04ed237"},
+    {file = "libsigscan-python-20221218.tar.gz", hash = "sha256:8eaca2be538666c1938f8b2357e5ada552a6eac8b9f00fe59d7fadc54325476f"},
+    {file = "libsigscan_python-20221218-cp310-cp310-win32.whl", hash = "sha256:1df9d5d985e3844a275181f8cf5df05dd57636ec09e6c1e4bc0a901c51a159f5"},
+    {file = "libsigscan_python-20221218-cp310-cp310-win_amd64.whl", hash = "sha256:f600e64742e100bbab5e8b5cb2330db97d7cdd3f5485325846433c2e18217dd6"},
 ]
 
 [[package]]
@@ -3436,20 +3435,20 @@ docs = ["Sphinx (>=5.1.1,<6.0.0)"]
 
 [[package]]
 name = "pylint"
-version = "2.15.8"
+version = "2.15.9"
 description = "python code static checker"
 category = "dev"
 optional = false
 python-versions = ">=3.7.2"
 files = [
-    {file = "pylint-2.15.8-py3-none-any.whl", hash = "sha256:ea82cd6a1e11062dc86d555d07c021b0fb65afe39becbe6fe692efd6c4a67443"},
-    {file = "pylint-2.15.8.tar.gz", hash = "sha256:ec4a87c33da054ab86a6c79afa6771dc8765cb5631620053e727fcf3ef8cbed7"},
+    {file = "pylint-2.15.9-py3-none-any.whl", hash = "sha256:349c8cd36aede4d50a0754a8c0218b43323d13d5d88f4b2952ddfe3e169681eb"},
+    {file = "pylint-2.15.9.tar.gz", hash = "sha256:18783cca3cfee5b83c6c5d10b3cdb66c6594520ffae61890858fe8d932e1c6b4"},
 ]
 
 [package.dependencies]
 astroid = ">=2.12.13,<=2.14.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
-dill = ">=0.2"
+dill = {version = ">=0.2", markers = "python_version < \"3.11\""}
 isort = ">=4.2.5,<6"
 mccabe = ">=0.6,<0.8"
 platformdirs = ">=2.2.0"
@@ -3794,14 +3793,14 @@ files = [
 
 [[package]]
 name = "pytz"
-version = "2022.6"
+version = "2022.7"
 description = "World timezone definitions, modern and historical"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pytz-2022.6-py2.py3-none-any.whl", hash = "sha256:222439474e9c98fced559f1709d89e6c9cbf8d79c794ff3eb9f8800064291427"},
-    {file = "pytz-2022.6.tar.gz", hash = "sha256:e89512406b793ca39f5971bc999cc538ce125c0e51c27941bef4568b460095e2"},
+    {file = "pytz-2022.7-py2.py3-none-any.whl", hash = "sha256:93007def75ae22f7cd991c84e02d434876818661f8df9ad5df9e950ff4e52cfd"},
+    {file = "pytz-2022.7.tar.gz", hash = "sha256:7ccfae7b4b2c067464a6733c6261673fdb8fd1be905460396b97a073e9fa683a"},
 ]
 
 [[package]]
@@ -4253,16 +4252,16 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.2.0"
+version = "1.2.1"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "semgrep-1.2.0-cp37.cp38.cp39.py37.py38.py39-none-any.whl", hash = "sha256:31f5f764ff114e2e56b3a93b09829f738cb9e287af7479e2c4714c77b10dc5c0"},
-    {file = "semgrep-1.2.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_10_14_x86_64.whl", hash = "sha256:e04dbc4a95ddfc9b07550b09b88f61c5c7d81817fac1c86683d8c2534514ac6c"},
-    {file = "semgrep-1.2.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_11_0_arm64.whl", hash = "sha256:cba38f882c9fedd00462247474a991715d5c8faf169e38cfbf299c7c89ccad55"},
-    {file = "semgrep-1.2.0.tar.gz", hash = "sha256:d7b9ccffab1cbecb7870e6792dc274f6a63133910150f33b6ba07d28f5cf00d5"},
+    {file = "semgrep-1.2.1-cp37.cp38.cp39.py37.py38.py39-none-any.whl", hash = "sha256:b4bbb64a53e3264bde6db209fe5a7d57f3cfa8db2a5770c5a4bfd81562514054"},
+    {file = "semgrep-1.2.1-cp37.cp38.cp39.py37.py38.py39-none-macosx_10_14_x86_64.whl", hash = "sha256:05fd69396bb9011e226ce2f814c2fb2f809c133048e81032a74867e6b6898aec"},
+    {file = "semgrep-1.2.1-cp37.cp38.cp39.py37.py38.py39-none-macosx_11_0_arm64.whl", hash = "sha256:166e62a27e625fb2ec113180d460ce88c8ceee74e5c5b5741e4f774bf6741bd5"},
+    {file = "semgrep-1.2.1.tar.gz", hash = "sha256:639f84f234714e01293c96e22d9651c10f93143bf9aa8ed4739d3fd6e7469a7c"},
 ]
 
 [package.dependencies]
@@ -4602,32 +4601,30 @@ telegram = ["requests"]
 
 [[package]]
 name = "traitlets"
-version = "5.7.1"
+version = "5.8.0"
 description = "Traitlets Python configuration system"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "traitlets-5.7.1-py3-none-any.whl", hash = "sha256:57ba2ba951632eeab9388fa45f342a5402060a5cc9f0bb942f760fafb6641581"},
-    {file = "traitlets-5.7.1.tar.gz", hash = "sha256:fde8f62c05204ead43c2c1b9389cfc85befa7f54acb5da28529d671175bb4108"},
+    {file = "traitlets-5.8.0-py3-none-any.whl", hash = "sha256:c864831efa0ba6576d09b44884b34e41defc18c0d7e720b4a2d6698c842cab3e"},
+    {file = "traitlets-5.8.0.tar.gz", hash = "sha256:6cc57d6dc28c85d5365961726ffd19b538739347749e13ebe34e03323a0e8f84"},
 ]
 
 [package.extras]
 docs = ["myst-parser", "pydata-sphinx-theme", "sphinx"]
-lint = ["black (>=22.6.0)", "mdformat (>0.7)", "ruff (>=0.0.156)"]
-test = ["pre-commit", "pytest"]
-typing = ["mypy (>=0.990)"]
+test = ["argcomplete (>=2.0)", "pre-commit", "pytest", "pytest-mock"]
 
 [[package]]
 name = "types-python-dateutil"
-version = "2.8.19.4"
+version = "2.8.19.5"
 description = "Typing stubs for python-dateutil"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-python-dateutil-2.8.19.4.tar.gz", hash = "sha256:351a8ca9afd4aea662f87c1724d2e1ae59f9f5f99691be3b3b11d2393cd3aaa1"},
-    {file = "types_python_dateutil-2.8.19.4-py3-none-any.whl", hash = "sha256:722a55be8e2eeff749c3e166e7895b0e2f4d29ab4921c0cff27aa6b997d7ee2e"},
+    {file = "types-python-dateutil-2.8.19.5.tar.gz", hash = "sha256:ab91fc5f715f7d76d9a50d3dd74d0c68dfe38a54f0239cfa0506575ae4d87a9d"},
+    {file = "types_python_dateutil-2.8.19.5-py3-none-any.whl", hash = "sha256:253c267e71cac148003db200cb3fc572ab0e2f994b34a4c1de5d3f550f0ad5b2"},
 ]
 
 [[package]]
@@ -5341,4 +5338,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.11"
-content-hash = "2d7a6106a6087150fb937c15b7f73b5bc0648cbc455766a0e954f96974e5a766"
+content-hash = "2717561ef2ad1ff0b7a2f0f4ce682fe16f5c91b50d15fb77aab7b119305b2dfe"
