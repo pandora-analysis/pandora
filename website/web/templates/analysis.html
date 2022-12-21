@@ -117,11 +117,11 @@
         <!-- Overall status -->
         <div class="row" id="taskStatus">
           <div class="col-md-1"></div>
-          {% for status in status %}
-          <div class="col-md-4 img-thumbnail overall-status-flag status-flag-{{ status.name|lower }}
-               {% if status != status.WAITING %} d-none {% endif %}" id="taskStatusIcon">
-            {% if status != status.ALERT %}
-              {{ render_icon(status_icons[status]) }}
+          {% for s in status %}
+          <div class="col-md-4 img-thumbnail overall-status-flag status-flag-{{ s.name|lower }}
+               {% if s != task.status %} d-none {% endif %}" id="taskStatusIcon">
+            {% if s != status.ALERT %}
+              {{ render_icon(status_icons[s]) }}
             {% else %}
               <img src="{{ url_for('static', filename='images/skull.svg') }}" width = "160" height = "160">
             {% endif %}
@@ -129,32 +129,32 @@
           {% endfor %}
 
           <div class="col-md-6" id="taskStatusMessage">
-            <div class="alert alert-overwrite d-none">
+              <div class="alert alert-overwrite {% if task.status != status.OVERWRITE %}d-none{% endif %}">
               <strong>Result overwritten! </strong><br>You're on your own, get in touch with your admin!
             </div>
-            <div class="alert alert-error d-none">
+            <div class="alert alert-error {% if task.status != status.ERROR %}d-none{% endif %}">
               <strong>Unexpected error during scan! </strong><br>Please contact your Pandora webmaster.
             </div>
-            <div class="alert alert-danger d-none">
+            <div class="alert alert-danger {% if task.status != status.ALERT %}d-none{% endif %}">
               <strong>Malicious File! </strong> This file is know malicious, or
               uses techniques seen in attacks, more details below. <br>
               <strong>Recommendations: </strong><br>
               We advise you to delete this file and maybe the linked message.<br>
               If this file has been opened, please contact your system administrator.<br>
             </div>
-            <div class="alert alert-warning d-none">
+            <div class="alert alert-warning {% if task.status != status.WARN %}d-none{% endif %}">
               <strong>Suspicious File! </strong> See reasons below.
               <strong>Recommendations: </strong><br>
               We advise you not to open the file on your computer and get in touch
               with your system administrator if you want more details.<br>
             </div>
-            <div class="alert alert-success d-none">
+            <div class="alert alert-success {% if task.status != status.CLEAN %}d-none{% endif %}">
               <strong>Clean File! </strong><br>
               No technical indicator for suspicious activity has been found in this file.</br>
               It doesn't mean it is for sure safe to open but you can be relatively confident.</br>
               If looking at the preview is enough for you, no need to open it on your computer!
             </div>
-            <div class="alert alert-info {% if task.done %} d-none {% endif %}">
+            <div class="alert alert-info {% if task.workers_done %} d-none {% endif %}">
               <strong>Pending task! </strong><br>
               Please wait for the scan to finish.
             </div>
@@ -468,8 +468,10 @@
                     <tr id="email-body">
                       <th>Body</th>
                       <td>
-                        <div class="row preview-done d-none" id="previews_images"></div>
-                        <div class="row preview-wait">
+                        <div class="row preview-done {% if not task.file.previews|length %} d-none {%endif%}" id="previews_images">
+                          {% include 'previews.html' %}
+                        </div>
+                        <div class="row preview-wait {% if task.file.previews|length %} d-none {%endif%}">
                           <div class="img-thumbnail small-status-flag status-flag-error">Content preview is not available</div>
                         </div>
                       </td>
@@ -479,10 +481,12 @@
 
                   <!-- Image preview -->
                   {% elif current_user.role.can(action.download_images) %}
-                    <div class="row preview-done d-none" id="previews_images"></div>
-                    <div class="row preview-wait">
-                      <div class="img-thumbnail small-status-flag status-flag-error">Content preview is not available</div>
-                    </div>
+                  <div class="row preview-done {% if not task.file.previews|length %} d-none {%endif%}" id="previews_images">
+                    {% include 'previews.html' %}
+                  </div>
+                  <div class="row preview-wait {% if task.file.previews|length %} d-none {%endif%}">
+                    <div class="img-thumbnail small-status-flag status-flag-error">Content preview is not available</div>
+                  </div>
                   {% endif %}
                 </div>
               </div>
@@ -498,7 +502,7 @@
                   </div>
                 </div>
 
-                <div class="row d-none preview-done">
+                <div class="row preview-done {% if not task.file.previews|length %} d-none {%endif%}">
                   <div>The text content can be huge, only display a part of it.</div>
                   <div class="col-md-12">
                     <div class="img-hover">
@@ -508,7 +512,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="row preview-wait">
+                <div class="row preview-wait {% if task.file.previews|length %} d-none {%endif%}">
                   <div>Creating preview, please wait...</div>
                 </div>
               </div>

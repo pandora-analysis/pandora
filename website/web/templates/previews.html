@@ -1,9 +1,3 @@
-{% if report.status != status.CLEAN %}
-<div class="col-md">
-  {{report.suspicious}}
-</div>
-{% endif %}
-
 {% for idx in range(task.file.previews|length) %}
 <div class="col-md-4">
   <div class="img-hover">
