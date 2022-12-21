@@ -9,6 +9,7 @@ import traceback
 
 from collections import defaultdict
 from datetime import datetime, timedelta
+import email.utils
 from importlib.metadata import version
 from io import BytesIO
 from pathlib import Path
@@ -243,10 +244,19 @@ def api_analysis(task_id, seed=None):
 
     if hasattr(task, 'parent') and task.parent and seed and not pandora.is_seed_valid(task.parent, seed):
         task.parent = None
+
+    email_config = get_config('generic', 'email')
+    admin_name = ''
+    if 'to' in email_config and email_config['to']:
+        admin_name, _ = email.utils.parseaddr(email_config['to'][0])
+    if not admin_name:
+        admin_name = 'Administrator'
+
     return render_template('analysis.html', task=task, seed=seed, api=api,
                            zip_passwd=get_config('generic', 'sample_password'),
                            default_share_time=get_config('generic', 'default_share_time'),
                            show_project_page=get_config('generic', 'show_project_page'),
+                           admin_name=admin_name,
                            api_resource=ApiTaskAction)
 
 

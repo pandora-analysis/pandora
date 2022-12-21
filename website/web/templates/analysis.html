@@ -87,7 +87,7 @@
               {% if current_user.role.can('notify_cert') %}
                 <li>
                   <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#notifyModal">
-                    Alert Administrator
+                      Alert {{admin_name}}
                   </a>
                 </li>
               {% endif %}
@@ -618,7 +618,7 @@
               onsubmit="return analysis.notify($(this).attr('action'))">
           <div class="modal-content">
             <div class="modal-header">
-              <h4 class="modal-title">Send message to CERT</h4>
+                <h4 class="modal-title">Send message to {{admin_name}}</h4>
               <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
