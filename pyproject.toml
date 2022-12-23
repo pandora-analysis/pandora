@@ -35,7 +35,7 @@ textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.4"
 eml-parser = "^1.17.5"
 unoserver = "^1.2"
-weasyprint = "^57.1"
+weasyprint = "^57.2"
 extract-msg = {version = "^0.38.4", extras = ["all"]}
 Pillow = "^9.3.0"
 oletools = {version = "0.60.1", extras = ["full"]}
@@ -62,7 +62,7 @@ werkzeug = "^2.2.2"
 pyhashlookup = "^1.2.1"
 pylookyloo = "^1.16.0"
 hachoir = "^3.2.0"
-dfvfs = "^20221218"
+dfvfs = "^20221223"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.15.9"

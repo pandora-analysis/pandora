@@ -806,14 +806,14 @@ pip = ">=7.0.0"
 
 [[package]]
 name = "dfvfs"
-version = "20221218"
+version = "20221223"
 description = "Digital Forensics Virtual File System (dfVFS)."
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "dfvfs-20221218-py2.py3-none-any.whl", hash = "sha256:12f02c1988aa72f233abae93a8ae120c2e69959904aac7e5bbbf83b7b6651267"},
-    {file = "dfvfs-20221218.tar.gz", hash = "sha256:e38267a0a3342510aa5972616d1e0e8066de196e24ca7b2f130ddb0d2ce40751"},
+    {file = "dfvfs-20221223-py2.py3-none-any.whl", hash = "sha256:50c884c877969267463607a2354840c72cbc895f2e1ca5de6f9c2065d35113b2"},
+    {file = "dfvfs-20221223.tar.gz", hash = "sha256:5f4e2862da21531931cdf87c8afbdd74577e2d90daf0a54377479d039ba3509b"},
 ]
 
 [package.dependencies]
@@ -4966,14 +4966,14 @@ files = [
 
 [[package]]
 name = "weasyprint"
-version = "57.1"
+version = "57.2"
 description = "The Awesome Document Factory"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "weasyprint-57.1-py3-none-any.whl", hash = "sha256:204dff5753e003c6e75f6c674e39825fc95a20f984cee38ddb7ed3ab242a66fd"},
-    {file = "weasyprint-57.1.tar.gz", hash = "sha256:397a9d11298f94485ec3b7b68aeef1c6106fb638350126d9d4a64109b73508a0"},
+    {file = "weasyprint-57.2-py3-none-any.whl", hash = "sha256:685692e7a2b4aec21010a61c1e8f1d6cd611dd46509fa7068fcca3c8e59a94f5"},
+    {file = "weasyprint-57.2.tar.gz", hash = "sha256:b8e9ef2dcbcfbc82e99215acfd68f947b2b5f1999b5b156db75fabe380ba7e9a"},
 ]
 
 [package.dependencies]
@@ -5392,4 +5392,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.11"
-content-hash = "ebc0a39daa00dc70abb25978d756061555d2bec21c2ad2d85f2d22d0e52437d9"
+content-hash = "7757465f9d3245fe91fd84ba7d341e2b08597f0a13dc22a8362ad8270f14b85f"
