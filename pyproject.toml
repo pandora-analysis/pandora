@@ -62,7 +62,7 @@ werkzeug = "^2.2.2"
 pyhashlookup = "^1.2.1"
 pylookyloo = "^1.16.0"
 hachoir = "^3.2.0"
-dfvfs = "^20221223"
+dfvfs = "^20221224"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.15.9"
