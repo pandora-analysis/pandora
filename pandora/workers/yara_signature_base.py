@@ -19,7 +19,8 @@ class YaraSignatureBaseWorker(YaraWorker):
     savepath = rulespath / 'yara.compiled'
     needs_external = ['generic_anomalies.yar', 'general_cloaking.yar',
                       'gen_webshells_ext_vars.yar',
-                      'thor_inverse_matches.yar', 'yara_mixed_ext_vars.yar']
+                      'thor_inverse_matches.yar', 'yara_mixed_ext_vars.yar',
+                      'configured_vulns_ext_vars.yar']
     last_change: Optional[float] = None
 
     def rules_with_external_vars(self, filename: str, filepath: str, filetype: str, owner: str) -> yara.Rules:
