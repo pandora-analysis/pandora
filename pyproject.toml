@@ -32,7 +32,7 @@ python-magic = "^0.4.27"
 PyMuPDF = "^1.21.1"
 requests = "^2.28.1"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
-PyExifTool = "^0.5.4"
+PyExifTool = "^0.5.5"
 eml-parser = "^1.17.5"
 unoserver = "^1.2"
 weasyprint = "^57.2"
