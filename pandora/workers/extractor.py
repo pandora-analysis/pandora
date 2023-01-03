@@ -119,7 +119,10 @@ class Extractor(BaseWorker):
                         break
                     tmp_dest_dir = dest_dir / f'.{dirname}'
                     safe_create_dir(tmp_dest_dir)
-                    filepath = tmp_dest_dir / filename
+                    if ';' in filename:
+                        filepath = tmp_dest_dir / filename.split(';')[0]
+                    else:
+                        filepath = tmp_dest_dir / filename
                     with filepath.open('wb') as f:
                         f.write(extracted.getvalue())
                     extracted_files.append(filepath)
@@ -452,7 +455,7 @@ class Extractor(BaseWorker):
                 elif sub_file_entry.IsDirectory():
                     process_dir(sub_file_entry)
 
-        for path_spec, volume_system in self.check_dfvfs(archive_file, False):
+        for path_spec, volume_system in self.check_dfvfs(archive_file, False):  # pylint: disable=not-an-iterable
             for volume in volume_system.volumes:
                 if volume_identifier := getattr(volume, 'identifier'):
                     volume = volume_system.GetVolumeByIdentifier(volume_identifier)
@@ -575,7 +578,8 @@ class Extractor(BaseWorker):
                 self.logger.exception('dfVFS dislikes it.')
                 report.status = Status.WARN
                 report.add_details('Warning', f'Unable to process with dfVFS {task.file.path.name}: {e}.')
-        else:
+
+        if not extracted:
             report.status = Status.WARN
             report.add_details('Warning', 'Nothing to extract.')
 
