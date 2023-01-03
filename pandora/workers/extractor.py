@@ -579,7 +579,7 @@ class Extractor(BaseWorker):
                 report.status = Status.WARN
                 report.add_details('Warning', f'Unable to process with dfVFS {task.file.path.name}: {e}.')
 
-        if not extracted:
+        if not extracted and report.status != Status.NOTAPPLICABLE:
             report.status = Status.WARN
             report.add_details('Warning', 'Nothing to extract.')
 
