@@ -383,7 +383,7 @@ class Extractor(BaseWorker):
         ...
 
     @overload
-    def check_dfvfs(self, submitted_file: File, check_only: Literal[False]) -> list[Tuple[PathSpec, tsk_volume_system.TSKVolumeSystem]]:
+    def check_dfvfs(self, submitted_file: File, check_only: Literal[False]) -> List[Tuple[PathSpec, tsk_volume_system.TSKVolumeSystem]]:
         ...
 
     def check_dfvfs(self, submitted_file: File, check_only: bool) -> Union[bool, List[Tuple[PathSpec, tsk_volume_system.TSKVolumeSystem]]]:
