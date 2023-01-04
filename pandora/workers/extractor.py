@@ -501,6 +501,29 @@ class Extractor(BaseWorker):
             report.status = Status.NOTAPPLICABLE
             return
 
+        # Check if we reach the max recursivity (archive in archive in archive...)
+        _curtask = task
+        _cur_recurse = self.max_recurse
+        _cur_max_files_in_recurse = self.max_files_in_recursive_archive
+        while _cur_recurse > 0 and _cur_max_files_in_recurse > 0:
+            if not _curtask.parent:
+                break
+            _curtask = _curtask.parent
+            _cur_recurse -= 1
+            _cur_max_files_in_recurse -= len(_curtask.extracted)
+
+        if _cur_recurse <= 0:
+            self.logger.warning(f'File {task.file.path.name} is too deep in the recursion chain (>{self.max_recurse}).')
+            report.status = Status.ERROR if self.max_is_error else Status.ALERT
+            report.add_details('Warning', f'File {task.file.path.name} is too deep in the recursion chain (>{self.max_recurse}). If you want to scan it anyway, click on Actions > Rescan file.')
+            return
+
+        if _cur_max_files_in_recurse <= 0:
+            self.logger.warning(f'File {task.file.path.name} cannot be extracted, too many files (>{self.max_files_in_recursive_archive}) in the recursive archive.')
+            report.status = Status.ERROR if self.max_is_error else Status.ALERT
+            report.add_details('Warning', f'File {task.file.path.name} cannot be extracted, too many files (>{self.max_files_in_recursive_archive}) in the recursive archive. If you want to scan it anyway, click on Actions > Rescan file.')
+            return
+
         if not task.user:
             raise PandoraException('The task user is missing. Should not happen, but investigate if it does.')
 
@@ -599,15 +622,18 @@ class Extractor(BaseWorker):
             tasks.append(new_task)
 
         shutil.rmtree(extracted_dir)
-        # wait for all the tasks to finish
-        while not all(t.workers_done for t in tasks):
-            time.sleep(1)
 
-        if tasks:
-            report.status = max(t.status for t in tasks)
-            if report.status > Status.CLEAN:
-                report.add_details('Warning', 'There are suspicious files in this archive, click on the "Extracted" tab for more.')
-        elif not report.status == Status.NOTAPPLICABLE:
+        if not tasks and not report.status == Status.NOTAPPLICABLE:
             # Nothing was extracted
             report.status = Status.WARN
             report.add_details('Warning', 'Looks like the archive is empty (?). This is suspicious.')
+        elif report.status not in [Status.ERROR, Status.WARN, Status.ALERT, Status.OVERWRITE]:
+            # wait for all the workers to finish, or have one of them raising an ALERT
+            while not all(t.workers_done for t in tasks):
+                for t in tasks:
+                    # If any of the task is marked as ALERT or OVERWRITE, we can quit.
+                    if t.workers_done and t.status >= Status.ALERT:
+                        report.add_details('Warning', 'There are suspicious files in this archive, click on the "Extracted" tab for more.')
+                        break
+                time.sleep(1)
+            report.status = max(t.status for t in tasks if t.workers_done)
