@@ -65,6 +65,8 @@ from .base import BaseWorker
 class Extractor(BaseWorker):
 
     max_files_in_archive: int
+    max_files_in_recursive_archive: int
+    max_recurse: int
     max_extracted_filesize_in_mb: int
     max_is_error: bool
     zip_passwords: List[str]
