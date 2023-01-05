@@ -114,6 +114,7 @@
     headers: {"X-CSRF-Token": "{{ csrf_token() }}"},
     paramName: "file",
     maxFilesize: {{ max_file_size }}, // MB
+    maxFiles: 1,
     previewTemplate: document.querySelector('#preview-template').innerHTML,
     sending: function(file, xhr, formData) {
       formData.append("workersDisabled", getDisabledWorkers());
