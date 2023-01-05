@@ -24,7 +24,8 @@ class Blocklists(BaseWorker):
         'text/x-python': ['text/x-script.python'],
         'application/x-cab': ['application/vnd.ms-cab-compressed'],
         'application/x-msdos-program': ['application/x-dosexec'],
-        'message/rfc822': ['application/vnd.ms-outlook', 'text/plain']
+        'message/rfc822': ['application/vnd.ms-outlook', 'text/plain'],
+        'application/rar': ['application/x-rar']
     }
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
