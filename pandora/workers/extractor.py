@@ -638,4 +638,6 @@ class Extractor(BaseWorker):
                         report.add_details('Warning', 'There are suspicious files in this archive, click on the "Extracted" tab for more.')
                         break
                 time.sleep(1)
-            report.status = max(t.status for t in tasks if t.workers_done)
+            all_status = [t.status for t in tasks if t.workers_done]
+            if all_status:
+                report.status = max(all_status)
