@@ -1,0 +1,49 @@
+{% from 'bootstrap5/utils.html' import render_icon %}
+{% from "macros.html" import display_status_badge %}
+
+<div class="col-md-12" id="{{worker_name}}">
+  <div>
+    <span class="h3">{{worker_meta.name}}</span>
+    <span style="vertical-align:top;" data-bs-toggle="tooltip" title="{{worker_meta.description}}">{{render_icon('question-circle')}}</span>
+  </div>
+
+  <table class="table table-hover table-bordered">
+    <tr>
+      <th scope="row" style="width:30%">Status</th>
+      <td>
+        {{ display_status_badge(report.status, status) }}
+      </td>
+    </tr>
+    {% if report.details %}
+    <tr>
+      <th scope="row" style="width:30%">Details</th>
+      <td>
+        <table class="table table-striped">
+          {% for key, value in report.details.items() %}
+          <tr>
+            <th scope="row">{{key}}</th>
+            <td>
+            {% if key == 'permaurl' %}
+              <a href="{{value}}">Show report on VirusTotal</a>
+            {% elif value is string %}
+              {{value}}
+            {% elif value is mapping %}
+            {% for k, v in value.items() %}
+              {{k}} - {{v}}</br>
+            {% endfor %}
+            {% elif value is sequence %}
+            {% for v in value %}
+              {{v}}</br>
+            {% endfor %}
+            {% else %}
+              {{value}}
+            {% endif %}
+            </td>
+         </tr>
+          {% endfor %}
+        </table>
+      </td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
