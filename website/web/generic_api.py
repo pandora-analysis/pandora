@@ -294,15 +294,18 @@ class ApiTaskAction(Resource):
                 raise Unsupported("missing mandatory key 'message'")
             if not seed:
                 seed = pandora.add_seed(task, time=90000)[0]  # Just a bit over a day
+            domain = get_config('generic', 'public_url')
+            permaurl = f'{domain}/analysis/{task.uuid}/seed-{seed}'
             message = '\n'.join([
                 f'-- Message from {data["email"]} --',
-                f'-- Page {url_for("api_analysis", task_id=task.uuid, seed=seed)} --',
+                f'-- Page {permaurl} --',
                 '',
                 data['message']
             ])
             sent = Mail.send(
                 subject='Pandora - Analysis Notify',
                 message=message,
+                reply_to=data['email'] if data.get('email') else None
             )
             if not sent:
                 raise PandoraException("an error has occurred when trying to send message")

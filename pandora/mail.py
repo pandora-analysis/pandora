@@ -1,6 +1,8 @@
 import smtplib
 
 from email.message import EmailMessage
+from typing import Optional
+
 
 from .default import get_config
 from .exceptions import Unsupported
@@ -8,7 +10,7 @@ from .exceptions import Unsupported
 
 class Mail:
     @staticmethod
-    def send(subject: str, message: str) -> bool:
+    def send(subject: str, message: str, reply_to: Optional[str]=None) -> bool:
         """
         Try to send a mail.
         :param (str) subject: email subject
@@ -28,6 +30,8 @@ class Mail:
         msg['Subject'] = subject
         msg['From'] = email_config['from']
         msg['To'] = ', '.join(email_config['to'])
+        if reply_to:
+            msg['Reply-to'] = reply_to
         msg.set_content(message)
 
         try:
