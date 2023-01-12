@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
 import logging
+import sys
 
 import asyncio
 import pathlib
 import urllib.parse
 
-import irmacl_async  # type: ignore
+if sys.version_info < (3, 11):
+    import irmacl_async  # type: ignore
 
 from ..helpers import Status, expire_in_sec
 from ..task import Task
@@ -23,6 +25,11 @@ class Irma(BaseWorker):
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
                  loglevel: int=logging.INFO, **options):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
+        if sys.version_info >= (3, 11):
+            self.disabled = True
+            self.logger.warning('Disabled, IRMA requires python <3.11.')
+            return
+
         if not self.apiurl:
             self.disabled = True
             self.logger.warning('Disabled, missing apiurl.')
