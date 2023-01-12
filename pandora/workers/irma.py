@@ -34,6 +34,7 @@ class Irma(BaseWorker):
             self.disabled = True
             self.logger.warning('Disabled, missing apiurl.')
             return
+        self.logger.warning('IRMA is deprecated and will be removed in the next release.')
 
         if self.apitimeout:
             self.apitimeout = expire_in_sec(self.apitimeout)
