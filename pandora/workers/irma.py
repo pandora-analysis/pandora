@@ -8,7 +8,11 @@ import pathlib
 import urllib.parse
 
 if sys.version_info < (3, 11):
-    import irmacl_async  # type: ignore
+    try:
+        import irmacl_async  # type: ignore
+        HAS_MODULE = True
+    except ImportError:
+        HAS_MODULE = False
 
 from ..helpers import Status, expire_in_sec
 from ..task import Task
@@ -28,6 +32,10 @@ class Irma(BaseWorker):
         if sys.version_info >= (3, 11):
             self.disabled = True
             self.logger.warning('Disabled, IRMA requires python <3.11.')
+            return
+        elif not HAS_MODULE:
+            self.logger.warning('Package irmacl_async missing. IRMA is EOL and this module will be removed very soon. If you still want to use it, run poetry run pip install irmacl_async and restart pandora.')
+            self.disabled = True
             return
 
         if not self.apiurl:
