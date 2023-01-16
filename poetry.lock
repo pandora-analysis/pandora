@@ -1125,14 +1125,14 @@ packaging = ">=14.1"
 
 [[package]]
 name = "flask-restx"
-version = "1.0.3"
+version = "1.0.5"
 description = "Fully featured framework for fast, easy and documented API development with Flask"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "flask-restx-1.0.3.tar.gz", hash = "sha256:5fdacd23031d25ff4642f141a47a7fa877f07e3e261099ccc5ebc4fc254de84c"},
-    {file = "flask_restx-1.0.3-py2.py3-none-any.whl", hash = "sha256:d291910face4a4040fbdd87658f884bfd2161dc25f710598017e08894f265594"},
+    {file = "flask-restx-1.0.5.tar.gz", hash = "sha256:e23dc4ff24869c92faa719b7a58be1203ed741275ff32c9f03d0ab56ed01546c"},
+    {file = "flask_restx-1.0.5-py2.py3-none-any.whl", hash = "sha256:c4c5d3adbd8d2239f428c813b8c237322d6aada4b2d7454b777275338bf21e53"},
 ]
 
 [package.dependencies]
@@ -5451,4 +5451,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "5186246719cbff80a3b3482503f34ecdfb2011624385e94bbbf83e084b6dfc7e"
+content-hash = "3ea83a9e4c8c84e2fdbcb97b40377c404fbc5a1ab2cd7a0bb2445b38f23b78e2"
