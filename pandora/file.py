@@ -464,7 +464,7 @@ class File:
         Delete from disk uploaded file and all other files in the same directory
         """
         # NOTE: Make sure all the settings (especially hashes and size) we want to store are initialized
-        self.to_dict
+        self.to_dict  # pylint: disable=W0104
         if self.directory and self.directory.exists():
             shutil.rmtree(self.directory, ignore_errors=True)
         self.deleted = True
