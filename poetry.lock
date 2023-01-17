@@ -901,22 +901,23 @@ graph = ["objgraph (>=1.7.2)"]
 
 [[package]]
 name = "dnspython"
-version = "2.2.1"
+version = "2.3.0"
 description = "DNS toolkit"
 category = "main"
 optional = false
-python-versions = ">=3.6,<4.0"
+python-versions = ">=3.7,<4.0"
 files = [
-    {file = "dnspython-2.2.1-py3-none-any.whl", hash = "sha256:a851e51367fb93e9e1361732c1d60dab63eff98712e503ea7d92e6eccb109b4f"},
-    {file = "dnspython-2.2.1.tar.gz", hash = "sha256:0f7569a4a6ff151958b64304071d370daa3243d15941a7beedf0c9fe5105603e"},
+    {file = "dnspython-2.3.0-py3-none-any.whl", hash = "sha256:89141536394f909066cabd112e3e1a37e4e654db00a25308b0f130bc3152eb46"},
+    {file = "dnspython-2.3.0.tar.gz", hash = "sha256:224e32b03eb46be70e12ef6d64e0be123a64e621ab4c0822ff6d450d52a540b9"},
 ]
 
 [package.extras]
 curio = ["curio (>=1.2,<2.0)", "sniffio (>=1.1,<2.0)"]
-dnssec = ["cryptography (>=2.6,<37.0)"]
-doh = ["h2 (>=4.1.0)", "httpx (>=0.21.1)", "requests (>=2.23.0,<3.0.0)", "requests-toolbelt (>=0.9.1,<0.10.0)"]
+dnssec = ["cryptography (>=2.6,<40.0)"]
+doh = ["h2 (>=4.1.0)", "httpx (>=0.21.1)", "requests (>=2.23.0,<3.0.0)", "requests-toolbelt (>=0.9.1,<0.11.0)"]
+doq = ["aioquic (>=0.9.20)"]
 idna = ["idna (>=2.1,<4.0)"]
-trio = ["trio (>=0.14,<0.20)"]
+trio = ["trio (>=0.14,<0.23)"]
 wmi = ["wmi (>=1.5.1,<2.0.0)"]
 
 [[package]]
@@ -1125,14 +1126,14 @@ packaging = ">=14.1"
 
 [[package]]
 name = "flask-restx"
-version = "1.0.3"
+version = "1.0.5"
 description = "Fully featured framework for fast, easy and documented API development with Flask"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "flask-restx-1.0.3.tar.gz", hash = "sha256:5fdacd23031d25ff4642f141a47a7fa877f07e3e261099ccc5ebc4fc254de84c"},
-    {file = "flask_restx-1.0.3-py2.py3-none-any.whl", hash = "sha256:d291910face4a4040fbdd87658f884bfd2161dc25f710598017e08894f265594"},
+    {file = "flask-restx-1.0.5.tar.gz", hash = "sha256:e23dc4ff24869c92faa719b7a58be1203ed741275ff32c9f03d0ab56ed01546c"},
+    {file = "flask_restx-1.0.5-py2.py3-none-any.whl", hash = "sha256:c4c5d3adbd8d2239f428c813b8c237322d6aada4b2d7454b777275338bf21e53"},
 ]
 
 [package.dependencies]
@@ -1165,14 +1166,14 @@ Flask = ">=0.8"
 
 [[package]]
 name = "flask-wtf"
-version = "1.0.1"
+version = "1.1.0"
 description = "Form rendering, validation, and CSRF protection for Flask with WTForms."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 files = [
-    {file = "Flask-WTF-1.0.1.tar.gz", hash = "sha256:34fe5c6fee0f69b50e30f81a3b7ea16aa1492a771fe9ad0974d164610c09a6c9"},
-    {file = "Flask_WTF-1.0.1-py3-none-any.whl", hash = "sha256:9d733658c80be551ce7d5bc13c7a7ac0d80df509be1e23827c847d9520f4359a"},
+    {file = "Flask-WTF-1.1.0.tar.gz", hash = "sha256:10fd267a41b6dee4f433ec8d6507d4cce4f1d71700280cf654a7cdbae6408d47"},
+    {file = "Flask_WTF-1.1.0-py3-none-any.whl", hash = "sha256:b37451583d41aa40678eeb28d81023d66ce239693c6c35fc57b989ef22053e98"},
 ]
 
 [package.dependencies]
@@ -1751,14 +1752,14 @@ testing = ["flake8 (<5)", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-chec
 
 [[package]]
 name = "jbxapi"
-version = "3.19.0"
+version = "3.20.0"
 description = "API for Joe Sandbox"
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 files = [
-    {file = "jbxapi-3.19.0-py2.py3-none-any.whl", hash = "sha256:e5c6d5bfd0affd5de420f6b040c6c52c6e4d27c72f63b9745026e65db4849bbe"},
-    {file = "jbxapi-3.19.0.tar.gz", hash = "sha256:60888383166919e503b5f1a3dfede92f48d58862ce610035c910329c7ae38f49"},
+    {file = "jbxapi-3.20.0-py2.py3-none-any.whl", hash = "sha256:1734be71afb66be724fe3223ac0484464466dd7bb0b889a7859548866a1bfb42"},
+    {file = "jbxapi-3.20.0.tar.gz", hash = "sha256:aa48a10a3fe7e26f7e238cd85babad7fe030ef7621c3a27cdb306579e661cabd"},
 ]
 
 [package.dependencies]
@@ -3279,14 +3280,14 @@ test = ["coverage[toml] (>=5.2)", "hypothesis", "pytest (>=6.0)", "pytest-cov"]
 
 [[package]]
 name = "pycdlib"
-version = "1.13.0"
+version = "1.14.0"
 description = "Pure python ISO manipulation library"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pycdlib-1.13.0-py2.py3-none-any.whl", hash = "sha256:cb4a9b55a3ee59c24b0b024aff7f46c2f1982452c7c8e153742f008f24a69930"},
-    {file = "pycdlib-1.13.0.tar.gz", hash = "sha256:38c033be82d3a671da5f779d441942907299c2113a6c50e1fb399a91ea1612f0"},
+    {file = "pycdlib-1.14.0-py2.py3-none-any.whl", hash = "sha256:a905827335f0066af3fd416c5cf9b1f29dffaf4d0914b714555213d1809f38d4"},
+    {file = "pycdlib-1.14.0.tar.gz", hash = "sha256:8ec306b31d9c850f28c5fda52438d904edd1e8fcf862c5ffd756272efac9f422"},
 ]
 
 [[package]]
@@ -3554,14 +3555,14 @@ docs = ["Sphinx (>=5.3.0,<6.0.0)"]
 
 [[package]]
 name = "pymisp"
-version = "2.4.167"
+version = "2.4.167.1"
 description = "Python API for MISP."
 category = "main"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pymisp-2.4.167-py3-none-any.whl", hash = "sha256:3977f23c09ecdf7c62fd91bb0a176dcdea6512ffc06f6e537fe561c71d90ad02"},
-    {file = "pymisp-2.4.167.tar.gz", hash = "sha256:0f2c985f4d9b4ae158943cd53f2c448e19245ee265aa5dd6d931b92939ac94fc"},
+    {file = "pymisp-2.4.167.1-py3-none-any.whl", hash = "sha256:d16eae627feae83e36297a1d651a3aef68dad39266b7e855ed769eb627c84631"},
+    {file = "pymisp-2.4.167.1.tar.gz", hash = "sha256:66fc220410bb2f4e30f0da92f57bdc57790489ff31b61369d1dc6c6c071ed2ef"},
 ]
 
 [package.dependencies]
@@ -3572,16 +3573,16 @@ publicsuffixlist = ">=0.9.1,<0.10.0"
 pydeep2 = {version = ">=0.5.1,<0.6.0", optional = true, markers = "extra == \"fileobjects\""}
 python-dateutil = ">=2.8.2,<3.0.0"
 python-magic = {version = ">=0.4.27,<0.5.0", optional = true, markers = "extra == \"fileobjects\""}
-requests = ">=2.28.1,<3.0.0"
+requests = ">=2.28.2,<3.0.0"
 
 [package.extras]
-brotli = ["urllib3[brotli] (>=1.26.13,<2.0.0)"]
-docs = ["recommonmark (>=0.7.1,<0.8.0)", "sphinx-autodoc-typehints (>=1.19.5,<2.0.0)"]
+brotli = ["urllib3[brotli] (>=1.26.14,<2.0.0)"]
+docs = ["recommonmark (>=0.7.1,<0.8.0)", "sphinx-autodoc-typehints (>=1.21.0,<2.0.0)"]
 email = ["RTFDE (>=0.0.2,<0.0.3)", "extract_msg (>=0.38.4,<0.39.0)", "oletools (>=0.60.1,<0.61.0)"]
 fileobjects = ["lief (>=0.12.3,<0.13.0)", "pydeep2 (>=0.5.1,<0.6.0)", "python-magic (>=0.4.27,<0.5.0)"]
 openioc = ["beautifulsoup4 (>=4.11.1,<5.0.0)"]
 pdfexport = ["reportlab (>=3.6.12,<4.0.0)"]
-url = ["chardet (>=5.1.0,<6.0.0)", "pyfaup (>=1.2,<2.0)"]
+url = ["pyfaup (>=1.2,<2.0)"]
 virustotal = ["validators (>=0.20.0,<0.21.0)"]
 
 [[package]]
@@ -3872,14 +3873,14 @@ files = [
 
 [[package]]
 name = "pytz"
-version = "2022.7"
+version = "2022.7.1"
 description = "World timezone definitions, modern and historical"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pytz-2022.7-py2.py3-none-any.whl", hash = "sha256:93007def75ae22f7cd991c84e02d434876818661f8df9ad5df9e950ff4e52cfd"},
-    {file = "pytz-2022.7.tar.gz", hash = "sha256:7ccfae7b4b2c067464a6733c6261673fdb8fd1be905460396b97a073e9fa683a"},
+    {file = "pytz-2022.7.1-py2.py3-none-any.whl", hash = "sha256:78f4f37d8198e0627c5f1143240bb0206b8691d8d7ac6d78fee88b78733f8c4a"},
+    {file = "pytz-2022.7.1.tar.gz", hash = "sha256:01a0681c4b9684a28304615eba55d1ab31ae00bf68ec157ec3708a8182dbbcd0"},
 ]
 
 [[package]]
@@ -4475,14 +4476,14 @@ test = ["pytest"]
 
 [[package]]
 name = "setuptools"
-version = "65.7.0"
+version = "66.0.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "setuptools-65.7.0-py3-none-any.whl", hash = "sha256:8ab4f1dbf2b4a65f7eec5ad0c620e84c34111a68d3349833494b9088212214dd"},
-    {file = "setuptools-65.7.0.tar.gz", hash = "sha256:4d3c92fac8f1118bb77a22181355e29c239cabfe2b9effdaa665c66b711136d7"},
+    {file = "setuptools-66.0.0-py3-none-any.whl", hash = "sha256:a78d01d1e2c175c474884671dde039962c9d74c7223db7369771fcf6e29ceeab"},
+    {file = "setuptools-66.0.0.tar.gz", hash = "sha256:bd6eb2d6722568de6d14b87c44a96fac54b2a45ff5e940e639979a3d1792adb6"},
 ]
 
 [package.extras]
@@ -5013,14 +5014,13 @@ bracex = ">=2.1.1"
 
 [[package]]
 name = "wcwidth"
-version = "0.2.5"
+version = "0.2.6"
 description = "Measures the displayed width of unicode strings in a terminal"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},
-    {file = "wcwidth-0.2.5.tar.gz", hash = "sha256:c4d647b99872929fdb7bdcaa4fbe7f01413ed3d98077df798530e5b04f116c83"},
+    {file = "wcwidth-0.2.6.tar.gz", hash = "sha256:a5220780a404dbe3353789870978e472cfe477761f06ee55077256e509b156d0"},
 ]
 
 [[package]]
@@ -5236,14 +5236,14 @@ files = [
 
 [[package]]
 name = "xlsxwriter"
-version = "3.0.6"
+version = "3.0.7"
 description = "A Python module for creating Excel XLSX files."
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "XlsxWriter-3.0.6-py3-none-any.whl", hash = "sha256:56eae8ae587536734009aa819845c3e3c865462399823085b0baabbb081a929c"},
-    {file = "XlsxWriter-3.0.6.tar.gz", hash = "sha256:2f9e5ea13343fe85486e349d4e5fdf746bb69dc7bc1dedfa9b5fae2bb48c0795"},
+    {file = "XlsxWriter-3.0.7-py3-none-any.whl", hash = "sha256:d79dadac9dcbff3c24281764b052b46bcdb391f3184f337c4c4e6ed8d2738d7d"},
+    {file = "XlsxWriter-3.0.7.tar.gz", hash = "sha256:1239958b12da12be6abf05b32f64ff162eb75fff0fdf00d901ca0f46dc0557cf"},
 ]
 
 [[package]]
@@ -5451,4 +5451,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "5186246719cbff80a3b3482503f34ecdfb2011624385e94bbbf83e084b6dfc7e"
+content-hash = "3ce4d90dbc43f1b42bae1085d1f69f524bb9426433902e013451cd90db58408f"
