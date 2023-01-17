@@ -11,7 +11,7 @@ from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
 
 from .default import get_config, get_socket_path
-from .exceptions import InvalidPandoraObject
+from .exceptions import InvalidPandoraObject, PandoraException
 from .helpers import roles_from_config, expire_in_sec
 # from .observable import Observable
 from .report import Report
@@ -126,7 +126,11 @@ class Pandora():
         tasks = []
         for task in self.storage.get_tasks(first_date=first_date, last_date=last_date):
             # FIXME: get rid of that typing ignore
-            _task = Task(**task)  # type: ignore
+            try:
+                _task = Task(**task)  # type: ignore
+            except PandoraException as e:
+                self.logger.warning(f'Unable to load task {task}: {e}')
+                continue
             if user.is_admin or (_task.user and user.get_id() == _task.user.get_id()):
                 tasks.append(_task)
         return tasks
