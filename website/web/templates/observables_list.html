@@ -17,13 +17,13 @@
     </tr>
     {% for observable in task.observables %}
     <tr id="observableRow-{{ observable.sha256 }}">
-      <td>
+      <td style="width:115px">
         {{ display_status_badge(observable.status, status) }}
       </td>
-      <td>
+      <td style="width: 110px">
 				{{ observable.observable_type }}
       </td>
-      <td>
+      <td style="max-width: 400px">
         <div style="word-wrap: break-word">{{observable.value}}</div>
         {% if lookyloo_url and observable.observable_type == "url" %}
         <div style="float:right" id="lookyloo_submit-{{observable.sha256}}" class="btn alert-link"
@@ -36,7 +36,7 @@
         </a>
         {% endif %}
       </td>
-      <td>
+      <td style="max-width: 300px">
         <ul>
         {% for wl in observable.warninglists%}
           <li>{{wl.name}}</li>
