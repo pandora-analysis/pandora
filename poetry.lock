@@ -168,19 +168,19 @@ test = ["coverage", "flake8", "pexpect", "wheel"]
 
 [[package]]
 name = "astroid"
-version = "2.13.2"
+version = "2.13.3"
 description = "An abstract syntax tree for Python with inference support."
 category = "dev"
 optional = false
 python-versions = ">=3.7.2"
 files = [
-    {file = "astroid-2.13.2-py3-none-any.whl", hash = "sha256:8f6a8d40c4ad161d6fc419545ae4b2f275ed86d1c989c97825772120842ee0d2"},
-    {file = "astroid-2.13.2.tar.gz", hash = "sha256:3bc7834720e1a24ca797fd785d77efb14f7a28ee8e635ef040b6e2d80ccb3303"},
+    {file = "astroid-2.13.3-py3-none-any.whl", hash = "sha256:14c1603c41cc61aae731cad1884a073c4645e26f126d13ac8346113c95577f3b"},
+    {file = "astroid-2.13.3.tar.gz", hash = "sha256:6afc22718a48a689ca24a97981ad377ba7fb78c133f40335dfd16772f29bcfb1"},
 ]
 
 [package.dependencies]
 lazy-object-proxy = ">=1.4.0"
-typing-extensions = ">=4.0.0"
+typing-extensions = {version = ">=4.0.0", markers = "python_version < \"3.11\""}
 wrapt = [
     {version = ">=1.11,<2", markers = "python_version < \"3.11\""},
     {version = ">=1.14,<2", markers = "python_version >= \"3.11\""},
@@ -496,14 +496,14 @@ cffi = ">=1.0.0"
 
 [[package]]
 name = "cachelib"
-version = "0.10.0"
+version = "0.10.1"
 description = "A collection of cache libraries in the same API interface."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "cachelib-0.10.0-py3-none-any.whl", hash = "sha256:6fbbae4637491cc78a5e82f7cf623eb6778ea21ad8aa92197f45a1add51dab02"},
-    {file = "cachelib-0.10.0.tar.gz", hash = "sha256:292e89d5f9201fb9570e9f222c202f59085c66f9cb8bdfeefcfffff2b442fb2a"},
+    {file = "cachelib-0.10.1-py3-none-any.whl", hash = "sha256:c91e94f13a439356b19cf0945e773543918cfd09befcb6b6d572fc38f5eafe4b"},
+    {file = "cachelib-0.10.1.tar.gz", hash = "sha256:0b51af1913ad7ed21372864c0649e916bac30897160e68d1de0e3aac104df49b"},
 ]
 
 [[package]]
@@ -2798,6 +2798,18 @@ qa = ["flake8 (==3.8.3)", "mypy (==0.782)"]
 testing = ["docopt", "pytest (<6.0.0)"]
 
 [[package]]
+name = "parsy"
+version = "2.0"
+description = "easy-to-use parser combinators, for parsing in pure Python"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "parsy-2.0-py2.py3-none-any.whl", hash = "sha256:214a0b3f2cdaf671e73654e50193c3bdf23b0c93a6a192d3f95bc6c9f67a38f3"},
+    {file = "parsy-2.0.tar.gz", hash = "sha256:7fd36ce0ebb0b80d969d39975038172de95ba212d9f0e1e73d8d51bf284f4524"},
+]
+
+[[package]]
 name = "pbr"
 version = "5.11.1"
 description = "Python Build Reasonableness"
@@ -3572,21 +3584,21 @@ docs = ["Sphinx (>=6.1.3,<7.0.0)"]
 
 [[package]]
 name = "pymisp"
-version = "2.4.167.2"
+version = "2.4.168"
 description = "Python API for MISP."
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pymisp-2.4.167.2-py3-none-any.whl", hash = "sha256:2cffa7ca117a153fe501c197cb6834083f1c94867ea63863cbade698813fc8ca"},
-    {file = "pymisp-2.4.167.2.tar.gz", hash = "sha256:f3e986826aadb1700b7d1ea73d06e6e40f231d2891a41841450fc2835a5e33be"},
+    {file = "pymisp-2.4.168-py3-none-any.whl", hash = "sha256:b89d68f5fe041089fb22dae4321c8d0ee3ca44dff01f016a7056848fed09daec"},
+    {file = "pymisp-2.4.168.tar.gz", hash = "sha256:4e88263348e7c558d255b47a636dbf6b85fdc73ad45b0ab22df064875cc1b020"},
 ]
 
 [package.dependencies]
 deprecated = ">=1.2.13,<2.0.0"
 jsonschema = ">=4.17.3,<5.0.0"
 lief = {version = ">=0.12.3,<0.13.0", optional = true, markers = "extra == \"fileobjects\""}
-publicsuffixlist = ">=0.9.1,<0.10.0"
+publicsuffixlist = ">=0.9.2,<0.10.0"
 pydeep2 = {version = ">=0.5.1,<0.6.0", optional = true, markers = "extra == \"fileobjects\""}
 python-dateutil = ">=2.8.2,<3.0.0"
 python-magic = {version = ">=0.4.27,<0.5.0", optional = true, markers = "extra == \"fileobjects\""}
@@ -3594,8 +3606,8 @@ requests = ">=2.28.2,<3.0.0"
 
 [package.extras]
 brotli = ["urllib3[brotli] (>=1.26.14,<2.0.0)"]
-docs = ["recommonmark (>=0.7.1,<0.8.0)", "sphinx-autodoc-typehints (>=1.21.1,<2.0.0)"]
-email = ["RTFDE (>=0.0.2,<0.0.3)", "extract_msg (>=0.38.4,<0.39.0)", "oletools (>=0.60.1,<0.61.0)"]
+docs = ["recommonmark (>=0.7.1,<0.8.0)", "sphinx-autodoc-typehints (>=1.21.7,<2.0.0)"]
+email = ["RTFDE (>=0.0.2,<0.0.3)", "extract_msg (>=0.39.0,<0.40.0)", "oletools (>=0.60.1,<0.61.0)"]
 fileobjects = ["lief (>=0.12.3,<0.13.0)", "pydeep2 (>=0.5.1,<0.6.0)", "python-magic (>=0.4.27,<0.5.0)"]
 openioc = ["beautifulsoup4 (>=4.11.1,<5.0.0)"]
 pdfexport = ["reportlab (>=3.6.12,<4.0.0)"]
@@ -4371,16 +4383,16 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.3.0"
+version = "1.5.1"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "semgrep-1.3.0-cp37.cp38.cp39.py37.py38.py39-none-any.whl", hash = "sha256:8bf037804655522436e995a1b3f30b7d34629a088ec41dfeb3b264013b20c0bb"},
-    {file = "semgrep-1.3.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_10_14_x86_64.whl", hash = "sha256:e8128ed889940dfa507dc15d35d461d582a6c06297ee9f3f546846a68cfa9088"},
-    {file = "semgrep-1.3.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_11_0_arm64.whl", hash = "sha256:ee56a13891c14918a9005d3e269342eee64cf40cc90929f83c871cce0e2e1044"},
-    {file = "semgrep-1.3.0.tar.gz", hash = "sha256:04792ba4e7b4d0c6cfd3a13908d6658ee249dfd8d0313f9c39db49300ce4b3b3"},
+    {file = "semgrep-1.5.1-cp37.cp38.cp39.py37.py38.py39-none-any.whl", hash = "sha256:dc83ff93ccf3f34b56ea6b267b0b959afc5833461159d7fa14495f73003df8a6"},
+    {file = "semgrep-1.5.1-cp37.cp38.cp39.py37.py38.py39-none-macosx_10_14_x86_64.whl", hash = "sha256:8a76d7eda19b62835e30268bd8599fa10c141ce4d7affb5f43a0982b11ee8fce"},
+    {file = "semgrep-1.5.1-cp37.cp38.cp39.py37.py38.py39-none-macosx_11_0_arm64.whl", hash = "sha256:600b9a8c83c2c8ea8822216ebfbec6c7030232b1377e21f9aa67c813d58ab7da"},
+    {file = "semgrep-1.5.1.tar.gz", hash = "sha256:a43c832a929bcd648fde17954819fe0c7ec711acccaac25c4a124559b16c8ba4"},
 ]
 
 [package.dependencies]
@@ -4393,6 +4405,7 @@ defusedxml = ">=0.7.1,<0.8.0"
 glom = ">=22.1,<23.0"
 jsonschema = ">=4.6,<5.0"
 packaging = ">=21.0,<22.0"
+parsy = ">=2.0,<3.0"
 peewee = ">=3.14,<4.0"
 python-lsp-jsonrpc = ">=1.0.0,<1.1.0"
 requests = ">=2.22,<3.0"
@@ -4493,14 +4506,14 @@ test = ["pytest"]
 
 [[package]]
 name = "setuptools"
-version = "66.0.0"
+version = "66.1.1"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "setuptools-66.0.0-py3-none-any.whl", hash = "sha256:a78d01d1e2c175c474884671dde039962c9d74c7223db7369771fcf6e29ceeab"},
-    {file = "setuptools-66.0.0.tar.gz", hash = "sha256:bd6eb2d6722568de6d14b87c44a96fac54b2a45ff5e940e639979a3d1792adb6"},
+    {file = "setuptools-66.1.1-py3-none-any.whl", hash = "sha256:6f590d76b713d5de4e49fe4fbca24474469f53c83632d5d0fd056f7ff7e8112b"},
+    {file = "setuptools-66.1.1.tar.gz", hash = "sha256:ac4008d396bc9cd983ea483cb7139c0240a07bbc74ffb6232fceffedc6cf03a8"},
 ]
 
 [package.extras]
@@ -5488,4 +5501,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "7cca4befa228e3046a6ab8f3d1f0bba16430b69a394b5f9a1cad0cf4be72765d"
+content-hash = "02a6108228575854f93d3d28c6762642a693801990691d2e8a92b794289d9017"
