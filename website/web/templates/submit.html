@@ -50,6 +50,7 @@
       <span><h2>Upload file, document, email or other</h2></span>
     </div>
   </div>
+  <div id="previews"></div>
 
   {% if current_user.detailed_view %}
   <div class="md-3">
@@ -90,14 +91,26 @@
     </center>
   </div>
 
-<div class="dz-preview dz-file-preview d-none" id="preview-template">
-  <div class="dz-image"><img data-dz-thumbnail /></div>
-  <div class="dz-details">
-    <div class="dz-size"><span data-dz-size></span></div>
-    <div class="dz-filename"><span data-dz-name></span></div>
+
+<!-- HTML heavily inspired by http://blueimp.github.io/jQuery-File-Upload/ -->
+<div class="table table-striped" class="files" id="previews">
+
+  <div id="template" class="file-row">
+    <!-- This is used as the file preview template -->
+    <div>
+        <p class="name" data-dz-name></p>
+        <strong class="error text-danger" data-dz-errormessage></strong>
+    </div>
+    <div>
+        <p class="size" data-dz-size></p>
+        <div class="progress active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Uploading file">
+          <div class="progress-bar bg-info" style="width:0%;" data-dz-uploadprogress></div>
+        </div>
+    </div>
   </div>
-  <div class="dz-error-message"><span data-dz-errormessage></span></div>
+
 </div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -109,29 +122,28 @@
         integrity="{{get_sri('static/js', 'submit.js')}}"
         crossorigin="anonymous"></script>
 <script type="text/javascript">
+  // Get the template HTML and remove it from the doument.
+  var previewNode = document.querySelector("#template");
+  previewNode.id = "";
+  var previewTemplate = previewNode.parentNode.innerHTML;
+  previewNode.parentNode.removeChild(previewNode);
   $("div#dropzone").dropzone({
     url: "{{ api.url_for(api_resource) }}",
     headers: {"X-CSRF-Token": "{{ csrf_token() }}"},
     paramName: "file",
     maxFilesize: {{ max_file_size }}, // MB
     maxFiles: 1,
-    previewTemplate: document.querySelector('#preview-template').innerHTML,
+    previewTemplate: previewTemplate,
+    previewsContainer: "#previews", // Define the container to display the previews
     sending: function(file, xhr, formData) {
       formData.append("workersDisabled", getDisabledWorkers());
       formData.append("password", getPassword());
     },
     success: function(file, answer){
-      if (file.previewElement) {
-        file.previewElement.classList.add("dz-success");
-      };
       window.setTimeout(function(){
         window.location = `/analysis/${answer.taskId}`;
-      }, 500);
+      }, 100);
     },
-    error: function(file, message) {
-      document.querySelector('.dz-message').innerHTML = message;
-      return
-    }
   });
 </script>
 
