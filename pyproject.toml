@@ -65,7 +65,7 @@ dfvfs = "^20221224"
 aiohttp = "^3.8.3"
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^2.15.10"
+pylint = "^2.16.1"
 ipython = "^8.9.0"
 mypy = "^0.991"
 types-redis = "^4.4.0.4"
