@@ -82,8 +82,7 @@ class WorkersManager(AbstractManager):
             except TypeError as e:
                 key = str(e).rsplit(': ', maxsplit=1)[-1]
                 raise ConfigError(f"missing mandatory key {key} for worker in config") from e
-            else:
-                workers_list.append(worker)
+            workers_list.append(worker)
         return workers_list
 
     def _manager(self):

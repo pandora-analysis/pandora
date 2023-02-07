@@ -40,5 +40,4 @@ class Mail:
             server.quit()
         except smtplib.SMTPException:
             return False
-        else:
-            return True
+        return True

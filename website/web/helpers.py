@@ -12,7 +12,7 @@ from flask import abort
 import flask_login  # type: ignore
 from werkzeug.security import generate_password_hash
 
-from pandora.default import get_homedir, get_config
+from pandora.default import get_homedir, get_config, PandoraException
 from pandora.pandora import Pandora
 from pandora.role import RoleName
 from pandora.task import Task
@@ -80,7 +80,7 @@ def build_users_table() -> Dict[str, Dict[str, str]]:
         if isinstance(authstuff, str):
             # just a password, make a key
             if not authstuff:
-                raise Exception(f'Password for {username} is empty, not allowed.')
+                raise PandoraException(f'Password for {username} is empty, not allowed.')
             users_table[username] = {}
             users_table[username]['password'] = generate_password_hash(authstuff)
             users_table[username]['authkey'] = hashlib.pbkdf2_hmac('sha256', get_secret_key(),
@@ -89,13 +89,13 @@ def build_users_table() -> Dict[str, Dict[str, str]]:
 
         elif isinstance(authstuff, list) and len(authstuff) == 2:
             if not authstuff[0]:
-                raise Exception(f'Password for {username} is empty, not allowed.')
+                raise PandoraException(f'Password for {username} is empty, not allowed.')
             if isinstance(authstuff[0], str) and isinstance(authstuff[1], str) and len(authstuff[1]) == 64:
                 users_table[username] = {}
                 users_table[username]['password'] = generate_password_hash(authstuff[0])
                 users_table[username]['authkey'] = authstuff[1]
         else:
-            raise Exception('User setup invalid. Must be "username": "password" or "username": ["password", "token 64 chars (sha256)"]')
+            raise PandoraException('User setup invalid. Must be "username": "password" or "username": ["password", "token 64 chars (sha256)"]')
     return users_table
 
 

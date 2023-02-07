@@ -58,7 +58,7 @@ app.config['SESSION_REDIS'] = pandora.redis_bytes
 app.config['SESSION_KEY_PREFIX'] = 'session:'
 
 if not app.template_folder:
-    raise Exception('Folder template not defined')
+    raise PandoraException('Folder template not defined')
 template_dir: Path = Path(app.root_path) / app.template_folder
 
 Bootstrap5(app)
@@ -110,7 +110,7 @@ status_icons = defaultdict(default_icon, {
 @app.context_processor
 def inject_enums():
     '''All the templates have the Action and Status enum'''
-    return dict(action=Action, status=Status, status_icons=status_icons)
+    return {"action": Action, "status": Status, "status_icons": status_icons}
 
 # ##### Global methods passed to jinja
 
@@ -170,8 +170,7 @@ def html_answer(func):
             if API_LOG_TRACEBACK:
                 traceback.print_exc()
             return abort(404)
-        else:
-            return res
+        return res
 
     return wrapper
 

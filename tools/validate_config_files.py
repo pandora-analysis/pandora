@@ -4,7 +4,7 @@ import json
 import logging
 import argparse
 
-from pandora.default import get_homedir
+from pandora.default import get_homedir, ConfigError
 
 
 def validate_generic_config_file():
@@ -16,7 +16,7 @@ def validate_generic_config_file():
         if key == '_notes':
             continue
         if key not in generic_config_sample['_notes']:
-            raise Exception(f'###### - Documentation missing for {key}')
+            raise ConfigError(f'###### - Documentation missing for {key}')
 
     user_config = get_homedir() / 'config' / 'generic.json'
     if not user_config.exists():
@@ -35,20 +35,20 @@ def validate_generic_config_file():
             logger.warning(f'Entry missing in user config file: {key}. Will default to: {generic_config_sample[key]}')
             continue
         if not isinstance(generic_config[key], type(generic_config_sample[key])):
-            raise Exception(f'Invalid type for {key}. Got: {type(generic_config[key])} ({generic_config[key]}), expected: {type(generic_config_sample[key])} ({generic_config_sample[key]})')
+            raise ConfigError(f'Invalid type for {key}. Got: {type(generic_config[key])} ({generic_config[key]}), expected: {type(generic_config_sample[key])} ({generic_config_sample[key]})')
 
         if isinstance(generic_config[key], dict):
             # Check entries
             for sub_key in generic_config_sample[key].keys():
                 if sub_key not in generic_config[key]:
-                    raise Exception(f'{sub_key} is missing in generic_config[key]. Default from sample file: {generic_config_sample[key][sub_key]}')
+                    raise ConfigError(f'{sub_key} is missing in generic_config[key]. Default from sample file: {generic_config_sample[key][sub_key]}')
                 if not isinstance(generic_config[key][sub_key], type(generic_config_sample[key][sub_key])):
-                    raise Exception(f'Invalid type for {sub_key} in {key}. Got: {type(generic_config[key][sub_key])} ({generic_config[key][sub_key]}), expected: {type(generic_config_sample[key][sub_key])} ({generic_config_sample[key][sub_key]})')
+                    raise ConfigError(f'Invalid type for {sub_key} in {key}. Got: {type(generic_config[key][sub_key])} ({generic_config[key][sub_key]}), expected: {type(generic_config_sample[key][sub_key])} ({generic_config_sample[key][sub_key]})')
 
     # Make sure the user config file doesn't have entries missing in the sample config
     for key in generic_config.keys():
         if key not in generic_config_sample:
-            raise Exception(f'{key} is missing in the sample config file. You need to compare {user_config} with {sample_config}.')
+            raise ConfigError(f'{key} is missing in the sample config file. You need to compare {user_config} with {sample_config}.')
 
     return True
 

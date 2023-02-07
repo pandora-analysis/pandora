@@ -66,8 +66,7 @@ def json_answer(func):
                 traceback.print_exc()
             err = repr(e) if API_VERBOSE_JSON else None
             return {'success': False, 'error': err}, 400
-        else:
-            return res
+        return res
 
     return wrapper
 

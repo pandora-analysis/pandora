@@ -31,7 +31,7 @@ def launch_cache(storage_directory: Optional[Path]=None):
     if not storage_directory:
         storage_directory = get_homedir()
     if not check_running('cache'):
-        Popen(["./run_redis.sh"], cwd=(storage_directory / 'cache'))
+        Popen(["./run_redis.sh"], cwd=storage_directory / 'cache')
 
 
 def shutdown_cache():
@@ -44,7 +44,7 @@ def launch_storage(storage_directory: Optional[Path]=None):
     if not storage_directory:
         storage_directory = get_homedir()
     if not check_running('storage'):
-        Popen(["./run_kvrocks.sh"], cwd=(storage_directory / 'storage'))
+        Popen(["./run_kvrocks.sh"], cwd=storage_directory / 'storage')
 
 
 def shutdown_storage():
