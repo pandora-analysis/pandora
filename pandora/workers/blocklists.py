@@ -55,11 +55,11 @@ class Blocklists(BaseWorker):
                 guessed_type, encoding = mimetypes.guess_type(task.file.original_filename)
                 if not guessed_type:
                     report.status = Status.ALERT
-                    report.add_details('Warning', 'Unable to guess the mimetype based on the filename.')
+                    report.add_details('Warning', 'Unable to guess the mimetype based on the filename. This is a known technique used to bypass detection. If you are unsure what do to, talk to your administrator.')
                 else:
                     list_valid_mimetypes = [guessed_type]
                     if guessed_type in self.synonyms:
                         list_valid_mimetypes += self.synonyms[guessed_type]
                     if task.file.mime_type not in list_valid_mimetypes:
                         report.status = Status.WARN
-                        report.add_details('Warning', f'The mimetype guessed from the filename ({guessed_type}) differs from the one guessed by magic ({task.file.mime_type}).')
+                        report.add_details('Warning', f'The mimetype guessed from the filename ({guessed_type}) differs from the one guessed by magic ({task.file.mime_type}). It is a known technique used to bypass detections.')

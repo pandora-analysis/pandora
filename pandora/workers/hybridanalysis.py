@@ -54,7 +54,8 @@ class HybridAnalysis(BaseWorker):
             for entries in result:
                 if entries['verdict'] == 'malicious':
                     report.status = Status.ALERT
-                    malicious.append(entries['vx_family'])
+                    if entries['vx_family']:
+                        malicious.append(entries['vx_family'])
             if malicious:
                 report.add_details('malicious', set(malicious))
         except requests.exceptions.HTTPError as e:
