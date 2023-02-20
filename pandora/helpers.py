@@ -93,10 +93,10 @@ def workers() -> Dict[str, Dict[str, Any]]:
             # If we miss a .py  *and* a .yml.sample file, it means the module has been removed and we can just skip it.
             logger.warning(f'The module {configfile.stem} has been removed. Remove {configfile} to get rid of this warning.')
             continue
-        elif not module_file.exists():
+        if not module_file.exists():
             # we have a sample config file but no module, this is bad
             raise ConfigError(f'No worker available for {configfile}, you need to remove the yml file, or add a .py modulefile.')
-        elif not sample_config_file.exists():
+        if not sample_config_file.exists():
             # we have a module but no sample config file, this is also bad
             raise ConfigError(f'No sample config file available for {configfile}, unable to load default config. Did you rename the yml.sample file instead of copying it? Please restore it.')
 
