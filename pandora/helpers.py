@@ -14,7 +14,7 @@ from pymispwarninglists import WarningLists
 import yaml
 
 from .default import get_homedir
-from .exceptions import Unsupported
+from .exceptions import Unsupported, ConfigError
 from .role import Role
 
 logger = logging.getLogger('Helpers')
@@ -85,14 +85,27 @@ def workers() -> Dict[str, Dict[str, Any]]:
     for configfile in workers_dir.glob('*.yml'):
         if configfile.name == 'base.yml':
             continue
+
+        module_file = workers_dir / f'{configfile.stem}.py'
+        sample_config_file = workers_dir / f'{configfile}.sample'
+
+        if not module_file.exists() and not sample_config_file.exists():
+            # If we miss a .py  *and* a .yml.sample file, it means the module has been removed and we can just skip it.
+            logger.warning(f'The module {configfile.stem} has been removed. Remove {configfile} to get rid of this warning.')
+            continue
+        elif not module_file.exists():
+            # we have a sample config file but no module, this is bad
+            raise ConfigError(f'No worker available for {configfile}, you need to remove the yml file, or add a .py modulefile.')
+        elif not sample_config_file.exists():
+            # we have a module but no sample config file, this is also bad
+            raise ConfigError(f'No sample config file available for {configfile}, unable to load default config. Did you rename the yml.sample file instead of copying it? Please restore it.')
+
         with configfile.open() as f:
             module_config = yaml.safe_load(f.read())
 
         # get the default config from the sample file, as a fallback
-        module_config_sample = {}
-        if (workers_dir / f'{configfile}.sample').exists():
-            with (workers_dir / f'{configfile}.sample').open() as f:
-                module_config_sample = yaml.safe_load(f.read())
+        with sample_config_file.open() as f:
+            module_config_sample = yaml.safe_load(f.read())
 
         all_configs[configfile.stem] = {
             'meta': {**default_config['meta'], **module_config_sample['meta'], **module_config['meta']},
