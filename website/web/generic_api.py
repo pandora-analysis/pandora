@@ -2,7 +2,8 @@
 
 import calendar
 import functools
-import traceback
+import logging
+import logging.config
 
 from collections import defaultdict
 from datetime import datetime, time, timedelta
@@ -29,7 +30,8 @@ from pandora.helpers import roles_from_config, workers, Status
 
 from .helpers import admin_required, update_user_role, build_users_table, load_user_from_request, sizeof_fmt
 
-API_LOG_TRACEBACK = get_config('generic', 'debug_web')
+logging.config.dictConfig(get_config('logging'))
+
 API_VERBOSE_JSON = get_config('generic', 'debug_web')
 
 pandora: Pandora = Pandora()
@@ -56,15 +58,12 @@ def json_answer(func):
         try:
             res = func(*args, **kwargs)
         except PandoraException as e:
-            err = str(e) if API_VERBOSE_JSON else None
-            return {'success': False, 'error': err}, 400
+            return {'success': False, 'error': str(e)}, 400
         except Forbidden as e:
-            err = str(e) if API_VERBOSE_JSON else None
-            return {'success': False, 'error': err}, 403
+            return {'success': False, 'error': str(e)}, 403
         except Exception as e:
-            if API_LOG_TRACEBACK:
-                traceback.print_exc()
-            err = repr(e) if API_VERBOSE_JSON else None
+            logging.exception('Error in API call.')
+            err = repr(e) if API_VERBOSE_JSON else 'Not returning the error to the user, the stacktrace is in the logs.'
             return {'success': False, 'error': err}, 400
         return res
 

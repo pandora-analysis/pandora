@@ -5,7 +5,6 @@ import json
 import logging
 import logging.config
 import operator
-import traceback
 
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -66,7 +65,6 @@ app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 app.config['SESSION_COOKIE_NAME'] = 'pandora'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
 app.debug = get_config('generic', 'debug_web')
-API_LOG_TRACEBACK = get_config('generic', 'debug_web')
 
 flask_session.Session(app=app)
 login_manager = flask_login.LoginManager(app=app)
@@ -167,8 +165,7 @@ def html_answer(func):
         try:
             res = func(*args, **kwargs)
         except (PandoraException, Exception):
-            if API_LOG_TRACEBACK:
-                traceback.print_exc()
+            logging.exception('Error in Web call.')
             return abort(404)
         return res
 
@@ -204,7 +201,7 @@ def api_toggle_detailed_view():
         flask_login.current_user.store()
         return json.dumps(True)
     except Exception as e:
-        print(f'Unable to toggle view: {e}')
+        logging.warning(f'Unable to toggle view: {e}')
         return json.dumps(False)
 
 
@@ -352,9 +349,8 @@ def api_admin_submit():
             raise Unsupported("missing mandatory key 'password'")
         try:
             users_table = build_users_table()
-        except Exception as e:
-            # FIXME add logging
-            print(e)
+        except Exception:
+            logging.exception('Failed to load the users.')
             return redirect(url_for('api_admin_page', error=2), 302)
         username = request.form['username']
         if username in users_table and check_password_hash(users_table[username]['password'], request.form['password']):
