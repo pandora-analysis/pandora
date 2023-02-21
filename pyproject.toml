@@ -72,7 +72,7 @@ mypy = "^1.0.1"
 types-redis = "^4.5.1.1"
 types-PyYAML = "^6.0.12.7"
 types-requests = "^2.28.11.13"
-types-python-dateutil = "^2.8.19.7"
+types-python-dateutil = "^2.8.19.8"
 bandit = {extras = ["toml"], version = "^1.7.4"}
 flake8 = "^6.0.0"
 semgrep = "^1.12.1"
