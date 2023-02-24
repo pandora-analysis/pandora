@@ -228,7 +228,7 @@ class ApiWorkerDetails(Resource):
         details = bool(args.get('details'))
         all_workers = bool(args.get('all_workers'))
 
-        if not any(worker_name, all_workers):
+        if not any((worker_name, all_workers)):
             return {'error': 'either all_workers must be set, or we need a worker name'}
 
         task = pandora.get_task(task_id=task_id)
