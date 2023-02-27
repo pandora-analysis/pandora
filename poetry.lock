@@ -1096,14 +1096,14 @@ tests = ["asttokens", "littleutils", "pytest", "rich"]
 
 [[package]]
 name = "extract-msg"
-version = "0.39.1"
+version = "0.39.2"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "extract_msg-0.39.1-py2.py3-none-any.whl", hash = "sha256:ad35b9260cdcdfdd61b0661d02eec495f0eaaf3ffa5d4cec4eca89da351dc8a7"},
-    {file = "extract_msg-0.39.1.tar.gz", hash = "sha256:bb83d79f13ed2d94380dc7705a4d6a8ba98de6694ccc242fa51afd74f2394d4e"},
+    {file = "extract_msg-0.39.2-py2.py3-none-any.whl", hash = "sha256:3ca81539b70fcac4a1d857dc27b32a54b4afa6b9e2061e476e19f5405964c19b"},
+    {file = "extract_msg-0.39.2.tar.gz", hash = "sha256:87710f998b2c81b4cd8df55bdf8cfd79edb1360110fa468e4dab17f436a3a8af"},
 ]
 
 [package.dependencies]
@@ -1113,14 +1113,14 @@ compressed-rtf = "1.0.6"
 ebcdic = "1.1.1"
 imapclient = ">=2.3.0,<3"
 olefile = "0.46"
-python-magic = {version = ">=0.4.27,<0.5.0", optional = true, markers = "extra == \"mime\""}
+python-magic = {version = ">=0.4.27,<0.5", optional = true, markers = "extra == \"mime\""}
 red-black-tree-mod = "1.20"
 RTFDE = "0.0.2"
 tzlocal = "4.2"
 
 [package.extras]
 all = ["extract-msg[mime]"]
-mime = ["python-magic (>=0.4.27,<0.5.0)"]
+mime = ["python-magic (>=0.4.27,<0.5)"]
 
 [[package]]
 name = "face"
@@ -5606,4 +5606,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "094e895e30dfebd52a58c4815799448caaa47c61b43b5319c3b2d8ae78e94078"
+content-hash = "26d77226ebbeaee44792a2dea18f439309606da548f82539dcb73242f5fcd680"
