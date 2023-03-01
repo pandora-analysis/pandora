@@ -36,6 +36,10 @@ class Mail:
 
         try:
             server = smtplib.SMTP(host=email_config['smtp_host'], port=email_config['smtp_port'])
+            if email_config['auth']:
+                server.login(email_config['smtp_user'], email_config['smtp_pass'])
+            if email_config['smtp_use_tls']:
+                server.starttls()
             server.send_message(msg)
             server.quit()
         except smtplib.SMTPException:
