@@ -28,6 +28,10 @@
     "email": {
         "smtp_host": "localhost",
         "smtp_port": "25",
+        "auth": false,
+        "smtp_user":"johndoe@myorg.local",
+        "smtp_pass":"password",
+        "smtp_use_tls": false,
         "to": ["Investigation Team <investigation_unit@myorg.local>"],
         "from": "Pandora <pandora@myorg.local>"
     },
