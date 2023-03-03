@@ -2,7 +2,7 @@
 
 import logging
 
-from typing import Dict, Optional
+from typing import Dict, Optional, List, Any
 
 from pylookyloo import Lookyloo
 
@@ -21,7 +21,7 @@ class LookylooWorker(BaseWorker):
     referer: Optional[str]
     user_agent: Optional[str]
     http_headers: Dict[str, str]
-    cookies: Dict[str, str]
+    cookies: List[Dict[str, Any]]
     proxy: Optional[str]
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
@@ -44,13 +44,14 @@ class LookylooWorker(BaseWorker):
             report.status = Status.MANUAL
             return
 
-        lookyloo_report = self.client.enqueue(document=task.file.data,
-                                              document_name=task.file.path.name,
-                                              listing=self.public_listing,
-                                              referer=self.referer,
-                                              user_agent=self.user_agent,
-                                              http_headers=self.http_headers,
-                                              cookies=self.cookies,
-                                              proxy=self.proxy)
+        lookyloo_report = self.client.submit(document=task.file.data,
+                                             document_name=task.file.path.name,
+                                             quiet=self.public_listing,
+                                             referer=self.referer,
+                                             user_agent=self.user_agent,
+                                             headers=self.http_headers,
+                                             cookies=self.cookies,
+                                             proxy=self.proxy
+                                             )
         report.status = Status.UNKNOWN
         report.add_details('permaurl', lookyloo_report)
