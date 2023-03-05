@@ -153,18 +153,19 @@ files = [
 
 [[package]]
 name = "argcomplete"
-version = "2.0.0"
+version = "2.0.5"
 description = "Bash tab completion for argparse"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "argcomplete-2.0.0-py2.py3-none-any.whl", hash = "sha256:cffa11ea77999bb0dd27bb25ff6dc142a6796142f68d45b1a26b11f58724561e"},
-    {file = "argcomplete-2.0.0.tar.gz", hash = "sha256:6372ad78c89d662035101418ae253668445b391755cfe94ea52f1b9d22425b20"},
+    {file = "argcomplete-2.0.5-py3-none-any.whl", hash = "sha256:e2a2cdb8ee9634ff2fa368ba6b996b46205341e0cf106be8075fd9bdbc5cf2e7"},
+    {file = "argcomplete-2.0.5.tar.gz", hash = "sha256:1cfd12928d62e41901783e4dc7d7ca03eccd589840face4c020693b13f754312"},
 ]
 
 [package.extras]
-test = ["coverage", "flake8", "pexpect", "wheel"]
+lint = ["flake8", "mypy"]
+test = ["coverage", "flake8", "mypy", "pexpect", "wheel"]
 
 [[package]]
 name = "astroid"
@@ -1211,14 +1212,14 @@ packaging = ">=14.1"
 
 [[package]]
 name = "flask-restx"
-version = "1.0.6"
+version = "1.1.0"
 description = "Fully featured framework for fast, easy and documented API development with Flask"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "flask-restx-1.0.6.tar.gz", hash = "sha256:5162fbccecdaf067ceaccf37bfd837292e4af8528f505e00900074f3dd5ebd42"},
-    {file = "flask_restx-1.0.6-py2.py3-none-any.whl", hash = "sha256:24522ccba93b69fec7f18a5789066527d6158c4d37415ab677d72509e7f988aa"},
+    {file = "flask-restx-1.1.0.tar.gz", hash = "sha256:62b6b6c9de65e5960cf4f8b35e1bd3eca6998838a01b2f71e2a9d4c14a4ccd14"},
+    {file = "flask_restx-1.1.0-py2.py3-none-any.whl", hash = "sha256:eaff65f6edd400ee00b40475496d61a4937b28371dfed039d3fd180d206fee4e"},
 ]
 
 [package.dependencies]
@@ -3173,14 +3174,14 @@ files = [
 
 [[package]]
 name = "platformdirs"
-version = "3.0.0"
+version = "3.1.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "platformdirs-3.0.0-py3-none-any.whl", hash = "sha256:b1d5eb14f221506f50d6604a561f4c5786d9e80355219694a1b244bcd96f4567"},
-    {file = "platformdirs-3.0.0.tar.gz", hash = "sha256:8a1228abb1ef82d788f74139988b137e78692984ec7b08eaa6c65f1723af28f9"},
+    {file = "platformdirs-3.1.0-py3-none-any.whl", hash = "sha256:13b08a53ed71021350c9e300d4ea8668438fb0046ab3937ac9a29913a1a1350a"},
+    {file = "platformdirs-3.1.0.tar.gz", hash = "sha256:accc3665857288317f32c7bebb5a8e482ba717b474f3fc1d18ca7f9214be0cef"},
 ]
 
 [package.extras]
@@ -3673,14 +3674,14 @@ testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "pylookyloo"
-version = "1.18.0"
+version = "1.18.1"
 description = "Python CLI and module for Lookyloo"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pylookyloo-1.18.0-py3-none-any.whl", hash = "sha256:e9482ed532c1b1ddeddf08d756d02d67f1a6a372c591f2641e445265e90c72f5"},
-    {file = "pylookyloo-1.18.0.tar.gz", hash = "sha256:e3093ec1484d6cddcaf1ecacac5f2a01ba16197ab938bcf9a2f18e67fd6898be"},
+    {file = "pylookyloo-1.18.1-py3-none-any.whl", hash = "sha256:6d32c96536e84ddf034bfb30e849e88f43b76440e67269121fce868e80433aad"},
+    {file = "pylookyloo-1.18.1.tar.gz", hash = "sha256:fc75f3f8859a0eaec0607644e82f6da7436396d2695d5d01cdd27da4c08c8f00"},
 ]
 
 [package.dependencies]
@@ -4373,19 +4374,19 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "rich"
-version = "13.3.1"
+version = "13.3.2"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 category = "dev"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "rich-13.3.1-py3-none-any.whl", hash = "sha256:8aa57747f3fc3e977684f0176a88e789be314a99f99b43b75d1e9cb5dc6db9e9"},
-    {file = "rich-13.3.1.tar.gz", hash = "sha256:125d96d20c92b946b983d0d392b84ff945461e5a06d3867e9f9e575f8697b67f"},
+    {file = "rich-13.3.2-py3-none-any.whl", hash = "sha256:a104f37270bf677148d8acb07d33be1569eeee87e2d1beb286a4e9113caf6f2f"},
+    {file = "rich-13.3.2.tar.gz", hash = "sha256:91954fe80cfb7985727a467ca98a7618e5dd15178cc2da10f553b36a93859001"},
 ]
 
 [package.dependencies]
-markdown-it-py = ">=2.1.0,<3.0.0"
-pygments = ">=2.14.0,<3.0.0"
+markdown-it-py = ">=2.2.0,<3.0.0"
+pygments = ">=2.13.0,<3.0.0"
 typing-extensions = {version = ">=4.0.0,<5.0", markers = "python_version < \"3.9\""}
 
 [package.extras]
@@ -5611,4 +5612,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "ab16c146ec1f0d51e4e09b57a70a5a3379205143d20ee5c66f797bb3bb66659d"
+content-hash = "5817fa003f297a3b15a2ffa8b81bcd9dc49c1551458834182d9961a223cbe6f7"
