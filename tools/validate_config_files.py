@@ -41,7 +41,7 @@ def validate_generic_config_file():
             # Check entries
             for sub_key in generic_config_sample[key].keys():
                 if sub_key not in generic_config[key]:
-                    raise ConfigError(f'{sub_key} is missing in generic_config[key]. Default from sample file: {generic_config_sample[key][sub_key]}')
+                    raise ConfigError(f'{sub_key} is missing in {generic_config[key]}. This is probably a new key, please update your config file accordingly. Default from sample file: {generic_config_sample[key][sub_key]}.')
                 if not isinstance(generic_config[key][sub_key], type(generic_config_sample[key][sub_key])):
                     raise ConfigError(f'Invalid type for {sub_key} in {key}. Got: {type(generic_config[key][sub_key])} ({generic_config[key][sub_key]}), expected: {type(generic_config_sample[key][sub_key])} ({generic_config_sample[key][sub_key]})')
 
