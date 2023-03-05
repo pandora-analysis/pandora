@@ -46,7 +46,7 @@ class LookylooWorker(BaseWorker):
 
         lookyloo_report = self.client.submit(document=task.file.data,
                                              document_name=task.file.path.name,
-                                             quiet=self.public_listing,
+                                             listing=self.public_listing,
                                              referer=self.referer,
                                              user_agent=self.user_agent,
                                              headers=self.http_headers,
