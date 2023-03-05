@@ -35,8 +35,8 @@
         "auth": false,
         "smtp_user":"johndoe@myorg.local",
         "smtp_pass":"password",
-        "smtp_use_tls": false,
-    }
+        "smtp_use_tls": false
+    },
     "weasyprint_fetch_ressources": false,
     "exiftool_path": "",
     "systemd_service_name": "pandora",
@@ -61,6 +61,7 @@
         "channels": "If enabled, the submissions are published on the redis pubsub channels",
         "misp": "The MISP configuration",
         "email": "Email configuration",
+        "email_smtp_auth": "Email SMTP auth configuration",
         "weasyprint_fetch_ressources": "If true, weasyprint will fetch resources linked in HTML content",
         "exiftool_path": "Pandora requires exiftool >=12.15 (check with exiftool -ver), if you have an older version see: https://github.com/sylikc/pyexiftool#pyexiftool-dependencies",
         "systemd_service_name": "(Optional) Name of the systemd service if your project has one."
