@@ -22,6 +22,7 @@ class Mail:
         :return (bool): whether if email has been correctly sent
         """
         email_config = get_config('generic', 'email')
+        smtp_auth = get_config('generic', 'email_smtp_auth')
 
         if not subject:
             raise Unsupported('subject cannot be empty')
@@ -36,10 +37,10 @@ class Mail:
 
         try:
             server = smtplib.SMTP(host=email_config['smtp_host'], port=email_config['smtp_port'])
-            if email_config['auth']:
-                server.login(email_config['smtp_user'], email_config['smtp_pass'])
-            if email_config['smtp_use_tls']:
-                server.starttls()
+            if smtp_auth['auth']:
+                server.login(smtp_auth['smtp_user'], smtp_auth['smtp_pass'])
+                if smtp_auth['smtp_use_tls']:
+                    server.starttls()
             server.send_message(msg)
             server.quit()
         except smtplib.SMTPException:

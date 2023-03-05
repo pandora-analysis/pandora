@@ -28,13 +28,15 @@
     "email": {
         "smtp_host": "localhost",
         "smtp_port": "25",
+        "to": ["Investigation Team <investigation_unit@myorg.local>"],
+        "from": "Pandora <pandora@myorg.local>"
+    },
+    "email_smtp_auth": {
         "auth": false,
         "smtp_user":"johndoe@myorg.local",
         "smtp_pass":"password",
         "smtp_use_tls": false,
-        "to": ["Investigation Team <investigation_unit@myorg.local>"],
-        "from": "Pandora <pandora@myorg.local>"
-    },
+    }
     "weasyprint_fetch_ressources": false,
     "exiftool_path": "",
     "systemd_service_name": "pandora",
