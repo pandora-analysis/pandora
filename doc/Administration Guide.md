@@ -11,9 +11,12 @@ the administration console is: [http://pandora/admin](http://pandora/admin)
 in generic.conf , add users in the key users
 
 ```json
-users:{"admin1":"password1", 
-
-  "admin2":"password2"}
+  {
+    "users": {
+      "admin1":"password1", 
+      "admin2":"password2"
+    }
+  }
 ```
 
 after adding users, restart Pandora
@@ -29,7 +32,7 @@ in generic.json you can setup a delay index for the reports in the *Recent* menu
 the key is by default is 3 days
 
 ```json
-max_delay_index: 3
+  {"max_delay_index": 3}
 ```
 
 You have access to the statistics submission in *Statistics* menu.
@@ -41,7 +44,8 @@ You have access to the statistics submission in *Statistics* menu.
 In generic.json, you can setup for receiving emails for specific reports.
 
 ```json
-"email": {
+  {
+    "email": {
         "smtp_host": "localhost",
         "smtp_port": "25",
         "to": ["Investigation Team <investigation_unit@myorg.local>"],
@@ -53,6 +57,7 @@ In generic.json, you can setup for receiving emails for specific reports.
         "smtp_pass":"password",
         "smtp_use_tls": false
     }
+  }
 ```
 
 The key *email* is for smtp configuration and the email contacts.
