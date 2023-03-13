@@ -68,3 +68,14 @@ choose *true* for authentication for the key *auth*
 and setup user, passwords for the keys *smtp_user* and *smtp_pass*
 
 For TLS, choose *true*  for the key *smtp_use_tls*
+
+## Docker setup
+
+change in generic.json the *storage_db_hostname*
+
+```json
+  {
+    "storage_db_hostname": "kvrocks",
+    "storage_db_port": 6101
+  }
+```
