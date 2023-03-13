@@ -39,6 +39,7 @@ services:
         - ./yara_rules:/pandora/yara_rules
         - ./yara_repos:/pandora/yara_repos
         - ./logs:/pandora/logs
+        - ./web_logs:/pandora/website/logs
         - ./tasks:/pandora/tasks
         - /tmp:/var/run/clamav
     links:
