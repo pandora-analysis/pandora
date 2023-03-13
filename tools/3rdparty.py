@@ -34,22 +34,22 @@ if __name__ == '__main__':
         f.write(chart.content)
         print(f'Downloaded chart v{chart_version}.')
 
-    datepicker_js = requests.get(f'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/{datepicker_version}/js/bootstrap-datepicker.min.js', timeout=5
+    datepicker_js = requests.get(f'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/{datepicker_version}/js/bootstrap-datepicker.min.js', timeout=5)
     with (dest_dir_js / 'bootstrap-datepicker.min.js').open('wb') as f:
         f.write(datepicker_js.content)
         print(f'Downloaded datepicker js v{datepicker_version}.')
 
-    datepicker_css = requests.get(f'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/{datepicker_version}/css/bootstrap-datepicker.min.css', timeout=5
+    datepicker_css = requests.get(f'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/{datepicker_version}/css/bootstrap-datepicker.min.css', timeout=5)
     with (dest_dir_css / 'bootstrap-datepicker.min.css').open('wb') as f:
         f.write(datepicker_css.content)
         print(f'Downloaded datepicker css v{datepicker_version}.')
 
-    dropzone_js = requests.get(f'https://unpkg.com/dropzone@{dropzone_version}/dist/dropzone-min.js', timeout=5
+    dropzone_js = requests.get(f'https://unpkg.com/dropzone@{dropzone_version}/dist/dropzone-min.js', timeout=5)
     with (dest_dir_js / 'dropzone-min.js').open('wb') as f:
         f.write(dropzone_js.content)
         print(f'Downloaded dropzone js v{dropzone_version}')
 
-    dropzone_css = requests.get(f'https://unpkg.com/dropzone@{dropzone_version}/dist/dropzone.css', timeout=5
+    dropzone_css = requests.get(f'https://unpkg.com/dropzone@{dropzone_version}/dist/dropzone.css', timeout=5)
     with (dest_dir_css / 'dropzone.css').open('wb') as f:
         f.write(dropzone_css.content)
         print(f'Downloaded dropzone css v{dropzone_version}')
