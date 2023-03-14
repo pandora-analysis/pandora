@@ -4,6 +4,7 @@ meta:
   replicas: 5
 
 settings:
+  timeout: 3m
   max_files_in_archive: 15
   max_files_in_recursive_archive: 25
   max_recurse: 2

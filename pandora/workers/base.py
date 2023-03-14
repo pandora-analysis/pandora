@@ -3,9 +3,11 @@ import json
 import logging
 import multiprocessing
 import signal
+import time
 import traceback
 
-from typing import Tuple, List, Optional
+from logging import LoggerAdapter
+from typing import Tuple, List, Optional, MutableMapping, Any
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
@@ -17,6 +19,16 @@ from ..helpers import expire_in_sec, Status
 from ..report import Report
 from ..storage_client import Storage
 from ..task import Task
+
+
+class WorkerLogAdapter(LoggerAdapter):
+    """
+    Prepend log entry with the UUID of the task
+    """
+    def process(self, msg: str, kwargs: MutableMapping[str, Any]) -> Tuple[str, MutableMapping[str, Any]]:
+        if self.extra:
+            return '[{}] {}'.format(self.extra['uuid'], msg), kwargs
+        return msg, kwargs
 
 
 class BaseWorker(multiprocessing.Process):
@@ -76,7 +88,8 @@ class BaseWorker(multiprocessing.Process):
         raise TimeoutError
 
     @contextlib.contextmanager
-    def _timeout_context(self):
+    def _timeout_context(self, logger):
+        start = time.time()
         if self.timeout != 0:
             # Register a function to raise a TimeoutError on the signal.
             signal.signal(signal.SIGALRM, self._raise_timeout)
@@ -89,6 +102,8 @@ class BaseWorker(multiprocessing.Process):
                 signal.signal(signal.SIGALRM, signal.SIG_IGN)
         else:
             yield
+        end = time.time()
+        logger.info(f'Runtime: {end-start:.2f}s')
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         """
@@ -125,10 +140,11 @@ class BaseWorker(multiprocessing.Process):
             try:
                 self.logger.debug('Waiting for new task...')
                 task_uuid, disabled_workers, manual_worker = self._read_stream()
-                self.logger.debug(f'Got new task {task_uuid}')
+                logger = WorkerLogAdapter(self.logger, {'uuid': task_uuid})
+                logger.debug('Got new task')
 
                 if self.module in disabled_workers:
-                    self.logger.debug(f'Disabled for this task ({task_uuid})')
+                    logger.debug('Disabled for this task.')
                     continue
 
                 task_data = self.storage.get_task(task_uuid)
@@ -147,16 +163,16 @@ class BaseWorker(multiprocessing.Process):
                     if not self.disabled:
                         # Store report to make status available to UI
                         self.storage.set_report(report.to_dict)
-                        with self._timeout_context():
+                        with self._timeout_context(logger):
                             self.analyse(task, report, self.module == manual_worker)
                 except TimeoutError:
                     e = f'timeout on analyse call after {self.timeout}s'
-                    self.logger.error(e)
+                    logger.error(e)
                     report.status = Status.ERROR
                 except Exception as e:
                     # TODO: bubble up the error to the user (if safe, may want to do that on a module by module basis)
                     err = f'{repr(e)}\n{traceback.format_exc()}'
-                    self.logger.error(f'unknown error during analysis : {err}')
+                    logger.error(f'unknown error during analysis : {err}')
                     report.status = Status.ERROR
                 else:
                     if report.status == Status.RUNNING:
@@ -164,7 +180,7 @@ class BaseWorker(multiprocessing.Process):
                         report.status = Status.CLEAN
                 finally:
                     self.storage.set_report(report.to_dict)
-                    self.logger.debug(f'Done with task {task_uuid}.')
+                    logger.debug('Done with task.')
 
             except PandoraException as e:
                 self.logger.critical(f'Error with current task : {e}')
