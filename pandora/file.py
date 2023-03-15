@@ -657,7 +657,7 @@ class File:
         if not self.is_msg:
             return None
         msg = openMsg(self.path, delayAttachments=True)
-        if not isinstance(msg, (MessageBase)):
+        if not issubclass(msg, MessageBase):
             raise Unsupported(f'msg file must be a message, other formats are not supported yet. Type: {type(msg)}')
         return msg
 
