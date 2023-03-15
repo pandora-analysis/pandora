@@ -1,0 +1,4 @@
+meta:
+  name: OutlookMSG
+  description: Process Outlook MSG files
+  replicas: 2
