@@ -21,7 +21,7 @@ from dfvfs.vfs.file_entry import FileEntry  # type: ignore
 from dfvfs.path.path_spec import PathSpec   # type: ignore
 
 
-from extract_msg import Message, MessageSigned, MSGFile
+from extract_msg import MessageBase, AppointmentMeeting, MSGFile
 from hachoir.stream import StringInputStream  # type: ignore
 from hachoir.parser.archive import CabFile  # type: ignore
 import py7zr  # type: ignore
@@ -485,7 +485,7 @@ class Extractor(BaseWorker):
             extracted.append((attachment['filename'], BytesIO(base64.b64decode(attachment['raw']))))
         return extracted
 
-    def extract_msg(self, msg_data: Union[Message, MessageSigned]) -> List[Tuple[str, BytesIO]]:
+    def extract_msg(self, msg_data: Union[MessageBase, AppointmentMeeting]) -> List[Tuple[str, BytesIO]]:
         extracted: List[Tuple[str, BytesIO]] = []
         for attachment in msg_data.attachments:
             if isinstance(attachment.data, bytes):
