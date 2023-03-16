@@ -54,7 +54,7 @@ pymispwarninglists = "^1.4"
 pikepdf = "^7.1.1"
 imapclient = "^2.3.1"
 pyzipper = "^0.3.6"
-pymisp = {version = "^2.4.168.1", extras = ["fileobjects"]}
+pymisp = {version = "^2.4.169.1", extras = ["fileobjects"]}
 python-dateutil = "^2.8.2"
 pycdlib = "^1.14.0"
 werkzeug = "^2.2.3"
@@ -75,7 +75,7 @@ types-requests = "^2.28.11.15"
 types-python-dateutil = "^2.8.19.10"
 bandit = {extras = ["toml"], version = "^1.7.5"}
 flake8 = "^6.0.0"
-semgrep = "^1.14.0"
+semgrep = "^1.15.0"
 
 [build-system]
 requires = ["poetry-core>=1.1.0"]
