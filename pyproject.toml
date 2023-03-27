@@ -63,7 +63,7 @@ pylookyloo = "^1.18.1"
 hachoir = "^3.2.0"
 dfvfs = "^20221224"
 aiohttp = "^3.8.4"
-libewf-python = "20201230"
+libewf-python = "20230212"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.1"
