@@ -3,7 +3,7 @@
     "css": {
       "lib": {
         "bootstrap-datepicker.min.css": "mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==",
-        "datatables.css": "pzE7jxB7oeaq/hZP2NCFIKlcLxbUsJwMVzmDmPtWUcXWaBb9IYonZ7aVunR76jEJjWcdmcdJKvtSMCSUmEtkXg==",
+        "datatables.css": "AN3IrhZkJZng0O9tz6RmfjbiX7UXVeusGfXKsVF7+wbRdqLH/kLy/0ljkUsNzXVFGx6vV1Bo9+9JK8DN+dRvZw==",
         "dropzone.css": "b3Wb3Os4sxJRdYkfCWtFjvuN/OlfBNtBGJknON+zbxU6M7GRYdII8m1W7TMsls/kwuwtq1wt7TvuF58Sd/4AGg=="
       },
       "ribbon.css": "2hAsQwCClHQ7b6VthbKYIkUPam4Ef6wbSxa3+nK0UuqCHezvPMr3aqpz16gD0lyYop55VEd/dhzZJLA4WMAplQ==",
@@ -27,9 +27,9 @@
       "lib": {
         "bootstrap-datepicker.min.js": "T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==",
         "chart.min.js": "ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==",
-        "datatables.js": "MOsicOaJyNWPgwMOE1q4sTPZK6KuUQTMBhkmzb0tFVSRxgx3VnGTwIyRme/IhBJQdWJkfTcIKozchO11ILrmSg==",
+        "datatables.js": "ONQixi38lWHD4KDFx/xLD01RI31TOTJ1pTSOXPaYOQ+YCurDIklLP5SwweVTSM99P6hZdIQx85hSuY3n/Sl/IQ==",
         "dropzone-min.js": "FFyHlfr2vLvm0wwfHTNluDFFhHaorucvwbpr0sZYmxciUj3NoW1lYpveAQcx2B+MnbXbSrRasqp43ldP9BKJcg==",
-        "jquery.min.js": "aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==",
+        "jquery.min.js": "pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ==",
         "moment-with-locales.min.js": "42PE0rd+wZ2hNXftlM78BSehIGzezNeQuzihiBCvUEB3CVxHvsShF86wBWwQORNxNINlBPuq7rG4WWhNiTVHFg=="
       },
       "role.js": "BTP7CW18uIGpKdx7zwll71xZsb7UDjKk3I+AGeWLtyj4olvazpWslfZWqmE0rsamhtvUC6pjm6F5vC4hwTPs9Q==",

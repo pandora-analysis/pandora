@@ -4,12 +4,12 @@ import requests
 
 from pandora.default import get_homedir, safe_create_dir
 
-jquery_version = "3.6.1"
+jquery_version = "3.6.4"
 dropzone_version = "6.0.0-beta.2"
 moments_version = "2.29.4"
 datepicker_version = "1.9.0"
 chart_version = "3.9.1"
-datatables_version = '1.12.1'
+datatables_version = '1.13.4'
 
 if __name__ == '__main__':
     dest_dir_js = get_homedir() / 'website' / 'web' / 'static' / 'js' / 'lib'
