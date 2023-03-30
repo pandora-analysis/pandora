@@ -1255,14 +1255,14 @@ email = ["email-validator"]
 
 [[package]]
 name = "fonttools"
-version = "4.39.2"
+version = "4.39.3"
 description = "Tools to manipulate font files"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "fonttools-4.39.2-py3-none-any.whl", hash = "sha256:85245aa2fd4cf502a643c9a9a2b5a393703e150a6eaacc3e0e84bb448053f061"},
-    {file = "fonttools-4.39.2.zip", hash = "sha256:e2d9f10337c9e3b17f9bce17a60a16a885a7d23b59b7f45ce07ea643e5580439"},
+    {file = "fonttools-4.39.3-py3-none-any.whl", hash = "sha256:64c0c05c337f826183637570ac5ab49ee220eec66cf50248e8df527edfa95aeb"},
+    {file = "fonttools-4.39.3.zip", hash = "sha256:9234b9f57b74e31b192c3fc32ef1a40750a8fbc1cd9837a7b7bfc4ca4a5c51d7"},
 ]
 
 [package.dependencies]
@@ -3550,14 +3550,14 @@ files = [
 
 [[package]]
 name = "pydyf"
-version = "0.5.0"
+version = "0.6.0"
 description = "A low-level PDF generator."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pydyf-0.5.0-py3-none-any.whl", hash = "sha256:116bc4b057822dc72d6afc826cad33444f7dcde8059aa85534380fb63e3e306f"},
-    {file = "pydyf-0.5.0.tar.gz", hash = "sha256:51e751ae1504037c1fc1f4815119137b011802cd5f6c3539db066c455b14a7e1"},
+    {file = "pydyf-0.6.0-py3-none-any.whl", hash = "sha256:291802bfb7f784134de27404eb592414b3c56a1290231fe6fb548a2559bc936a"},
+    {file = "pydyf-0.6.0.tar.gz", hash = "sha256:b44a38855d7e47b740b3cd31ab63a2f5b9b2793931d50b0ccaed3bb7b86912fc"},
 ]
 
 [package.extras]
@@ -3659,14 +3659,14 @@ testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "pylookyloo"
-version = "1.18.1"
+version = "1.19.0"
 description = "Python CLI and module for Lookyloo"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pylookyloo-1.18.1-py3-none-any.whl", hash = "sha256:6d32c96536e84ddf034bfb30e849e88f43b76440e67269121fce868e80433aad"},
-    {file = "pylookyloo-1.18.1.tar.gz", hash = "sha256:fc75f3f8859a0eaec0607644e82f6da7436396d2695d5d01cdd27da4c08c8f00"},
+    {file = "pylookyloo-1.19.0-py3-none-any.whl", hash = "sha256:10be0d517556bcc938a17ad252c95deb8b7ea107a977a91aa7184a4302dbe178"},
+    {file = "pylookyloo-1.19.0.tar.gz", hash = "sha256:37f7160e67e58cbf503b1002fc14fd72eb22219bf14596008b256a0e5ebf2c4e"},
 ]
 
 [package.dependencies]
@@ -3995,14 +3995,14 @@ files = [
 
 [[package]]
 name = "pytz"
-version = "2023.2"
+version = "2023.3"
 description = "World timezone definitions, modern and historical"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pytz-2023.2-py2.py3-none-any.whl", hash = "sha256:8a8baaf1e237175b02f5c751eea67168043a749c843989e2b3015aa1ad9db68b"},
-    {file = "pytz-2023.2.tar.gz", hash = "sha256:a27dcf612c05d2ebde626f7d506555f10dfc815b3eddccfaadfc7d99b11c9a07"},
+    {file = "pytz-2023.3-py2.py3-none-any.whl", hash = "sha256:a151b3abb88eda1d4e34a9814df37de2a80e301e68ba0fd856fb9b46bfbbbffb"},
+    {file = "pytz-2023.3.tar.gz", hash = "sha256:1d8ce29db189191fb55338ee6d0387d82ab59f3d00eac103412d64e0ebd0c588"},
 ]
 
 [[package]]
@@ -4255,18 +4255,18 @@ files = [
 
 [[package]]
 name = "redis"
-version = "4.5.1"
+version = "4.5.4"
 description = "Python client for Redis database and key-value store"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "redis-4.5.1-py3-none-any.whl", hash = "sha256:5deb072d26e67d2be1712603bfb7947ec3431fb0eec9c578994052e33035af6d"},
-    {file = "redis-4.5.1.tar.gz", hash = "sha256:1eec3741cda408d3a5f84b78d089c8b8d895f21b3b050988351e925faf202864"},
+    {file = "redis-4.5.4-py3-none-any.whl", hash = "sha256:2c19e6767c474f2e85167909061d525ed65bea9301c0770bb151e041b7ac89a2"},
+    {file = "redis-4.5.4.tar.gz", hash = "sha256:73ec35da4da267d6847e47f68730fdd5f62e2ca69e3ef5885c6a78a9374c3893"},
 ]
 
 [package.dependencies]
-async-timeout = ">=4.0.2"
+async-timeout = {version = ">=4.0.2", markers = "python_version <= \"3.11.2\""}
 hiredis = {version = ">=1.0.0", optional = true, markers = "extra == \"hiredis\""}
 
 [package.extras]
@@ -4614,14 +4614,14 @@ test = ["pytest"]
 
 [[package]]
 name = "setuptools"
-version = "67.6.0"
+version = "67.6.1"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "setuptools-67.6.0-py3-none-any.whl", hash = "sha256:b78aaa36f6b90a074c1fa651168723acbf45d14cb1196b6f02c0fd07f17623b2"},
-    {file = "setuptools-67.6.0.tar.gz", hash = "sha256:2ee892cd5f29f3373097f5a814697e397cf3ce313616df0af11231e2ad118077"},
+    {file = "setuptools-67.6.1-py3-none-any.whl", hash = "sha256:e728ca814a823bf7bf60162daf9db95b93d532948c4c0bea762ce62f60189078"},
+    {file = "setuptools-67.6.1.tar.gz", hash = "sha256:257de92a9d50a60b8e22abfcbb771571fde0dbf3ec234463212027a4eeecbe9a"},
 ]
 
 [package.extras]
@@ -4878,14 +4878,14 @@ files = [
 
 [[package]]
 name = "types-redis"
-version = "4.5.1.5"
+version = "4.5.4.1"
 description = "Typing stubs for redis"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-redis-4.5.1.5.tar.gz", hash = "sha256:f516254bd593023110a38b77e80d5a76a7f033f1d94c53bee09a7d5d0433f34d"},
-    {file = "types_redis-4.5.1.5-py3-none-any.whl", hash = "sha256:43d92b4d6315a45bb0e9a790683ba4448ada88cd1233f3f9886fa6f783f53956"},
+    {file = "types-redis-4.5.4.1.tar.gz", hash = "sha256:bf04192f415b2b42ecefd70bb4b91eb0352e48f2716a213e038e35c096a639c2"},
+    {file = "types_redis-4.5.4.1-py3-none-any.whl", hash = "sha256:2db530f54facec3149147bfe61d5ac24f5fe4e871823d95a601cd2c1d775d8a0"},
 ]
 
 [package.dependencies]
@@ -4894,14 +4894,14 @@ types-pyOpenSSL = "*"
 
 [[package]]
 name = "types-requests"
-version = "2.28.11.16"
+version = "2.28.11.17"
 description = "Typing stubs for requests"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-requests-2.28.11.16.tar.gz", hash = "sha256:9d4002056df7ebc4ec1f28fd701fba82c5c22549c4477116cb2656aa30ace6db"},
-    {file = "types_requests-2.28.11.16-py3-none-any.whl", hash = "sha256:a86921028335fdcc3aaf676c9d3463f867db6af2303fc65aa309b13ae1e6dd53"},
+    {file = "types-requests-2.28.11.17.tar.gz", hash = "sha256:0d580652ce903f643f8c3b494dd01d29367ea57cea0c7ad7f65cf3169092edb0"},
+    {file = "types_requests-2.28.11.17-py3-none-any.whl", hash = "sha256:cc1aba862575019306b2ed134eb1ea994cab1c887a22e18d3383e6dd42e9789b"},
 ]
 
 [package.dependencies]
@@ -4909,14 +4909,14 @@ types-urllib3 = "<1.27"
 
 [[package]]
 name = "types-urllib3"
-version = "1.26.25.9"
+version = "1.26.25.10"
 description = "Typing stubs for urllib3"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-urllib3-1.26.25.9.tar.gz", hash = "sha256:160727879bdbe52f11f5feeca092a473f38d68ed3be88abb461b59cda40fb9bc"},
-    {file = "types_urllib3-1.26.25.9-py3-none-any.whl", hash = "sha256:b327d360ba4a9edd80ea82f5990ba19e76175a20b5b64be4b4813d9a1c424caa"},
+    {file = "types-urllib3-1.26.25.10.tar.gz", hash = "sha256:c44881cde9fc8256d05ad6b21f50c4681eb20092552351570ab0a8a0653286d6"},
+    {file = "types_urllib3-1.26.25.10-py3-none-any.whl", hash = "sha256:12c744609d588340a07e45d333bf870069fc8793bcf96bae7a96d4712a42591d"},
 ]
 
 [[package]]
@@ -4933,14 +4933,14 @@ files = [
 
 [[package]]
 name = "tzdata"
-version = "2023.2"
+version = "2023.3"
 description = "Provider of IANA time zone data"
 category = "main"
 optional = false
 python-versions = ">=2"
 files = [
-    {file = "tzdata-2023.2-py2.py3-none-any.whl", hash = "sha256:905ae9e6744dd9ef5ce94d2aaa2dd00282fee38b670b2133407f23c388f110a1"},
-    {file = "tzdata-2023.2.tar.gz", hash = "sha256:c3b51b235b07f9f1889089c2264bcbeaaba260a63f89bea09e350ea4205eb95f"},
+    {file = "tzdata-2023.3-py2.py3-none-any.whl", hash = "sha256:7e65763eef3120314099b6939b5546db7adce1e7d6f2e179e3df563c70511eda"},
+    {file = "tzdata-2023.3.tar.gz", hash = "sha256:11ef1e08e54acb0d4f95bdb1be05da659673de4acbd21bf9c69e94cc5e907a3a"},
 ]
 
 [[package]]
@@ -5586,4 +5586,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "193f7a07a5840755b19c02c2a11c6f99b719cd6737eb2ded4a1a923448b46ecc"
+content-hash = "2dbfdb5506745401bbcf2eaacc90ab788dcab923887f24d14d8eff38af7c1705"
