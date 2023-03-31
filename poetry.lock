@@ -1080,14 +1080,14 @@ tests = ["asttokens", "littleutils", "pytest", "rich"]
 
 [[package]]
 name = "extract-msg"
-version = "0.39.2"
+version = "0.40.0"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.8"
 files = [
-    {file = "extract_msg-0.39.2-py2.py3-none-any.whl", hash = "sha256:3ca81539b70fcac4a1d857dc27b32a54b4afa6b9e2061e476e19f5405964c19b"},
-    {file = "extract_msg-0.39.2.tar.gz", hash = "sha256:87710f998b2c81b4cd8df55bdf8cfd79edb1360110fa468e4dab17f436a3a8af"},
+    {file = "extract_msg-0.40.0-py2.py3-none-any.whl", hash = "sha256:93e8d668aae53a9ee233c6a90edcdf704e3494fd9e91a267b1fba16b7502adab"},
+    {file = "extract_msg-0.40.0.tar.gz", hash = "sha256:df8c15b1a7be2bf8ad5f71ad0f969e244d1d834445300f3459de683e463d391d"},
 ]
 
 [package.dependencies]
@@ -1733,14 +1733,14 @@ test = ["pyannotate", "pytest"]
 
 [[package]]
 name = "ipython"
-version = "8.11.0"
+version = "8.12.0"
 description = "IPython: Productive Interactive Computing"
 category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "ipython-8.11.0-py3-none-any.whl", hash = "sha256:5b54478e459155a326bf5f42ee4f29df76258c0279c36f21d71ddb560f88b156"},
-    {file = "ipython-8.11.0.tar.gz", hash = "sha256:735cede4099dbc903ee540307b9171fbfef4aa75cfcacc5a273b2cda2f02be04"},
+    {file = "ipython-8.12.0-py3-none-any.whl", hash = "sha256:1c183bf61b148b00bcebfa5d9b39312733ae97f6dad90d7e9b4d86c8647f498c"},
+    {file = "ipython-8.12.0.tar.gz", hash = "sha256:a950236df04ad75b5bc7f816f9af3d74dc118fd42f2ff7e80e8e60ca1f182e2d"},
 ]
 
 [package.dependencies]
@@ -1756,6 +1756,7 @@ prompt-toolkit = ">=3.0.30,<3.0.37 || >3.0.37,<3.1.0"
 pygments = ">=2.4.0"
 stack-data = "*"
 traitlets = ">=5"
+typing-extensions = {version = "*", markers = "python_version < \"3.10\""}
 
 [package.extras]
 all = ["black", "curio", "docrepr", "ipykernel", "ipyparallel", "ipywidgets", "matplotlib", "matplotlib (!=3.2.0)", "nbconvert", "nbformat", "notebook", "numpy (>=1.21)", "pandas", "pytest (<7)", "pytest (<7.1)", "pytest-asyncio", "qtconsole", "setuptools (>=18.5)", "sphinx (>=1.3)", "sphinx-rtd-theme", "stack-data", "testpath", "trio", "typing-extensions"]
@@ -4492,16 +4493,16 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.15.0"
+version = "1.16.0"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "semgrep-1.15.0-cp37.cp38.cp39.py37.py38.py39-none-any.whl", hash = "sha256:b55392f912ee9fb6fb803086c251d9c37fdfd54ab9be14e0447d89ff2da79411"},
-    {file = "semgrep-1.15.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_10_14_x86_64.whl", hash = "sha256:77377efda82eb03632e5b6ce470cae5e871608a81d5e7317531087fae111d304"},
-    {file = "semgrep-1.15.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_11_0_arm64.whl", hash = "sha256:d4a4182f801c131ab835b3cf4659ac1619f361ce22ab3ca46acd72ba04f68181"},
-    {file = "semgrep-1.15.0.tar.gz", hash = "sha256:ba638c65b0fea50259501e6b56faccf5d88d625c7e0c0c47f881bcb772bb2c44"},
+    {file = "semgrep-1.16.0-cp37.cp38.cp39.py37.py38.py39-none-any.whl", hash = "sha256:83fafcea96100ab1051c153ae0b144dc9a73f5f1cc2cc8bd11d486b4e9688271"},
+    {file = "semgrep-1.16.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_10_14_x86_64.whl", hash = "sha256:7b1f0a037849fda5d80c06ab36bf6b5c427d975b211d10c4c7c7fe1a7927d597"},
+    {file = "semgrep-1.16.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_11_0_arm64.whl", hash = "sha256:397f1ede96a66532922525663efba27be9f63ff0370182865ff7df1ab9edac9e"},
+    {file = "semgrep-1.16.0.tar.gz", hash = "sha256:a480a880cee2953e68ae828726399d1aaabffe3489219e30af609ccc72e8ed2d"},
 ]
 
 [package.dependencies]
@@ -5586,4 +5587,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "2dbfdb5506745401bbcf2eaacc90ab788dcab923887f24d14d8eff38af7c1705"
+content-hash = "48de3b9e95b0b182d8d156a4300224d66fea64f61a3e3fe0cb3ce3863126a21c"
