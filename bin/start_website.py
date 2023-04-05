@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import logging
+import logging.config
 from typing import Optional
 
-import logging.config
 from subprocess import Popen
 
 from pandora.default import AbstractManager

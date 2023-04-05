@@ -13,10 +13,6 @@ from pathlib import Path
 from tarfile import TarFile
 from typing import List, Optional, Union, Tuple, Sequence, Dict, overload, Literal, TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from dfvfs.path.path_spec import PathSpec   # type: ignore
-    from dfvfs.volume import tsk_volume_system  # type: ignore
-
 from extract_msg import MessageBase, AppointmentMeeting, MSGFile
 from hachoir.stream import StringInputStream  # type: ignore
 from hachoir.parser.archive import CabFile  # type: ignore
@@ -35,6 +31,10 @@ from ..task import Task
 from ..file import File
 
 from .base import BaseWorker
+
+if TYPE_CHECKING:
+    from dfvfs.path.path_spec import PathSpec   # type: ignore
+    from dfvfs.volume import tsk_volume_system  # type: ignore
 
 
 def dfvfs_wrapper(func):
@@ -408,6 +408,7 @@ class Extractor(BaseWorker):
     @dfvfs_wrapper
     def check_dfvfs(self, submitted_file: File, check_only: bool) -> Union[bool, List[Tuple['PathSpec', 'tsk_volume_system.TSKVolumeSystem']]]:
         to_process = []
+        # pylint: disable=C0415
         from dfvfs.analyzer import analyzer  # type: ignore
         from dfvfs.lib import definitions, raw_helper, errors  # type: ignore
         from dfvfs.path import factory  # type: ignore
@@ -457,6 +458,7 @@ class Extractor(BaseWorker):
     @dfvfs_wrapper
     def extract_with_dfvfs(self, archive_file: File, report: Report) -> List[Tuple[str, BytesIO]]:
         extracted: List[Tuple[str, BytesIO]] = []
+        # pylint: disable=C0415
         from dfvfs.vfs.file_entry import FileEntry  # type: ignore
         from dfvfs.path import factory  # type: ignore
         from dfvfs.resolver import resolver  # type: ignore

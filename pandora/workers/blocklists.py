@@ -1,6 +1,6 @@
 import mimetypes
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from ..helpers import Status
 from ..task import Task
@@ -26,10 +26,6 @@ class Blocklists(BaseWorker):
         'message/rfc822': ['application/vnd.ms-outlook', 'text/plain'],
         'application/rar': ['application/x-rar']
     }
-
-    def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: Optional[int]=None, **options):
-        super().__init__(module, worker_id, cache, timeout, loglevel, **options)
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         report.status = Status.NOTAPPLICABLE
