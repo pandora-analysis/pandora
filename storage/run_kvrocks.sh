@@ -3,4 +3,8 @@
 set -e
 set -x
 
-../../kvrocks/src/kvrocks -c kvrocks.conf
+if test -f "../../kvrocks/src/kvrocks"; then
+    ../../kvrocks/src/kvrocks -c kvrocks.conf
+else
+    ../../kvrocks/build/kvrocks -c kvrocks.conf
+fi
