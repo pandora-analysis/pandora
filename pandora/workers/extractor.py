@@ -1,25 +1,21 @@
-import logging
-import zipfile
 import base64
+import functools
+import os
 import shutil
 import time
-from tarfile import TarFile
+import zipfile
 
 from bz2 import BZ2File
 from gzip import GzipFile
 from lzma import LZMAFile
 from io import BytesIO
 from pathlib import Path
-from typing import List, Optional, Union, Tuple, Sequence, Dict, overload, Literal
+from tarfile import TarFile
+from typing import List, Optional, Union, Tuple, Sequence, Dict, overload, Literal, TYPE_CHECKING
 
-from dfvfs.analyzer import analyzer  # type: ignore
-from dfvfs.lib import definitions, raw_helper, errors  # type: ignore
-from dfvfs.path import factory  # type: ignore
-from dfvfs.resolver import resolver  # type: ignore
-from dfvfs.volume import tsk_volume_system  # type: ignore
-from dfvfs.vfs.file_entry import FileEntry  # type: ignore
-from dfvfs.path.path_spec import PathSpec   # type: ignore
-
+if TYPE_CHECKING:
+    from dfvfs.path.path_spec import PathSpec   # type: ignore
+    from dfvfs.volume import tsk_volume_system  # type: ignore
 
 from extract_msg import MessageBase, AppointmentMeeting, MSGFile
 from hachoir.stream import StringInputStream  # type: ignore
@@ -29,6 +25,7 @@ import pycdlib
 from pycdlib.facade import PyCdlibJoliet, PyCdlibUDF, PyCdlibRockRidge, PyCdlibISO9660
 import pyzipper  # type: ignore
 import rarfile  # type: ignore
+from tzlocal import get_localzone_name
 
 from ..default import safe_create_dir, PandoraException
 from ..helpers import Status
@@ -38,6 +35,23 @@ from ..task import Task
 from ..file import File
 
 from .base import BaseWorker
+
+
+def dfvfs_wrapper(func):
+    # Importing dfvfs changes the timezone, we need to store the one set before, and reset it afterwards
+
+    @functools.wraps(func)
+    def reset_local_tz(*args, **kwargs):
+        localtz = get_localzone_name()
+        try:
+            to_return = func(*args, **kwargs)
+        finally:
+            os.environ['TZ'] = localtz
+            time.tzset()
+        return to_return
+
+    return reset_local_tz
+
 
 # Notes:
 # 1. Never blindly extract a file:
@@ -388,12 +402,17 @@ class Extractor(BaseWorker):
         ...
 
     @overload
-    def check_dfvfs(self, submitted_file: File, check_only: Literal[False]) -> List[Tuple[PathSpec, tsk_volume_system.TSKVolumeSystem]]:
+    def check_dfvfs(self, submitted_file: File, check_only: Literal[False]) -> List[Tuple['PathSpec', 'tsk_volume_system.TSKVolumeSystem']]:
         ...
 
-    def check_dfvfs(self, submitted_file: File, check_only: bool) -> Union[bool, List[Tuple[PathSpec, tsk_volume_system.TSKVolumeSystem]]]:
-
+    @dfvfs_wrapper
+    def check_dfvfs(self, submitted_file: File, check_only: bool) -> Union[bool, List[Tuple['PathSpec', 'tsk_volume_system.TSKVolumeSystem']]]:
         to_process = []
+        from dfvfs.analyzer import analyzer  # type: ignore
+        from dfvfs.lib import definitions, raw_helper, errors  # type: ignore
+        from dfvfs.path import factory  # type: ignore
+        from dfvfs.resolver import resolver  # type: ignore
+        from dfvfs.volume import tsk_volume_system  # type: ignore
 
         path_spec = factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_OS, location=submitted_file.path)
 
@@ -435,8 +454,13 @@ class Extractor(BaseWorker):
             return False
         return to_return
 
+    @dfvfs_wrapper
     def extract_with_dfvfs(self, archive_file: File, report: Report) -> List[Tuple[str, BytesIO]]:
         extracted: List[Tuple[str, BytesIO]] = []
+        from dfvfs.vfs.file_entry import FileEntry  # type: ignore
+        from dfvfs.path import factory  # type: ignore
+        from dfvfs.resolver import resolver  # type: ignore
+        from dfvfs.lib import definitions
 
         def process_dir(file_entry: FileEntry):
             for sub_file_entry in file_entry.sub_file_entries:
