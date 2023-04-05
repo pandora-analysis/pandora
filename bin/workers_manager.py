@@ -5,7 +5,7 @@ import inspect
 import logging
 import logging.config
 
-from typing import List, Dict, Type
+from typing import List, Dict, Type, Optional
 
 from redis import Redis
 
@@ -19,7 +19,7 @@ logging.config.dictConfig(get_config('logging'))
 
 class WorkersManager(AbstractManager):
 
-    def __init__(self, loglevel: int=logging.INFO):
+    def __init__(self, loglevel: Optional[int]=None):
         super().__init__(loglevel)
         self.script_name = 'workers_manager'
         self._workers: List[BaseWorker] = []

@@ -26,7 +26,7 @@ logging.config.dictConfig(get_config('logging'))
 
 class IMAPFetcher(AbstractManager):
 
-    def __init__(self, loglevel: int=logging.INFO):
+    def __init__(self, loglevel: Optional[int]=None):
         super().__init__(loglevel)
         self.script_name = 'imap_fetcher'
         self.imap_server = get_config('mail', 'imap_server')

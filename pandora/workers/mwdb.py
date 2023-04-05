@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import logging
+from typing import Optional
 
 from mwdblib import MWDB
 from mwdblib.exc import ObjectNotFoundError, MWDBError
@@ -17,7 +17,7 @@ class Mwdb(BaseWorker):
     apikey: str
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int=logging.DEBUG, **options):
+                 loglevel: Optional[int]=None, **options):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         if not self.apikey:
             self.disabled = True

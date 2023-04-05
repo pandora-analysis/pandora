@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-import logging
 import os
+
+from typing import Optional
 
 import clamd  # type: ignore
 
@@ -17,7 +18,7 @@ class ClamAVWorker(BaseWorker):
     socket_path: str
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int=logging.INFO, **options):
+                 loglevel: Optional[int]=None, **options):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
 
         if not self.socket_path or not os.path.exists(self.socket_path):

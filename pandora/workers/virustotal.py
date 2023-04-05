@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import logging
 import traceback
+from typing import Optional
 
 import vt  # type: ignore
 from vt import error
@@ -17,7 +17,7 @@ class VirusTotal(BaseWorker):
     apikey: str
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int=logging.INFO, **options):
+                 loglevel: Optional[int]=None, **options):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         if not self.apikey:
             self.disabled = True

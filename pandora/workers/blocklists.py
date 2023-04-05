@@ -1,7 +1,6 @@
-import logging
 import mimetypes
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from ..helpers import Status
 from ..task import Task
@@ -29,7 +28,7 @@ class Blocklists(BaseWorker):
     }
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int=logging.INFO, **options):
+                 loglevel: Optional[int]=None, **options):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False):

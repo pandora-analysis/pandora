@@ -9,6 +9,7 @@ from typing import Optional, overload, List, Union
 # NOTE: remove .api on next package release.
 from pymispwarninglists.api import WarningList
 
+from .default import get_config
 from .helpers import get_warninglists, Status
 from .storage_client import Storage
 
@@ -65,6 +66,7 @@ class Observable:
                  warninglist: Optional[str]=None):
         self.storage = Storage()
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
+        self.logger.setLevel(get_config('generic', 'loglevel'))
 
         self.sha256 = sha256
         self.value = value

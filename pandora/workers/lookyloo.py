@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import logging
-
 from typing import Dict, Optional, List, Any
 
 from pylookyloo import Lookyloo
@@ -25,7 +23,7 @@ class LookylooWorker(BaseWorker):
     proxy: Optional[str]
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int=logging.INFO, **options):
+                 loglevel: Optional[int]=None, **options):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         self.client = Lookyloo(self.apiurl, get_useragent_for_requests())
         if not self.client.is_up:

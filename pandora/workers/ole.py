@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-import logging
 import os
 import re
 
 from collections import defaultdict
 from datetime import datetime
-from typing import List, Set, Tuple, Dict
+from typing import List, Set, Tuple, Dict, Optional
 
 from oletools import oleid, ooxml  # type: ignore
 from oletools.ftguess import FTYPE, CONTAINER, FType_Generic_OLE, FType_Generic_OpenXML, FileTypeGuesser  # type: ignore
@@ -28,12 +27,10 @@ from .base import BaseWorker
 class Ole(BaseWorker):
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int=logging.DEBUG, **options):
+                 loglevel: Optional[int]=None, **options):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         log = get_logger('oleobj')
-        log.setLevel(logging.DEBUG)
-        # log = get_logger('olevba')
-        # log.setLevel(logging.DEBUG)
+        log.setLevel(self.loglevel)
 
     def _get_meta_attributes(self, meta, attributes_list):
         to_return = {}

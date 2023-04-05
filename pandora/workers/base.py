@@ -13,7 +13,7 @@ from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
 from redis.exceptions import ResponseError, ConnectionError as RedisConnectionError
 
-from ..default import get_socket_path
+from ..default import get_socket_path, get_config
 from ..exceptions import PandoraException
 from ..helpers import expire_in_sec, Status
 from ..report import Report
@@ -34,7 +34,7 @@ class WorkerLogAdapter(LoggerAdapter):
 class BaseWorker(multiprocessing.Process):
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int=logging.INFO, **options):
+                 loglevel: Optional[int]=None, **options):
         """
         Create a worker.
         :param module: module of the worker
@@ -43,9 +43,9 @@ class BaseWorker(multiprocessing.Process):
         :param timeout: timeout for module
         """
         super().__init__(name=f'{module}-{worker_id}', daemon=True)
-        self.loglevel = loglevel
+        self.loglevel: int = loglevel if loglevel is not None else get_config('generic', 'loglevel') or logging.INFO
         self.logger = logging.getLogger(module)
-        self.logger.setLevel(loglevel)
+        self.logger.setLevel(self.loglevel)
         self.logger.info(f'Initializing {self.name}')
 
         self.redis_pool_cache: ConnectionPool = ConnectionPool(

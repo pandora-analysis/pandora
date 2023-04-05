@@ -86,7 +86,7 @@ class Extractor(BaseWorker):
     zip_passwords: List[str]
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int=logging.INFO, **options):
+                 loglevel: Optional[int]=None, **options):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         self.max_extracted_filesize = self.max_extracted_filesize_in_mb * 1000000
 

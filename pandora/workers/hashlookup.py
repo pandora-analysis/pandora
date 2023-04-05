@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import logging
-
 from typing import Dict, Any, Tuple, Optional
 
 from pyhashlookup import Hashlookup
@@ -16,7 +14,7 @@ from .base import BaseWorker
 class HashlookupWorker(BaseWorker):
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int=logging.DEBUG, **options):
+                 loglevel: Optional[int]=None, **options):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
 
         try:

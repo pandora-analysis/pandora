@@ -6,6 +6,7 @@ import logging.config
 import signal
 
 from datetime import datetime, timedelta
+from typing import Optional
 
 from unoserver.server import UnoServer  # type: ignore
 
@@ -16,7 +17,7 @@ logging.config.dictConfig(get_config('logging'))
 
 class UnoserverLauncher(AbstractManager):
 
-    def __init__(self, loglevel: int=logging.INFO):
+    def __init__(self, loglevel: Optional[int]=None):
         super().__init__(loglevel)
         self.script_name = 'unoserver'
         self.timeout = 3600
