@@ -54,7 +54,7 @@ pymispwarninglists = "^1.4"
 pikepdf = "^7.1.2"
 imapclient = "^2.3.1"
 pyzipper = "^0.3.6"
-pymisp = {version = "^2.4.169.3", extras = ["fileobjects"]}
+pymisp = {version = "^2.4.170.1", extras = ["fileobjects"]}
 python-dateutil = "^2.8.2"
 pycdlib = "^1.14.0"
 werkzeug = "^2.2.3"
