@@ -67,7 +67,7 @@ libewf-python = "20201230"
 tzlocal = "4.2"
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^2.17.2"
+pylint = "^2.17.3"
 ipython = "^8.12.0"
 mypy = "^1.2.0"
 types-redis = {version = "^4.5.4.1"}
