@@ -14,7 +14,6 @@ from io import BytesIO
 from pathlib import Path
 from typing import Optional, Union
 
-import flask_session  # type: ignore
 import flask_moment  # type: ignore
 import flask_login  # type: ignore
 import flask_wtf  # type: ignore
@@ -42,6 +41,7 @@ from .helpers import (get_secret_key, update_user_role, admin_required,
                       src_request_ip, load_user_from_request, build_users_table,
                       sri_load, sizeof_fmt)
 from .proxied import ReverseProxied
+from .redisserverssession import Session
 
 logging.config.dictConfig(get_config('logging'))
 pandora: Pandora = Pandora()
@@ -52,9 +52,8 @@ app.wsgi_app = ReverseProxied(app.wsgi_app)  # type: ignore
 app.config['SECRET_KEY'] = get_secret_key()
 app.config['UPLOAD_FOLDER'] = get_homedir() / 'upload'
 app.config['CACHE_TYPE'] = 'simple'
-app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_REDIS'] = pandora.redis_bytes
-app.config['SESSION_KEY_PREFIX'] = 'session:'
+app.config['SESSION_KEY_PREFIX'] = 'pandora_session:'
 
 if not app.template_folder:
     raise PandoraException('Folder template not defined')
@@ -62,13 +61,14 @@ template_dir: Path = Path(app.root_path) / app.template_folder
 
 Bootstrap5(app)
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
-app.config['SESSION_COOKIE_NAME'] = 'pandora'
-app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
 app.debug = get_config('generic', 'debug_web')
 
-flask_session.Session(app=app)
+app.config['SESSION_COOKIE_NAME'] = 'pandora'
+app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
+Session(app=app)
 login_manager = flask_login.LoginManager(app=app)
 flask_moment.Moment(app=app)
+
 app.config['WTF_CSRF_CHECK_DEFAULT'] = False
 csrf = flask_wtf.CSRFProtect(app=app)
 
@@ -148,7 +148,7 @@ def update_user():
         flask_login.current_user.last_seen = datetime.now()
         flask_login.current_user.store()
     else:
-        # Note: session.sid comes from flask_session
+        # Note: session.sid comes from the redis session
         user = User(session_id=session.sid, last_ip=src_request_ip(request))  # type: ignore
         user.store()
         flask_login.login_user(user)
