@@ -43,14 +43,13 @@ import pickle
 from typing import Optional, Dict
 from uuid import uuid4
 
+from flask import Flask, Request, Response
 from flask.sessions import SessionMixin
 from flask.sessions import SessionInterface
 from redis import Redis
 from itsdangerous import BadSignature
 from itsdangerous.url_safe import URLSafeSerializer
 from werkzeug.datastructures import CallbackDict
-
-from flask import Flask, Request, Response
 
 
 class RedisSession(CallbackDict, SessionMixin):
