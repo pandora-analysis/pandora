@@ -38,7 +38,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pickle
+import logging
+import pickle  # nosec
 
 from typing import Optional, Dict
 from uuid import uuid4
@@ -72,7 +73,6 @@ class RedisSession(CallbackDict, SessionMixin):
             self.sid = sid
         self.permanent = True
         self.modified = False
-        print('session', self.sid)
 
     def clear(self):
         self.redis.delete(f'{self.key_prefix}{self.sid}')
@@ -88,6 +88,8 @@ class RedisSessionInterface(SessionInterface):
     """
 
     def __init__(self, redis: Redis, key_prefix: str, secret_key: str):
+        self.logger = logging.getLogger(f'{self.__class__.__name__}')
+        self.logger.setLevel('INFO')
         self.redis: Redis = redis
         self.key_prefix: str = key_prefix
         self.safe_serializer = URLSafeSerializer(secret_key)
@@ -95,22 +97,22 @@ class RedisSessionInterface(SessionInterface):
     def open_session(self, app: Flask, request: Request) -> RedisSession:
         sid = request.cookies.get(app.config['SESSION_COOKIE_NAME'])
         if not sid:
-            print('sid not in cookie')
+            self.logger.debug('Session ID not in cookie')
             return RedisSession(redis=self.redis, key_prefix=self.key_prefix)
         try:
             # We have a sid from the cookie
             sid = self.safe_serializer.loads(sid)
         except BadSignature:
-            print('Bad signature in cookie.')
+            self.logger.debug('Bad signature in cookie, unable to get the session ID.')
             return RedisSession(redis=self.redis, key_prefix=self.key_prefix)
 
         if val := self.redis.get(f'{self.key_prefix}{sid}'):
             try:
-                return RedisSession(sid=sid, initial=pickle.loads(val), redis=self.redis, key_prefix=self.key_prefix)
+                return RedisSession(sid=sid, initial=pickle.loads(val), redis=self.redis, key_prefix=self.key_prefix)  # nosec
             except Exception:
-                print('Unable to load session fron redis.')
+                self.logger.debug('Unable to load session from redis.')
                 return RedisSession(redis=self.redis, key_prefix=self.key_prefix)
-        print('missing key in redis')
+        self.logger.debug(f'Key in redis for session id {sid}')
         return RedisSession(redis=self.redis, key_prefix=self.key_prefix)
 
     def save_session(self, app: Flask, session: RedisSession, response: Response):  # type: ignore[override]
