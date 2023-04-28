@@ -33,7 +33,7 @@ requests = "^2.29.0"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.5"
 eml-parser = "^1.17.5"
-unoserver = "^1.3"
+unoserver = "^1.4"
 weasyprint = "^58.1"
 extract-msg = {version = "^0.40.0", extras = ["all"]}
 Pillow = "^9.5.0"
