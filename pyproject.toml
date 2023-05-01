@@ -67,7 +67,7 @@ tzlocal = "4.2"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.3"
-ipython = "^8.12.0"
+ipython = "^8.12.1"
 mypy = "^1.2.0"
 types-redis = {version = "^4.5.4.1"}
 types-PyYAML = "^6.0.12.9"
