@@ -1140,14 +1140,14 @@ pyflakes = ">=3.0.0,<3.1.0"
 
 [[package]]
 name = "flask"
-version = "2.3.1"
+version = "2.3.2"
 description = "A simple framework for building complex web applications."
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Flask-2.3.1-py3-none-any.whl", hash = "sha256:8ba2a854608fdd603b67dccd4514a46450132227fb9df40127a8d0c1de8769ec"},
-    {file = "Flask-2.3.1.tar.gz", hash = "sha256:a6059db4297106e5a64b3215fa16ae641822c1cb97ecb498573549b2478602cb"},
+    {file = "Flask-2.3.2-py3-none-any.whl", hash = "sha256:77fd4e1249d8c9923de34907236b747ced06e5467ecac1a7bb7115ae0e9670b0"},
+    {file = "Flask-2.3.2.tar.gz", hash = "sha256:8c2f9abd47a9e8df7f0c3f091ce9497d011dc3b31effcf4c85a6e2b50f4114ef"},
 ]
 
 [package.dependencies]
@@ -1156,7 +1156,7 @@ click = ">=8.1.3"
 importlib-metadata = {version = ">=3.6.0", markers = "python_version < \"3.10\""}
 itsdangerous = ">=2.1.2"
 Jinja2 = ">=3.1.2"
-Werkzeug = ">=2.3.0"
+Werkzeug = ">=2.3.3"
 
 [package.extras]
 async = ["asgiref (>=3.2)"]
@@ -1718,14 +1718,14 @@ test = ["pyannotate", "pytest"]
 
 [[package]]
 name = "ipython"
-version = "8.12.0"
+version = "8.12.1"
 description = "IPython: Productive Interactive Computing"
 category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "ipython-8.12.0-py3-none-any.whl", hash = "sha256:1c183bf61b148b00bcebfa5d9b39312733ae97f6dad90d7e9b4d86c8647f498c"},
-    {file = "ipython-8.12.0.tar.gz", hash = "sha256:a950236df04ad75b5bc7f816f9af3d74dc118fd42f2ff7e80e8e60ca1f182e2d"},
+    {file = "ipython-8.12.1-py3-none-any.whl", hash = "sha256:e3015a1a4aa09b3984fb81b9cef4f0772af5a549878b81efb094cda8bb121993"},
+    {file = "ipython-8.12.1.tar.gz", hash = "sha256:2442915417763b62181009259782975fa50bb5eedb97ae97fb614204bf6ecc21"},
 ]
 
 [package.dependencies]
@@ -4381,14 +4381,14 @@ msg-parse = ["extract-msg (>=0.27)"]
 
 [[package]]
 name = "ruamel-yaml"
-version = "0.17.21"
+version = "0.17.22"
 description = "ruamel.yaml is a YAML parser/emitter that supports roundtrip preservation of comments, seq/map flow style, and map key order"
 category = "dev"
 optional = false
 python-versions = ">=3"
 files = [
-    {file = "ruamel.yaml-0.17.21-py3-none-any.whl", hash = "sha256:742b35d3d665023981bd6d16b3d24248ce5df75fdb4e2924e93a05c1f8b61ca7"},
-    {file = "ruamel.yaml-0.17.21.tar.gz", hash = "sha256:8b7ce697a2f212752a35c1ac414471dc16c424c9573be4926b56ff3f5d23b7af"},
+    {file = "ruamel.yaml-0.17.22-py3-none-any.whl", hash = "sha256:b4c6e66d103d8af198aa6139580ab735169be4922eb4c515ac121bdabf6f9361"},
+    {file = "ruamel.yaml-0.17.22.tar.gz", hash = "sha256:c22ec58aaca5105f771cb8f7ac45ad631b5e8b00454ebe1822d442fb696e9e62"},
 ]
 
 [package.dependencies]
@@ -4462,16 +4462,16 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.19.0"
+version = "1.20.0"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "semgrep-1.19.0-cp37.cp38.cp39.py37.py38.py39-none-any.whl", hash = "sha256:723429f9548bd4c959b12c25b6f88fc48858c129d0a13f0fc7904be866f344de"},
-    {file = "semgrep-1.19.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_10_14_x86_64.whl", hash = "sha256:e59784801146a8d799bc553da68e5e5acbf338a3cae1e8486a9b7aaa925cb266"},
-    {file = "semgrep-1.19.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_11_0_arm64.whl", hash = "sha256:89cfde0b8bb5a3b0624d9710ec7ac73e74598bf227c3c61fd1fa489dd29e33eb"},
-    {file = "semgrep-1.19.0.tar.gz", hash = "sha256:5d5e32ffb1bd963e0ede87f0b801305b8367ad660a73f8e0dd8e14f0c8d3e956"},
+    {file = "semgrep-1.20.0-cp37.cp38.cp39.py37.py38.py39-none-any.whl", hash = "sha256:613fc656ee23771d0e7ad9f093366e6446787e5ef4b84c93e106576eb1ef4cd7"},
+    {file = "semgrep-1.20.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_10_14_x86_64.whl", hash = "sha256:2b543d367acedaf5d3efa07d63b8f2444880255ce35d1106778db68ec559da5d"},
+    {file = "semgrep-1.20.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_11_0_arm64.whl", hash = "sha256:517ed80d50a408d18851ffd74323f43c78650c232b6a8c1defce92ec42d9f575"},
+    {file = "semgrep-1.20.0.tar.gz", hash = "sha256:db43b3fdbe427f9fe0caf8bafaf681fd3478a128e2b887a8036067cb02d3f272"},
 ]
 
 [package.dependencies]
@@ -4876,14 +4876,14 @@ types-pyOpenSSL = "*"
 
 [[package]]
 name = "types-requests"
-version = "2.28.11.17"
+version = "2.29.0.0"
 description = "Typing stubs for requests"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-requests-2.28.11.17.tar.gz", hash = "sha256:0d580652ce903f643f8c3b494dd01d29367ea57cea0c7ad7f65cf3169092edb0"},
-    {file = "types_requests-2.28.11.17-py3-none-any.whl", hash = "sha256:cc1aba862575019306b2ed134eb1ea994cab1c887a22e18d3383e6dd42e9789b"},
+    {file = "types-requests-2.29.0.0.tar.gz", hash = "sha256:c86f4a955d943d2457120dbe719df24ef0924e11177164d10a0373cf311d7b4d"},
+    {file = "types_requests-2.29.0.0-py3-none-any.whl", hash = "sha256:4cf6e323e856c779fbe8815bb977a5bf5d6c5034713e4c17ff2a9a20610f5b27"},
 ]
 
 [package.dependencies]
@@ -4906,14 +4906,14 @@ types-pytz = "*"
 
 [[package]]
 name = "types-urllib3"
-version = "1.26.25.11"
+version = "1.26.25.12"
 description = "Typing stubs for urllib3"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-urllib3-1.26.25.11.tar.gz", hash = "sha256:697102ddf4f781eed6f692353f40cee1098643526f5a8b99f49d2ede90fd3754"},
-    {file = "types_urllib3-1.26.25.11-py3-none-any.whl", hash = "sha256:04235e792139cf3624b25d38faab593456738fbdb7439634046172e3b1339400"},
+    {file = "types-urllib3-1.26.25.12.tar.gz", hash = "sha256:a1557355ce8d350a555d142589f3001903757d2d36c18a66f588d9659bbc917d"},
+    {file = "types_urllib3-1.26.25.12-py3-none-any.whl", hash = "sha256:3ba3d3a8ee46e0d5512c6bd0594da4f10b2584b47a470f8422044a2ab462f1df"},
 ]
 
 [[package]]
@@ -5038,14 +5038,14 @@ files = [
 
 [[package]]
 name = "unoserver"
-version = "1.3"
+version = "1.4"
 description = "A server for file conversions with Libre Office"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "unoserver-1.3-py3-none-any.whl", hash = "sha256:8e5669f8c5b85b551fa71c245acde6248348c8b85ff58252b006280adeb7539d"},
-    {file = "unoserver-1.3.tar.gz", hash = "sha256:bbafe79b67966aa532223c628bbde9ba4f26696a2b736c5ca761f3be81ae2425"},
+    {file = "unoserver-1.4-py3-none-any.whl", hash = "sha256:4a9d9878be188d8898300320ae93a8f3e697894071c99066bf7046cf56183ec4"},
+    {file = "unoserver-1.4.tar.gz", hash = "sha256:1dc687b4f70fb06fbdc180325270271f40ef31c1539380e72b963f2256243562"},
 ]
 
 [package.dependencies]
@@ -5188,14 +5188,14 @@ files = [
 
 [[package]]
 name = "werkzeug"
-version = "2.3.1"
+version = "2.3.3"
 description = "The comprehensive WSGI web application library."
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Werkzeug-2.3.1-py3-none-any.whl", hash = "sha256:69a4b8fcbb30a4c3fa81a5cebd961541273e4d222a4c08593b0b18312e14f64a"},
-    {file = "Werkzeug-2.3.1.tar.gz", hash = "sha256:2d35a28a75ae03727eae14ea7d13627c0f77aed6b9998441e6dae0b387f697fc"},
+    {file = "Werkzeug-2.3.3-py3-none-any.whl", hash = "sha256:4866679a0722de00796a74086238bb3b98d90f423f05de039abb09315487254a"},
+    {file = "Werkzeug-2.3.3.tar.gz", hash = "sha256:a987caf1092edc7523edb139edb20c70571c4a8d5eed02e0b547b4739174d091"},
 ]
 
 [package.dependencies]
@@ -5585,4 +5585,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "ac6bdaa16a60841a22bea1f0132b06fb5700be5c2fe0ed4928856190c796e961"
+content-hash = "95bd0ac8604bc08e96adc771bea35f512e27e76e9ba3341c6aceac569105e648"
