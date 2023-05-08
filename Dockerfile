@@ -15,7 +15,7 @@ RUN apt-get -y install unrar
 RUN apt-get -y install libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig
 RUN apt-get -y install libssl-dev
 RUN apt-get -y install apparmor-utils
-RUN apt-get -y install libcairo2-dev
+RUN apt-get -y install libcairo2-dev pkg-config
 
 RUN sed '/^profile libreoffice-soffice \/usr\/lib\/libreoffice\/program\/soffice.bin/a owner @{HOME}\/pandora\/tasks\/\*\* rwk,/' /etc/apparmor.d/usr.lib.libreoffice.program.soffice.bin -i
 
