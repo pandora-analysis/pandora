@@ -65,16 +65,14 @@ In order to compile kvrocks, you will need a few packages:
 
 ```bash
 sudo apt-get update
-sudo apt install gcc g++ make libsnappy-dev autoconf automake libtool googletest libgtest-dev
+sudo apt install git gcc g++ make cmake autoconf automake libtool python3 libssl-dev
 ```
 
 ```bash
 git clone --recursive https://github.com/apache/incubator-kvrocks.git kvrocks
 cd kvrocks
-git checkout 2.0
-make -j4
-# Optionally, you can run the tests:
-make test
+git checkout 2.4
+./x.py build
 cd ..
 ```
 
