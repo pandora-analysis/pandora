@@ -29,7 +29,7 @@ Flask-WTF = "^1.1.1"
 validators = "^0.20.0"
 python-magic = "^0.4.27"
 PyMuPDF = "^1.22.3"
-requests = "^2.30.0"
+requests = "^2.31.0"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.5"
 eml-parser = "^1.17.5"
