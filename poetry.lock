@@ -303,14 +303,14 @@ yaml = ["PyYAML"]
 
 [[package]]
 name = "beautifulsoup4"
-version = "4.11.2"
+version = "4.12.2"
 description = "Screen-scraping library"
 category = "main"
 optional = false
 python-versions = ">=3.6.0"
 files = [
-    {file = "beautifulsoup4-4.11.2-py3-none-any.whl", hash = "sha256:0e79446b10b3ecb499c1556f7e228a53e64a2bfcebd455f370d8927cb5b59e39"},
-    {file = "beautifulsoup4-4.11.2.tar.gz", hash = "sha256:bc4bdda6717de5a2987436fb8d72f45dc90dd856bdfd512a1314ce90349a0106"},
+    {file = "beautifulsoup4-4.12.2-py3-none-any.whl", hash = "sha256:bd2520ca0d9d7d12694a53d44ac482d181b4ec1888909b035a3dbf40d0f57d4a"},
+    {file = "beautifulsoup4-4.12.2.tar.gz", hash = "sha256:492bbc69dca35d12daac71c4db1bfff0c876c00ef4a2ffacce226d4638eb72da"},
 ]
 
 [package.dependencies]
@@ -1080,18 +1080,18 @@ tests = ["asttokens", "littleutils", "pytest", "rich"]
 
 [[package]]
 name = "extract-msg"
-version = "0.40.0"
+version = "0.41.1"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "extract_msg-0.40.0-py2.py3-none-any.whl", hash = "sha256:93e8d668aae53a9ee233c6a90edcdf704e3494fd9e91a267b1fba16b7502adab"},
-    {file = "extract_msg-0.40.0.tar.gz", hash = "sha256:df8c15b1a7be2bf8ad5f71ad0f969e244d1d834445300f3459de683e463d391d"},
+    {file = "extract_msg-0.41.1-py2.py3-none-any.whl", hash = "sha256:b7a65d2efad09f756521d87c997626f4e5fc21a617a3f0bf4515f54ad5944dbf"},
+    {file = "extract_msg-0.41.1.tar.gz", hash = "sha256:873d3c4fd9a60a65147a23d40f8bbbe21c4d9b5197dddbf1535a9ef190aa86de"},
 ]
 
 [package.dependencies]
-beautifulsoup4 = ">=4.11.1,<4.12"
+beautifulsoup4 = ">=4.11.1,<4.13"
 chardet = ">=4.0.0,<6"
 compressed-rtf = "1.0.6"
 ebcdic = "1.1.1"
@@ -5637,4 +5637,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "6e295bda1bf69d2717979c872a866085f9bc8b7a25849f72e0246dcfb314de3a"
+content-hash = "d31047f080e76330726978d99de0507f43f6b424760e284d97170de4d4fee66a"
