@@ -64,7 +64,7 @@ aiohttp = "^3.8.4"
 dfvfs = "^20221224"
 libewf-python = "20201230"
 libfsntfs-python = "20221023"
-dfdatetime = "20230225"
+dfdatetime = "20230506"
 dtfabric = "20221218"
 
 
