@@ -35,7 +35,7 @@ PyExifTool = "^0.5.5"
 eml-parser = "^1.17.5"
 unoserver = "^1.4"
 weasyprint = "^58.1"
-extract-msg = {version = "^0.41.1", extras = ["all"]}
+extract-msg = {version = "^0.41.2", extras = ["all"]}
 Pillow = "^9.5.0"
 oletools = {version = "0.60.1", extras = ["full"]}
 py7zr = "^0.20.5"
