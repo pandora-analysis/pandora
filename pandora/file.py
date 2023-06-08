@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from functools import cached_property, lru_cache
 from io import BytesIO
 from pathlib import Path
+from threading import Thread
 from typing import Optional, List, Union, Dict, cast, Set, Tuple
 from uuid import uuid4
 from zipfile import ZipFile
@@ -288,7 +289,12 @@ class File:
 
     def convert(self) -> None:
         if self.is_unoconv_concerned:
-            office_to_pdf(self.path, f'{self.path}.pdf')
+            try:
+                p = Thread(target=office_to_pdf, args=[self.path, f'{self.path}.pdf'], daemon=True)
+                p.start()
+                p.join()
+            except TimeoutError:
+                raise Unsupported('Generating the preview took too long and had to be aborded.')
 
         if self.is_svg:
             drawing = svg2rlg(self.path)
