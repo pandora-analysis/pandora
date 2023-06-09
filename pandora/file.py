@@ -293,8 +293,8 @@ class File:
                 p = Thread(target=office_to_pdf, args=[self.path, f'{self.path}.pdf'], daemon=True)
                 p.start()
                 p.join()
-            except TimeoutError:
-                raise Unsupported('Generating the preview took too long and had to be aborded.')
+            except TimeoutError as e:
+                raise Unsupported('Generating the preview took too long and had to be aborded.') from e
 
         if self.is_svg:
             drawing = svg2rlg(self.path)

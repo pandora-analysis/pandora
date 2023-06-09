@@ -34,7 +34,6 @@ class Task:
         filepath = directory / secure_filename(filename)
         with filepath.open('wb') as _f:
             _f.write(sample.getvalue())
-
         file = File.new_file(filepath, filename=filename)
 
         task = cls(uuid=task_uuid, submitted_file=file, disabled_workers=disabled_workers,
