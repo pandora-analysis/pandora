@@ -3529,32 +3529,32 @@ docs = ["Sphinx (>=7.0.1,<8.0.0)"]
 
 [[package]]
 name = "pymisp"
-version = "2.4.171"
+version = "2.4.172"
 description = "Python API for MISP."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pymisp-2.4.171-py3-none-any.whl", hash = "sha256:9410f44cd811f91d523593b5353e0fd37057ba1b1cf856a4050454cbb8a5b788"},
-    {file = "pymisp-2.4.171.tar.gz", hash = "sha256:6dca1dd7be6e63c423eb48e84e587cb776db545de3385dc4875ecc55192a7863"},
+    {file = "pymisp-2.4.172-py3-none-any.whl", hash = "sha256:b2c128277400a9070bba4891eb3f05e8962a17ad2ca25e8541c99c0adb77b4a3"},
+    {file = "pymisp-2.4.172.tar.gz", hash = "sha256:d81d4a0f3b94c020320e61e43c4eab6eedf292df79b81ed39c50c9170782123c"},
 ]
 
 [package.dependencies]
-deprecated = ">=1.2.13,<2.0.0"
+deprecated = ">=1.2.14,<2.0.0"
 jsonschema = ">=4.17.3,<5.0.0"
-lief = {version = ">=0.13.0,<0.14.0", optional = true, markers = "extra == \"fileobjects\""}
-publicsuffixlist = ">=0.10.0.20230506,<0.11.0.0"
+lief = {version = ">=0.13.1,<0.14.0", optional = true, markers = "extra == \"fileobjects\""}
+publicsuffixlist = ">=0.10.0.20230608,<0.11.0.0"
 pydeep2 = {version = ">=0.5.1,<0.6.0", optional = true, markers = "extra == \"fileobjects\""}
 python-dateutil = ">=2.8.2,<3.0.0"
 python-magic = {version = ">=0.4.27,<0.5.0", optional = true, markers = "extra == \"fileobjects\""}
-requests = ">=2.30.0,<3.0.0"
+requests = ">=2.31.0,<3.0.0"
 
 [package.extras]
 brotli = ["urllib3[brotli]"]
 docs = ["recommonmark (>=0.7.1,<0.8.0)", "sphinx-autodoc-typehints (>=1.23.0,<2.0.0)"]
-email = ["RTFDE (>=0.0.2,<0.0.3)", "extract_msg (>=0.41.1,<0.42.0)", "oletools (>=0.60.1,<0.61.0)"]
-fileobjects = ["lief (>=0.13.0,<0.14.0)", "pydeep2 (>=0.5.1,<0.6.0)", "python-magic (>=0.4.27,<0.5.0)"]
+email = ["RTFDE (>=0.0.2,<0.0.3)", "extract_msg (>=0.41.2,<0.42.0)", "oletools (>=0.60.1,<0.61.0)"]
+fileobjects = ["lief (>=0.13.1,<0.14.0)", "pydeep2 (>=0.5.1,<0.6.0)", "python-magic (>=0.4.27,<0.5.0)"]
 openioc = ["beautifulsoup4 (>=4.12.2,<5.0.0)"]
-pdfexport = ["reportlab (>=4.0.0,<5.0.0)"]
+pdfexport = ["reportlab (>=4.0.4,<5.0.0)"]
 url = ["pyfaup (>=1.2,<2.0)"]
 virustotal = ["validators (>=0.20.0,<0.21.0)"]
 
@@ -4965,13 +4965,13 @@ files = [
 
 [[package]]
 name = "werkzeug"
-version = "2.3.5"
+version = "2.3.6"
 description = "The comprehensive WSGI web application library."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Werkzeug-2.3.5-py3-none-any.whl", hash = "sha256:26c6a6a63a8a8d10a8d4e13e7f10821772ff5f138909262e89e946717c72b857"},
-    {file = "Werkzeug-2.3.5.tar.gz", hash = "sha256:f6426f626540009131f06482c73f10c536efd47125afc63c850cc950db9ae585"},
+    {file = "Werkzeug-2.3.6-py3-none-any.whl", hash = "sha256:935539fa1413afbb9195b24880778422ed620c0fc09670945185cce4d91a8890"},
+    {file = "Werkzeug-2.3.6.tar.gz", hash = "sha256:98c774df2f91b05550078891dee5f0eb0cb797a522c757a2452b9cee5b202330"},
 ]
 
 [package.dependencies]
@@ -5350,4 +5350,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "4bb2f09ab01c42943bfda4d8a49908a858e005a6b1995bd93509526bd8e94965"
+content-hash = "14d702c9a983061912ea3990df6ae18d52fa7c52b53b44a087a120b129cd2b32"
