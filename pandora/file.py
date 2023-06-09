@@ -616,7 +616,8 @@ class File:
                                 continue
                             uri = annots["/A"].get("/URI")
                             if uri is not None:
-                                observables['url'].add(str(uri))
+                                if observable := str(uri).strip():
+                                    observables['url'].add(observable)
             except Exception as e:
                 self.logger.warning(f'Unable to process PDF in file {self.uuid}: {e}')
         elif self.is_oletools_concerned:
