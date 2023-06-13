@@ -4116,6 +4116,7 @@ optional = false
 python-versions = ">=3.7,<4"
 files = [
     {file = "reportlab-4.0.4-py3-none-any.whl", hash = "sha256:3dcda79ce04baf70721e2ec54854722644262cac2feec3d5c4c5e77015504cb0"},
+    {file = "reportlab-4.0.4.tar.gz", hash = "sha256:7f70b3b56aff5f11cb4136c51a0f5a56fe6e4c8fbbac7b903076db99a8ef31c1"},
 ]
 
 [package.dependencies]
@@ -4228,7 +4229,8 @@ files = [
     {file = "ruamel.yaml.clib-0.2.7-cp310-cp310-win32.whl", hash = "sha256:763d65baa3b952479c4e972669f679fe490eee058d5aa85da483ebae2009d231"},
     {file = "ruamel.yaml.clib-0.2.7-cp310-cp310-win_amd64.whl", hash = "sha256:d000f258cf42fec2b1bbf2863c61d7b8918d31ffee905da62dede869254d3b8a"},
     {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:045e0626baf1c52e5527bd5db361bc83180faaba2ff586e763d3d5982a876a9e"},
-    {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-macosx_12_6_arm64.whl", hash = "sha256:721bc4ba4525f53f6a611ec0967bdcee61b31df5a56801281027a3a6d1c2daf5"},
+    {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-macosx_13_0_arm64.whl", hash = "sha256:1a6391a7cabb7641c32517539ca42cf84b87b667bad38b78d4d42dd23e957c81"},
+    {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:9c7617df90c1365638916b98cdd9be833d31d337dbcd722485597b43c4a215bf"},
     {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl", hash = "sha256:41d0f1fa4c6830176eef5b276af04c89320ea616655d01327d5ce65e50575c94"},
     {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-win32.whl", hash = "sha256:f6d3d39611ac2e4f62c3128a9eed45f19a6608670c5a2f4f07f24e8de3441d38"},
     {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-win_amd64.whl", hash = "sha256:da538167284de58a52109a9b89b8f6a53ff8437dd6dc26d33b57bf6699153122"},
@@ -4276,15 +4278,15 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.25.0"
+version = "1.27.0"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "semgrep-1.25.0-cp37.cp38.cp39.py37.py38.py39-none-any.whl", hash = "sha256:c968a12fc500ea6b0024b98ee0713fe642039c43b09f70b284ef1c887253075c"},
-    {file = "semgrep-1.25.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_10_14_x86_64.whl", hash = "sha256:31943443b9b693f6b132bd48c25a8ed5c415e7325ab649a2f706774a1d58bdb4"},
-    {file = "semgrep-1.25.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_11_0_arm64.whl", hash = "sha256:ae406b04b4f5324cffa1621c4ccd927ccf598f0c64612cadd8ceba2d64a64ce7"},
-    {file = "semgrep-1.25.0.tar.gz", hash = "sha256:f4c724cf741b54c050efb4d365a142dcff97df8e38911c588ff51f9f8cfd3bbd"},
+    {file = "semgrep-1.27.0-cp37.cp38.cp39.py37.py38.py39-none-any.whl", hash = "sha256:7118fcd5d5e9004e92d045da8ec46290e2003f39547f8d858620c25a3bfec194"},
+    {file = "semgrep-1.27.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_10_14_x86_64.whl", hash = "sha256:8ea7c6559185fc31605e4afb91083a432a8410b4abf00284dc66bc9137ed9c86"},
+    {file = "semgrep-1.27.0-cp37.cp38.cp39.py37.py38.py39-none-macosx_11_0_arm64.whl", hash = "sha256:7bfb8249131d6d50f496f73486e91b894ce17aa44d2088752e032ae807bb2582"},
+    {file = "semgrep-1.27.0.tar.gz", hash = "sha256:c8796d290e497bd2e7f1fc2a415d89a7ab90a2509d9fc5b912053e557a7d7057"},
 ]
 
 [package.dependencies]
@@ -5350,4 +5352,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "14d702c9a983061912ea3990df6ae18d52fa7c52b53b44a087a120b129cd2b32"
+content-hash = "9fff5a2f3a892315094e6a25778a8866ad81b783287f251cf700804dcf897131"
