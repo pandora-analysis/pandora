@@ -57,7 +57,8 @@ cd ..
 
 ### Kvrocks
 
-[Kvrocks](https://github.com/apache/incubator-kvrocks) is a distributed key value NoSQL database that uses RocksDB as storage engine and is compatible with Redis protocol. Kvrocks intends to decrease the cost of memory and increase the capability while compared to Redis.
+[Kvrocks](https://github.com/apache/incubator-kvrocks) is a distributed key value NoSQL database that uses RocksDB as storage engine and is compatible with Redis protocol.
+Kvrocks intends to decrease the cost of memory and increase the capability while compared to Redis.
 
 NOTE: Kvrocks should be installed from the source, and the repository must be in the same directory as the one you will be cloning Pandora into.
 
