@@ -35,7 +35,8 @@
         "auth": false,
         "smtp_user":"johndoe@myorg.local",
         "smtp_pass":"password",
-        "smtp_use_tls": false
+        "smtp_use_starttls": true,
+        "verify_certificate": false
     },
     "weasyprint_fetch_ressources": false,
     "exiftool_path": "",
