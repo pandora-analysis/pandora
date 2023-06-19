@@ -83,13 +83,13 @@ class Ole(BaseWorker):
             status = Status.ALERT
             details['exploit'] = 'Possibly an exploit for the OLE2Link vulnerability (VU#921560, CVE-2017-0199)'
             pat = re.compile(b'(?:[\\x20-\\x7E][\\x00]){3,}')
-            words = [w.decode('utf-16le') for w in pat.findall(ole.oledata)]
+            words = [w.decode('utf-16le') for w in pat.findall(ole.oledata) if w]
             urls: Set[str] = set()
             for w in words:
                 if "http" in w:
                     urls.add(w)
                 else:
-                    print(w)
+                    self.logger.info(f'not a URL: {w}')
             details['URLs'] = sorted(urls)  # type: ignore
         elif ole.class_name.lower().startswith(b'equation.3'):
             status = Status.ALERT

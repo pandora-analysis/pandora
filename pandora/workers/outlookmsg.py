@@ -12,7 +12,6 @@ from .base import BaseWorker
 class OutlookMSG(BaseWorker):
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
-        print(task.file.msg_data)
         if not task.file.msg_data or not isinstance(task.file.msg_data, AppointmentMeeting):
             report.status = Status.NOTAPPLICABLE
             return
