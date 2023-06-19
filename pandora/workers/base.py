@@ -120,13 +120,15 @@ class BaseWorker(multiprocessing.Process):
         #    update cache if relevant. Do not store cache on error
         raise NotImplementedError('Stuff this module is doing with this task')
 
-    def _read_stream(self) -> Optional[Tuple[str, List[str], Optional[str]]]:
-        new_stream = self.redis.xreadgroup(
-            groupname=self.module, consumername=self.name, streams={'tasks_queue': '>'},
-            block=2000, count=1
-        )
-        if not new_stream:
-            return None
+    def _read_stream(self) -> Tuple[str, List[str], Optional[str]]:
+        while True:
+            new_stream = self.redis.xreadgroup(
+                groupname=self.module, consumername=self.name, streams={'tasks_queue': '>'},
+                block=2000, count=1
+            )
+            if new_stream:
+                break
+            time.sleep(1)
         _, entries = new_stream[0]
         _, values = entries[0]
         return (values['task_uuid'],
@@ -142,11 +144,7 @@ class BaseWorker(multiprocessing.Process):
         while True:
             try:
                 self.logger.debug('Waiting for new task...')
-                stream = self._read_stream()
-                if not stream:
-                    time.sleep(1)
-                    continue
-                task_uuid, disabled_workers, manual_worker = stream
+                task_uuid, disabled_workers, manual_worker = self._read_stream()
                 logger = WorkerLogAdapter(self.logger, {'uuid': task_uuid})
                 logger.debug('Got new task')
 
