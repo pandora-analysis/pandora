@@ -65,7 +65,7 @@ dfvfs = "^20221224"
 libewf-python = "20201230"
 libfsntfs-python = "20221023"
 dfdatetime = "20230225"
-dtfabric = "20221218"
+dtfabric = "20230519"
 libfsapfs-python = "20221102"
 
 [tool.poetry.group.dev.dependencies]
