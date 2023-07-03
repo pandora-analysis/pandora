@@ -36,7 +36,7 @@ eml-parser = "^1.17.5"
 unoserver = "^1.4"
 weasyprint = "^59.0"
 extract-msg = {version = "^0.41.5", extras = ["all"]}
-Pillow = "^9.5.0"
+Pillow = "^10.0.0"
 oletools = {version = "0.60.1", extras = ["full"]}
 py7zr = "^0.20.5"
 jbxapi = "^3.21.0"
