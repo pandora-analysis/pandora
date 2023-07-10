@@ -67,6 +67,7 @@ libfsntfs-python = "20221023"
 dfdatetime = "20230225"
 dtfabric = "20221218"
 libfsapfs-python = "20221102"
+opencv-python = "^4.8.0.74"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.4"
