@@ -17,7 +17,7 @@
 
     $(document).ready(function () {
       analysis.refresher = setInterval(function() {
-        analysis.refresh("{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='refresh') }}");
+        analysis.refresh("{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='refresh') }}");
       }, 1000);
     });
   </script>
@@ -79,7 +79,7 @@
               {% if current_user.role.can('rescan_file') and not task.file.deleted %}
                 <li>
                   <a class="dropdown-item" href="#" onclick="javascript:analysis.rescan($(this).attr('data-url'))"
-                     data-url="{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='rescan') }}">
+                     data-url="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='rescan') }}">
                     Rescan file
                   </a>
                 </li>
@@ -94,7 +94,7 @@
               {% if current_user.role.can('delete_file') and not task.file.deleted %}
                   <li id="deleteButton">
                     <a class="dropdown-item" href="#" onclick="javascript:analysis.deleteFile($(this).attr('data-url'))"
-                       data-url="{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='delete') }}">
+                       data-url="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='delete') }}">
                       Delete file
                     </a>
                   </li>
@@ -616,7 +616,7 @@
   {% if current_user.role.can('notify_cert') %}
     <div id="notifyModal" class="modal fade" role="dialog">
       <div class="modal-dialog">
-        <form id="notifyForm" class="form-horizontal" action="{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='notify') }}"
+        <form id="notifyForm" class="form-horizontal" action="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='notify') }}"
               onsubmit="return analysis.notify($(this).attr('action'))">
           <div class="modal-content">
             <div class="modal-header">
@@ -662,7 +662,7 @@
             </div>
             <div class="modal-body">
               <form id="shareForm" class="form-horizontal"
-                    action="{{ api.url_for(api_resource, task_id=task.uuid, seed=seed, action='share') }}"
+                    action="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='share') }}"
                     onsubmit="return analysis.share($(this).attr('action'))">
               <div class="row g-3 align-items-center">
                 <div class="col-auto">

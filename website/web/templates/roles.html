@@ -10,7 +10,7 @@
           integrity="{{get_sri('static/js', 'role.js')}}"
           crossorigin="anonymous"></script>
   <script>
-      var role = new Role("{{ csrf_token() }}", "{{ api.url_for(api_resource, action='update') }}", "{{ api.url_for(api_resource, action='reload') }}");
+      var role = new Role("{{ csrf_token() }}", "{{ url_for('PandoraAPI_api_role', action='update') }}", "{{ url_for('PandoraAPI_api_role', action='reload') }}");
   </script>
 {% endblock %}
 

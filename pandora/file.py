@@ -562,7 +562,9 @@ class File:
             text_width = 0
             lines = self.text.splitlines()
             for line in lines:
-                w, text_height = font.getsize(line.encode('latin-1', 'ignore'))
+                left, top, right, bottom = font.getbbox(line.encode('latin-1', 'ignore'))
+                w = font.getlength(line.encode('latin-1', 'ignore'))
+                text_height = bottom
                 if w > text_width:
                     text_width = w
             text_height = text_height * len(lines)

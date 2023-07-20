@@ -58,7 +58,7 @@
             <div class="col-auto">
               <button type="submit" class="btn btn-secondary" id="shareBuild" style="float: right;"
                       onclick="javascript:analysis.rescan($(this).attr('data-url'))"
-                      data-url="{{ api.url_for(api_task_action, task_id=task.uuid, seed=seed, action='rescan') }}">
+                      data-url="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='rescan') }}">
                 Rescan
               </button>
             </div>

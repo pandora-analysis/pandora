@@ -69,7 +69,7 @@
           {% else %}
             <span id="delete-{{ task.uuid }}" class="btn btn-danger mt-1"
                   onclick="javascript:deleteFile($(this).attr('data-url'), $(this).attr('data-uid'))"
-                  data-url="{{ api.url_for(api_resource, task_id=task.uuid, action='delete') }}" data-uid="{{ task.file.uuid }}">
+                  data-url="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, action='delete') }}" data-uid="{{ task.file.uuid }}">
                 Delete file
             </span>
           {% endif %}

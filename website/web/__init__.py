@@ -36,7 +36,6 @@ from pandora.role import Action
 from pandora.user import User
 
 from .generic_api import api as generic_api
-from .generic_api import ApiRole, ApiSubmit, ApiTaskAction
 from .helpers import (get_secret_key, update_user_role, admin_required,
                       src_request_ip, load_user_from_request, build_users_table,
                       sri_load, sizeof_fmt)
@@ -217,8 +216,6 @@ def api_submit_page():
         show_project_page=get_config('generic', 'show_project_page'),
         max_file_size=get_config('generic', 'max_file_size'),
         workers={worker_name: config for worker_name, config in workers().items() if worker_name in enaled_workers},
-        api=api,
-        api_resource=ApiSubmit,
         generic_disclaimer=disclaimers['disclaimer'],
         special_disclaimer=disclaimers['special_disclaimer']
     )
@@ -248,12 +245,11 @@ def api_analysis(task_id, seed=None):
     if not admin_name:
         admin_name = 'Administrator'
 
-    return render_template('analysis.html', task=task, seed=seed, api=api,
+    return render_template('analysis.html', task=task, seed=seed,
                            zip_passwd=get_config('generic', 'sample_password'),
                            default_share_time=get_config('generic', 'default_share_time'),
                            show_project_page=get_config('generic', 'show_project_page'),
-                           admin_name=admin_name,
-                           api_resource=ApiTaskAction)
+                           admin_name=admin_name)
 
 
 @app.route('/task-misp-submit/<task_id>', methods=['GET'], strict_slashes=False)
@@ -405,7 +401,7 @@ def api_tasks() -> str:
         tasks = filtered_tasks
     return render_template('tasks.html', tasks=tasks, search=search or '',
                            show_project_page=get_config('generic', 'show_project_page'),
-                           status=Status, api=api, api_resource=ApiTaskAction)
+                           status=Status)
 
 
 @app.route('/users', methods=['GET'], strict_slashes=False)
@@ -442,7 +438,7 @@ def api_roles():
     roles = pandora.get_roles()
     return render_template('roles.html',
                            show_project_page=get_config('generic', 'show_project_page'),
-                           roles=roles, api=api, api_resource=ApiRole)
+                           roles=roles)
 
 
 @app.route('/observables_lists', methods=['GET'], strict_slashes=False)
@@ -551,8 +547,7 @@ def html_workers_result(task_id: str, worker_name: str, seed: Optional[str]=None
     return render_template(template_file,
                            worker_name=worker_name,
                            worker_meta=workers()[worker_name]['meta'],
-                           task=task, seed=seed, report=report, api=api,
-                           api_task_action=ApiTaskAction)
+                           task=task, seed=seed, report=report)
 
 
 @app.route('/manual_trigger_worker/<task_id>/<worker_name>', methods=['GET'], strict_slashes=False)

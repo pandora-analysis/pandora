@@ -128,7 +128,7 @@
   var previewTemplate = previewNode.parentNode.innerHTML;
   previewNode.parentNode.removeChild(previewNode);
   $("div#dropzone").dropzone({
-    url: "{{ api.url_for(api_resource) }}",
+    url: "{{ url_for('PandoraAPI_api_submit') }}",
     headers: {"X-CSRF-Token": "{{ csrf_token() }}"},
     paramName: "file",
     maxFilesize: {{ max_file_size }}, // MB
