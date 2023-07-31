@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from extract_msg import AppointmentMeeting
+from extract_msg.msg_classes import AppointmentMeeting
 
 from ..helpers import Status
 from ..task import Task

@@ -13,7 +13,9 @@ from pathlib import Path
 from tarfile import TarFile
 from typing import List, Optional, Union, Tuple, Sequence, Dict, overload, Literal, TYPE_CHECKING
 
-from extract_msg import MessageBase, AppointmentMeeting, MSGFile
+from extract_msg.msg_classes import MessageBase, AppointmentMeeting
+from extract_msg.attachments import AttachmentBase, SignedAttachment
+from extract_msg import MSGFile
 from hachoir.stream import StringInputStream  # type: ignore
 from hachoir.parser.archive import CabFile  # type: ignore
 import py7zr  # type: ignore
@@ -519,7 +521,10 @@ class Extractor(BaseWorker):
             elif isinstance(attachment.data, MSGFile):
                 blob = BytesIO()
                 attachment.data.export(blob)
-            extracted.append((attachment.getFilename(), blob))
+            if isinstance(attachment, AttachmentBase):
+                extracted.append((attachment.getFilename(), blob))
+            elif isinstance(attachment, SignedAttachment):
+                extracted.append((attachment.name, blob))
         return extracted
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False):

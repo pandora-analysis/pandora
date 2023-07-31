@@ -30,7 +30,8 @@ import textract  # type: ignore
 from weasyprint import HTML, default_url_fetcher  # type: ignore
 
 from eml_parser import EmlParser
-from extract_msg import openMsg, MessageBase, AppointmentMeeting
+from extract_msg import openMsg
+from extract_msg.msg_classes import MessageBase, AppointmentMeeting
 
 from .default import get_config
 from .exceptions import Unsupported, NoPreview, InvalidPandoraObject
