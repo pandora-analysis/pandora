@@ -38,7 +38,7 @@ weasyprint = "^59.0"
 extract-msg = {version = "^0.42.1"}
 Pillow = "^10.0.0"
 oletools = {version = "0.60.1", extras = ["full"]}
-py7zr = "^0.20.5"
+py7zr = "^0.20.6"
 jbxapi = "^3.21.0"
 defusedxml = "^0.7.1"
 mwdblib = "^4.5.0"
