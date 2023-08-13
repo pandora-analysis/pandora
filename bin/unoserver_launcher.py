@@ -4,8 +4,10 @@ import contextlib
 import logging
 import logging.config
 import signal
+import tempfile
 
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Optional
 
 from unoserver.server import UnoServer  # type: ignore
@@ -22,8 +24,8 @@ class UnoserverLauncher(AbstractManager):
         self.script_name = 'unoserver'
         self.timeout = 3600
 
-    def _launch_unoserver(self):
-        unoserver = UnoServer()
+    def _launch_unoserver(self, temp_dir: str):
+        unoserver = UnoServer(user_installation=Path(temp_dir).as_uri())
         return unoserver.start(), datetime.now()
 
     @staticmethod
@@ -47,23 +49,24 @@ class UnoserverLauncher(AbstractManager):
 
     def safe_run(self):
         # it sometimes fails but simply restarting the server fixes it
-        self.process, start_time = self._launch_unoserver()
-        self.set_running()
-        retry = 0
-        while True:
-            with self._timeout_context():
-                self.run(sleep_in_sec=10)
-            if self.shutdown_requested():
-                break
-            if retry >= 3:
-                self.logger.critical(f'Unable to restart {self.script_name}.')
-                break
-            if datetime.now() - start_time > timedelta(seconds=60):
-                retry = 0
-            else:
-                retry += 1
-            self.process, start_time = self._launch_unoserver()
+        with tempfile.TemporaryDirectory() as tmpuserdir:
+            self.process, start_time = self._launch_unoserver(temp_dir=tmpuserdir)
             self.set_running()
+            retry = 0
+            while True:
+                with self._timeout_context():
+                    self.run(sleep_in_sec=10)
+                if self.shutdown_requested():
+                    break
+                if retry >= 3:
+                    self.logger.critical(f'Unable to restart {self.script_name}.')
+                    break
+                if datetime.now() - start_time > timedelta(seconds=60):
+                    retry = 0
+                else:
+                    retry += 1
+                self.process, start_time = self._launch_unoserver(temp_dir=tmpuserdir)
+                self.set_running()
 
 
 def main():
