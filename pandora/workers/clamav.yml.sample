@@ -5,3 +5,5 @@ meta:
 
 settings:
   socket_path: /var/run/clamav/clamd.ctl
+  # For docker setup:
+  # socket_path: /var/run/clamav/clamd.sock 
