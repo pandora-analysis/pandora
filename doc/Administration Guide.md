@@ -79,3 +79,12 @@ change in generic.json the *storage_db_hostname*
     "storage_db_port": 6101
   }
 ```
+
+#### ClamAV
+
+Change *socket_path* in the ClamAV worker configuration (`/pandora/workers/clamav.yml`) (see [ClamAV Docker Documentation](https://docs.clamav.net/manual/Installing/Docker.html#unix-sockets)).
+
+```yaml
+settings:
+  socket_path: /var/run/clamav/clamd.sock
+```

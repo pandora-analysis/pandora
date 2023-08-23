@@ -18,7 +18,7 @@ services:
   clamav:
     image: clamav/clamav
     volumes:
-        - /tmp:/var/run/clamav
+        - clamav-socket:/tmp
 
   pandora:
     build: .
@@ -41,10 +41,13 @@ services:
         - ./logs:/pandora/logs
         - ./web_logs:/pandora/website/logs
         - ./tasks:/pandora/tasks
-        - /tmp:/var/run/clamav
+        - clamav-socket:/var/run/clamav
     links:
         - "clamav"
         - "redis"
         - "kvrocks"
     ports:
         - 6100:6100
+
+volumes:
+    clamav-socket:
