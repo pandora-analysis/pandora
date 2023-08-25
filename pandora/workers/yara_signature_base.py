@@ -23,7 +23,8 @@ class YaraSignatureBaseWorker(YaraWorker):
                       'configured_vulns_ext_vars.yar',
                       'gen_fake_amsi_dll.yar',
                       'gen_mal_3cx_compromise_mar23.yar',
-                      'yara-rules_vuln_drivers_strict_renamed.yar']
+                      'yara-rules_vuln_drivers_strict_renamed.yar',
+                      'expl_citrix_netscaler_adc_exploitation_cve_2023_3519.yar']
     last_change: Optional[float] = None
 
     def rules_with_external_vars(self, filename: str, filepath: str, filetype: str, owner: str) -> yara.Rules:
