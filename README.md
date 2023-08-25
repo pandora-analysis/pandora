@@ -48,7 +48,7 @@ sudo apt install build-essential tcl
 ```bash
 git clone https://github.com/redis/redis.git
 cd redis
-git checkout 6.2
+git checkout 7.0
 make
 # Optionally, you can run the tests:
 make test
@@ -72,7 +72,7 @@ sudo apt install git gcc g++ make cmake autoconf automake libtool python3 libssl
 ```bash
 git clone --recursive https://github.com/apache/incubator-kvrocks.git kvrocks
 cd kvrocks
-git checkout 2.4
+git checkout 2.5
 ./x.py build
 cd ..
 ```
