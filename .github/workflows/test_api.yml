@@ -40,7 +40,7 @@ jobs:
         git clone --recursive https://github.com/apache/incubator-kvrocks.git kvrocks
         pushd kvrocks
         git checkout 2.5
-        make -j4
+        ./x.py build
         popd
         popd
 
