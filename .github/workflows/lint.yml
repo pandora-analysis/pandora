@@ -55,7 +55,7 @@ jobs:
     - name: codespell
       uses: codespell-project/actions-codespell@master
       with:
-        skip: ./cache/cache.conf,./poetry.lock
+        skip: ./cache/cache.conf,./poetry.lock,storage/kvrocks.conf
         ignore_words_file: .codespellignore
       if: ${{ always() }}
 
