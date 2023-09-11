@@ -191,3 +191,5 @@ class Storage():
 
     def set_report(self, report: Dict[str, str]):
         self.storage.hmset(f'reports:{report["task_uuid"]}-{report["worker_name"]}', report)
+        # In case the status of the task was set, drop it
+        self.storage.hdel(f'tasks:{report["task_uuid"]}', 'status')
