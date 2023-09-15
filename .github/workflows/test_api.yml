@@ -49,7 +49,7 @@ jobs:
         pushd ..
         git clone https://github.com/redis/redis.git
         pushd redis
-        git checkout 7.0
+        git checkout 7.2
         make
         popd
         popd
