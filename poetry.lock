@@ -163,13 +163,13 @@ test = ["coverage", "mypy", "pexpect", "ruff", "wheel"]
 
 [[package]]
 name = "astroid"
-version = "2.15.6"
+version = "2.15.7"
 description = "An abstract syntax tree for Python with inference support."
 optional = false
 python-versions = ">=3.7.2"
 files = [
-    {file = "astroid-2.15.6-py3-none-any.whl", hash = "sha256:389656ca57b6108f939cf5d2f9a2a825a3be50ba9d589670f393236e0a03b91c"},
-    {file = "astroid-2.15.6.tar.gz", hash = "sha256:903f024859b7c7687d7a7f3a3f73b17301f8e42dfd9cc9df9d4418172d3e2dbd"},
+    {file = "astroid-2.15.7-py3-none-any.whl", hash = "sha256:958f280532e36ca84a13023f15cb1556fb6792d193acb87e1f3ca536b6fa6bd2"},
+    {file = "astroid-2.15.7.tar.gz", hash = "sha256:c522f2832a900e27a7d284b9b6ef670d2495f760ede3c8c0b004a5641d3c5987"},
 ]
 
 [package.dependencies]
@@ -746,34 +746,34 @@ files = [
 
 [[package]]
 name = "cryptography"
-version = "41.0.3"
+version = "41.0.4"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "cryptography-41.0.3-cp37-abi3-macosx_10_12_universal2.whl", hash = "sha256:652627a055cb52a84f8c448185922241dd5217443ca194d5739b44612c5e6507"},
-    {file = "cryptography-41.0.3-cp37-abi3-macosx_10_12_x86_64.whl", hash = "sha256:8f09daa483aedea50d249ef98ed500569841d6498aa9c9f4b0531b9964658922"},
-    {file = "cryptography-41.0.3-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:4fd871184321100fb400d759ad0cddddf284c4b696568204d281c902fc7b0d81"},
-    {file = "cryptography-41.0.3-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:84537453d57f55a50a5b6835622ee405816999a7113267739a1b4581f83535bd"},
-    {file = "cryptography-41.0.3-cp37-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:3fb248989b6363906827284cd20cca63bb1a757e0a2864d4c1682a985e3dca47"},
-    {file = "cryptography-41.0.3-cp37-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:42cb413e01a5d36da9929baa9d70ca90d90b969269e5a12d39c1e0d475010116"},
-    {file = "cryptography-41.0.3-cp37-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:aeb57c421b34af8f9fe830e1955bf493a86a7996cc1338fe41b30047d16e962c"},
-    {file = "cryptography-41.0.3-cp37-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:6af1c6387c531cd364b72c28daa29232162010d952ceb7e5ca8e2827526aceae"},
-    {file = "cryptography-41.0.3-cp37-abi3-win32.whl", hash = "sha256:0d09fb5356f975974dbcb595ad2d178305e5050656affb7890a1583f5e02a306"},
-    {file = "cryptography-41.0.3-cp37-abi3-win_amd64.whl", hash = "sha256:a983e441a00a9d57a4d7c91b3116a37ae602907a7618b882c8013b5762e80574"},
-    {file = "cryptography-41.0.3-pp310-pypy310_pp73-macosx_10_12_x86_64.whl", hash = "sha256:5259cb659aa43005eb55a0e4ff2c825ca111a0da1814202c64d28a985d33b087"},
-    {file = "cryptography-41.0.3-pp310-pypy310_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:67e120e9a577c64fe1f611e53b30b3e69744e5910ff3b6e97e935aeb96005858"},
-    {file = "cryptography-41.0.3-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:7efe8041897fe7a50863e51b77789b657a133c75c3b094e51b5e4b5cec7bf906"},
-    {file = "cryptography-41.0.3-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:ce785cf81a7bdade534297ef9e490ddff800d956625020ab2ec2780a556c313e"},
-    {file = "cryptography-41.0.3-pp38-pypy38_pp73-macosx_10_12_x86_64.whl", hash = "sha256:57a51b89f954f216a81c9d057bf1a24e2f36e764a1ca9a501a6964eb4a6800dd"},
-    {file = "cryptography-41.0.3-pp38-pypy38_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:4c2f0d35703d61002a2bbdcf15548ebb701cfdd83cdc12471d2bae80878a4207"},
-    {file = "cryptography-41.0.3-pp38-pypy38_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:23c2d778cf829f7d0ae180600b17e9fceea3c2ef8b31a99e3c694cbbf3a24b84"},
-    {file = "cryptography-41.0.3-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:95dd7f261bb76948b52a5330ba5202b91a26fbac13ad0e9fc8a3ac04752058c7"},
-    {file = "cryptography-41.0.3-pp39-pypy39_pp73-macosx_10_12_x86_64.whl", hash = "sha256:41d7aa7cdfded09b3d73a47f429c298e80796c8e825ddfadc84c8a7f12df212d"},
-    {file = "cryptography-41.0.3-pp39-pypy39_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:d0d651aa754ef58d75cec6edfbd21259d93810b73f6ec246436a21b7841908de"},
-    {file = "cryptography-41.0.3-pp39-pypy39_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:ab8de0d091acbf778f74286f4989cf3d1528336af1b59f3e5d2ebca8b5fe49e1"},
-    {file = "cryptography-41.0.3-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:a74fbcdb2a0d46fe00504f571a2a540532f4c188e6ccf26f1f178480117b33c4"},
-    {file = "cryptography-41.0.3.tar.gz", hash = "sha256:6d192741113ef5e30d89dcb5b956ef4e1578f304708701b8b73d38e3e1461f34"},
+    {file = "cryptography-41.0.4-cp37-abi3-macosx_10_12_universal2.whl", hash = "sha256:80907d3faa55dc5434a16579952ac6da800935cd98d14dbd62f6f042c7f5e839"},
+    {file = "cryptography-41.0.4-cp37-abi3-macosx_10_12_x86_64.whl", hash = "sha256:35c00f637cd0b9d5b6c6bd11b6c3359194a8eba9c46d4e875a3660e3b400005f"},
+    {file = "cryptography-41.0.4-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:cecfefa17042941f94ab54f769c8ce0fe14beff2694e9ac684176a2535bf9714"},
+    {file = "cryptography-41.0.4-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e40211b4923ba5a6dc9769eab704bdb3fbb58d56c5b336d30996c24fcf12aadb"},
+    {file = "cryptography-41.0.4-cp37-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:23a25c09dfd0d9f28da2352503b23e086f8e78096b9fd585d1d14eca01613e13"},
+    {file = "cryptography-41.0.4-cp37-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:2ed09183922d66c4ec5fdaa59b4d14e105c084dd0febd27452de8f6f74704143"},
+    {file = "cryptography-41.0.4-cp37-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:5a0f09cefded00e648a127048119f77bc2b2ec61e736660b5789e638f43cc397"},
+    {file = "cryptography-41.0.4-cp37-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:9eeb77214afae972a00dee47382d2591abe77bdae166bda672fb1e24702a3860"},
+    {file = "cryptography-41.0.4-cp37-abi3-win32.whl", hash = "sha256:3b224890962a2d7b57cf5eeb16ccaafba6083f7b811829f00476309bce2fe0fd"},
+    {file = "cryptography-41.0.4-cp37-abi3-win_amd64.whl", hash = "sha256:c880eba5175f4307129784eca96f4e70b88e57aa3f680aeba3bab0e980b0f37d"},
+    {file = "cryptography-41.0.4-pp310-pypy310_pp73-macosx_10_12_x86_64.whl", hash = "sha256:004b6ccc95943f6a9ad3142cfabcc769d7ee38a3f60fb0dddbfb431f818c3a67"},
+    {file = "cryptography-41.0.4-pp310-pypy310_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:86defa8d248c3fa029da68ce61fe735432b047e32179883bdb1e79ed9bb8195e"},
+    {file = "cryptography-41.0.4-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:37480760ae08065437e6573d14be973112c9e6dcaf5f11d00147ee74f37a3829"},
+    {file = "cryptography-41.0.4-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:b5f4dfe950ff0479f1f00eda09c18798d4f49b98f4e2006d644b3301682ebdca"},
+    {file = "cryptography-41.0.4-pp38-pypy38_pp73-macosx_10_12_x86_64.whl", hash = "sha256:7e53db173370dea832190870e975a1e09c86a879b613948f09eb49324218c14d"},
+    {file = "cryptography-41.0.4-pp38-pypy38_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:5b72205a360f3b6176485a333256b9bcd48700fc755fef51c8e7e67c4b63e3ac"},
+    {file = "cryptography-41.0.4-pp38-pypy38_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:93530900d14c37a46ce3d6c9e6fd35dbe5f5601bf6b3a5c325c7bffc030344d9"},
+    {file = "cryptography-41.0.4-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:efc8ad4e6fc4f1752ebfb58aefece8b4e3c4cae940b0994d43649bdfce8d0d4f"},
+    {file = "cryptography-41.0.4-pp39-pypy39_pp73-macosx_10_12_x86_64.whl", hash = "sha256:c3391bd8e6de35f6f1140e50aaeb3e2b3d6a9012536ca23ab0d9c35ec18c8a91"},
+    {file = "cryptography-41.0.4-pp39-pypy39_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:0d9409894f495d465fe6fda92cb70e8323e9648af912d5b9141d616df40a87b8"},
+    {file = "cryptography-41.0.4-pp39-pypy39_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:8ac4f9ead4bbd0bc8ab2d318f97d85147167a488be0e08814a37eb2f439d5cf6"},
+    {file = "cryptography-41.0.4-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:047c4603aeb4bbd8db2756e38f5b8bd7e94318c047cfe4efeb5d715e08b49311"},
+    {file = "cryptography-41.0.4.tar.gz", hash = "sha256:7febc3094125fc126a7f6fb1f420d0da639f3f32cb15c8ff0dc3997c4549f51a"},
 ]
 
 [package.dependencies]
@@ -1348,20 +1348,20 @@ smmap = ">=3.0.1,<6"
 
 [[package]]
 name = "gitpython"
-version = "3.1.36"
+version = "3.1.37"
 description = "GitPython is a Python library used to interact with Git repositories"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "GitPython-3.1.36-py3-none-any.whl", hash = "sha256:8d22b5cfefd17c79914226982bb7851d6ade47545b1735a9d010a2a4c26d8388"},
-    {file = "GitPython-3.1.36.tar.gz", hash = "sha256:4bb0c2a6995e85064140d31a33289aa5dce80133a23d36fcd372d716c54d3ebf"},
+    {file = "GitPython-3.1.37-py3-none-any.whl", hash = "sha256:5f4c4187de49616d710a77e98ddf17b4782060a1788df441846bddefbb89ab33"},
+    {file = "GitPython-3.1.37.tar.gz", hash = "sha256:f9b9ddc0761c125d5780eab2d64be4873fc6817c2899cbcb34b02344bdc7bc54"},
 ]
 
 [package.dependencies]
 gitdb = ">=4.0.1,<5"
 
 [package.extras]
-test = ["black", "coverage[toml]", "ddt (>=1.1.1,!=1.4.3)", "mypy", "pre-commit", "pytest", "pytest-cov", "pytest-sugar", "virtualenv"]
+test = ["black", "coverage[toml]", "ddt (>=1.1.1,!=1.4.3)", "mypy", "pre-commit", "pytest", "pytest-cov", "pytest-sugar"]
 
 [[package]]
 name = "glom"
@@ -1587,21 +1587,21 @@ testing = ["flufl.flake8", "importlib-resources (>=1.3)", "packaging", "pyfakefs
 
 [[package]]
 name = "importlib-resources"
-version = "6.0.1"
+version = "6.1.0"
 description = "Read resources from Python packages"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "importlib_resources-6.0.1-py3-none-any.whl", hash = "sha256:134832a506243891221b88b4ae1213327eea96ceb4e407a00d790bb0626f45cf"},
-    {file = "importlib_resources-6.0.1.tar.gz", hash = "sha256:4359457e42708462b9626a04657c6208ad799ceb41e5c58c57ffa0e6a098a5d4"},
+    {file = "importlib_resources-6.1.0-py3-none-any.whl", hash = "sha256:aa50258bbfa56d4e33fbd8aa3ef48ded10d1735f11532b8df95388cc6bdb7e83"},
+    {file = "importlib_resources-6.1.0.tar.gz", hash = "sha256:9d48dcccc213325e810fd723e7fbb45ccb39f6cf5c31f00cf2b965f5f10f3cb9"},
 ]
 
 [package.dependencies]
 zipp = {version = ">=3.1.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
-docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
-testing = ["pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy (>=0.9.1)", "pytest-ruff"]
+docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (<7.2.5)", "sphinx (>=3.5)", "sphinx-lint"]
+testing = ["pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy (>=0.9.1)", "pytest-ruff", "zipp (>=3.17)"]
 
 [[package]]
 name = "inflate64"
@@ -1879,13 +1879,13 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "jsonschema"
-version = "4.19.0"
+version = "4.19.1"
 description = "An implementation of JSON Schema validation for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jsonschema-4.19.0-py3-none-any.whl", hash = "sha256:043dc26a3845ff09d20e4420d6012a9c91c9aa8999fa184e7efcfeccb41e32cb"},
-    {file = "jsonschema-4.19.0.tar.gz", hash = "sha256:6e1e7569ac13be8139b2dd2c21a55d350066ee3f80df06c608b398cdc6f30e8f"},
+    {file = "jsonschema-4.19.1-py3-none-any.whl", hash = "sha256:cd5f1f9ed9444e554b38ba003af06c0a8c2868131e56bfbef0550fb450c0330e"},
+    {file = "jsonschema-4.19.1.tar.gz", hash = "sha256:ec84cc37cfa703ef7cd4928db24f9cb31428a5d0fa77747b8b51a847458e0bbf"},
 ]
 
 [package.dependencies]
@@ -3430,13 +3430,13 @@ files = [
 
 [[package]]
 name = "publicsuffixlist"
-version = "0.10.0.20230919"
+version = "0.10.0.20230920"
 description = "publicsuffixlist implement"
 optional = false
 python-versions = ">=2.6"
 files = [
-    {file = "publicsuffixlist-0.10.0.20230919-py2.py3-none-any.whl", hash = "sha256:31bfc7035dddae547eba69c7976337517bb46e70e12f5b3e650b2493f59f60cc"},
-    {file = "publicsuffixlist-0.10.0.20230919.tar.gz", hash = "sha256:c89486256a43c00c42dd92ac19cb5921255d5d0f37e5bdc4bc95a4e126c17649"},
+    {file = "publicsuffixlist-0.10.0.20230920-py2.py3-none-any.whl", hash = "sha256:3ef6fabdbde3bbdb2d0a340496552ddb78343b49e1504bd405f19409d21e2639"},
+    {file = "publicsuffixlist-0.10.0.20230920.tar.gz", hash = "sha256:e12a7cbb224027e4a0d30bfa4e336430e08a94bfdcff64e858fd5bc86d8166d1"},
 ]
 
 [package.extras]
@@ -3728,13 +3728,13 @@ files = [
 
 [[package]]
 name = "pydyf"
-version = "0.7.0"
+version = "0.8.0"
 description = "A low-level PDF generator."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pydyf-0.7.0-py3-none-any.whl", hash = "sha256:23a753daa75adba387606c54eab4d5c9bca83f076be697e59f719d238753fb05"},
-    {file = "pydyf-0.7.0.tar.gz", hash = "sha256:a5a88cb06e5beb64a1ef2147ee879b0e5139f5fdb827fda2fcf14a018c7b11e6"},
+    {file = "pydyf-0.8.0-py3-none-any.whl", hash = "sha256:901186a2e9f897108139426a6486f5225bdcc9b70be2ec965f25111e42f8ac5d"},
+    {file = "pydyf-0.8.0.tar.gz", hash = "sha256:b22b1ef016141b54941ad66ed4e036a7bdff39c0b360993b283875c3f854dd9a"},
 ]
 
 [package.extras]
@@ -3802,17 +3802,17 @@ docs = ["Sphinx (>=5.1.1,<6.0.0)"]
 
 [[package]]
 name = "pylint"
-version = "2.17.5"
+version = "2.17.6"
 description = "python code static checker"
 optional = false
 python-versions = ">=3.7.2"
 files = [
-    {file = "pylint-2.17.5-py3-none-any.whl", hash = "sha256:73995fb8216d3bed149c8d51bba25b2c52a8251a2c8ac846ec668ce38fab5413"},
-    {file = "pylint-2.17.5.tar.gz", hash = "sha256:f7b601cbc06fef7e62a754e2b41294c2aa31f1cb659624b9a85bcba29eaf8252"},
+    {file = "pylint-2.17.6-py3-none-any.whl", hash = "sha256:18a1412e873caf8ffb56b760ce1b5643675af23e6173a247b502406b24c716af"},
+    {file = "pylint-2.17.6.tar.gz", hash = "sha256:be928cce5c76bf9acdc65ad01447a1e0b1a7bccffc609fb7fc40f2513045bd05"},
 ]
 
 [package.dependencies]
-astroid = ">=2.15.6,<=2.17.0-dev0"
+astroid = ">=2.15.7,<=2.17.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
 dill = [
     {version = ">=0.2", markers = "python_version < \"3.11\""},
@@ -3831,20 +3831,19 @@ testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "pylookyloo"
-version = "1.21.0"
+version = "1.21.1"
 description = "Python CLI and module for Lookyloo"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pylookyloo-1.21.0-py3-none-any.whl", hash = "sha256:846c5544aa4842813a78d0385d0f05da269f6760268a58cdd5c91bd9d4ab5f4d"},
-    {file = "pylookyloo-1.21.0.tar.gz", hash = "sha256:799456641ea6dc875b347a8906a17328a2e5bc09365f3f5de2b384e4bd38b754"},
+    {file = "pylookyloo-1.21.1-py3-none-any.whl", hash = "sha256:2cd443b27e708c592634e844c1dce3917593ae6a54f2f4b0e8990fdc278cd2f0"},
 ]
 
 [package.dependencies]
 requests = ">=2.31.0,<3.0.0"
 
 [package.extras]
-docs = ["Sphinx (>=7.0.1,<8.0.0)"]
+docs = ["Sphinx (<7.2)", "Sphinx (>=7.2,<8.0)"]
 
 [[package]]
 name = "pymisp"
@@ -5035,35 +5034,35 @@ files = [
 
 [[package]]
 name = "types-pytz"
-version = "2023.3.1.0"
+version = "2023.3.1.1"
 description = "Typing stubs for pytz"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-pytz-2023.3.1.0.tar.gz", hash = "sha256:8e7d2198cba44a72df7628887c90f68a568e1445f14db64631af50c3cab8c090"},
-    {file = "types_pytz-2023.3.1.0-py3-none-any.whl", hash = "sha256:a660a38ed86d45970603e4f3b4877c7ba947668386a896fb5d9589c17e7b8407"},
+    {file = "types-pytz-2023.3.1.1.tar.gz", hash = "sha256:cc23d0192cd49c8f6bba44ee0c81e4586a8f30204970fc0894d209a6b08dab9a"},
+    {file = "types_pytz-2023.3.1.1-py3-none-any.whl", hash = "sha256:1999a123a3dc0e39a2ef6d19f3f8584211de9e6a77fe7a0259f04a524e90a5cf"},
 ]
 
 [[package]]
 name = "types-pyyaml"
-version = "6.0.12.11"
+version = "6.0.12.12"
 description = "Typing stubs for PyYAML"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-PyYAML-6.0.12.11.tar.gz", hash = "sha256:7d340b19ca28cddfdba438ee638cd4084bde213e501a3978738543e27094775b"},
-    {file = "types_PyYAML-6.0.12.11-py3-none-any.whl", hash = "sha256:a461508f3096d1d5810ec5ab95d7eeecb651f3a15b71959999988942063bf01d"},
+    {file = "types-PyYAML-6.0.12.12.tar.gz", hash = "sha256:334373d392fde0fdf95af5c3f1661885fa10c52167b14593eb856289e1855062"},
+    {file = "types_PyYAML-6.0.12.12-py3-none-any.whl", hash = "sha256:c05bc6c158facb0676674b7f11fe3960db4f389718e19e62bd2b84d6205cfd24"},
 ]
 
 [[package]]
 name = "types-redis"
-version = "4.6.0.6"
+version = "4.6.0.7"
 description = "Typing stubs for redis"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-redis-4.6.0.6.tar.gz", hash = "sha256:7865a843802937ab2ddca33579c4e255bfe73f87af85824ead7a6729ba92fc52"},
-    {file = "types_redis-4.6.0.6-py3-none-any.whl", hash = "sha256:e0e9dcc530623db3a41ec058ccefdcd5c7582557f02ab5f7aa9a27fe10a78d7e"},
+    {file = "types-redis-4.6.0.7.tar.gz", hash = "sha256:28c4153ddb5c9d4f10def44a2454673c361d2d5fc3cd867cf3bb1520f3f59a38"},
+    {file = "types_redis-4.6.0.7-py3-none-any.whl", hash = "sha256:05b1bf92879b25df20433fa1af07784a0d7928c616dc2ebf9087618db77ccbd0"},
 ]
 
 [package.dependencies]
@@ -5072,13 +5071,13 @@ types-pyOpenSSL = "*"
 
 [[package]]
 name = "types-requests"
-version = "2.31.0.2"
+version = "2.31.0.5"
 description = "Typing stubs for requests"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-requests-2.31.0.2.tar.gz", hash = "sha256:6aa3f7faf0ea52d728bb18c0a0d1522d9bfd8c72d26ff6f61bfc3d06a411cf40"},
-    {file = "types_requests-2.31.0.2-py3-none-any.whl", hash = "sha256:56d181c85b5925cbc59f4489a57e72a8b2166f18273fd8ba7b6fe0c0b986f12a"},
+    {file = "types-requests-2.31.0.5.tar.gz", hash = "sha256:e4153c2a4e48dcc661600fa5f199b483cdcbd21965de0b5e2df26e93343c0f57"},
+    {file = "types_requests-2.31.0.5-py3-none-any.whl", hash = "sha256:e2523825754b2832e04cdc1e731423390e731457890113a201ebca8ad9b40427"},
 ]
 
 [package.dependencies]
@@ -5332,13 +5331,13 @@ files = [
 
 [[package]]
 name = "weasyprint"
-version = "59.0"
+version = "60.0"
 description = "The Awesome Document Factory"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "weasyprint-59.0-py3-none-any.whl", hash = "sha256:a308d67c5e99f536b15527baaad4e91be0cf307317e0f66e8d934a0bc99bfb38"},
-    {file = "weasyprint-59.0.tar.gz", hash = "sha256:223a76636b3744eaa4ab8a2885f50cf46cf8ebb1acb99b5276d02feccf507492"},
+    {file = "weasyprint-60.0-py3-none-any.whl", hash = "sha256:42f7a2d5db24639aac6468d398b46dad128449b355dd39e6d2a2177563819c73"},
+    {file = "weasyprint-60.0.tar.gz", hash = "sha256:2a6befe33b5f18c8a24302577bf23d00c8533d0121175da3cfaf07870fa1787f"},
 ]
 
 [package.dependencies]
@@ -5347,7 +5346,7 @@ cssselect2 = ">=0.1"
 fonttools = {version = ">=4.0.0", extras = ["woff"]}
 html5lib = ">=1.1"
 Pillow = ">=9.1.0"
-pydyf = ">=0.6.0"
+pydyf = ">=0.8.0"
 Pyphen = ">=0.9.1"
 tinycss2 = ">=1.0.0"
 
@@ -5545,13 +5544,13 @@ files = [
 
 [[package]]
 name = "xlsxwriter"
-version = "3.1.4"
+version = "3.1.5"
 description = "A Python module for creating Excel XLSX files."
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "XlsxWriter-3.1.4-py3-none-any.whl", hash = "sha256:29c7bf5ade4de1f0bb487882eb45d4845eebc3ff72a68b2090df94d83e10b92e"},
-    {file = "XlsxWriter-3.1.4.tar.gz", hash = "sha256:f4b1b1ba046b50aefc0b634d465bce5bf8497530bc8625e216cf30a84ed97a46"},
+    {file = "XlsxWriter-3.1.5-py3-none-any.whl", hash = "sha256:a6d95556f96d6908885523554b3a468d74a711010d0a25b63d47e9ef4ba3bb94"},
+    {file = "XlsxWriter-3.1.5.tar.gz", hash = "sha256:27eba7b0f9a9ba2b091d5e77f0003a327e022a5fe3e24ee95a5fe5b75784cf45"},
 ]
 
 [[package]]
@@ -5752,4 +5751,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "e1975473b22585f8cd80f863d9145983c499591997f6ad9b9d84136a4dfb0d50"
+content-hash = "db19988ccd9c96bd120215c9916b4cbfb5930f8aa9b5d1a643f00b7df9a73183"
