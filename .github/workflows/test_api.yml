@@ -32,24 +32,37 @@ jobs:
         path: ../kvrocks
         key: ${{ runner.os }}-kvrocks
 
+    - name: Clone Kvrocks
+      uses: actions/checkout@v4
+      with:
+        repository: apache/kvrocks
+        path: kvrocks-tmp
+        ref: 2.5
+        submodules: true
+
     - name: Install kvrocks
       run: |
         sudo apt-get update
         sudo apt-get install gcc g++ make libsnappy-dev autoconf automake libtool libgtest-dev
+        mv kvrocks-tmp ../kvrocks
         pushd ..
-        git clone --recursive https://github.com/apache/incubator-kvrocks.git kvrocks
         pushd kvrocks
-        git checkout 2.5
         ./x.py build
         popd
         popd
 
+    - name: Clone Redis
+      uses: actions/checkout@v4
+      with:
+        repository: redis/redis
+        path: redis-tmp
+        ref: 7.2
+
     - name: Install redis
       run: |
+        mv redis-tmp ../redis
         pushd ..
-        git clone https://github.com/redis/redis.git
         pushd redis
-        git checkout 7.2
         make
         popd
         popd
@@ -64,12 +77,16 @@ jobs:
         poetry install
         echo PANDORA_HOME=`pwd` > .env
 
+    - name: Clone PyPandora
+      uses: actions/checkout@v4
+      with:
+        repository: pandora-analysis/pypandora
+        path: pypandora
+
     - name: Run API tests
       run: |
         poetry run start
         sleep 10
-
-        git clone https://github.com/pandora-analysis/pypandora.git
         pushd pypandora
         poetry install
         poetry run pytest tests/test_web.py
