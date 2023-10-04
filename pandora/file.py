@@ -295,7 +295,7 @@ class File:
                 p.start()
                 p.join()
             except TimeoutError as e:
-                raise Unsupported('Generating the preview took too long and had to be aborded.') from e
+                raise Unsupported('Generating the preview took too long and had to be aborted.') from e
 
         if self.is_svg:
             drawing = svg2rlg(self.path)
