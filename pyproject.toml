@@ -53,10 +53,7 @@ pikepdf = [
     {version = "<8", python = "<3.10"},
     {version = "^8.3.2", python = ">=3.10"}
 ]
-Pillow = [
-    {version = "<10", python = "<3.10"},
-    {version = "^10.0.1", python = ">=3.10"}
-]
+Pillow = "^10.0.1"
 imapclient = "^2.3.1"
 pyzipper = "^0.3.6"
 pymisp = {version = "^2.4.176", extras = ["fileobjects"]}
@@ -89,7 +86,7 @@ types-python-dateutil = "^2.8.19.14"
 bandit = {extras = ["toml"], version = "^1.7.5"}
 flake8 = "^6.1.0"
 semgrep = "^1.43.0"
-types-tzlocal = "^5.0.1.1"
+types-tzlocal = "^5.1.0.0"
 
 [build-system]
 requires = ["poetry-core"]
