@@ -48,7 +48,7 @@ sudo apt install build-essential tcl
 ```bash
 git clone https://github.com/redis/redis.git
 cd redis
-git checkout 7.0
+git checkout 7.2
 make
 # Optionally, you can run the tests:
 make test
@@ -72,7 +72,7 @@ sudo apt install git gcc g++ make cmake autoconf automake libtool python3 libssl
 ```bash
 git clone --recursive https://github.com/apache/incubator-kvrocks.git kvrocks
 cd kvrocks
-git checkout 2.5
+git checkout 2.6
 ./x.py build
 cd ..
 ```
@@ -108,7 +108,7 @@ The directory tree must look like that:
 ```bash
 sudo apt install python3-dev  # for compiling things
 sudo apt install libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0  # For HTML -> PDF
-sudo apt install libreoffice-base-nogui libreoffice-calc-nogui libreoffice-draw-nogui libreoffice-impress-nogui libreoffice-math-nogui libreoffice-writer-nogui  # For Office -> PDF
+sudo apt install libreoffice-nogui # For Office -> PDF
 sudo apt install exiftool  # for extracting exif information
 sudo apt install unrar  # for extracting rar files
 sudo apt install libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig  # for textract
