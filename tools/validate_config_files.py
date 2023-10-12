@@ -6,6 +6,7 @@ import argparse
 
 from pandora.default import get_homedir, ConfigError
 
+logger = logging.getLogger('Config validator')
 
 def validate_generic_config_file():
     sample_config = get_homedir() / 'config' / 'generic.json.sample'
@@ -85,7 +86,6 @@ def update_user_configs():
 
 
 if __name__ == '__main__':
-    logger = logging.getLogger('Config validator')
     parser = argparse.ArgumentParser(description='Check the config files.')
     parser.add_argument('--check', default=False, action='store_true', help='Check if the sample config and the user config are in-line')
     parser.add_argument('--update', default=False, action='store_true', help='Update the user config with the entries from the sample config if entries are missing')
