@@ -541,16 +541,17 @@ def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
             to_return['submit_size']['min'] = min(to_return['submit_size']['min'], size)
             to_return['submit_size']['max'] = max(to_return['submit_size']['max'], size)
             to_return['submit_size']['avg'] += size
-            if Status[t['status']] == Status.CLEAN:
-                to_return['metrics']['clean'] += 1
-            elif Status[t['status']] == Status.WARN:
-                to_return['metrics']['suspicious'] += 1
-            elif Status[t['status']] == Status.ALERT:
-                to_return['metrics']['malicious'] += 1
-            elif Status[t['status']] == Status.OVERWRITE:
-                to_return['metrics']['overwritten'] += 1
-            elif Status[t['status']] == Status.ERROR:
-                to_return['metrics']['error'] += 1
+            if 'status' in t:
+                if Status[t['status']] == Status.CLEAN:
+                    to_return['metrics']['clean'] += 1
+                elif Status[t['status']] == Status.WARN:
+                    to_return['metrics']['suspicious'] += 1
+                elif Status[t['status']] == Status.ALERT:
+                    to_return['metrics']['malicious'] += 1
+                elif Status[t['status']] == Status.OVERWRITE:
+                    to_return['metrics']['overwritten'] += 1
+                elif Status[t['status']] == Status.ERROR:
+                    to_return['metrics']['error'] += 1
     nb_alert = to_return['metrics']['malicious'] + to_return['metrics']['suspicious']
     if to_return['submit']['total']:
         to_return['submit_size']['avg'] = sizeof_fmt(to_return['submit_size']['avg'] / to_return['submit']['total'])
