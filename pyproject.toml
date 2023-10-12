@@ -23,7 +23,7 @@ flask-restx = "^1.1.0"
 gunicorn = {version = "^21.2.0", extras = ["setproctitle"]}
 Flask-Moment = "^1.0.5"
 Flask-Login = "^0.6.2"
-Bootstrap-Flask = "^2.3.1"
+Bootstrap-Flask = "^2.3.2"
 PyYAML = "^6.0.1"
 Flask-WTF = "^1.2.1"
 validators = "^0.22.0"
@@ -73,7 +73,7 @@ libfsapfs-python = "20221102"
 opencv-python = "^4.8.1.78"
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^2.17.7"
+pylint = "^3.0.1"
 ipython = [
     {version = "<8.13.0", python = "<3.9"},
     {version = "^8.13.0", python = ">=3.9"}
