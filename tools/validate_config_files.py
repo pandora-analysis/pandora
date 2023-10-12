@@ -8,6 +8,7 @@ from pandora.default import get_homedir, ConfigError
 
 logger = logging.getLogger('Config validator')
 
+
 def validate_generic_config_file():
     sample_config = get_homedir() / 'config' / 'generic.json.sample'
     with sample_config.open() as f:
