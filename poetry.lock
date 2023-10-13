@@ -3484,13 +3484,13 @@ files = [
 
 [[package]]
 name = "pycodestyle"
-version = "2.11.0"
+version = "2.11.1"
 description = "Python style guide checker"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pycodestyle-2.11.0-py2.py3-none-any.whl", hash = "sha256:5d1013ba8dc7895b548be5afb05740ca82454fd899971563d2ef625d090326f8"},
-    {file = "pycodestyle-2.11.0.tar.gz", hash = "sha256:259bcc17857d8a8b3b4a2327324b79e5f020a13c16074670f9c8c8f872ea76d0"},
+    {file = "pycodestyle-2.11.1-py2.py3-none-any.whl", hash = "sha256:44fe31000b2d866f2e41841b18528a505fbd7fef9017b04eff4e2648a0fadc67"},
+    {file = "pycodestyle-2.11.1.tar.gz", hash = "sha256:41ba0e7afc9752dfb53ced5489e89f8186be00e599e712660695b7a75ff2663f"},
 ]
 
 [[package]]
@@ -3794,8 +3794,7 @@ astroid = ">=3.0.0,<=3.1.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
 dill = [
     {version = ">=0.2", markers = "python_version < \"3.11\""},
-    {version = ">=0.3.7", markers = "python_version >= \"3.12\""},
-    {version = ">=0.3.6", markers = "python_version >= \"3.11\" and python_version < \"3.12\""},
+    {version = ">=0.3.6", markers = "python_version >= \"3.11\""},
 ]
 isort = ">=4.2.5,<6"
 mccabe = ">=0.6,<0.8"
@@ -5742,5 +5741,5 @@ test = ["pytest"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.8.1,<3.13"
-content-hash = "18a4984d7bb3d63f02f367189b776ccfe2dd567eb492f5da078461539c166890"
+python-versions = "^3.8.1,<3.12"
+content-hash = "8dad91d23cf13a2681dfc02cb0b310836ed4181e3bec6d7342bb84ba6a6503a0"

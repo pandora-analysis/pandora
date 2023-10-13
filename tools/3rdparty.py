@@ -4,12 +4,12 @@ import requests
 
 from pandora.default import get_homedir, safe_create_dir
 
-jquery_version = "3.6.4"
+jquery_version = "3.7.1"
 dropzone_version = "6.0.0-beta.2"
 moments_version = "2.29.4"
-datepicker_version = "1.9.0"
-chart_version = "3.9.1"
-datatables_version = '1.13.4'
+datepicker_version = "1.10.0"
+chart_version = "4.4.0"
+datatables_version = '1.13.6'
 
 if __name__ == '__main__':
     dest_dir_js = get_homedir() / 'website' / 'web' / 'static' / 'js' / 'lib'
@@ -29,7 +29,7 @@ if __name__ == '__main__':
         f.write(moments.content)
         print(f'Downloaded moments v{moments_version}.')
 
-    chart = requests.get(f'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/{chart_version}/chart.min.js', timeout=5)
+    chart = requests.get(f'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/{chart_version}/chart.umd.min.js', timeout=5)
     with (dest_dir_js / 'chart.min.js').open('wb') as f:
         f.write(chart.content)
         print(f'Downloaded chart v{chart_version}.')
