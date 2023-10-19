@@ -50,8 +50,8 @@ rarfile = "^4.1"
 publicsuffix2 = "^2.20191221"
 pymispwarninglists = "^1.5"
 pikepdf = [
-    {version = "<8", python = "<3.10"},
-    {version = "^8.3.2", python = ">=3.10"}
+    {version = "<9", python = "<3.10"},
+    {version = "^8.5.1", python = ">=3.10"}
 ]
 Pillow = "^10.1.0"
 imapclient = "^2.3.1"
@@ -75,7 +75,7 @@ opencv-python = "^4.8.1.78"
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.0.1"
 ipython = [
-    {version = "<8.13.0", python = "<3.9"},
+    {version = "<9.13.0", python = "<3.9"},
     {version = "^8.13.0", python = ">=3.9"}
 ]
 mypy = "^1.6.1"
