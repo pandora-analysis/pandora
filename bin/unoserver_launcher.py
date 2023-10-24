@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
 import contextlib
+import importlib
 import logging
 import logging.config
 import signal
+import sys
 import tempfile
 
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
-
-from unoserver.server import UnoServer  # type: ignore
 
 from pandora.default import AbstractManager, get_config
 
@@ -25,7 +25,10 @@ class UnoserverLauncher(AbstractManager):
         self.timeout = 3600
 
     def _launch_unoserver(self, temp_dir: str):
-        unoserver = UnoServer(user_installation=Path(temp_dir).as_uri())
+        sys.path.append('/usr/lib/python3/dist-packages')
+        module = importlib.import_module('unoserver.server')
+        sys.path.pop()
+        unoserver = module.UnoServer(user_installation=Path(temp_dir).as_uri())
         return unoserver.start(), datetime.now()
 
     @staticmethod

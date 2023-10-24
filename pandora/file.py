@@ -1,16 +1,13 @@
 import hashlib
-import importlib
 import logging
 import re
 import shutil
-import sys
 import traceback
 
 from datetime import datetime, timezone
-from functools import cached_property, lru_cache
+from functools import cached_property
 from io import BytesIO
 from pathlib import Path
-from threading import Thread
 from typing import Optional, List, Union, Dict, cast, Set, Tuple
 from uuid import uuid4
 from zipfile import ZipFile
@@ -32,20 +29,13 @@ from weasyprint import HTML, default_url_fetcher  # type: ignore
 from eml_parser import EmlParser
 from extract_msg import openMsg
 from extract_msg.msg_classes import MessageBase, AppointmentMeeting
+from unoserver.client import UnoClient  # type: ignore
 
 from .default import get_config
 from .exceptions import Unsupported, NoPreview, InvalidPandoraObject
 from .helpers import make_bool, make_bool_for_redis
 from .storage_client import Storage
 from .text_parser import TextParser
-
-
-@lru_cache
-def dirty_load_unoconverter():
-    sys.path.append('/usr/lib/python3/dist-packages')
-    module = importlib.import_module('unoserver.converter')
-    sys.path.pop()
-    return module
 
 
 def html_to_pdf(source: Union[str, bytes, Path], dest: str) -> None:
@@ -60,18 +50,6 @@ def html_to_pdf(source: Union[str, bytes, Path], dest: str) -> None:
     elif isinstance(source, Path):
         html = HTML(source, url_fetcher=default_url_fetcher if get_config('generic', 'weasyprint_fetch_ressources') else disable_fetch_weasyprint)
     html.write_pdf(dest)
-
-
-def office_to_pdf(source: Union[Path, bytes], dest: str) -> None:
-    converter = dirty_load_unoconverter().UnoConverter()
-    try:
-        if isinstance(source, Path):
-            converter.convert(source, outpath=dest)
-        elif isinstance(source, bytes):
-            converter.convert(indata=source, outpath=dest)
-    except AttributeError as e:
-        # Happens when the file is password protected, might be happening on other occasions
-        raise Unsupported(f"The Office document is probably password protected, this feature isn't supported yet - Error message: {e}.") from e
 
 
 class File:
@@ -233,6 +211,7 @@ class File:
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
         self.logger.setLevel(get_config('generic', 'loglevel'))
         self.storage = Storage()
+        self.libreoffice_client = UnoClient()
 
         # NOTE: they're alny used by the text conversion method, is it expected?
         self.error = ''
@@ -291,11 +270,10 @@ class File:
     def convert(self) -> None:
         if self.is_unoconv_concerned:
             try:
-                p = Thread(target=office_to_pdf, args=[self.path, f'{self.path}.pdf'], daemon=True)
-                p.start()
-                p.join()
-            except TimeoutError as e:
-                raise Unsupported('Generating the preview took too long and had to be aborted.') from e
+                self.libreoffice_client.convert(inpath=str(self.path), outpath=f'{self.path}.pdf')
+            except AttributeError as e:
+                # Happens when the file is password protected, might be happening on other occasions
+                raise Unsupported(f"The Office document is probably password protected, this feature isn't supported yet - Error message: {e}.") from e
 
         if self.is_svg:
             drawing = svg2rlg(self.path)
@@ -311,7 +289,7 @@ class File:
 
         if self.msg_data:
             if self.msg_data.body:
-                office_to_pdf(self.msg_data.body.encode(), f'{self.path}_body_txt.pdf')
+                self.libreoffice_client.convert(indata=self.msg_data.body.encode(), outpath=f'{self.path}_body_txt.pdf')
 
             try:
                 if self.msg_data.htmlBody:
@@ -328,14 +306,12 @@ class File:
                         if body_part_type == 'HTM':
                             html_to_pdf(body_part['content'], f'{self.path}_body_{i}.pdf')
                         elif body_part_type == 'TXT':
-                            converter = dirty_load_unoconverter().UnoConverter()
-                            converter.convert(indata=body_part['content'].encode(), outpath=f'{self.path}_body_{i}.pdf')
+                            self.libreoffice_client.convert(indata=body_part['content'].encode(), outpath=f'{self.path}_body_{i}.pdf')
                         else:
                             print('Unexpected body type:', body_part_type)
                     else:
                         # Assume txt
-                        converter = dirty_load_unoconverter().UnoConverter()
-                        converter.convert(indata=body_part['content'].encode(), outpath=f'{self.path}_body_{i}.pdf')
+                        self.libreoffice_client.convert(indata=body_part['content'].encode(), outpath=f'{self.path}_body_{i}.pdf')
 
     def make_previews(self) -> None:
         if self.is_pdf:
