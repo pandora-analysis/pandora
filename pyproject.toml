@@ -59,7 +59,7 @@ pyzipper = "^0.3.6"
 pymisp = {version = "^2.4.176", extras = ["fileobjects"]}
 python-dateutil = "^2.8.2"
 pycdlib = "^1.14.0"
-werkzeug = "^2.3.7"
+werkzeug = "^3.0.1"
 pyhashlookup = "^1.2.1"
 pylookyloo = "^1.22.1"
 hachoir = "^3.2.0"
