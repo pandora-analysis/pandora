@@ -4,6 +4,7 @@ import os
 import shutil
 import time
 import zipfile
+import zlib
 
 from bz2 import BZ2File
 from gzip import GzipFile
@@ -527,6 +528,64 @@ class Extractor(BaseWorker):
                 extracted.append((attachment.name, blob))
         return extracted
 
+    def _extract_daa(self, archive_file: File, report: Report, dest_dir: Path) -> List[Tuple[str, BytesIO]]:
+        def extract_header(data: bytes) -> Dict[str, bytes]:
+            header = {}
+            header['magic'] = data[:16]
+            header['size_first_offset'] = data[16:20]
+            header['version'] = data[20:24]
+            header['data_first_offset'] = data[24:28]
+            # not sure what the two there are for, but sure
+            header['b1'] = data[28:32]  # should be b'\x01\x00\x00\x00'
+            header['b0'] = data[32:36]  # should be b'\x00\x00\x00\x00'
+            header['chunksize'] = data[36:40]
+            header['isosize'] = data[40:48]
+            header['daasize'] = data[48:56]
+            header['hdata'] = data[56:72]  # should be b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            header['crc'] = data[72:76]
+            return header
+
+        def getting_chuncklist(header, data):
+            chunklist = []
+            size_first_offset = int.from_bytes(header['size_first_offset'], byteorder='little', signed=False)
+            data_first_offset = int.from_bytes(header['data_first_offset'], byteorder='little', signed=False)
+            for offset in range(size_first_offset, data_first_offset, 3):
+                chunksize1, chunksize2, chunksize3 = data[offset:offset + 3]
+                # We need to flip the byte : 0xAABBCC to 0xAACCBB
+                finalchunksizeB = [chunksize1, chunksize3, chunksize2]
+                finalchunksize = int.from_bytes(finalchunksizeB, 'big')
+                chunklist.append(finalchunksize)
+            return chunklist
+
+        def unpackdata(header, chunksizes, data):
+            raw = b""
+            offset = int.from_bytes(header['data_first_offset'], byteorder='little', signed=False)
+            for chunksize in chunksizes:
+                packeddata = data[offset:offset + chunksize]
+                offset += chunksize
+                raw += zlib.decompress(packeddata, -zlib.MAX_WBITS)
+            return raw
+
+        pseudo_file = archive_file.data
+        if not pseudo_file:
+            return []
+
+        header = extract_header(pseudo_file.getvalue())
+        if len(pseudo_file.getvalue()) != int.from_bytes(header['daasize'], byteorder='little', signed=False):
+            # length is incorrect.
+            self.logger.warning('Potentially invalid DAA file length')
+
+        crc = zlib.crc32(pseudo_file.getvalue()[0:72])
+        if crc != int.from_bytes(header['crc'], byteorder='little', signed=False):
+            # invalid crc
+            self.logger.warning('Invalid CRC')
+
+        chunklist = getting_chuncklist(header, pseudo_file.getvalue())
+        raw = unpackdata(header, chunklist, pseudo_file.getvalue())
+        if len(raw) != int.from_bytes(header['isosize'], byteorder='little', signed=False):
+            self.logger.warning('Potentially invalid ISO file length')
+        return [('internal_iso_in_daa.iso', BytesIO(raw))]
+
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
         # The files supported by dfvfs generally don't have proper mime types, so we just try it on everything.
         dfvfs_info = self.check_dfvfs(task.file, True)
@@ -598,6 +657,8 @@ class Extractor(BaseWorker):
                         report.clear_details()
                         report.reset_status()
                         extracted = self._extract_zip(task.file, report, extracted_dir, pyzipper.AESZipFile)
+                elif task.file.mime_type == "application/pandora-daa":
+                    extracted = self._extract_daa(task.file, report, extracted_dir)
                 else:
                     raise PandoraException(f'Unsupported mimetype: {task.file.mime_type}')
             except BaseException as e:

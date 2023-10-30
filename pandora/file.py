@@ -66,6 +66,7 @@ class File:
         'application/x-rar': ['ARC', 'rar'],
         'application/x-iso9660-image': ['ARC', 'iso'],
         'application/vnd.ms-cab-compressed': ['ARC', 'cab'],
+        'application/pandora-daa': ['ARC', 'daa'],  # Manually set.
         'text/css': ['CSS', 'css'],
         'text/csv': ['CSV', 'csv'],
         'application/msword': ['DOC', 'doc'],
@@ -436,6 +437,13 @@ class File:
     def mime_type(self) -> str:
         if not self._mime_type and self.data:
             self._mime_type = magic.from_buffer(self.data.getvalue(), mime=True)
+            # Some files are recognized but don't have a mimetype
+            if self._mime_type == 'application/octet-stream':
+                human_type = magic.from_buffer(self.data.getvalue())
+                if human_type == 'PowerISO Direct-Access-Archive':
+                    # # Daa - https://isc.sans.edu/diary/The+DAA+File+Format/25246 - #407
+                    self._mime_type = "application/pandora-daa"
+
         return self._mime_type
 
     @mime_type.setter
