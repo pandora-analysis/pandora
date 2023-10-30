@@ -441,7 +441,7 @@ class File:
             if self._mime_type == 'application/octet-stream':
                 human_type = magic.from_buffer(self.data.getvalue())
                 if human_type == 'PowerISO Direct-Access-Archive':
-                    # # Daa - https://isc.sans.edu/diary/The+DAA+File+Format/25246 - #407
+                    # # DAA - https://isc.sans.edu/diary/The+DAA+File+Format/25246 - #407
                     self._mime_type = "application/pandora-daa"
 
         return self._mime_type
