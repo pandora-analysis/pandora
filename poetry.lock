@@ -1547,21 +1547,17 @@ files = [
 
 [[package]]
 name = "imapclient"
-version = "2.3.1"
+version = "3.0.0"
 description = "Easy-to-use, Pythonic and complete IMAP client library"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7.0"
 files = [
-    {file = "IMAPClient-2.3.1-py2.py3-none-any.whl", hash = "sha256:057f28025d2987c63e065afb0e4370b0b850b539b0e1494cea0427e88130108c"},
-    {file = "IMAPClient-2.3.1.zip", hash = "sha256:26ea995664fae3a88b878ebce2aff7402931697b86658b7882043ddb01b0e6ba"},
+    {file = "IMAPClient-3.0.0-py2.py3-none-any.whl", hash = "sha256:31ec03da31f82fb380fdc0c79a9c31272789b50680285ade6581338c17ad8bf3"},
+    {file = "IMAPClient-3.0.0.zip", hash = "sha256:93a283c733288639b07989ffcf950f4046c831f1107f634de63b4e1ef9b75eb5"},
 ]
-
-[package.dependencies]
-six = "*"
 
 [package.extras]
 doc = ["sphinx"]
-test = ["mock (>=1.3.0)"]
 
 [[package]]
 name = "importlib-metadata"
@@ -5409,4 +5405,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "cd614ce044739121bcf28e23f79dde2ee4989ad3eb73b7172a98dd34ab54bd73"
+content-hash = "e1119d9b225d271b22419605806d34442a006c061150b76196d3e136fd1a5245"
