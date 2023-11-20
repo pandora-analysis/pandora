@@ -7,7 +7,7 @@ from .exceptions import PandoraException  # noqa
 # and allow to update them easily.
 # You should not have to change anything in this file below this line.
 
-import os  # noqa
+import os  # noqa pylint: disable=wrong-import-order
 
 from .abstractmanager import AbstractManager  # noqa
 
