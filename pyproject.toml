@@ -53,7 +53,7 @@ pikepdf = "^8.7.1"
 Pillow = "^10.1.0"
 imapclient = "^3.0.0"
 pyzipper = "^0.3.6"
-pymisp = {version = "^2.4.178", extras = ["fileobjects"]}
+pymisp = {version = "^2.4.179", extras = ["fileobjects"]}
 python-dateutil = "^2.8.2"
 pycdlib = "^1.14.0"
 werkzeug = "^2.3.8"
