@@ -69,7 +69,7 @@ dfdatetime = "^20230506"
 libewf-python = "^20231119"  # No non-testing release for this one, YOLO
 libfsntfs-python = "^20231119"  # No non-testing release for this one, YOLO
 dtfabric = "^20230520"  # No non-testing release for this one, YOLO
-libfsapfs-python = "^20231115" # No non-testing release for this one, YOLO
+libfsapfs-python = "^20231122" # No non-testing release for this one, YOLO
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.0.2"
