@@ -1955,17 +1955,17 @@ files = [
 
 [[package]]
 name = "libfsapfs-python"
-version = "20231115"
+version = "20231122"
 description = "Python bindings module for libfsapfs"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "libfsapfs-python-20231115.tar.gz", hash = "sha256:0c471b7d479aa0ba69c8e30b8233b5c52bff46c2a0434a2d28b4826096a9cf6c"},
-    {file = "libfsapfs_python-20231115-cp310-cp310-macosx_12_0_x86_64.whl", hash = "sha256:aae39dddf5e9325a71b0386ae56d895a0f3c6b81af70889ad2783d939f232633"},
-    {file = "libfsapfs_python-20231115-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:d6697c07586e75631bde0ed3ca35670b6b932316557c0ae72389d73cfe2c3204"},
-    {file = "libfsapfs_python-20231115-cp312-cp312-macosx_12_0_x86_64.whl", hash = "sha256:68287233641c2a3c05f6054ed3c67ad5f2e27155b9951cfc6a31f72bff596f45"},
-    {file = "libfsapfs_python-20231115-cp38-cp38-macosx_12_0_x86_64.whl", hash = "sha256:046f82fd9de9f9dbb973e76a14f3c553b46e711240226d725dbf8d84f6c48417"},
-    {file = "libfsapfs_python-20231115-cp39-cp39-macosx_12_0_x86_64.whl", hash = "sha256:8941879dd94839261844c9df392cce975d5e0b136a10ac40979fdaf9076a6f04"},
+    {file = "libfsapfs-python-20231122.tar.gz", hash = "sha256:090fbfc55b8dbd6e4fe8aa9cfbd4d69e3c3dce74ea2becbff632f5e027f067bd"},
+    {file = "libfsapfs_python-20231122-cp310-cp310-macosx_12_0_x86_64.whl", hash = "sha256:033aebc8ed4ffba01a8a14c14667512a787e4f9d493cb3e7f451289061804060"},
+    {file = "libfsapfs_python-20231122-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:4ba9674c9c50947211465c28445abe24a189415baa22ca57c3a5f4e631192fab"},
+    {file = "libfsapfs_python-20231122-cp312-cp312-macosx_12_0_x86_64.whl", hash = "sha256:0dd513a137616d772aa786fbbef9459d579d6675730638a2fdb9f3c91e3b2dd1"},
+    {file = "libfsapfs_python-20231122-cp38-cp38-macosx_12_0_x86_64.whl", hash = "sha256:715bfa504e08d67bbbaa6f990191e36b27bfbf9d1e56eda8a6796ef3b6775eea"},
+    {file = "libfsapfs_python-20231122-cp39-cp39-macosx_12_0_x86_64.whl", hash = "sha256:d85d5383b5a2fdc3b55f7ac47e7f17ea4bbb50d356904fee8b400b1826407f6e"},
 ]
 
 [[package]]
@@ -2012,12 +2012,12 @@ files = [
 
 [[package]]
 name = "libfsntfs-python"
-version = "20231119"
+version = "20231125"
 description = "Python bindings module for libfsntfs"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "libfsntfs-python-20231119.tar.gz", hash = "sha256:ca0e0d233ab346913d2759142d7bc8e333a69c2c314541dd47ccebdacbc86c64"},
+    {file = "libfsntfs-python-20231125.tar.gz", hash = "sha256:e23c5e9938a8cc0ba778dbebb1be29a2e3b84a1e16d9d4cefa3cb37608b320ad"},
 ]
 
 [[package]]
@@ -5367,4 +5367,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "472a0973eb7388b1c2ccf81e6f589d1d5df6d636f44bb48afccf495b4da5e639"
+content-hash = "7b0b390be94cb844fa738050dc53b626e77f03c98fe90692bfd913cdb59714d5"
