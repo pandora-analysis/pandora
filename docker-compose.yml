@@ -33,7 +33,7 @@ services:
         - ./cache:/pandora/cache
         - ./storage:/pandora/storage
         - ./pandora/workers:/pandora/pandora/workers
-        - ./config:/pandora/config
+        - ./config/docker.json:/pandora/config/generic.json
         - ./yara_rules:/pandora/yara_rules
         - ./yara_repos:/pandora/yara_repos
         - ./logs:/pandora/logs
