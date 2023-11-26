@@ -6,9 +6,7 @@ services:
     working_dir: /kvrocks
     volumes:
         - ./storage:/kvrocks/conf
-    ports:
-        - 6101:6101
-
+    command: "--bind 0.0.0.0"
   redis:
     image: redis
     working_dir: /cache
