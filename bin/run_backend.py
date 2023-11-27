@@ -15,6 +15,7 @@ from pandora.default import get_homedir, get_socket_path, get_config
 
 def check_running(name: str) -> bool:
     if name == "storage":
+        print("If you're running pandora with docker-compose, don't forget to change storage_db_hostname in config/generic.json. It should be \"kvrocks\".")
         r = Redis(get_config('generic', 'storage_db_hostname'), get_config('generic', 'storage_db_port'))
     else:
         socket_path = get_socket_path(name)

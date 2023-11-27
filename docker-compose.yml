@@ -6,13 +6,17 @@ services:
     working_dir: /kvrocks
     volumes:
         - ./storage:/kvrocks/conf
+    ports:
+        - 6101:6666
     command: "--bind 0.0.0.0"
+
   redis:
-    image: redis
+    image: redis:7
     working_dir: /cache
     command: ./cache.conf --daemonize no
     volumes:
         - ./cache:/cache
+
   clamav:
     image: clamav/clamav
     volumes:
@@ -34,7 +38,6 @@ services:
         - ./storage:/pandora/storage
         - ./pandora/workers:/pandora/pandora/workers
         - ./config:/pandora/config
-        - ./config/docker.json:/pandora/config/generic.json
         - ./yara_rules:/pandora/yara_rules
         - ./yara_repos:/pandora/yara_repos
         - ./logs:/pandora/logs

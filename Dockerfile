@@ -34,6 +34,6 @@ COPY README.md .
 COPY LICENSE .
 
 RUN mkdir cache storage tasks
-RUN echo PANDORA_HOME="`pwd`" >> .env
-RUN poetry install
+RUN echo PANDORA_HOME="`pwd`" > .env
+RUN poetry install --without=dev
 RUN poetry run tools/3rdparty.py
