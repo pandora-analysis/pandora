@@ -8,7 +8,7 @@ the administration console is: [http://pandora/admin](http://pandora/admin)
 
 ### Users’ admins
 
-in generic.conf , add users in the key users
+in generic.json , add users in the key users
 
 ```json
   {
