@@ -23,7 +23,7 @@ flask-restx = "^1.2.0"
 gunicorn = {version = "^21.2.0", extras = ["setproctitle"]}
 Flask-Moment = "^1.0.5"
 Flask-Login = "^0.6.3"
-Bootstrap-Flask = "^2.3.2"
+Bootstrap-Flask = "^2.3.3"
 PyYAML = "^6.0.1"
 Flask-WTF = "^1.2.1"
 validators = "^0.22.0"
