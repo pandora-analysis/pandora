@@ -1561,13 +1561,13 @@ doc = ["sphinx"]
 
 [[package]]
 name = "importlib-metadata"
-version = "6.9.0"
+version = "7.0.0"
 description = "Read metadata from Python packages"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "importlib_metadata-6.9.0-py3-none-any.whl", hash = "sha256:1c8dc6839ddc9771412596926f24cb5a553bbd40624ee2c7e55e531542bed3b8"},
-    {file = "importlib_metadata-6.9.0.tar.gz", hash = "sha256:e8acb523c335a91822674e149b46c0399ec4d328c4d1f6e49c273da5ff0201b9"},
+    {file = "importlib_metadata-7.0.0-py3-none-any.whl", hash = "sha256:d97503976bb81f40a193d41ee6570868479c69d5068651eb039c40d850c59d67"},
+    {file = "importlib_metadata-7.0.0.tar.gz", hash = "sha256:7fc841f8b8332803464e5dc1c63a2e59121f46ca186c0e2e182e80bf8c1319f7"},
 ]
 
 [package.dependencies]
@@ -1898,17 +1898,18 @@ testing = ["pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)",
 
 [[package]]
 name = "lark"
-version = "1.1.5"
+version = "1.1.8"
 description = "a modern parsing library"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 files = [
-    {file = "lark-1.1.5-py3-none-any.whl", hash = "sha256:8476f9903e93fbde4f6c327f74d79e9b4bd0ed9294c5dfa3164ab8c581b5de2a"},
-    {file = "lark-1.1.5.tar.gz", hash = "sha256:4b534eae1f9af5b4ea000bea95776350befe1981658eea3820a01c37e504bb4d"},
+    {file = "lark-1.1.8-py3-none-any.whl", hash = "sha256:7d2c221a66a8165f3f81aacb958d26033d40d972fdb70213ab0a2e0627e29c86"},
+    {file = "lark-1.1.8.tar.gz", hash = "sha256:7ef424db57f59c1ffd6f0d4c2b705119927f566b68c0fe1942dddcc0e44391a5"},
 ]
 
 [package.extras]
 atomic-cache = ["atomicwrites"]
+interegular = ["interegular (>=0.3.1,<0.4.0)"]
 nearley = ["js2py"]
 regex = ["regex"]
 
@@ -1930,12 +1931,12 @@ regex = ["regex"]
 
 [[package]]
 name = "libbde-python"
-version = "20231120"
+version = "20231204"
 description = "Python bindings module for libbde"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "libbde-python-20231120.tar.gz", hash = "sha256:eee988d8b44c534270a8004e365e01690c769ea6b2334e30fa45650034253b2e"},
+    {file = "libbde-python-20231204.tar.gz", hash = "sha256:a0a5abcee08e5103b32ce7e71e238501bd9cfc98e63946fdf3abcb048e620976"},
 ]
 
 [[package]]
@@ -4259,17 +4260,17 @@ files = [
 
 [[package]]
 name = "rtfde"
-version = "0.1.0"
+version = "0.1.1"
 description = "A library for extracting HTML content from RTF encapsulated HTML as commonly found in the exchange MSG email format."
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.8"
 files = [
-    {file = "RTFDE-0.1.0-py3-none-any.whl", hash = "sha256:a110dbef435803f3fba717d51a7b9c7a92695c2461637cc6eaf36a9f54386e26"},
-    {file = "RTFDE-0.1.0.tar.gz", hash = "sha256:12215ee59856208010b9200c19afe0f9fa13a3fb39f44015979299c248cbacd7"},
+    {file = "RTFDE-0.1.1-py3-none-any.whl", hash = "sha256:ea7ab0e0b9d4af08415f5017ecff91d74e24216a5e4e4682155cedc478035e99"},
+    {file = "RTFDE-0.1.1.tar.gz", hash = "sha256:9e43485e79b2dd1018127735d8134f65d2a9d73af314d2a101f10346333b241e"},
 ]
 
 [package.dependencies]
-lark = "1.1.5"
+lark = "1.1.8"
 oletools = ">=0.56"
 
 [package.extras]
