@@ -26,7 +26,7 @@ from pandora.mail import Mail
 from pandora.role import Action
 from pandora.task import Task
 from pandora.file import File
-from pandora.helpers import roles_from_config, workers, Status
+from pandora.helpers import roles_from_config, Status
 
 from .helpers import admin_required, update_user_role, build_users_table, load_user_from_request, sizeof_fmt
 
@@ -143,9 +143,8 @@ class ApiSubmit(Resource):
             raise Unsupported('file required')
 
         file_bytes = BytesIO(submitted_file.read())
-        # check if file is empty. Do not run any worker if it is the case.
         if file_bytes.getvalue().strip() == b'':
-            disabled_workers = list(workers())
+            return {'success': False, 'error': 'You attempted to submit an empty file. Wait for the page to reload...'}, 400
         disabled_workers = request.form["workersDisabled"].split(",") if request.form.get("workersDisabled") else []
         password = request.form['password'] if request.form.get('password') else args.get('password')
         try:

@@ -98,8 +98,8 @@
   <div id="template" class="file-row">
     <!-- This is used as the file preview template -->
     <div>
-        <p class="name" data-dz-name></p>
-        <strong class="error text-danger" data-dz-errormessage></strong>
+        <div class="dz-filename"><p class="name" data-dz-name></p></div>
+        <div class="dz-error-message"><strong class="error text-danger" data-dz-errormessage></strong></div>
     </div>
     <div>
         <p class="size" data-dz-size></p>
@@ -143,6 +143,23 @@
       window.setTimeout(function(){
         window.location = `/analysis/${answer.taskId}`;
       }, 100);
+    },
+    error: function(file, message){
+      if (file.previewElement) {
+        file.previewElement.classList.add("dz-error");
+        if (typeof message !== "string" && message.error) {
+          message = message.error;
+        }
+        for (let node of file.previewElement.querySelectorAll(
+          "[data-dz-errormessage]"
+        )) {
+          node.textContent = message;
+        }
+      }
+      $("div#dropzone").hide();
+      window.setTimeout(function(){
+        window.location = `/submit`;
+      }, 2000);
     },
   });
 </script>
