@@ -850,17 +850,14 @@ dev = ["PyTest", "PyTest-Cov", "bump2version (<1)", "sphinx (<2)", "tox"]
 
 [[package]]
 name = "dfdatetime"
-version = "20230506"
+version = "20231205"
 description = "Digital Forensics date and time (dfDateTime)."
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "dfdatetime-20230506-py2.py3-none-any.whl", hash = "sha256:91441058c089de8822cf01d0a93acd5112a2d08ad7861ed3fe4cff1cd185ab79"},
-    {file = "dfdatetime-20230506.tar.gz", hash = "sha256:ed8209d9555e055403dc9f938bbe2dbc804f269e3261d9d36dc683c24aaba146"},
+    {file = "dfdatetime-20231205-py2.py3-none-any.whl", hash = "sha256:024ace9cd270ca1ad81d87e4315559dde1ab071340e70577b28bdb12506259f2"},
+    {file = "dfdatetime-20231205.tar.gz", hash = "sha256:386dba75f5923ed3a47b05f9d27f36a9ad729f5ac6b668ca28cd2dfee65412d8"},
 ]
-
-[package.dependencies]
-pip = ">=7.0.0"
 
 [[package]]
 name = "dfvfs"
@@ -1931,12 +1928,12 @@ regex = ["regex"]
 
 [[package]]
 name = "libbde-python"
-version = "20231204"
+version = "20231205"
 description = "Python bindings module for libbde"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "libbde-python-20231204.tar.gz", hash = "sha256:a0a5abcee08e5103b32ce7e71e238501bd9cfc98e63946fdf3abcb048e620976"},
+    {file = "libbde-python-20231205.tar.gz", hash = "sha256:53a9e5ce90f6bd1cc97c4234aeb0fa679dae2433a784bfd1ddab21634e8ad4e1"},
 ]
 
 [[package]]
@@ -2056,17 +2053,12 @@ files = [
 
 [[package]]
 name = "libluksde-python"
-version = "20231128"
+version = "20231204"
 description = "Python bindings module for libluksde"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "libluksde-python-20231128.tar.gz", hash = "sha256:46fd4274b23a6df404f64263e10ec9ea907a4040053157cea56600ab412bca98"},
-    {file = "libluksde_python-20231128-cp310-cp310-macosx_12_0_x86_64.whl", hash = "sha256:27fa427a9714b4aca52c12b4cb8e7f0ea0968e3443657f8a87675a98fe7cf0ae"},
-    {file = "libluksde_python-20231128-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:c7c7bb92bc3655682924db27623728e75343832bfba34123d1e17145c95ad659"},
-    {file = "libluksde_python-20231128-cp312-cp312-macosx_12_0_x86_64.whl", hash = "sha256:3a64d99a4a374baa3b67b1aa133aab390abd04c74c5476badccfba6da50d93ce"},
-    {file = "libluksde_python-20231128-cp38-cp38-macosx_12_0_x86_64.whl", hash = "sha256:4b04135e59e2033eae669f570280490b8f582c7afb29cb957bc6a50fd20b14ad"},
-    {file = "libluksde_python-20231128-cp39-cp39-macosx_12_0_x86_64.whl", hash = "sha256:1a8a66ad1571515225d30eb93813082672f2240334dd20823769e0a8bd89d98a"},
+    {file = "libluksde-python-20231204.tar.gz", hash = "sha256:48c5a667beac24eadc0b8615d936b6da0763f86aa0d7f28385deb5fb133b061f"},
 ]
 
 [[package]]
@@ -3078,13 +3070,13 @@ files = [
 
 [[package]]
 name = "platformdirs"
-version = "4.0.0"
+version = "4.1.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "platformdirs-4.0.0-py3-none-any.whl", hash = "sha256:118c954d7e949b35437270383a3f2531e99dd93cf7ce4dc8340d3356d30f173b"},
-    {file = "platformdirs-4.0.0.tar.gz", hash = "sha256:cb633b2bcf10c51af60beb0ab06d2f1d69064b43abf4c185ca6b28865f3f9731"},
+    {file = "platformdirs-4.1.0-py3-none-any.whl", hash = "sha256:11c8f37bcca40db96d8144522d925583bdb7a31f7b0e37e3ed4318400a8e2380"},
+    {file = "platformdirs-4.1.0.tar.gz", hash = "sha256:906d548203468492d432bcb294d4bc2fff751bf84971fbb2c10918cc206ee420"},
 ]
 
 [package.extras]
