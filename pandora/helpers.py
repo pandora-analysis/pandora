@@ -167,7 +167,7 @@ def get_public_suffix_list() -> PublicSuffixList:
 
 @lru_cache(64)
 def get_warninglists() -> WarningLists:
-    return WarningLists(slow_search=True)
+    return WarningLists(slow_search=False)
 
 
 @lru_cache(64)

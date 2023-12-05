@@ -634,7 +634,6 @@ class File:
             observables['url'].update(tp.urls)
             observables['hostname'].update(tp.hostnames)
             observables['email'].update(tp.emails)
-
         return observables
 
     @cached_property

@@ -124,7 +124,7 @@ class BaseWorker(multiprocessing.Process):
         while True:
             new_stream = self.redis.xreadgroup(
                 groupname=self.module, consumername=self.name, streams={'tasks_queue': '>'},
-                block=2000, count=1
+                count=1, block=2000
             )
             if new_stream:
                 break
@@ -162,17 +162,18 @@ class BaseWorker(multiprocessing.Process):
                 try:
                     if self.disabled:
                         report.status = Status.DISABLED
-                    else:
-                        report.status = Status.RUNNING
+                        # NOTE: continue still runs the finally block
+                        continue
 
-                    if not self.disabled:
-                        # Store report to make status available to UI
-                        self.storage.set_report(report.to_dict)
-                        with self._timeout_context(logger):
-                            self.analyse(task, report, self.module == manual_worker)
+                    report.status = Status.RUNNING
+                    # Store report to make status available to UI
+                    self.storage.set_report(report.to_dict)
+
+                    with self._timeout_context(logger):
+                        self.analyse(task, report, self.module == manual_worker)
                 except TimeoutError:
                     e = f'timeout on analyse call after {self.timeout}s'
-                    logger.error(e)
+                    logger.warning(e)
                     report.status = Status.ERROR
                 except Exception as e:
                     # TODO: bubble up the error to the user (if safe, may want to do that on a module by module basis)

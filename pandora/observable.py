@@ -16,6 +16,8 @@ from .storage_client import Storage
 
 class Observable:
 
+    all_warninglists = get_warninglists()
+
     @classmethod
     def new_observable(cls, value: str, observable_type: str, seen: Optional[datetime]=None):
         if not seen:
@@ -92,8 +94,8 @@ class Observable:
         if warninglists:
             if isinstance(warninglists, str):
                 for wl in json.loads(warninglists):
-                    if get_warninglists().get(wl):
-                        self.warninglists.append(get_warninglists()[wl])
+                    if wl := self.all_warninglists.get(wl):
+                        self.warninglists.append(wl)
                     else:
                         self.logger.warning(f'Unable to find warning list {wl}')
             elif isinstance(warninglists, list):
@@ -107,7 +109,7 @@ class Observable:
         return False
 
     def check_warninglists(self):
-        self.warninglists = get_warninglists().search(self.value)
+        self.warninglists = self.all_warninglists.search(self.value)
 
     @cached_property
     def status(self) -> Status:

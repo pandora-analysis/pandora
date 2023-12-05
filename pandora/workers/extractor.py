@@ -723,17 +723,19 @@ class Extractor(BaseWorker):
             report.add_details('Warning', 'Looks like the archive is empty (?). This is suspicious.')
         elif report.status not in [Status.ERROR, Status.WARN, Status.ALERT, Status.OVERWRITE]:
             # wait for all the workers to finish, or have one of them raising an ALERT
-            got_alert = False
-            while not all(t.workers_done for t in tasks):
-                for t in tasks:
-                    # If any of the task is marked as ALERT or OVERWRITE, we can quit.
-                    if t.workers_done and t.status >= Status.ALERT:
-                        report.add_details('Warning', 'There are suspicious files in this archive, click on the "Extracted" tab for more.')
-                        got_alert = True
-                        break
-                if got_alert:
-                    break
-                time.sleep(1)
-            all_status = [t.status for t in tasks if t.workers_done]
-            if all_status:
-                report.status = max(all_status)
+            try:
+                while not all(t.workers_done for t in tasks):
+                    for t in tasks:
+                        # If any of the task is marked as ALERT or OVERWRITE, we can quit.
+                        if t.workers_done and t.status >= Status.ALERT:
+                            report.add_details('Warning', 'There are suspicious files in this archive, click on the "Extracted" tab for more.')
+                            break
+                    time.sleep(1)
+            except TimeoutError:
+                # The extracted tasks can take a very long time, force the status in that case
+                report.add_details('Warning', 'The extracted task(s) took too long, click on the "Extracted" tab for more.')
+                report.status = Status.OVERWRITE
+            else:
+                all_status = [t.status for t in tasks if t.workers_done]
+                if all_status:
+                    report.status = max(all_status)
