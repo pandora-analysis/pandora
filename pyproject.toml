@@ -63,7 +63,7 @@ hachoir = "^3.2.0"
 aiohttp = "^3.9.1"
 opencv-python = "^4.8.1.78"
 # The libyall libs
-dfvfs = "^20230531"
+dfvfs = "^20231205"
 # The libyall libs that are sneakily for testing purpose only
 
 [tool.poetry.group.dev.dependencies]
