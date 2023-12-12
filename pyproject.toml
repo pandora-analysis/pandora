@@ -34,7 +34,7 @@ textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.6"
 eml-parser = "^1.17.5"
 unoserver = "^2.0"
-weasyprint = "^60.1"
+weasyprint = "^60.2"
 extract-msg = {version = "^0.47.0"}
 oletools = {version = "0.60.1", extras = ["full"]}
 py7zr = "^0.20.8"
@@ -59,7 +59,7 @@ pycdlib = "^1.14.0"
 werkzeug = "^3.0.1"
 pyhashlookup = "^1.2.1"
 pylookyloo = "^1.22.2"
-hachoir = "^3.2.0"
+hachoir = "^3.3.0"
 aiohttp = "^3.9.1"
 opencv-python = "^4.8.1.78"
 # The libyall libs
@@ -67,7 +67,7 @@ dfvfs = "^20230531"
 # The libyall libs that are sneakily for testing purpose only
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^3.0.2"
+pylint = "^3.0.3"
 ipython = [
     {version = "<8.13.0", python = "<3.9"},
     {version = "^8.13.0", python = ">=3.9"}
