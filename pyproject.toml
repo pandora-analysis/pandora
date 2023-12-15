@@ -54,7 +54,7 @@ pikepdf = "^8.9.0"
 Pillow = "^10.1.0"
 imapclient = "^3.0.1"
 pyzipper = "^0.3.6"
-pymisp = {version = "^2.4.179", extras = ["fileobjects"]}
+pymisp = {version = "^2.4.182", extras = ["fileobjects"]}
 python-dateutil = "^2.8.2"
 pycdlib = "^1.14.0"
 werkzeug = "^3.0.1"
@@ -77,11 +77,11 @@ ipython = [
 mypy = "^1.7.1"
 types-redis = {version = "^4.6.0.11"}
 types-PyYAML = "^6.0.12.12"
-types-requests = "==2.31.0.6"
+types-requests = "^2.31.0.10"
 types-python-dateutil = "^2.8.19.14"
 bandit = {extras = ["toml"], version = "^1.7.6"}
 flake8 = "^6.1.0"
-semgrep = "^1.52.0"
+semgrep = "^1.53.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
