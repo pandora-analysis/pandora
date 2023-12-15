@@ -303,5 +303,5 @@ class Task:
         # Delegate population to file class as the objects will depend on the filetype.
         self.file.populate_misp_event(event)
         for observable in self.observables:
-            event.add_attribute(observable.observable_type, observable.value)
+            event.add_attribute(observable.observable_type, observable.value, to_ids=False)
         return event
