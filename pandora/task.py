@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from .default import get_homedir, safe_create_dir, PandoraException, get_config
 from .exceptions import TooManyObservables, Unsupported
 from .file import File
-from .helpers import Status, workers
+from .helpers import Status, workers, Seed
 from .observable import Observable
 from .report import Report
 from .storage_client import Storage
@@ -128,6 +128,7 @@ class Task:
         else:
             self.password = ''  # nosec B105
         self.store()
+        self.seed_manager = Seed()
 
     @property
     def user(self) -> Optional[User]:
@@ -294,8 +295,11 @@ class Task:
         public_url = get_config('generic', 'public_url')
         event = MISPEvent()
         event.info = f'Pandora analysis ({self.file.original_filename})'
-        pandora_link: MISPAttribute = event.add_attribute('link', f'{public_url}/analysis/{self.uuid}')  # type: ignore
+        seed, _ = self.seed_manager.add(self.uuid, None)
+        pandora_link: MISPAttribute = event.add_attribute('link', f'{public_url}/analysis/{self.uuid}/seed-{seed}')  # type: ignore
         pandora_link.distribution = 0
+        internal_ref: MISPAttribute = event.add_attribute('comment', self.uuid, category="Internal reference")  # type: ignore
+        internal_ref.distribution = 0
         # Delegate population to file class as the objects will depend on the filetype.
         self.file.populate_misp_event(event)
         for observable in self.observables:

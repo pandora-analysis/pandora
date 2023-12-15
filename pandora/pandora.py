@@ -2,17 +2,16 @@
 
 import json
 import logging
-import secrets
 
 from datetime import datetime
-from typing import Optional, Union, Tuple, List, Set
+from typing import Optional, Union, List, Set
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
 
 from .default import get_config, get_socket_path
 from .exceptions import InvalidPandoraObject, PandoraException
-from .helpers import roles_from_config, expire_in_sec
+from .helpers import roles_from_config, Seed
 from .report import Report
 from .role import Role, RoleName
 from .task import Task
@@ -35,6 +34,8 @@ class Pandora():
             path=get_socket_path('cache'))
 
         self.storage: Storage = Storage()
+
+        self.seed = Seed()
 
         # probably move that somewhere else
         if not self.storage.has_roles():
@@ -166,22 +167,8 @@ class Pandora():
 
     # #### Seed ####
 
-    def get_seed_uuid(self, seed: str) -> Optional[str]:
-        return self.redis.get(f'seed:{seed}')
-
-    def add_seed(self, task: Task, time: str, seed: Optional[str]=None) -> Tuple[str, int]:
-        expire = expire_in_sec(time)
-        if not seed:
-            seed = secrets.token_urlsafe()
-        if expire:
-            self.redis.setex(name=f'seed:{seed}', time=expire, value=task.uuid)
-        else:
-            # When seed is False (0, None)
-            self.redis.set(name=f'seed:{seed}', value=task.uuid)
-        return seed, expire
-
     def is_seed_valid(self, task: Task, seed: str) -> bool:
-        if task.uuid == self.get_seed_uuid(seed):
+        if task.uuid == self.seed.get_task_uuid(seed):
             return True
         if hasattr(task, 'parent') and task.parent:
             return self.is_seed_valid(task.parent, seed)

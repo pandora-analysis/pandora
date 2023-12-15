@@ -31,6 +31,7 @@ class BackgroundProcessing(AbstractManager):
             self.misp_autosubmit_status = Status[misp_settings['autosubmit']['status']]
             self.misp = PyMISP(misp_settings['url'], misp_settings['apikey'], ssl=misp_settings['tls_verify'])
             self.misp_autosubmit = True
+            self.misp_autopublish = misp_settings['autosubmit'].get('autopublish')
         else:
             self.misp_autosubmit = False
 
@@ -38,8 +39,8 @@ class BackgroundProcessing(AbstractManager):
         # Run processing after a task is done
         self.postprocessing()
 
-    def _task_on_misp(self, permaurl: str) -> bool:
-        attributes = self.misp.search('attributes', value=permaurl, limit=1, page=1, pythonify=True)
+    def _task_on_misp(self, internal_ref: str) -> bool:
+        attributes = self.misp.search('attributes', value=internal_ref, limit=1, page=1, pythonify=True)
         if not attributes or not isinstance(attributes[0], MISPAttribute):
             return False
         return True
@@ -52,9 +53,11 @@ class BackgroundProcessing(AbstractManager):
             # if MISP autosubmit enabled & task status is ALERT & task not already submitted => submit
             if (self.misp_autosubmit
                     and task.status >= self.misp_autosubmit_status
-                    and not self._task_on_misp(f'{self.public_url}/analysis/{task.uuid}')):
+                    and not self._task_on_misp(task.uuid)):
                 event = task.misp_export()
-                self.misp.add_event(event)
+                new_event = self.misp.add_event(event)
+                if self.misp_autopublish:
+                    self.misp.publish(new_event)
 
 
 def main():

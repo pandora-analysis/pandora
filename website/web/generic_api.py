@@ -26,7 +26,7 @@ from pandora.mail import Mail
 from pandora.role import Action
 from pandora.task import Task
 from pandora.file import File
-from pandora.helpers import roles_from_config, Status
+from pandora.helpers import roles_from_config, Status, Seed
 
 from .helpers import admin_required, update_user_role, build_users_table, load_user_from_request, sizeof_fmt
 
@@ -36,6 +36,7 @@ API_VERBOSE_JSON = get_config('generic', 'debug_web')
 
 pandora: Pandora = Pandora()
 api = Namespace('PandoraAPI', description='Pandora API', path='/')
+seed_manager = Seed()
 
 
 def api_auth_check(method):
@@ -156,7 +157,7 @@ class ApiSubmit(Resource):
             return {'success': False, 'error': str(e)}, 400
         pandora.enqueue_task(task)
         if args.get('validity') is not None:
-            seed, expire = pandora.add_seed(task, args['validity'])
+            seed, expire = seed_manager.add(task.uuid, args['validity'])
             link = url_for('api_analysis', task_id=task.uuid, seed=seed)
             return {'success': True, 'taskId': task.uuid, 'seed': seed,
                     'lifetime': expire, 'link': link}
@@ -279,7 +280,7 @@ class ApiTaskAction(Resource):
             data: Dict[str, str] = request.get_json()  # type: ignore
             if "validity" not in data:
                 data['validity'] = get_config('generic', 'default_share_time')
-            seed, expire = pandora.add_seed(task, data['validity'])
+            seed, expire = seed_manager.add(task.uuid, data['validity'])
             link = url_for('api_analysis', task_id=task.uuid, seed=seed)
             return {'success': True, 'seed': seed, 'lifetime': expire, 'link': link}
 

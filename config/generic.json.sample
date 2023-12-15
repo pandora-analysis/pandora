@@ -26,7 +26,8 @@
         "tls_verify": true,
         "autosubmit": {
             "status": "ALERT",
-            "enabled": false
+            "enabled": false,
+            "autopublish": false
         }
     },
     "email": {

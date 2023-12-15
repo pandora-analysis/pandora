@@ -2,18 +2,20 @@
 
 import logging
 import re
+import secrets
 
 from datetime import timedelta
 from enum import IntEnum, Enum, unique, auto
 from functools import lru_cache
 from importlib.metadata import version
-from typing import Dict, List, Optional, Union, Any
+from typing import Dict, List, Optional, Union, Any, Tuple
 
 from publicsuffix2 import PublicSuffixList, fetch  # type: ignore
 from pymispwarninglists import WarningLists
+from redis import Redis
 import yaml
 
-from .default import get_homedir
+from .default import get_homedir, get_socket_path
 from .exceptions import Unsupported, ConfigError
 from .role import Role
 
@@ -194,3 +196,23 @@ def get_email_template() -> str:
 @lru_cache(64)
 def get_useragent_for_requests():
     return f'Pandora / {version("pandora")}'
+
+
+class Seed():
+
+    def __init__(self):
+        self.redis = Redis(unix_socket_path=get_socket_path('cache'), decode_responses=True)
+
+    def get_task_uuid(self, seed: str) -> Optional[str]:
+        return self.redis.get(f'seed:{seed}')
+
+    def add(self, task_uuid: str, time: str, seed: Optional[str]=None) -> Tuple[str, int]:
+        expire = expire_in_sec(time)
+        if not seed:
+            seed = secrets.token_urlsafe()
+        if expire:
+            self.redis.setex(name=f'seed:{seed}', time=expire, value=task_uuid)
+        else:
+            # When seed is False (0, None)
+            self.redis.set(name=f'seed:{seed}', value=task_uuid)
+        return seed, expire
