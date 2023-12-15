@@ -23,7 +23,11 @@
     "misp": {
         "url": "",
         "apikey": "",
-        "tls_verify": true
+        "tls_verify": true,
+        "autosubmit": {
+            "status": "ALERT",
+            "enabled": false
+        }
     },
     "email": {
         "smtp_host": "localhost",

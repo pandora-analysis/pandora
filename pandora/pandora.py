@@ -13,7 +13,6 @@ from redis.connection import UnixDomainSocketConnection
 from .default import get_config, get_socket_path
 from .exceptions import InvalidPandoraObject, PandoraException
 from .helpers import roles_from_config, expire_in_sec
-# from .observable import Observable
 from .report import Report
 from .role import Role, RoleName
 from .task import Task
