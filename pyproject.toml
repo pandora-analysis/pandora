@@ -77,7 +77,7 @@ ipython = [
 mypy = "^1.8.0"
 types-redis = {version = "^4.6.0.11"}
 types-PyYAML = "^6.0.12.12"
-types-requests = "^2.31.0.10"
+types-requests = "^2.31.0.20231231"
 types-python-dateutil = "^2.8.19.14"
 bandit = {extras = ["toml"], version = "^1.7.6"}
 flake8 = "^6.1.0"
