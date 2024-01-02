@@ -51,7 +51,7 @@ rarfile = "^4.1"
 publicsuffix2 = "^2.20191221"
 pymispwarninglists = "^1.5"
 pikepdf = "^8.10.1"
-Pillow = "^10.1.0"
+Pillow = "^10.2.0"
 imapclient = "^3.0.1"
 pyzipper = "^0.3.6"
 pymisp = {version = "^2.4.182", extras = ["fileobjects"]}
