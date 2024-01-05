@@ -314,7 +314,7 @@ class File:
                         # Assume txt
                         self.libreoffice_client.convert(indata=body_part['content'].encode(), outpath=f'{self.path}_body_{i}.pdf')
 
-    def make_previews(self) -> None:
+    def paths_to_preview(self) -> List[Path]:
         if self.is_pdf:
             to_convert = [self.path]
         elif self.is_unoconv_concerned or self.is_html or self.is_image or self.is_svg:
@@ -325,6 +325,10 @@ class File:
             to_convert = list(self.directory.glob(f'{self.path.name}_body_*.pdf'))
         else:
             raise NoPreview('Preview not supported for this file format')
+        return to_convert
+
+    def make_previews(self) -> None:
+        to_convert = self.paths_to_preview()
 
         for i, p in enumerate(to_convert):
             doc = fitz.open(p)
