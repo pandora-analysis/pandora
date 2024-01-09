@@ -862,13 +862,13 @@ files = [
 
 [[package]]
 name = "dfvfs"
-version = "20230531"
+version = "20231208"
 description = "Digital Forensics Virtual File System (dfVFS)."
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "dfvfs-20230531-py2.py3-none-any.whl", hash = "sha256:4d1c89321689e2848b2cf0166d3771daeb7d70fc0b177c9d452887562deaa88e"},
-    {file = "dfvfs-20230531.tar.gz", hash = "sha256:f2c71d781c0fe03b348ee93cc1f0c7da6c82e0038adb94b3c055b4ea647c428f"},
+    {file = "dfvfs-20231208-py2.py3-none-any.whl", hash = "sha256:bae9617d7cdb2fc65c189a1277243a10b61ed82982821c6a9d243175239dd524"},
+    {file = "dfvfs-20231208.tar.gz", hash = "sha256:891addc19612c03d73f964e7973c63508f38851ea6bf4ae8af7266f14d95c212"},
 ]
 
 [package.dependencies]
@@ -899,7 +899,6 @@ libvsapm-python = ">=20230506"
 libvsgpt-python = ">=20211115"
 libvshadow-python = ">=20160109"
 libvslvm-python = ">=20160109"
-pip = ">=7.0.0"
 pytsk3 = ">=20210419"
 pyxattr = {version = ">=0.7.2", markers = "platform_system != \"Windows\""}
 PyYAML = ">=3.10"
@@ -5644,4 +5643,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.12"
-content-hash = "126fc701a9c2d9b2de94cbb98ff6c802ee11c62ae4cbb53090d1f5cd534a0ff3"
+content-hash = "17250af6d8e5d3240d8f8ce837f0fd5e54d20aa91c40f82b030edba64320023d"
