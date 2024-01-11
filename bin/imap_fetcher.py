@@ -119,7 +119,7 @@ class IMAPFetcher(AbstractManager):
                 self.pandora.enqueue_task(new_task)
                 client.add_flags(uid, ('\\Seen'))
 
-                seed, _ = self.pandora.add_seed(new_task, '0')
+                seed, _ = self.pandora.seed.add(new_task.uuid, '0')
                 domain = get_config('generic', 'public_url')
                 permaurl = f'{domain}/analysis/{new_task.uuid}/seed-{seed}'
                 reply = self._prepare_reply(email_message, permaurl)
