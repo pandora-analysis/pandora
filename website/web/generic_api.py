@@ -291,7 +291,7 @@ class ApiTaskAction(Resource):
             if 'message' not in data:
                 raise Unsupported("missing mandatory key 'message'")
             if not seed:
-                seed = pandora.add_seed(task, time=90000)[0]  # Just a bit over a day
+                seed = pandora.seed.add(task.uuid, time=90000)[0]  # Just a bit over a day
             domain = get_config('generic', 'public_url')
             permaurl = f'{domain}/analysis/{task.uuid}/seed-{seed}'
             message = '\n'.join([
