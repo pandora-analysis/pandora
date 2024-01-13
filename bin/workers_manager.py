@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import importlib
 import inspect
 import logging
 import logging.config
-
-from typing import List, Dict, Type, Optional
 
 from redis import Redis
 
@@ -19,10 +19,10 @@ logging.config.dictConfig(get_config('logging'))
 
 class WorkersManager(AbstractManager):
 
-    def __init__(self, loglevel: Optional[int]=None) -> None:
+    def __init__(self, loglevel: int | None=None) -> None:
         super().__init__(loglevel)
         self.script_name = 'workers_manager'
-        self._workers: List[BaseWorker] = []
+        self._workers: list[BaseWorker] = []
 
         self.redis = Redis(unix_socket_path=get_socket_path('cache'), decode_responses=True)
 
@@ -35,7 +35,7 @@ class WorkersManager(AbstractManager):
             self.logger.info(f'starting worker {worker.name}...')
             worker.start()
 
-    def _get_worker_class(self, module) -> Type[BaseWorker]:  # type: ignore[no-untyped-def]
+    def _get_worker_class(self, module) -> type[BaseWorker]:  # type: ignore[no-untyped-def]
         for class_name, worker in inspect.getmembers(module, inspect.isclass):
             if class_name == 'BaseWorker':
                 continue
@@ -43,7 +43,7 @@ class WorkersManager(AbstractManager):
                 return worker
         raise MissingWorker(f'The worker class is missing in {module}')
 
-    def _init_worker(self, module_name: str, worker_conf: Dict[str, Dict[str, str]], restart: bool=False) -> List[BaseWorker]:
+    def _init_worker(self, module_name: str, worker_conf: dict[str, dict[str, str]], restart: bool=False) -> list[BaseWorker]:
         """
         Create a new worker with given conf.
         :param worker_conf: dict extracted from yaml

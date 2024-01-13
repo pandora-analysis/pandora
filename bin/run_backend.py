@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import argparse
 import os
 import time
 from pathlib import Path
 from subprocess import Popen
-from typing import Optional, Dict
 
 from redis import Redis
 from redis.exceptions import ConnectionError as RedisConnectionError
@@ -28,7 +29,7 @@ def check_running(name: str) -> bool:
         return False
 
 
-def launch_cache(storage_directory: Optional[Path]=None) -> None:
+def launch_cache(storage_directory: Path | None=None) -> None:
     if not storage_directory:
         storage_directory = get_homedir()
     if not check_running('cache'):
@@ -41,7 +42,7 @@ def shutdown_cache() -> None:
     print('Redis cache database shutdown.')
 
 
-def launch_storage(storage_directory: Optional[Path]=None) -> None:
+def launch_storage(storage_directory: Path | None=None) -> None:
     if not storage_directory:
         storage_directory = get_homedir()
     if not check_running('storage'):
@@ -60,7 +61,7 @@ def launch_all() -> None:
 
 
 def check_all(stop: bool=False) -> None:
-    backends: Dict[str, bool] = {'cache': False, 'storage': False}
+    backends: dict[str, bool] = {'cache': False, 'storage': False}
     while True:
         for db_name in backends:
             try:

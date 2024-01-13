@@ -6,7 +6,6 @@ import json
 import logging
 
 from datetime import datetime
-from typing import Optional, Union, List, Set
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection

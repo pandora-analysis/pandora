@@ -6,7 +6,6 @@ import logging
 import logging.config
 
 from datetime import datetime, timedelta
-from typing import Optional
 
 from pymisp import PyMISP, MISPAttribute, MISPEvent  # type: ignore[attr-defined]
 

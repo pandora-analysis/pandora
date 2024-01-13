@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 
 from enum import Enum, unique, auto
-from typing import Union, List, Dict, cast
+from typing import Dict, cast
 
 from .exceptions import Unsupported
 from .storage_client import Storage

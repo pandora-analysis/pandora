@@ -4,7 +4,7 @@ import json
 
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
-from typing import Dict, Any, Optional, List, overload, Tuple
+from typing import overload, Any
 from uuid import uuid4
 
 from pymisp import MISPEvent, MISPAttribute  # type: ignore[attr-defined]

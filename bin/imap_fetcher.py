@@ -13,7 +13,6 @@ from email.message import EmailMessage, Message
 from email import policy
 from io import BytesIO
 from smtplib import SMTP
-from typing import Optional
 
 from imapclient import imapclient, IMAPClient  # type: ignore
 

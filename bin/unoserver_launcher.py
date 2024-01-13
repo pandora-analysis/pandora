@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import importlib
 import logging
 import logging.config
@@ -8,7 +10,6 @@ import sys
 import tempfile
 
 from pathlib import Path
-from typing import Optional
 
 from pandora.default import AbstractManager, get_config
 
@@ -17,7 +18,7 @@ logging.config.dictConfig(get_config('logging'))
 
 class UnoserverLauncher(AbstractManager):
 
-    def __init__(self, loglevel: Optional[int]=None) -> None:
+    def __init__(self, loglevel: int | None=None) -> None:
         super().__init__(loglevel)
         self.script_name = 'unoserver'
         # Initialize the server, doesn't start it.

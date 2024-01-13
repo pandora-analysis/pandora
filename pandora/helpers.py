@@ -10,7 +10,7 @@ from datetime import timedelta
 from enum import IntEnum, Enum, unique, auto
 from functools import lru_cache
 from importlib.metadata import version
-from typing import Dict, List, Optional, Union, Any, Tuple
+from typing import Any
 
 from publicsuffix2 import PublicSuffixList, fetch  # type: ignore
 from pymispwarninglists import WarningLists  # type: ignore[attr-defined]

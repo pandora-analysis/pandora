@@ -5,7 +5,7 @@ from __future__ import annotations
 import operator
 
 from datetime import datetime
-from typing import Optional, Dict, List, Union, Set, overload
+from typing import overload
 
 from redis import ConnectionPool, Redis
 

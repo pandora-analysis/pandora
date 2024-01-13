@@ -6,7 +6,7 @@ import logging
 
 from datetime import datetime, timezone
 from functools import cached_property
-from typing import Optional, overload, List, Union, Any
+from typing import overload, Any
 
 # NOTE: remove .api on next package release.
 from pymispwarninglists.api import WarningList

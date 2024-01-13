@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import logging
 import logging.config
-from typing import Optional
 
 from subprocess import Popen
 
@@ -14,7 +15,7 @@ logging.config.dictConfig(get_config('logging'))
 
 class Website(AbstractManager):
 
-    def __init__(self, loglevel: Optional[int]=None) -> None:
+    def __init__(self, loglevel: int | None=None) -> None:
         super().__init__(loglevel)
         self.script_name = 'website'
         self.process = self._launch_website()
