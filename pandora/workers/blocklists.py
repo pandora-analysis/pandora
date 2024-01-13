@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import mimetypes
 
-from typing import Dict, List
-
 from ..helpers import Status
 from ..task import Task
 from ..report import Report

@@ -12,10 +12,6 @@ from logging import LoggerAdapter
 from typing import MutableMapping, Any, TypedDict, Iterator
 
 import sys
-if sys.version_info >= (3, 11):
-    from typing import Unpack
-else:
-    from typing_extensions import Unpack
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
@@ -26,6 +22,12 @@ from ..helpers import expire_in_sec, Status
 from ..report import Report
 from ..storage_client import Storage
 from ..task import Task
+
+
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 
 class WorkerLogAdapter(LoggerAdapter):  # type: ignore[type-arg]

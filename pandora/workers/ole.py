@@ -4,20 +4,17 @@ from __future__ import annotations
 
 import os
 import re
+import sys
 
 from collections import defaultdict
 from datetime import datetime
 from typing import Any
-import sys
-if sys.version_info >= (3, 11):
-    from typing import Unpack
-else:
-    from typing_extensions import Unpack
 
+from olefile import OleMetadata  # type: ignore[import-untyped]
 from oletools import oleid, ooxml  # type: ignore
 from oletools.ftguess import FTYPE, CONTAINER, FType_Generic_OLE, FType_Generic_OpenXML, FileTypeGuesser  # type: ignore
 from oletools.oleid import RISK  # type: ignore
-from oletools.oleobj import get_logger, find_ole, find_external_relationships, OleObject, OleMetadata  # type: ignore
+from oletools.oleobj import get_logger, find_ole, find_external_relationships, OleObject  # type: ignore
 from oletools.olevba import VBA_Parser  # type: ignore
 from oletools.rtfobj import RtfObjParser, re_executable_extensions  # type: ignore
 # from oletools.thirdparty.xxxswf import xxxswf  # type: ignore
@@ -27,6 +24,11 @@ from ..task import Task
 from ..report import Report
 
 from .base import BaseWorker, WorkerOption
+
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 # This module doesn't look for DDE stuff, this is done by the msodde module
 

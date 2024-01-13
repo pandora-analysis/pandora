@@ -11,7 +11,6 @@ import time
 from abc import ABC
 from datetime import datetime, timedelta
 from subprocess import Popen
-from typing import List, Optional, Tuple
 
 from redis import Redis
 from redis.exceptions import ConnectionError as RedisConnectionError

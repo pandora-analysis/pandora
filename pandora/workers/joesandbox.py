@@ -4,10 +4,6 @@ from __future__ import annotations
 
 import traceback
 import sys
-if sys.version_info >= (3, 11):
-    from typing import Unpack
-else:
-    from typing_extensions import Unpack
 
 from jbxapi import JoeSandbox, JoeException  # type: ignore
 
@@ -16,6 +12,12 @@ from ..task import Task
 from ..report import Report
 
 from .base import BaseWorker, WorkerOption
+
+
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 
 class JoeSandboxWorker(BaseWorker):

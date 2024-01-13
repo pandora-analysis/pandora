@@ -16,10 +16,6 @@ from pathlib import Path
 from tarfile import TarFile
 from typing import Sequence, overload, Literal, TYPE_CHECKING, Any
 import sys
-if sys.version_info >= (3, 11):
-    from typing import Unpack
-else:
-    from typing_extensions import Unpack
 
 from extract_msg.msg_classes import MessageBase, AppointmentMeeting
 from extract_msg.attachments import AttachmentBase, SignedAttachment
@@ -45,6 +41,12 @@ from .base import BaseWorker, WorkerOption
 if TYPE_CHECKING:
     from dfvfs.path.path_spec import PathSpec   # type: ignore
     from dfvfs.volume import tsk_volume_system  # type: ignore
+
+
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 
 def dfvfs_wrapper(func):  # type: ignore[no-untyped-def]

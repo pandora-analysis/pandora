@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import os
 
-from typing import Optional
-
 import yara  # type: ignore
 
 from ..default import get_homedir
