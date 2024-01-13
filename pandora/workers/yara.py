@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Optional, List, Unpack
+import sys
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 import yara  # type: ignore
 

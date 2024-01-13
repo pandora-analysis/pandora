@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 
-from typing import Dict, Optional, List, Any, Unpack
+from __future__ import annotations
+
+from typing import Optional, Any, List, Dict
+import sys
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 from pylookyloo import Lookyloo  # type: ignore[attr-defined]
 
@@ -16,14 +23,14 @@ class LookylooWorker(BaseWorker):
     apiurl: str
     autosubmit: bool
     public_listing: bool
-    referer: Optional[str]
-    user_agent: Optional[str]
-    http_headers: Dict[str, str]
-    cookies: List[Dict[str, Any]]
-    proxy: Optional[str]
+    referer: str | None
+    user_agent: str | None
+    http_headers: dict[str, str]
+    cookies: list[dict[str, Any]]
+    proxy: str | None
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: Optional[int]=None, **options: Unpack[WorkerOption]) -> None:
+                 loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         self.client = Lookyloo(self.apiurl, get_useragent_for_requests())
         if not self.client.is_up:

@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 import traceback
-from typing import Optional, Unpack
+import sys
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 import vt  # type: ignore
 from vt import error

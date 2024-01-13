@@ -6,7 +6,11 @@ import os
 import re
 import subprocess
 
-from typing import Optional, Unpack
+import sys
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 from ..helpers import Status
 from ..task import Task

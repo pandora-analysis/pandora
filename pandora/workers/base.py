@@ -9,7 +9,13 @@ import time
 import traceback
 
 from logging import LoggerAdapter
-from typing import Tuple, List, Optional, MutableMapping, Any, Unpack, TypedDict, Iterator
+from typing import MutableMapping, Any, TypedDict, Iterator
+
+import sys
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection

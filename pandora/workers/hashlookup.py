@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Dict, Any, Tuple, Optional, Unpack
+from typing import Any
+import sys
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 from pyhashlookup import Hashlookup  # type: ignore[attr-defined]
 

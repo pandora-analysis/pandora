@@ -7,7 +7,12 @@ import re
 
 from collections import defaultdict
 from datetime import datetime
-from typing import List, Set, Tuple, Dict, Optional, Unpack, Any
+from typing import Any
+import sys
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 from oletools import oleid, ooxml  # type: ignore
 from oletools.ftguess import FTYPE, CONTAINER, FType_Generic_OLE, FType_Generic_OpenXML, FileTypeGuesser  # type: ignore

@@ -14,7 +14,12 @@ from lzma import LZMAFile
 from io import BytesIO
 from pathlib import Path
 from tarfile import TarFile
-from typing import List, Optional, Union, Tuple, Sequence, Dict, overload, Literal, TYPE_CHECKING, Unpack, Any
+from typing import Sequence, overload, Literal, TYPE_CHECKING, Any
+import sys
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 from extract_msg.msg_classes import MessageBase, AppointmentMeeting
 from extract_msg.attachments import AttachmentBase, SignedAttachment
