@@ -28,7 +28,7 @@ def sri_for_dir(directory: Path) -> Dict[str, Any]:
 if __name__ == '__main__':
     dest_dir = get_homedir() / 'website' / 'web'
 
-    to_save: Dict = {'static': sri_for_dir(dest_dir / 'static')}
+    to_save: Dict[str, Any] = {'static': sri_for_dir(dest_dir / 'static')}
 
     with (dest_dir / 'sri.txt').open('w') as fw:
         json.dump(to_save, fw, indent=2, sort_keys=True)

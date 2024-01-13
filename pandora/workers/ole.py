@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import os
 import re
 
 from collections import defaultdict
 from datetime import datetime
-from typing import List, Set, Tuple, Dict, Optional
+from typing import List, Set, Tuple, Dict, Optional, Unpack, Any
 
 from oletools import oleid, ooxml  # type: ignore
 from oletools.ftguess import FTYPE, CONTAINER, FType_Generic_OLE, FType_Generic_OpenXML, FileTypeGuesser  # type: ignore
 from oletools.oleid import RISK  # type: ignore
-from oletools.oleobj import get_logger, find_ole, find_external_relationships, OleObject  # type: ignore
+from oletools.oleobj import get_logger, find_ole, find_external_relationships, OleObject, OleMetadata  # type: ignore
 from oletools.olevba import VBA_Parser  # type: ignore
 from oletools.rtfobj import RtfObjParser, re_executable_extensions  # type: ignore
 # from oletools.thirdparty.xxxswf import xxxswf  # type: ignore
@@ -19,7 +21,7 @@ from ..helpers import Status
 from ..task import Task
 from ..report import Report
 
-from .base import BaseWorker
+from .base import BaseWorker, WorkerOption
 
 # This module doesn't look for DDE stuff, this is done by the msodde module
 
@@ -27,12 +29,12 @@ from .base import BaseWorker
 class Ole(BaseWorker):
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: Optional[int]=None, **options):
+                 loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         log = get_logger('oleobj')
         log.setLevel(self.loglevel)
 
-    def _get_meta_attributes(self, meta, attributes_list):
+    def _get_meta_attributes(self, meta: OleMetadata, attributes_list: list[str]) -> dict[str, str]:
         to_return = {}
         for attrib in attributes_list:
             attribute = getattr(meta, attrib)
@@ -49,7 +51,7 @@ class Ole(BaseWorker):
             to_return[attrib] = attribute
         return to_return
 
-    def process_ole(self, ole) -> Tuple[Status, Dict]:
+    def process_ole(self, ole: OleObject) -> tuple[Status, dict[str, Any]]:
         details = {'malicious': ''}
         status = Status.CLEAN
         if ole.format_id == OleObject.TYPE_EMBEDDED:
@@ -84,7 +86,7 @@ class Ole(BaseWorker):
             details['exploit'] = 'Possibly an exploit for the OLE2Link vulnerability (VU#921560, CVE-2017-0199)'
             pat = re.compile(b'(?:[\\x20-\\x7E][\\x00]){3,}')
             words = [w.decode('utf-16le') for w in pat.findall(ole.oledata) if w]
-            urls: Set[str] = set()
+            urls: set[str] = set()
             for w in words:
                 if "http" in w:
                     urls.add(w)
@@ -99,7 +101,7 @@ class Ole(BaseWorker):
             details.pop('malicious')
         return status, details
 
-    def _process_macros(self, filetype: FileTypeGuesser):
+    def _process_macros(self, filetype: FileTypeGuesser) -> tuple[Status, dict[str, Any]]:
         # NOTE: must pass a filepath because of XLMMacroDeobfuscator
         # Code copied from: https://github.com/decalage2/oletools/blob/master/oletools/oleid.py#L415
         details = defaultdict(list)
@@ -108,7 +110,7 @@ class Ole(BaseWorker):
             details[type_entry].append(description)
         return Status.ALERT, details
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.data:
             report.status = Status.NOTAPPLICABLE
             return
@@ -127,9 +129,9 @@ class Ole(BaseWorker):
 
         report.status = Status.CLEAN
 
-        malicious: List[str] = []
-        suspicious: List[str] = []
-        info: List[str] = []
+        malicious: list[str] = []
+        suspicious: list[str] = []
+        info: list[str] = []
 
         if oid.ole:
             # Get meta

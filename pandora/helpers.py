@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import logging
 import re
 import secrets
@@ -11,7 +13,7 @@ from importlib.metadata import version
 from typing import Dict, List, Optional, Union, Any, Tuple
 
 from publicsuffix2 import PublicSuffixList, fetch  # type: ignore
-from pymispwarninglists import WarningLists
+from pymispwarninglists import WarningLists  # type: ignore[attr-defined]
 from redis import Redis
 import yaml
 
@@ -52,14 +54,14 @@ class TypeObservable(Enum):
 
 
 @lru_cache(64)
-def allowlist_default() -> List[str]:
+def allowlist_default() -> list[str]:
     with (get_homedir() / 'config' / 'allowlist.yml').open() as config_file:
         config = yaml.safe_load(config_file.read())
     return config['allowlist']
 
 
 @lru_cache(64)
-def roles_from_config() -> Dict[str, Role]:
+def roles_from_config() -> dict[str, Role]:
     with (get_homedir() / 'config' / 'roles.yml').open() as config_file:
         config = yaml.safe_load(config_file.read())
     to_return = {}
@@ -71,7 +73,7 @@ def roles_from_config() -> Dict[str, Role]:
 
 
 @lru_cache(64)
-def workers() -> Dict[str, Dict[str, Any]]:
+def workers() -> dict[str, dict[str, Any]]:
     workers_dir = get_homedir() / 'pandora' / 'workers'
     worker_default_config_file = workers_dir / 'base.yml'
     if not worker_default_config_file.exists():
@@ -121,19 +123,19 @@ def workers() -> Dict[str, Dict[str, Any]]:
     return {name: all_configs[name] for name in sorted(all_configs)}
 
 
-def make_bool(value: Optional[Union[bool, int, str]]) -> bool:
+def make_bool(value: bool | int | str | None) -> bool:
     if value in [True, 1, '1']:
         return True
     return False
 
 
-def make_bool_for_redis(value: Optional[bool]) -> int:
+def make_bool_for_redis(value: bool | None) -> int:
     if value is True:
         return 1
     return 0
 
 
-def expire_in_sec(time: Union[str, int]) -> int:
+def expire_in_sec(time: str | int | None) -> int:
     """
     Try to parse time value and return the amount of seconds.
     :param time: time value to parse
@@ -173,7 +175,7 @@ def get_warninglists() -> WarningLists:
 
 
 @lru_cache(64)
-def get_disclaimers() -> Dict[str, str]:
+def get_disclaimers() -> dict[str, str]:
     disclaimer_path = get_homedir() / 'config' / 'disclaimer.tmpl'
     if not disclaimer_path.exists():
         disclaimer_path = get_homedir() / 'config' / 'disclaimer.tmpl.sample'
@@ -194,19 +196,19 @@ def get_email_template() -> str:
 
 
 @lru_cache(64)
-def get_useragent_for_requests():
+def get_useragent_for_requests() -> str:
     return f'Pandora / {version("pandora")}'
 
 
 class Seed():
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.redis = Redis(unix_socket_path=get_socket_path('cache'), decode_responses=True)
 
-    def get_task_uuid(self, seed: str) -> Optional[str]:
+    def get_task_uuid(self, seed: str) -> str | None:
         return self.redis.get(f'seed:{seed}')
 
-    def add(self, task_uuid: str, time: str, seed: Optional[str]=None) -> Tuple[str, int]:
+    def add(self, task_uuid: str, time: str | None=None, seed: str | None=None) -> tuple[str, int]:
         expire = expire_in_sec(time)
         if not seed:
             seed = secrets.token_urlsafe()

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-from typing import Optional, List
+from __future__ import annotations
+
+from typing import Optional, List, Unpack
 
 import yara  # type: ignore
 
@@ -9,14 +11,14 @@ from ..helpers import Status
 from ..task import Task
 from ..report import Report
 
-from .base import BaseWorker
+from .base import BaseWorker, WorkerOption
 
 
 class YaraWorker(BaseWorker):
     rulespath = get_homedir() / 'yara_rules'
     savepath = get_homedir() / 'yara_rules' / 'yara.compiled'
-    needs_external: List[str] = []  # list of filenames, used for children classes with yara files requiring external variables
-    last_change: Optional[float] = None
+    needs_external: list[str] = []  # list of filenames, used for children classes with yara files requiring external variables
+    last_change: float | None = None
 
     @property
     def rules(self) -> yara.Rules:
@@ -35,7 +37,7 @@ class YaraWorker(BaseWorker):
         return rules
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: Optional[int]=None, **options):
+                 loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
 
         if not list(self.rulespath.glob('**/*.yar')):
@@ -54,7 +56,7 @@ class YaraWorker(BaseWorker):
             self.disabled = True
             self.logger.critical(f'Unable to initialize rules: {e}')
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.data:
             # Empty file
             report.status = Status.NOTAPPLICABLE

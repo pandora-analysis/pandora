@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
+from __future__ import annotations
+
 import logging
 import logging.config
 
 from datetime import datetime, timedelta
 from typing import Optional
 
-from pymisp import PyMISP, MISPAttribute
+from pymisp import PyMISP, MISPAttribute, MISPEvent  # type: ignore[attr-defined]
 
 from pandora.default import AbstractManager, get_config
 from pandora.helpers import Status
@@ -18,7 +20,7 @@ logging.config.dictConfig(get_config('logging'))
 
 class BackgroundProcessing(AbstractManager):
 
-    def __init__(self, loglevel: Optional[int]=None):
+    def __init__(self, loglevel: int | None=None) -> None:
         super().__init__(loglevel)
         self.script_name = 'background_processing'
         self.pandora = Pandora()
@@ -35,7 +37,7 @@ class BackgroundProcessing(AbstractManager):
         else:
             self.misp_autosubmit = False
 
-    def _to_run_forever(self):
+    def _to_run_forever(self) -> None:
         # Run processing after a task is done
         self.postprocessing()
 
@@ -45,7 +47,7 @@ class BackgroundProcessing(AbstractManager):
             return False
         return True
 
-    def postprocessing(self):
+    def postprocessing(self) -> None:
         # Only try to run postprocessing on tasks from the last 24h
         cut_date = datetime.now() - timedelta(hours=24)
         u = User('admin', last_ip='127.0.0.1', role='admin')
@@ -55,12 +57,12 @@ class BackgroundProcessing(AbstractManager):
                     and task.status >= self.misp_autosubmit_status
                     and not self._task_on_misp(task.uuid)):
                 event = task.misp_export()
-                new_event = self.misp.add_event(event)
-                if self.misp_autopublish:
+                new_event = self.misp.add_event(event, pythonify=True)
+                if isinstance(new_event, MISPEvent) and self.misp_autopublish:
                     self.misp.publish(new_event)
 
 
-def main():
+def main() -> None:
     bp = BackgroundProcessing()
     bp.run(sleep_in_sec=10)
 

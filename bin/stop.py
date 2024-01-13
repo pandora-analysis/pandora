@@ -8,7 +8,7 @@ from redis.exceptions import ConnectionError as RedisConnectionError
 from pandora.default import get_homedir, get_socket_path
 
 
-def main():
+def main() -> None:
     get_homedir()
     with Popen(['shutdown']) as p:
         p.wait()

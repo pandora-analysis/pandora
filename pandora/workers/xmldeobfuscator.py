@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 from XLMMacroDeobfuscator.deobfuscator import process_file  # type: ignore
 from xlrd2.biffh import XLRDError  # type: ignore
 
@@ -13,7 +15,7 @@ from .base import BaseWorker
 
 class XLMMacroDeobfuscator(BaseWorker):
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.is_oletools_concerned:
             report.status = Status.NOTAPPLICABLE
             return

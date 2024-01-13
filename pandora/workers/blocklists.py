@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import mimetypes
 
 from typing import Dict, List
@@ -12,14 +14,14 @@ from .base import BaseWorker
 class Blocklists(BaseWorker):
 
     enable_extensions: bool
-    malicious_extensions: List[str]
+    malicious_extensions: list[str]
     enable_mimetypes: bool
-    malicious_mimetypes: List[str]
-    overwrite_extensions: List[str]
+    malicious_mimetypes: list[str]
+    overwrite_extensions: list[str]
 
     # we sometimes have differences between magic and mimetypes from python
     # Example: text/x-python from mimetypes.guess_type and text/x-script.python from magic
-    synonyms: Dict[str, List[str]] = {
+    synonyms: dict[str, list[str]] = {
         'text/x-python': ['text/x-script.python'],
         'application/x-cab': ['application/vnd.ms-cab-compressed'],
         'application/x-msdos-program': ['application/x-dosexec'],
@@ -27,7 +29,7 @@ class Blocklists(BaseWorker):
         'application/rar': ['application/x-rar']
     }
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         report.status = Status.NOTAPPLICABLE
         if self.enable_extensions:
             ext = task.file.original_filename.rsplit(".", 1)[-1]

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import json
 import logging
 
@@ -9,8 +11,8 @@ from typing import Optional, Union, List, Set
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
 
-from .default import get_config, get_socket_path
-from .exceptions import InvalidPandoraObject, PandoraException
+from .default import get_config, get_socket_path, PandoraException
+from .exceptions import InvalidPandoraObject
 from .helpers import roles_from_config, Seed
 from .report import Report
 from .role import Role, RoleName
@@ -43,25 +45,25 @@ class Pandora():
                 role.store()
 
     @property
-    def redis_bytes(self):
+    def redis_bytes(self) -> Redis:  # type: ignore[type-arg]
         return Redis(connection_pool=self.redis_pool_cache_bytes)
 
     @property
-    def redis(self):
+    def redis(self) -> Redis:  # type: ignore[type-arg]
         return Redis(connection_pool=self.redis_pool_cache)
 
-    def check_redis_up(self):
+    def check_redis_up(self) -> bool:
         return self.redis.ping()
 
     # #### User ####
 
-    def get_user(self, user_id: str) -> Optional[User]:
+    def get_user(self, user_id: str) -> User | None:
         u = self.storage.get_user(user_id)
         if u:
             return User(**u)
         return None
 
-    def get_users(self):
+    def get_users(self) -> list[User]:
         users = []
         for user in self.storage.get_users():
             users.append(User(**user))
@@ -71,7 +73,7 @@ class Pandora():
 
     # #### Role ####
 
-    def get_role(self, role_name: Union[str, RoleName]) -> Role:
+    def get_role(self, role_name: str | RoleName) -> Role:
         if isinstance(role_name, RoleName):
             role_name = role_name.name
         r = self.storage.storage.hgetall(f'roles:{role_name}')
@@ -79,7 +81,7 @@ class Pandora():
             raise InvalidPandoraObject(f'Unknown role: "{role_name}"')
         return Role(**r)
 
-    def get_roles(self) -> List[Role]:
+    def get_roles(self) -> list[Role]:
         roles = []
         for role in self.storage.get_roles():
             roles.append(Role(**role))
@@ -103,22 +105,22 @@ class Pandora():
             'task_uuid': task.uuid,
             'disabled_workers': json.dumps(task.disabled_workers)
         }
-        self.redis.xadd(name='tasks_queue', fields=fields, id='*',
+        self.redis.xadd(name='tasks_queue', fields=fields, id='*',  # type: ignore[arg-type]
                         maxlen=get_config('generic', 'tasks_max_len'))
         return task.uuid
 
-    def trigger_manual_worker(self, task: Task, worker: str):
+    def trigger_manual_worker(self, task: Task, worker: str) -> None:
         fields = {
             'task_uuid': task.uuid,
             'manual_worker': worker
         }
-        self.redis.xadd(name='tasks_queue', fields=fields, id='*',
+        self.redis.xadd(name='tasks_queue', fields=fields, id='*',  # type: ignore[arg-type]
                         maxlen=get_config('generic', 'tasks_max_len'))
 
-    def add_extracted_reference(self, task: Task, extracted_task: Task):
+    def add_extracted_reference(self, task: Task, extracted_task: Task) -> None:
         self.storage.add_extracted_reference(task.uuid, extracted_task.uuid)
 
-    def get_tasks(self, user: User, *, first_date: Union[datetime, int, float, str]=0, last_date: Union[datetime, int, float, str]='+Inf'):
+    def get_tasks(self, user: User, *, first_date: datetime | int | float | str=0, last_date: datetime | int | float | str='+Inf') -> list[Task]:
         if isinstance(first_date, datetime):
             first_date = first_date.timestamp()
         if isinstance(last_date, datetime):
@@ -145,22 +147,22 @@ class Pandora():
 
     # #### Observables Lists ####
 
-    def get_suspicious_observables(self):
+    def get_suspicious_observables(self) -> dict[str, str] | None:
         return self.storage.get_suspicious_observables()
 
-    def add_suspicious_observable(self, observable: str, observable_type: str):
+    def add_suspicious_observable(self, observable: str, observable_type: str) -> None:
         return self.storage.add_suspicious_observable(observable, observable_type)
 
-    def delete_suspicious_observable(self, observable: str):
+    def delete_suspicious_observable(self, observable: str) -> None:
         return self.storage.delete_suspicious_observable(observable)
 
-    def get_legitimate_observables(self):
+    def get_legitimate_observables(self) -> dict[str, str] | None:
         return self.storage.get_legitimate_observables()
 
-    def add_legitimate_observable(self, observable: str, observable_type: str):
+    def add_legitimate_observable(self, observable: str, observable_type: str) -> None:
         return self.storage.add_legitimate_observable(observable, observable_type)
 
-    def delete_legitimate_observable(self, observable: str):
+    def delete_legitimate_observable(self, observable: str) -> None:
         return self.storage.delete_legitimate_observable(observable)
 
     # ##############
@@ -187,10 +189,10 @@ class Pandora():
 
     # #### Other ####
 
-    def get_enabled_workers(self) -> Set[str]:
+    def get_enabled_workers(self) -> set[str]:
         return self.redis.smembers('enabled_workers')
 
     # #### pubsub ####
 
-    def publish_on_channel(self, channel_name: str, data: str):
+    def publish_on_channel(self, channel_name: str, data: str) -> None:
         self.redis.publish(channel_name, data)

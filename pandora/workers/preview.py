@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ..exceptions import NoPreview
 from ..helpers import Status
 from ..task import Task
@@ -8,7 +10,7 @@ from .base import BaseWorker
 
 class Preview(BaseWorker):
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         try:
             task.file.convert()
             task.file.make_previews()

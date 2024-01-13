@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 
 from enum import Enum, unique, auto
@@ -47,7 +49,7 @@ class Action(Enum):
 
 class Role:
 
-    def __init__(self, name: str, description: str, actions: Union[Dict[str, bool], str]):
+    def __init__(self, name: str, description: str, actions: dict[str, bool] | str):
         if name not in RoleName.__members__:
             raise Unsupported(f"unexpected role name '{name}'")
         self.storage = Storage()
@@ -55,14 +57,14 @@ class Role:
         self.description = description
         if isinstance(actions, str):
             actions = cast(Dict[str, bool], json.loads(actions))
-        self.actions: Dict[Action, bool] = {}
+        self.actions: dict[Action, bool] = {}
         for action_name, perm in actions.items():
             if action_name not in Action.__members__:
                 raise Unsupported(f"unexpected action name '{action_name}'")
             self.actions[Action[action_name]] = perm
 
     @property
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         to_return = {'name': str(self.name.name), 'description': self.description}
         to_return['actions'] = json.dumps({action.name: perm for action, perm in self.actions.items()})
         return to_return
@@ -70,7 +72,7 @@ class Role:
     def store(self) -> None:
         self.storage.set_role(self.to_dict)
 
-    def set_action(self, action: Union[str, Action], value: bool):
+    def set_action(self, action: str | Action, value: bool) -> None:
         """
         Add boolean action for role.
         :param (str) action: model name
@@ -82,7 +84,7 @@ class Role:
             action = Action[action]
         self.actions[action] = value
 
-    def can(self, actions: Union[str, List[str], Action, List[Action]], operator: str='and') -> bool:
+    def can(self, actions: str | list[str] | Action | list[Action], operator: str='and') -> bool:
         """
         Property that returns True if role can do an action
         :param actions: action or list of actions
@@ -109,5 +111,5 @@ class Role:
         """
         return self.name == RoleName.admin
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self.to_dict)

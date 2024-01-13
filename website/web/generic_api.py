@@ -53,7 +53,7 @@ class RedisUp(Resource):
         return pandora.check_redis_up()
 
 
-def json_answer(func):
+def json_answer(func) -> Dict[str, Any]:
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:

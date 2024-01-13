@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
-from typing import Dict, Optional, List, Any
+from typing import Dict, Optional, List, Any, Unpack
 
-from pylookyloo import Lookyloo
+from pylookyloo import Lookyloo  # type: ignore[attr-defined]
 
 from ..helpers import Status, get_useragent_for_requests
 from ..task import Task
 from ..report import Report
 
-from .base import BaseWorker
+from .base import BaseWorker, WorkerOption
 
 
 class LookylooWorker(BaseWorker):
@@ -23,7 +23,7 @@ class LookylooWorker(BaseWorker):
     proxy: Optional[str]
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: Optional[int]=None, **options):
+                 loglevel: Optional[int]=None, **options: Unpack[WorkerOption]) -> None:
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         self.client = Lookyloo(self.apiurl, get_useragent_for_requests())
         if not self.client.is_up:
@@ -31,7 +31,7 @@ class LookylooWorker(BaseWorker):
             self.logger.warning(f'Unable to connect to the Lookyloo instance: {self.apiurl}.')
             return
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.data:
             report.status = Status.NOTAPPLICABLE
             return

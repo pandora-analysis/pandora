@@ -1,4 +1,9 @@
+from __future__ import annotations
+
 import re
+
+from typing import Any
+
 from .helpers import get_public_suffix_list
 
 
@@ -22,7 +27,7 @@ class TextParser:
         r'[\+][0-9]{3}(([a-zA-Z0-9]{1,4}[\+]?){0,4})[\+]))'
     ])
 
-    def __init__(self, text):
+    def __init__(self, text: Any) -> None:
         self.tlds = get_public_suffix_list().tlds
         self.text = str(text) or ''
         self.ips = self._find_ips()
@@ -31,20 +36,20 @@ class TextParser:
         self.hostnames = self._find_hostnames()
         self.emails = self._find_emails()
 
-    def _find_ips(self):
+    def _find_ips(self) -> set[str]:
         ips = set()
         text = self.text.replace('[.]', '.')
         for match in re.finditer(self.IP_REGEX, text):
             ips.add(match.group(1))
         return ips
 
-    def _find_ibans(self):
+    def _find_ibans(self) -> set[str]:
         ibans = set()
         for match in re.finditer(self.IBAN_REGEX, self.text):
             ibans.add(re.sub(r'\s\+', '', match.group(1)))
         return ibans
 
-    def _find_urls(self):
+    def _find_urls(self) -> set[str]:
         urls = set()
         simple_pattern = re.compile(self.URL_REGEX_SIMPLE, re.VERBOSE)
         complex_pattern = re.compile(self.URL_REGEX, re.VERBOSE)
@@ -64,7 +69,7 @@ class TextParser:
                 urls.add(url)
         return urls
 
-    def _find_hostnames(self):
+    def _find_hostnames(self) -> set[str]:
         hostnames = set()
         text = self.text.replace("[.]", ".")
         for match in re.finditer(self.HOSTNAME_REGEX, text):
@@ -74,7 +79,7 @@ class TextParser:
                 hostnames.add(hostname)
         return hostnames
 
-    def _find_emails(self):
+    def _find_emails(self) -> set[str]:
         emails = set()
         # Replace [a] with @
         text = self.text.replace("[a]", "@")

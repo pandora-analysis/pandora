@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import annotations
+
 import contextlib
 import email
 import logging
@@ -7,7 +9,7 @@ import logging.config
 import signal
 import ssl
 
-from email.message import EmailMessage
+from email.message import EmailMessage, Message
 from email import policy
 from io import BytesIO
 from smtplib import SMTP
@@ -26,7 +28,7 @@ logging.config.dictConfig(get_config('logging'))
 
 class IMAPFetcher(AbstractManager):
 
-    def __init__(self, loglevel: Optional[int]=None):
+    def __init__(self, loglevel: int | None=None):
         super().__init__(loglevel)
         self.script_name = 'imap_fetcher'
         self.imap_server = get_config('mail', 'imap_server')
@@ -45,11 +47,11 @@ class IMAPFetcher(AbstractManager):
         self.timeout = 60
 
     @staticmethod
-    def _raise_timeout(_, __):
+    def _raise_timeout(_, __):  # type: ignore[no-untyped-def]
         raise TimeoutError
 
     @contextlib.contextmanager
-    def _timeout_context(self):
+    def _timeout_context(self):  # type: ignore[no-untyped-def]
         if self.timeout != 0:
             # Register a function to raise a TimeoutError on the signal.
             signal.signal(signal.SIGALRM, self._raise_timeout)
@@ -63,14 +65,14 @@ class IMAPFetcher(AbstractManager):
         else:
             yield
 
-    def _to_run_forever(self):
+    def _to_run_forever(self) -> None:
         try:
             with self._timeout_context():
                 self._imap_fetcher()
         except TimeoutError:
-            self.warning('The imap fetcher raised a timeout after {self.timeout}s, kill it and retry.')
+            self.logger.warning('The imap fetcher raised a timeout after {self.timeout}s, kill it and retry.')
 
-    def _prepare_reply(self, initial_message: EmailMessage, permaurl: str) -> Optional[EmailMessage]:
+    def _prepare_reply(self, initial_message: Message, permaurl: str) -> EmailMessage | None:
         msg = EmailMessage()
         msg['From'] = get_config('mail', 'from')
         if initial_message.get('reply-to'):
@@ -95,7 +97,7 @@ class IMAPFetcher(AbstractManager):
         msg.set_content(body)
         return msg
 
-    def _imap_fetcher(self):
+    def _imap_fetcher(self) -> None:
         self.logger.debug('fetching mails...')
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
@@ -142,7 +144,7 @@ class IMAPFetcher(AbstractManager):
         self.logger.debug('Done with fetching mails.')
 
 
-def main():
+def main() -> None:
     if not get_config('generic', 'enable_imap_fetcher'):
         print('IMAP fetcher is disabled in config, quitting.')
         return

@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import hashlib
 import json
 import logging
 
 from datetime import datetime, timezone
 from functools import cached_property
-from typing import Optional, overload, List, Union
+from typing import Optional, overload, List, Union, Any
 
 # NOTE: remove .api on next package release.
 from pymispwarninglists.api import WarningList
@@ -19,7 +21,7 @@ class Observable:
     all_warninglists = get_warninglists()
 
     @classmethod
-    def new_observable(cls, value: str, observable_type: str, seen: Optional[datetime]=None):
+    def new_observable(cls, value: str, observable_type: str, seen: datetime | None=None) -> Observable:
         if not seen:
             seen = datetime.now(timezone.utc)
         # NOTE: observable_type must be a valid MISP Type, we need to check that.
@@ -52,20 +54,20 @@ class Observable:
 
     @overload
     def __init__(self, sha256: str, value: str, observable_type: str,
-                 first_seen: str, last_seen: str, warninglists: Optional[str]=None):
+                 first_seen: str, last_seen: str, warninglists: str | None=None):
         '''From redis'''
         ...
 
     @overload
     def __init__(self, sha256: str, value: str, observable_type: str,
-                 first_seen: datetime, last_seen: datetime, warninglists: Optional[List[WarningList]]=None):
+                 first_seen: datetime, last_seen: datetime, warninglists: list[WarningList] | None=None):
         '''From python'''
         ...
 
     def __init__(self, sha256: str, value: str, observable_type: str,
-                 first_seen: Union[str, datetime], last_seen: Union[str, datetime],
-                 warninglists: Optional[Union[str, List[WarningList]]]=None,
-                 warninglist: Optional[str]=None):
+                 first_seen: str | datetime, last_seen: str | datetime,
+                 warninglists: str | list[WarningList] | None=None,
+                 warninglist: str | None=None):
         self.storage = Storage()
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
         self.logger.setLevel(get_config('generic', 'loglevel'))
@@ -90,7 +92,7 @@ class Observable:
             # cleaning up old data
             warninglists = json.dumps([warninglist])
 
-        self.warninglists: List[WarningList] = []
+        self.warninglists: list[WarningList] = []
         if warninglists:
             if isinstance(warninglists, str):
                 for wl in json.loads(warninglists):
@@ -101,26 +103,28 @@ class Observable:
             elif isinstance(warninglists, list):
                 self.warninglists = warninglists
 
-    def __lt__(self, obj: 'Observable') -> bool:
+    def __lt__(self, obj: Observable) -> bool:
         if self.observable_type < obj.observable_type:
             return True
         if self.observable_type == obj.observable_type:
             return self.value < obj.value
         return False
 
-    def check_warninglists(self):
+    def check_warninglists(self) -> None:
         self.warninglists = self.all_warninglists.search(self.value)
 
     @cached_property
     def status(self) -> Status:
-        if self.value in self.storage.get_suspicious_observables():
-            return Status.ALERT
-        if self.value in self.storage.get_legitimate_observables():
-            return Status.CLEAN
+        if suspicious_observables := self.storage.get_suspicious_observables():
+            if self.value in suspicious_observables:
+                return Status.ALERT
+        if legitimate_observbles := self.storage.get_legitimate_observables():
+            if self.value in legitimate_observbles:
+                return Status.CLEAN
         return Status.NOTAPPLICABLE
 
     @property
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
         return {
             'sha256': self.sha256,
             'value': self.value,
@@ -130,5 +134,5 @@ class Observable:
             'warninglists': json.dumps([wl.name for wl in self.warninglists])
         }
 
-    def store(self):
+    def store(self) -> None:
         self.storage.set_observable(self.to_dict)

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import operator
 
 from datetime import datetime
@@ -14,7 +16,7 @@ class Storage():
 
     _instance = None
 
-    def __new__(cls) -> 'Storage':
+    def __new__(cls) -> Storage:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._redis_pool_storage: ConnectionPool = ConnectionPool(
@@ -24,20 +26,20 @@ class Storage():
         return cls._instance
 
     @property
-    def storage(self):
+    def storage(self) -> Redis:  # type: ignore[type-arg]
         return Redis(connection_pool=self._redis_pool_storage)
 
     # #### User ####
 
-    def get_user(self, user_id: str) -> Optional[Dict[str, str]]:
+    def get_user(self, user_id: str) -> dict[str, str] | None:
         return self.storage.hgetall(f'users:{user_id}')
 
-    def set_user(self, user: Dict[str, str]) -> None:
-        self.storage.hmset(f'users:{user["session_id"]}', user)
+    def set_user(self, user: dict[str, str]) -> None:
+        self.storage.hmset(f'users:{user["session_id"]}', user)  # type: ignore[arg-type]
         self.storage.expire(f'users:{user["session_id"]}', get_config('generic', 'session_expire'))
         self.storage.sadd('users', user["session_id"])
 
-    def get_users(self):
+    def get_users(self) -> list[dict[str, str]]:
         users = []
         to_pop = []
         for session_id in self.storage.smembers('users'):
@@ -52,7 +54,7 @@ class Storage():
         users.sort(key=operator.itemgetter('last_seen'), reverse=True)
         return users
 
-    def del_users(self):
+    def del_users(self) -> None:
         to_delete = [f'users:{key}' for key in self.storage.smembers('users')]
         to_delete.append('users')
         self.storage.delete(*to_delete)
@@ -61,31 +63,31 @@ class Storage():
 
     # #### Role ####
 
-    def get_role(self, role_name: str) -> Dict[str, str]:
+    def get_role(self, role_name: str) -> dict[str, str]:
         return self.storage.hgetall(f'roles:{role_name}')
 
-    def get_roles(self) -> List[Dict[str, str]]:
+    def get_roles(self) -> list[dict[str, str]]:
         roles = []
         for role_name in sorted(list(self.storage.smembers('roles'))):
             roles.append(self.get_role(role_name))
         return roles
 
-    def set_role(self, role: Dict[str, str]) -> None:
-        self.storage.hmset(f'roles:{role["name"]}', role)
+    def set_role(self, role: dict[str, str]) -> None:
+        self.storage.hmset(f'roles:{role["name"]}', role)  # type: ignore[arg-type]
         self.storage.sadd('roles', role["name"])
 
-    def has_roles(self):
-        return self.storage.exists('roles')
+    def has_roles(self) -> bool:
+        return bool(self.storage.exists('roles'))
 
     # ##############
 
     # #### Observable ####
 
-    def set_observable(self, observable: Dict[str, str]):
+    def set_observable(self, observable: dict[str, str]) -> None:
         timestamp = datetime.fromisoformat(observable['last_seen']).timestamp()
         identifier = f'{observable["sha256"]}-{observable["observable_type"]}'
 
-        self.storage.hmset(f'observables:{identifier}', observable)
+        self.storage.hmset(f'observables:{identifier}', observable)  # type: ignore[arg-type]
         if self.storage.hexists(f'observables:{identifier}', 'warninglist'):
             # Clear old way to store WLs
             self.storage.hdel(f'observables:{identifier}', 'warninglist')
@@ -94,19 +96,21 @@ class Storage():
         self.storage.zadd('observables', {identifier: timestamp})
 
     @overload
-    def get_observable(self, sha256: str, observable_type: str) -> Optional[Dict[str, str]]:
+    def get_observable(self, sha256: str, observable_type: str) -> dict[str, str] | None:
         ...
 
     @overload
-    def get_observable(self, identifier: str) -> Optional[Dict[str, str]]:
+    def get_observable(self, identifier: str) -> dict[str, str] | None:
         ...
 
-    def get_observable(self, sha256=None, observable_type=None, identifier=None):
+    def get_observable(self, sha256: str | None=None,  # type: ignore[misc]
+                       observable_type: str | None =None,
+                       identifier: str | None=None) -> dict[str, str] | None:
         if not identifier:
             identifier = f'{sha256}-{observable_type}'
         return self.storage.hgetall(f'observables:{identifier}')
 
-    def get_task_observables(self, task_uuid: str) -> List[Dict[str, str]]:
+    def get_task_observables(self, task_uuid: str) -> list[dict[str, str]]:
         observables = []
         for identifier in self.storage.smembers(f'{task_uuid}:observables'):
             observable = self.get_observable(identifier=identifier)
@@ -114,41 +118,41 @@ class Storage():
                 observables.append(observable)
         return observables
 
-    def add_task_observable(self, task_uuid: str, sha256: str, observable_type: str):
+    def add_task_observable(self, task_uuid: str, sha256: str, observable_type: str) -> None:
         self.storage.sadd(f'{task_uuid}:observables', f'{sha256}-{observable_type}')
 
     # #### Observables lists ####
 
-    def get_suspicious_observables(self):
+    def get_suspicious_observables(self) -> dict[str, str] | None:
         return self.storage.hgetall('suspicious_observables')
 
-    def add_suspicious_observable(self, observable: str, observable_type: str):
+    def add_suspicious_observable(self, observable: str, observable_type: str) -> None:
         self.storage.hset('suspicious_observables', observable.strip(), observable_type.strip())
 
-    def delete_suspicious_observable(self, observable: str):
+    def delete_suspicious_observable(self, observable: str) -> None:
         self.storage.hdel('suspicious_observables', observable.strip())
 
-    def get_legitimate_observables(self):
+    def get_legitimate_observables(self) -> dict[str, str] | None:
         return self.storage.hgetall('legitimate_observables')
 
-    def add_legitimate_observable(self, observable: str, observable_type: str):
+    def add_legitimate_observable(self, observable: str, observable_type: str) -> None:
         self.storage.hset('legitimate_observables', observable.strip(), observable_type.strip())
 
-    def delete_legitimate_observable(self, observable: str):
+    def delete_legitimate_observable(self, observable: str) -> None:
         self.storage.hdel('legitimate_observables', observable.strip())
 
     # ##############
 
     # #### File ####
 
-    def get_file(self, file_id: str) -> Dict[str, str]:
+    def get_file(self, file_id: str) -> dict[str, str]:
         return self.storage.hgetall(f'files:{file_id}')
 
-    def set_file(self, file_details: Dict[str, Union[str, int]]):
-        self.storage.hmset(f'files:{file_details["uuid"]}', file_details)
+    def set_file(self, file_details: dict[str, str | int]) -> None:
+        self.storage.hmset(f'files:{file_details["uuid"]}', file_details)  # type: ignore[arg-type]
         self.storage.sadd('files', file_details["uuid"])
 
-    def get_files(self) -> List[Dict[str, str]]:
+    def get_files(self) -> list[dict[str, str]]:
         files = []
         for uuid in self.storage.smembers('files'):
             files.append(self.get_file(uuid))
@@ -158,38 +162,38 @@ class Storage():
 
     # #### Task ####
 
-    def get_task(self, task_id: str) -> Dict[str, str]:
+    def get_task(self, task_id: str) -> dict[str, str]:
         return self.storage.hgetall(f'tasks:{task_id}')
 
-    def set_task(self, task: Dict[str, str]):
+    def set_task(self, task: dict[str, str]) -> None:
         timestamp = datetime.fromisoformat(task['save_date']).timestamp()
-        self.storage.hmset(f'tasks:{task["uuid"]}', task)
+        self.storage.hmset(f'tasks:{task["uuid"]}', task)  # type: ignore[arg-type]
         self.storage.zadd('tasks', {task["uuid"]: timestamp})
 
-    def get_tasks(self, *, first_date: Union[str, float]=0, last_date: Union[str, float]='+Inf') -> List[Dict[str, str]]:
+    def get_tasks(self, *, first_date: str | float=0, last_date: str | float='+Inf') -> list[dict[str, str]]:
         tasks = []
         for uuid in self.storage.zrevrangebyscore('tasks', min=first_date, max=last_date):
             tasks.append(self.get_task(uuid))
         tasks.sort(key=operator.itemgetter('save_date'), reverse=True)
         return tasks
 
-    def count_tasks(self, *, first_date: Union[str, float]=0, last_date: Union[str, float]='+Inf') -> int:
+    def count_tasks(self, *, first_date: str | float=0, last_date: str | float='+Inf') -> int:
         return self.storage.zcount('tasks', min=first_date, max=last_date)
 
-    def add_extracted_reference(self, parent_task_uuid: str, extracted_task_uuid: str):
+    def add_extracted_reference(self, parent_task_uuid: str, extracted_task_uuid: str) -> None:
         self.storage.sadd(f'tasks:{parent_task_uuid}:extracted', extracted_task_uuid)
 
-    def get_extracted_references(self, task_id: str) -> Set[str]:
+    def get_extracted_references(self, task_id: str) -> set[str]:
         return self.storage.smembers(f'tasks:{task_id}:extracted')
 
     # ##############
 
     # #### Report ####
 
-    def get_report(self, task_uuid: str, worker_name: str) -> Dict[str, str]:
+    def get_report(self, task_uuid: str, worker_name: str) -> dict[str, str]:
         return self.storage.hgetall(f'reports:{task_uuid}-{worker_name}')
 
-    def set_report(self, report: Dict[str, str]):
-        self.storage.hmset(f'reports:{report["task_uuid"]}-{report["worker_name"]}', report)
+    def set_report(self, report: dict[str, str]) -> None:
+        self.storage.hmset(f'reports:{report["task_uuid"]}-{report["worker_name"]}', report)  # type: ignore[arg-type]
         # In case the status of the task was set, drop it
         self.storage.hdel(f'tasks:{report["task_uuid"]}', 'status')

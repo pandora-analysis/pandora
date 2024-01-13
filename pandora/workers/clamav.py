@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import os
 
-from typing import Optional
+from typing import Optional, Unpack
 
 import clamd  # type: ignore
 
@@ -10,7 +12,7 @@ from ..helpers import Status
 from ..task import Task
 from ..report import Report
 
-from .base import BaseWorker
+from .base import BaseWorker, WorkerOption
 
 
 class ClamAVWorker(BaseWorker):
@@ -18,7 +20,7 @@ class ClamAVWorker(BaseWorker):
     socket_path: str
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: Optional[int]=None, **options):
+                 loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
 
         if not self.socket_path or not os.path.exists(self.socket_path):
@@ -26,7 +28,7 @@ class ClamAVWorker(BaseWorker):
             return
         self._socket = clamd.ClamdUnixSocket(path=self.socket_path)
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         self.logger.debug(f'analysing file {task.file.path}...')
         res = self._socket.instream(task.file.data)
         status, message = res['stream']

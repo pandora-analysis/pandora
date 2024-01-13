@@ -17,7 +17,7 @@ logging.config.dictConfig(get_config('logging'))
 
 class UnoserverLauncher(AbstractManager):
 
-    def __init__(self, loglevel: Optional[int]=None):
+    def __init__(self, loglevel: Optional[int]=None) -> None:
         super().__init__(loglevel)
         self.script_name = 'unoserver'
         # Initialize the server, doesn't start it.
@@ -30,12 +30,12 @@ class UnoserverLauncher(AbstractManager):
         self.unoserver.user_installation = Path(self.tmpuserdir).as_uri()
         self.process = self.unoserver.start()
 
-    def _wait_to_finish(self):
+    def _wait_to_finish(self) -> None:
         self.unoserver.stop()
         shutil.rmtree(self.tmpuserdir, ignore_errors=True)
 
 
-def main():
+def main() -> None:
     u = UnoserverLauncher()
     u.run(sleep_in_sec=5)
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import os
 
 from typing import Optional
@@ -26,7 +28,7 @@ class YaraSignatureBaseWorker(YaraWorker):
                       'yara-rules_vuln_drivers_strict_renamed.yar',
                       'expl_citrix_netscaler_adc_exploitation_cve_2023_3519.yar',
                       'gen_vcruntime140_dll_sideloading.yar']
-    last_change: Optional[float] = None
+    last_change: float | None = None
 
     def rules_with_external_vars(self, filename: str, filepath: str, filetype: str, owner: str) -> yara.Rules:
         extension = os.path.splitext(filename)[1]
@@ -38,7 +40,7 @@ class YaraSignatureBaseWorker(YaraWorker):
                                         'owner': owner})
         return rules
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.data:
             report.status = Status.NOTAPPLICABLE
             return

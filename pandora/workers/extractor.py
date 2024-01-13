@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import base64
 import functools
 import os
@@ -12,14 +14,14 @@ from lzma import LZMAFile
 from io import BytesIO
 from pathlib import Path
 from tarfile import TarFile
-from typing import List, Optional, Union, Tuple, Sequence, Dict, overload, Literal, TYPE_CHECKING
+from typing import List, Optional, Union, Tuple, Sequence, Dict, overload, Literal, TYPE_CHECKING, Unpack, Any
 
 from extract_msg.msg_classes import MessageBase, AppointmentMeeting
 from extract_msg.attachments import AttachmentBase, SignedAttachment
 from extract_msg import MSGFile
 from hachoir.stream import StringInputStream  # type: ignore
 from hachoir.parser.archive import CabFile  # type: ignore
-import py7zr  # type: ignore
+import py7zr
 import pycdlib
 from pycdlib.facade import PyCdlibJoliet, PyCdlibUDF, PyCdlibRockRidge, PyCdlibISO9660
 import pyzipper  # type: ignore
@@ -33,18 +35,18 @@ from ..report import Report
 from ..task import Task
 from ..file import File
 
-from .base import BaseWorker
+from .base import BaseWorker, WorkerOption
 
 if TYPE_CHECKING:
     from dfvfs.path.path_spec import PathSpec   # type: ignore
     from dfvfs.volume import tsk_volume_system  # type: ignore
 
 
-def dfvfs_wrapper(func):
+def dfvfs_wrapper(func):  # type: ignore[no-untyped-def]
     # Importing dfvfs changes the timezone, we need to store the one set before, and reset it afterwards
 
     @functools.wraps(func)
-    def reset_local_tz(*args, **kwargs):
+    def reset_local_tz(*args, **kwargs):  # type: ignore[no-untyped-def]
         localtz = get_localzone_name()
         try:
             to_return = func(*args, **kwargs)
@@ -86,10 +88,10 @@ class Extractor(BaseWorker):
     max_recurse: int
     max_extracted_filesize_in_mb: int
     max_is_error: bool
-    zip_passwords: List[str]
+    zip_passwords: list[str]
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: Optional[int]=None, **options):
+                 loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         self.max_extracted_filesize = self.max_extracted_filesize_in_mb * 1000000
 
@@ -97,21 +99,21 @@ class Extractor(BaseWorker):
         self.zip_passwords = [str(pwd) for pwd in self.zip_passwords]
 
     @property
-    def passwords(self):
+    def passwords(self) -> list[str]:
         return self._passwords
 
     @passwords.setter
-    def passwords(self, passwords: List[str]):
+    def passwords(self, passwords: list[str]) -> None:
         self._passwords = passwords
 
-    def _extract_iso(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
-        iso = pycdlib.PyCdlib()
-        extracted_files: List[Path] = []
+    def _extract_iso(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
+        iso = pycdlib.PyCdlib()  # type: ignore[attr-defined]
+        extracted_files: list[Path] = []
         try:
             if not archive_file.data:
                 return extracted_files
             iso.open_fp(archive_file.data)
-            facade: Union[PyCdlibJoliet, PyCdlibUDF, PyCdlibRockRidge, PyCdlibISO9660]
+            facade: PyCdlibJoliet | PyCdlibUDF | PyCdlibRockRidge | PyCdlibISO9660
             if iso.has_udf():
                 facade = iso.get_udf_facade()
             elif iso.has_joliet():
@@ -156,9 +158,10 @@ class Extractor(BaseWorker):
                 pass
         return extracted_files
 
-    def _extract_zip(self, archive_file: File, report: Report, dest_dir: Path, zip_reader=zipfile.ZipFile) -> List[Path]:
+    def _extract_zip(self, archive_file: File, report: Report, dest_dir: Path,  # type: ignore[no-untyped-def]
+                     zip_reader=zipfile.ZipFile) -> list[Path]:
         found_password = False
-        extracted_files: List[Path] = []
+        extracted_files: list[Path] = []
         with zip_reader(str(archive_file.path)) as archive:
             for file_number, info in enumerate(archive.infolist()):
                 if file_number >= self.max_files_in_archive:
@@ -198,9 +201,9 @@ class Extractor(BaseWorker):
                     report.status = Status.CLEAN
         return extracted_files
 
-    def _extract_rar(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
+    def _extract_rar(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
         found_password = False
-        extracted_files: List[Path] = []
+        extracted_files: list[Path] = []
         with rarfile.RarFile(archive_file.path) as archive:
             if not archive.infolist():
                 # Looks like there are no files in the archive, this is suspicious
@@ -246,7 +249,7 @@ class Extractor(BaseWorker):
                     report.status = Status.CLEAN
         return extracted_files
 
-    def _try_password_7z(self, path) -> Optional[str]:
+    def _try_password_7z(self, path: Path) -> str | None:
         for pwd in self.passwords:
             try:
                 with py7zr.SevenZipFile(file=path, mode='r', password=pwd) as archive:
@@ -261,7 +264,7 @@ class Extractor(BaseWorker):
                 continue
         return None
 
-    def _extract_7z(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
+    def _extract_7z(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
         # 7z can be encrypted at 2 places, headers, or files. if headers, we have to try.
         needs_password = False
         try:
@@ -299,7 +302,7 @@ class Extractor(BaseWorker):
 
         return [path for path in dest_dir.glob('**/*') if path.is_file()]
 
-    def _extract_bz2(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
+    def _extract_bz2(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
         # bz2 is a TAR archive, we basically need to unzip it and then extract the files from the TAR
         # No password can be used to protect a bz2, so we don't need to check for passwords this time
         # Sometimes the bz2 won't contain a TAR, but the way to unzip bz2 stays the same either way
@@ -319,9 +322,9 @@ class Extractor(BaseWorker):
             f.write(data)  # write an uncompressed file
         return [new_file_path]
 
-    def _extract_tar(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
+    def _extract_tar(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
         # tar is not a compressed archive but a directory mainly used to regroup other directories
-        extracted_files: List[Path] = []
+        extracted_files: list[Path] = []
         with TarFile(archive_file.path) as tar:
             for file_number, tarinfo in enumerate(tar.getmembers()):
                 if file_number >= self.max_files_in_archive:
@@ -341,8 +344,8 @@ class Extractor(BaseWorker):
                 extracted_files.append(Path(file_path))
         return extracted_files
 
-    def _extract_cab(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
-        extracted_files: List[Path] = []
+    def _extract_cab(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
+        extracted_files: list[Path] = []
         # Code from https://github.com/vstinner/hachoir/issues/65#issuecomment-866965090
         if not archive_file.data:
             return extracted_files
@@ -366,7 +369,7 @@ class Extractor(BaseWorker):
             extracted_files.append(Path(file_path))
         return extracted_files
 
-    def _extract_gz(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
+    def _extract_gz(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
         # gz is just like bz2, a compressed archive with a TAR directory inside
         gz_file = GzipFile(archive_file.path)
         data = gz_file.read(self.max_extracted_filesize + 1)
@@ -383,7 +386,7 @@ class Extractor(BaseWorker):
             f.write(data)  # write an uncompressed file
         return [new_file_path]
 
-    def _extract_lzma(self, archive_file: File, report: Report, dest_dir: Path) -> List[Path]:
+    def _extract_lzma(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
         # lzma is just like bz2 and gz, a compressed archive with a TAR directory inside
         lzma_file = LZMAFile(archive_file.path)
         data = lzma_file.read(self.max_extracted_filesize + 1)
@@ -405,18 +408,18 @@ class Extractor(BaseWorker):
         ...
 
     @overload
-    def check_dfvfs(self, submitted_file: File, check_only: Literal[False]) -> List[Tuple['PathSpec', 'tsk_volume_system.TSKVolumeSystem']]:
+    def check_dfvfs(self, submitted_file: File, check_only: Literal[False]) -> list[tuple[PathSpec, tsk_volume_system.TSKVolumeSystem]]:
         ...
 
-    @dfvfs_wrapper
-    def check_dfvfs(self, submitted_file: File, check_only: bool) -> Union[bool, List[Tuple['PathSpec', 'tsk_volume_system.TSKVolumeSystem']]]:
+    @dfvfs_wrapper  # type: ignore[misc]
+    def check_dfvfs(self, submitted_file: File, check_only: bool) -> bool | list[tuple[PathSpec, tsk_volume_system.TSKVolumeSystem]]:
         to_process = []
         # pylint: disable=C0415
         from dfvfs.analyzer import analyzer  # type: ignore
         from dfvfs.lib import definitions, raw_helper, errors  # type: ignore
         from dfvfs.path import factory  # type: ignore
         from dfvfs.resolver import resolver  # type: ignore
-        from dfvfs.volume import tsk_volume_system  # type: ignore
+        from dfvfs.volume import tsk_volume_system
 
         path_spec = factory.Factory.NewPathSpec(definitions.TYPE_INDICATOR_OS, location=submitted_file.path)
 
@@ -458,16 +461,16 @@ class Extractor(BaseWorker):
             return False
         return to_return
 
-    @dfvfs_wrapper
-    def extract_with_dfvfs(self, archive_file: File, report: Report) -> List[Tuple[str, BytesIO]]:
-        extracted: List[Tuple[str, BytesIO]] = []
+    @dfvfs_wrapper  # type: ignore[misc]
+    def extract_with_dfvfs(self, archive_file: File, report: Report) -> list[tuple[str, BytesIO]]:
+        extracted: list[tuple[str, BytesIO]] = []
         # pylint: disable=C0415
         from dfvfs.vfs.file_entry import FileEntry  # type: ignore
-        from dfvfs.path import factory  # type: ignore
-        from dfvfs.resolver import resolver  # type: ignore
+        from dfvfs.path import factory
+        from dfvfs.resolver import resolver
         from dfvfs.lib import definitions
 
-        def process_dir(file_entry: FileEntry):
+        def process_dir(file_entry: FileEntry) -> None:
             for sub_file_entry in file_entry.sub_file_entries:
                 if len(extracted) >= self.max_files_in_archive:
                     self.logger.warning(f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive, stop extracting.')
@@ -508,14 +511,14 @@ class Extractor(BaseWorker):
                     self.logger.warning('Missing volume identifier, cannot do anything.')
         return extracted
 
-    def extract_eml(self, eml_data: Dict) -> List[Tuple[str, BytesIO]]:
-        extracted: List[Tuple[str, BytesIO]] = []
+    def extract_eml(self, eml_data: dict[str, Any]) -> list[tuple[str, BytesIO]]:
+        extracted: list[tuple[str, BytesIO]] = []
         for attachment in eml_data['attachment']:
             extracted.append((attachment['filename'], BytesIO(base64.b64decode(attachment['raw']))))
         return extracted
 
-    def extract_msg(self, msg_data: Union[MessageBase, AppointmentMeeting]) -> List[Tuple[str, BytesIO]]:
-        extracted: List[Tuple[str, BytesIO]] = []
+    def extract_msg(self, msg_data: MessageBase | AppointmentMeeting) -> list[tuple[str, BytesIO]]:
+        extracted: list[tuple[str, BytesIO]] = []
         for attachment in msg_data.attachments:
             if isinstance(attachment.data, bytes):
                 blob = BytesIO(attachment.data)
@@ -528,8 +531,8 @@ class Extractor(BaseWorker):
                 extracted.append((attachment.name, blob))
         return extracted
 
-    def _extract_daa(self, archive_file: File, report: Report, dest_dir: Path) -> List[Tuple[str, BytesIO]]:
-        def extract_header(data: bytes) -> Dict[str, bytes]:
+    def _extract_daa(self, archive_file: File, report: Report, dest_dir: Path) -> list[tuple[str, BytesIO]]:
+        def extract_header(data: bytes) -> dict[str, bytes]:
             header = {}
             header['magic'] = data[:16]
             header['size_first_offset'] = data[16:20]
@@ -545,7 +548,7 @@ class Extractor(BaseWorker):
             header['crc'] = data[72:76]
             return header
 
-        def getting_chuncklist(header, data):
+        def getting_chuncklist(header: dict[str, Any], data: bytes) -> list[int]:
             chunklist = []
             size_first_offset = int.from_bytes(header['size_first_offset'], byteorder='little', signed=False)
             data_first_offset = int.from_bytes(header['data_first_offset'], byteorder='little', signed=False)
@@ -557,7 +560,7 @@ class Extractor(BaseWorker):
                 chunklist.append(finalchunksize)
             return chunklist
 
-        def unpackdata(header, chunksizes, data):
+        def unpackdata(header: dict[str, Any], chunksizes: list[int], data: bytes) -> bytes:
             raw = b""
             offset = int.from_bytes(header['data_first_offset'], byteorder='little', signed=False)
             for chunksize in chunksizes:
@@ -586,7 +589,7 @@ class Extractor(BaseWorker):
             self.logger.warning('Potentially invalid ISO file length')
         return [('internal_iso_in_daa.iso', BytesIO(raw))]
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         # The files supported by dfvfs generally don't have proper mime types, so we just try it on everything.
         dfvfs_info = self.check_dfvfs(task.file, True)
         if not (task.file.is_archive or task.file.is_eml or task.file.is_msg or dfvfs_info):
@@ -621,10 +624,10 @@ class Extractor(BaseWorker):
 
         pandora = Pandora()
 
-        tasks: List[Task] = []
+        tasks: list[Task] = []
         extracted_dir = task.file.directory / 'extracted'
         safe_create_dir(extracted_dir)
-        extracted: Sequence[Union[Path, Tuple[str, BytesIO]]] = []
+        extracted: Sequence[Path | tuple[str, BytesIO]] = []
 
         # Try to extract files from archive
         # TODO: Support other archive formats

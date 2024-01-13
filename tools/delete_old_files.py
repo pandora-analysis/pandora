@@ -8,7 +8,7 @@ from pandora.pandora import Pandora
 from pandora.user import User
 
 
-def delete_old_files(d: datetime):
+def delete_old_files(d: datetime) -> None:
     p = Pandora()
     u = User('admin', last_ip='127.0.0.1', role='admin')
     for task in p.get_tasks(u, last_date=d, first_date=0):

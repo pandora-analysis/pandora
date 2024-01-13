@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import zipfile
 
 from ..helpers import Status
@@ -11,7 +13,7 @@ from .base import BaseWorker
 
 class ODF(BaseWorker):
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.is_odf:
             report.status = Status.NOTAPPLICABLE
             return

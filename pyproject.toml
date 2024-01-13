@@ -29,12 +29,12 @@ PyYAML = "^6.0.1"
 Flask-WTF = "^1.2.1"
 validators = "^0.22.0"
 python-magic = "^0.4.27"
-PyMuPDF = "^1.23.9"
+PyMuPDF = "^1.23.12"
 requests = "^2.31.0"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.6"
 eml-parser = "^1.17.5"
-unoserver = "^2.0"
+unoserver = "^2.0.1"
 weasyprint = "^60.2"
 extract-msg = {version = "^0.47.0"}
 oletools = {version = "0.60.1", extras = ["full"]}
@@ -87,21 +87,6 @@ types-tzlocal = "^5.1.0.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.mypy]
-python_version = 3.10
-check_untyped_defs = true
-ignore_errors = false
-ignore_missing_imports = false
-strict_optional = true
-no_implicit_optional = true
-warn_unused_ignores = true
-warn_redundant_casts = true
-warn_unused_configs = true
-warn_unreachable = true
-
-show_error_context = true
-pretty = true
 
 [tool.bandit]
 exclude_dirs = ["tasks"]

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import time
 
 from pathlib import Path
@@ -16,7 +18,7 @@ from .base import BaseWorker
 
 class QrCodeDecoder(BaseWorker):
 
-    def _process_image(self, task: Task, report: Report, image_path: Path):
+    def _process_image(self, task: Task, report: Report, image_path: Path) -> None:
         self.logger.debug(f'analysing file {image_path}...')
         try:
             image = cv2.imread(str(image_path))
@@ -33,7 +35,7 @@ class QrCodeDecoder(BaseWorker):
         except Exception as e:
             self.logger.warning(f'Unable to process image: {e}')
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if task.file.is_image:
             self._process_image(task, report, task.file.path)
         else:

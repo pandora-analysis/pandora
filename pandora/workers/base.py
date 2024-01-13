@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextlib
 import json
 import logging
@@ -7,34 +9,38 @@ import time
 import traceback
 
 from logging import LoggerAdapter
-from typing import Tuple, List, Optional, MutableMapping, Any
+from typing import Tuple, List, Optional, MutableMapping, Any, Unpack, TypedDict, Iterator
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
 from redis.exceptions import ResponseError, ConnectionError as RedisConnectionError
 
-from ..default import get_socket_path, get_config
-from ..exceptions import PandoraException
+from ..default import get_socket_path, get_config, PandoraException
 from ..helpers import expire_in_sec, Status
 from ..report import Report
 from ..storage_client import Storage
 from ..task import Task
 
 
-class WorkerLogAdapter(LoggerAdapter):
+class WorkerLogAdapter(LoggerAdapter):  # type: ignore[type-arg]
     """
     Prepend log entry with the UUID of the task
     """
-    def process(self, msg: str, kwargs: MutableMapping[str, Any]) -> Tuple[str, MutableMapping[str, Any]]:
+    def process(self, msg: str, kwargs: MutableMapping[str, Any]) -> tuple[str, MutableMapping[str, Any]]:
         if self.extra:
             return '[{}] {}'.format(self.extra['uuid'], msg), kwargs
         return msg, kwargs
 
 
+class WorkerOption(TypedDict):
+    key: str
+    value: str | int
+
+
 class BaseWorker(multiprocessing.Process):
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: Optional[int]=None, **options):
+                 loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
         """
         Create a worker.
         :param module: module of the worker
@@ -80,15 +86,15 @@ class BaseWorker(multiprocessing.Process):
             setattr(self, key, value)
 
     @property
-    def redis(self):
+    def redis(self) -> Redis:  # type: ignore[type-arg]
         return Redis(connection_pool=self.redis_pool_cache)
 
     @staticmethod
-    def _raise_timeout(_, __):
+    def _raise_timeout(_, __) -> None:  # type: ignore[no-untyped-def]
         raise TimeoutError
 
     @contextlib.contextmanager
-    def _timeout_context(self, logger):
+    def _timeout_context(self, logger: WorkerLogAdapter) -> Iterator[None]:
         start = time.time()
         if self.timeout != 0:
             # Register a function to raise a TimeoutError on the signal.
@@ -120,7 +126,7 @@ class BaseWorker(multiprocessing.Process):
         #    update cache if relevant. Do not store cache on error
         raise NotImplementedError('Stuff this module is doing with this task')
 
-    def _read_stream(self) -> Tuple[str, List[str], Optional[str]]:
+    def _read_stream(self) -> tuple[str, list[str], str | None]:
         while True:
             new_stream = self.redis.xreadgroup(
                 groupname=self.module, consumername=self.name, streams={'tasks_queue': '>'},
@@ -135,7 +141,7 @@ class BaseWorker(multiprocessing.Process):
                 json.loads(values['disabled_workers']) if values.get('disabled_workers') else [],
                 values.get('manual_worker'))
 
-    def run(self):
+    def run(self) -> None:
         """
         Run current worker and execute tasks from queue.
         """

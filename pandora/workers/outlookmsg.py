@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 from extract_msg.msg_classes import AppointmentMeeting
 
 from ..helpers import Status
@@ -11,7 +13,7 @@ from .base import BaseWorker
 
 class OutlookMSG(BaseWorker):
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.msg_data or not isinstance(task.file.msg_data, AppointmentMeeting):
             report.status = Status.NOTAPPLICABLE
             return

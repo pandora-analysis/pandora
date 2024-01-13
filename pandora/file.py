@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import logging
 import re
@@ -8,7 +10,7 @@ from datetime import datetime, timezone
 from functools import cached_property
 from io import BytesIO
 from pathlib import Path
-from typing import Optional, List, Union, Dict, cast, Set, Tuple
+from typing import Optional, List, Union, Dict, cast, Set, Tuple, Any
 from uuid import uuid4
 from zipfile import ZipFile
 
@@ -19,8 +21,8 @@ import pikepdf
 
 from oletools.msodde import process_maybe_encrypted  # type: ignore
 from PIL import Image, ImageDraw, ImageFont  # type: ignore
-from pymisp import MISPEvent, MISPObject
-from pymisp.tools import make_binary_objects, FileObject
+from pymisp import MISPEvent, MISPObject  # type: ignore[attr-defined]
+from pymisp.tools import make_binary_objects, FileObject  # type: ignore[attr-defined]
 from svglib.svglib import svg2rlg  # type: ignore
 from reportlab.graphics import renderPDF  # type: ignore
 import textract  # type: ignore
@@ -38,9 +40,9 @@ from .storage_client import Storage
 from .text_parser import TextParser
 
 
-def html_to_pdf(source: Union[str, bytes, Path], dest: str) -> None:
+def html_to_pdf(source: str | bytes | Path, dest: str) -> None:
 
-    def disable_fetch_weasyprint(url: str, timeout=10, ssl_context=None):
+    def disable_fetch_weasyprint(url: str, timeout: int=10, ssl_context: Any | None=None) -> None:
         raise ValueError(f'Fetching is disabled, ignoring: {url}')
 
     if isinstance(source, str):
@@ -53,7 +55,7 @@ def html_to_pdf(source: Union[str, bytes, Path], dest: str) -> None:
 
 
 class File:
-    MIME_TYPE_EQUAL: Dict[str, List[str]] = {
+    MIME_TYPE_EQUAL: dict[str, list[str]] = {
         'application/zip': ['ARC', 'zip'],
         'application/x-bzip2': ['ARC', 'bz2'],
         'application/java-archive': ['ARC', 'jar'],
@@ -115,7 +117,7 @@ class File:
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['XLS', 'xlsx']
     }
 
-    TYPE_EXTENSIONS: Dict[str, Set[str]] = {
+    TYPE_EXTENSIONS: dict[str, set[str]] = {
         'ARC': {'.zip', '.tar', '.gz', '.bz2', '.bz', '.rar', '.7z', 'lzma'},
         'BIN': {'.bin', '.iso'},
         'CSS': {'.css'},
@@ -134,7 +136,7 @@ class File:
         'TXT': {'.txt'},
         'XLS': {'.xls', '.xlsx', '.ods'}
     }
-    TYPE_ICONS: Dict[str, str] = {
+    TYPE_ICONS: dict[str, str] = {
         'ARC': 'file-zip',
         'BIN': 'file-binary',
         'CSS': 'filetype-css',
@@ -153,7 +155,7 @@ class File:
         'TXT': 'filetype-txt',
         'XLS': 'file-excel',
     }
-    TYPE_INFO: Dict[str, str] = {
+    TYPE_INFO: dict[str, str] = {
         'ARC': 'Archive file',
         'BIN': 'Binary file',
         'CSS': 'Cascading Style Sheet',
@@ -172,30 +174,30 @@ class File:
         'TXT': 'Text file',
         'XLS': 'MS Excel document',
     }
-    OLETOOLS_TYPES: Set[str] = {'DOC', 'PPT', 'RTF', 'XLS'}
-    UNOCONV_TYPES: Set[str] = {'CSS', 'DOC', 'JSC', 'PPT', 'RTF', 'TXT', 'XLS'}
+    OLETOOLS_TYPES: set[str] = {'DOC', 'PPT', 'RTF', 'XLS'}
+    UNOCONV_TYPES: set[str] = {'CSS', 'DOC', 'JSC', 'PPT', 'RTF', 'TXT', 'XLS'}
     FOLDER_MODE = 0o2775
     FILE_MODE = 0o0664
     SUBPROCESS_TIMEOUT: int = 30
 
-    DATA_CHARSETS: List[str] = [
+    DATA_CHARSETS: list[str] = [
         'utf8',
         'latin1',
         'ascii'
     ]
 
     @classmethod
-    def new_file(cls, filepath: Path, filename: str) -> 'File':
+    def new_file(cls, filepath: Path, filename: str) -> File:
         file = cls(filepath, original_filename=filename)
         file.store()
         return file
 
-    def __init__(self, path: Union[Path, str], original_filename: str, uuid: Optional[str]=None, *,
-                 save_date: Optional[Union[str, datetime]]=None,
-                 md5: Optional[str]=None, sha1: Optional[str]=None, sha256: Optional[str]=None,
-                 size: Optional[Union[int, str]]=None,
-                 mime_type: Optional[str]=None,
-                 deleted: Union[bool, int, str]=False):
+    def __init__(self, path: Path | str, original_filename: str, uuid: str | None=None, *,
+                 save_date: str | datetime | None=None,
+                 md5: str | None=None, sha1: str | None=None, sha256: str | None=None,
+                 size: int | str | None=None,
+                 mime_type: str | None=None,
+                 deleted: bool | int | str=False):
         """
         Generate File object.
         :param path: absolute file path
@@ -233,10 +235,10 @@ class File:
         if not self.path.exists():
             self.deleted = True
 
-        self._md5: Optional[str] = None
-        self._sha1: Optional[str] = None
-        self._sha256: Optional[str] = None
-        self._text: Optional[str] = None
+        self._md5: str | None = None
+        self._sha1: str | None = None
+        self._sha256: str | None = None
+        self._text: str | None = None
         self._size: int = 0
         self._mime_type: str = ''
         if self.deleted:
@@ -314,7 +316,7 @@ class File:
                         # Assume txt
                         self.libreoffice_client.convert(indata=body_part['content'].encode(), outpath=f'{self.path}_body_{i}.pdf')
 
-    def paths_to_preview(self) -> List[Path]:
+    def paths_to_preview(self) -> list[Path]:
         if self.is_pdf:
             to_convert = [self.path]
         elif self.is_unoconv_concerned or self.is_html or self.is_image or self.is_svg:
@@ -341,11 +343,11 @@ class File:
                 pix.save(img_name)
 
     @property
-    def previews(self) -> List[Path]:
+    def previews(self) -> list[Path]:
         return sorted(self.directory.glob('preview-*.png'))
 
     @property
-    def previews_archive(self) -> Optional[Path]:
+    def previews_archive(self) -> Path | None:
         if not self.previews:
             return None
         archive_file = self.directory / 'previews.zip'
@@ -361,7 +363,7 @@ class File:
         return self.path.parent
 
     @cached_property
-    def data(self) -> Optional[BytesIO]:
+    def data(self) -> BytesIO | None:
         """
         Property to get file content in binary format.
         :return (BytesIO|None): file content or None if file is not reachable
@@ -372,7 +374,7 @@ class File:
             return BytesIO(f.read())
 
     @property
-    def to_dict(self) -> Dict[str, Union[str, int]]:
+    def to_dict(self) -> dict[str, str | int]:
         return {
             'path': str(self.path),
             'uuid': self.uuid,
@@ -387,7 +389,7 @@ class File:
         }
 
     @property
-    def to_web(self) -> Dict[str, Union[str, int, List[str]]]:
+    def to_web(self) -> dict[str, str | int | list[str]]:
         to_return = cast(Dict[str, Union[str, int, List[str]]], self.to_dict)
         to_return['previews'] = [str(path) for path in self.previews]
         return to_return
@@ -406,7 +408,7 @@ class File:
         return self._md5 if self._md5 else ''
 
     @md5.setter
-    def md5(self, value: str):
+    def md5(self, value: str) -> None:
         self._md5 = value  # nosec B303
 
     @property
@@ -420,7 +422,7 @@ class File:
         return self._sha1 if self._sha1 else ''
 
     @sha1.setter
-    def sha1(self, value: str):
+    def sha1(self, value: str) -> None:
         self._sha1 = value  # nosec B303
 
     @property
@@ -434,7 +436,7 @@ class File:
         return self._sha256 if self._sha256 else ''
 
     @sha256.setter
-    def sha256(self, value: str):
+    def sha256(self, value: str) -> None:
         self._sha256 = value
 
     @property
@@ -451,7 +453,7 @@ class File:
         return self._mime_type
 
     @mime_type.setter
-    def mime_type(self, mime_type: str):
+    def mime_type(self, mime_type: str) -> None:
         self._mime_type = mime_type
 
     def delete(self) -> None:
@@ -476,7 +478,7 @@ class File:
         return self._size
 
     @size.setter
-    def size(self, value: int):
+    def size(self, value: int) -> None:
         self._size = value
 
     @cached_property
@@ -498,7 +500,7 @@ class File:
         return 'BIN'
 
     @cached_property
-    def _extension_for_textract(self) -> Optional[str]:
+    def _extension_for_textract(self) -> str | None:
         """
         Textract expects a specific list of extensions, sanitize the one we have.
         :return (str): file type or None if file is not reachable
@@ -575,11 +577,11 @@ class File:
         return to_return
 
     @property
-    def observables(self) -> Dict[str, Set[str]]:
+    def observables(self) -> dict[str, set[str]]:
         """
         Extract observables from file content
         """
-        observables: Dict[str, Set[str]] = {'ip-dst': set(), 'iban': set(), 'url': set(), 'hostname': set(), 'email': set()}
+        observables: dict[str, set[str]] = {'ip-dst': set(), 'iban': set(), 'url': set(), 'hostname': set(), 'email': set()}
 
         if self.eml_data:
             for body in self.eml_data['body']:
@@ -641,14 +643,14 @@ class File:
         return observables
 
     @cached_property
-    def eml_data(self) -> Optional[Dict]:
+    def eml_data(self) -> dict[str, Any] | None:
         if not self.is_eml:
             return None
         ep = EmlParser(include_raw_body=True, include_attachment_data=True)
         return ep.decode_email(eml_file=self.path)
 
     @cached_property
-    def msg_data(self) -> Optional[Union[MessageBase, AppointmentMeeting]]:
+    def msg_data(self) -> MessageBase | AppointmentMeeting | None:
         # NOTE: the msg file can be other things than a message.
         # See https://github.com/TeamMsgExtractor/msg-extractor/blob/master/extract_msg/utils.py
         if not self.is_msg:
@@ -659,12 +661,12 @@ class File:
         return msg
 
     @cached_property
-    def metadata(self) -> Dict[str, str]:
+    def metadata(self) -> dict[str, str]:
         """
         Get file metadata.
         :return (dict): metadata
         """
-        metadata: Dict[str, str] = {}
+        metadata: dict[str, str] = {}
         if not self.path.exists():
             return {}
         exiftool_path = get_config('generic', 'exiftool_path')
@@ -685,7 +687,7 @@ class File:
         return metadata
 
     @property
-    def icon(self) -> Optional[str]:
+    def icon(self) -> str | None:
         """
         Get web icon for file type.
         :return (str|None): icon name or None if unknown type
@@ -693,7 +695,7 @@ class File:
         return self.TYPE_ICONS.get(self.type)
 
     @property
-    def info(self) -> Optional[str]:
+    def info(self) -> str | None:
         """
         Get type info for web display.
         :return (str|None): type info or None if unknown type
@@ -828,7 +830,7 @@ class File:
         """
         return self.type == 'EXE'
 
-    def misp_export(self) -> Optional[Tuple[FileObject, Optional[MISPObject], Optional[List[MISPObject]]]]:
+    def misp_export(self) -> tuple[FileObject, MISPObject | None, list[MISPObject] | None] | None:
         try:
             # Currently only extract indicators from binary files (PE, ELF, MachO)
             return make_binary_objects(pseudofile=self.data, filename=self.original_filename)
@@ -847,14 +849,14 @@ class File:
                 event.add_object(s)
         if peo:
             if hasattr(peo, 'certificates') and hasattr(peo, 'signers'):
-                for c in peo.certificates:  # type: ignore
+                for c in peo.certificates:
                     event.add_object(c)
-                for s in peo.signers:  # type: ignore
+                for s in peo.signers:
                     event.add_object(s)
-                del peo.certificates  # type: ignore
-                del peo.signers  # type: ignore
+                del peo.certificates
+                del peo.signers
             if hasattr(peo, 'sections'):
-                del peo.sections  # type: ignore
+                del peo.sections
             event.add_object(peo)
         if fo:
             event.add_object(fo)

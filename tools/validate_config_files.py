@@ -9,7 +9,7 @@ from pandora.default import get_homedir, ConfigError
 logger = logging.getLogger('Config validator')
 
 
-def validate_generic_config_file():
+def validate_generic_config_file() -> bool:
     sample_config = get_homedir() / 'config' / 'generic.json.sample'
     with sample_config.open() as f:
         generic_config_sample = json.load(f)
@@ -55,7 +55,7 @@ def validate_generic_config_file():
     return True
 
 
-def update_user_configs():
+def update_user_configs() -> bool:
     for file_name in ['generic']:
         with (get_homedir() / 'config' / f'{file_name}.json').open() as f:
             try:

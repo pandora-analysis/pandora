@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import traceback
 
-from typing import Optional
+from typing import Optional, Unpack
 from urllib.parse import urljoin
 
 import requests
@@ -11,7 +13,7 @@ from ..helpers import Status, get_useragent_for_requests
 from ..task import Task
 from ..report import Report
 
-from .base import BaseWorker
+from .base import BaseWorker, WorkerOption
 
 
 class HybridAnalysis(BaseWorker):
@@ -20,7 +22,7 @@ class HybridAnalysis(BaseWorker):
     apiurl: str
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: Optional[int]=None, **options):
+                 loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
         if not self.apikey:
             self.disabled = True
@@ -42,7 +44,7 @@ class HybridAnalysis(BaseWorker):
             self.logger.warning(e)
             self.disabled = True
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         try:
             self.logger.debug(f'analysing file {task.file.path}...')
             data = {'hash': task.file.sha256}

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime, timezone
 from typing import Dict, Optional, Union
 
@@ -7,11 +9,11 @@ from .storage_client import Storage
 
 class User:
 
-    def __init__(self, session_id: str, *, last_ip: str, name: Optional[str]=None,
-                 detailed_view: Union[bool, int, str]=False,
-                 first_seen: Optional[Union[str, datetime]]=None,
-                 last_seen: Optional[Union[str, datetime]]=None,
-                 role: Union[str, RoleName, Role]=RoleName.other):
+    def __init__(self, session_id: str, *, last_ip: str, name: str | None=None,
+                 detailed_view: bool | int | str=False,
+                 first_seen: str | datetime | None=None,
+                 last_seen: str | datetime | None=None,
+                 role: str | RoleName | Role=RoleName.other):
         """
         Generate User object for flask_login.
         :param session_id: session uid
@@ -54,7 +56,7 @@ class User:
                 stored_role = self.storage.get_role(role)
             self.role = Role(**stored_role)
 
-    def toggle_detailed_view(self):
+    def toggle_detailed_view(self) -> None:
         self._detailed_view = not self._detailed_view
 
     @property
@@ -81,7 +83,7 @@ class User:
         return self.role.name == RoleName.admin
 
     @property
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         return {k: v for k, v in {'session_id': self.session_id, 'name': self.name,
                                   'first_seen': self.first_seen.isoformat(),
                                   'last_seen': self.last_seen.isoformat(),
@@ -91,8 +93,8 @@ class User:
                 if v is not None
                 }
 
-    def store(self):
+    def store(self) -> None:
         self.storage.set_user(self.to_dict)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'User(name={self.name}, session_id={self.session_id}, role={self.role.name})'

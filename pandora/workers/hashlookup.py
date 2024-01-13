@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
 
-from typing import Dict, Any, Tuple, Optional
+from __future__ import annotations
 
-from pyhashlookup import Hashlookup
+from typing import Dict, Any, Tuple, Optional, Unpack
+
+from pyhashlookup import Hashlookup  # type: ignore[attr-defined]
 
 from ..helpers import Status, get_useragent_for_requests
 from ..task import Task
 from ..report import Report
 
-from .base import BaseWorker
+from .base import BaseWorker, WorkerOption
 
 
 class HashlookupWorker(BaseWorker):
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: Optional[int]=None, **options):
+                 loglevel: int | None=None, **options: Unpack[WorkerOption]):
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
 
         try:
@@ -24,7 +26,7 @@ class HashlookupWorker(BaseWorker):
             self.logger.warning(e)
             self.disabled = True
 
-    def _check_result(self, result: Dict[str, Any]) -> Tuple[Optional[bool], Dict]:
+    def _check_result(self, result: dict[str, Any]) -> tuple[bool | None, dict[str, Any]]:
         if 'message' in result:
             # Unknown in db
             return None, {}
@@ -46,7 +48,7 @@ class HashlookupWorker(BaseWorker):
                 legit = True
         return legit, details
 
-    def analyse(self, task: Task, report: Report, manual_trigger: bool=False):
+    def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         self.logger.debug(f'analysing file {task.file.path}...')
         # Run a lookup against all the hashes, as hashlookup gaters multiple
         # sources with different hashes available

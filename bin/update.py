@@ -17,14 +17,14 @@ from pandora.default import get_homedir, get_config
 logging.config.dictConfig(get_config('logging'))
 
 
-def compute_hash_self():
+def compute_hash_self() -> bytes:
     m = hashlib.sha256()
     with (get_homedir() / 'bin' / 'update.py').open('rb') as f:
         m.update(f.read())
         return m.digest()
 
 
-def keep_going(ignore: bool=False):
+def keep_going(ignore: bool=False) -> None:
     if ignore:
         return
     keep_going_str = input('Continue? (y/N) ')
@@ -33,7 +33,7 @@ def keep_going(ignore: bool=False):
         sys.exit()
 
 
-def run_command(command, expect_fail: bool=False, capture_output: bool=True):
+def run_command(command: str, expect_fail: bool=False, capture_output: bool=True) -> None:
     args = shlex.split(command)
     homedir = get_homedir()
     process = subprocess.run(args, cwd=homedir, capture_output=capture_output)
@@ -44,7 +44,7 @@ def run_command(command, expect_fail: bool=False, capture_output: bool=True):
         sys.exit()
 
 
-def check_poetry_version():
+def check_poetry_version() -> None:
     args = shlex.split("poetry self -V")
     homedir = get_homedir()
     process = subprocess.run(args, cwd=homedir, capture_output=True)
@@ -60,7 +60,7 @@ def check_poetry_version():
         sys.exit()
 
 
-def check_unconfigured_workers(default_yes: bool=False):
+def check_unconfigured_workers(default_yes: bool=False) -> None:
     workers_dir = get_homedir() / 'pandora' / 'workers'
     for sample_config in workers_dir.glob('*.yml.sample'):
         if (workers_dir / sample_config.stem).exists():
@@ -90,7 +90,7 @@ def check_unconfigured_workers(default_yes: bool=False):
         print(f'{sample_config.stem} enabled.\n')
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description='Pull latest release, update dependencies, update and validate the config files, update 3rd deps for the website.')
     parser.add_argument('--yes', default=False, action='store_true', help='Run all commands without asking.')
     args = parser.parse_args()

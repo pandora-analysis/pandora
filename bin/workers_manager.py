@@ -19,7 +19,7 @@ logging.config.dictConfig(get_config('logging'))
 
 class WorkersManager(AbstractManager):
 
-    def __init__(self, loglevel: Optional[int]=None):
+    def __init__(self, loglevel: Optional[int]=None) -> None:
         super().__init__(loglevel)
         self.script_name = 'workers_manager'
         self._workers: List[BaseWorker] = []
@@ -35,7 +35,7 @@ class WorkersManager(AbstractManager):
             self.logger.info(f'starting worker {worker.name}...')
             worker.start()
 
-    def _get_worker_class(self, module) -> Type[BaseWorker]:
+    def _get_worker_class(self, module) -> Type[BaseWorker]:  # type: ignore[no-untyped-def]
         for class_name, worker in inspect.getmembers(module, inspect.isclass):
             if class_name == 'BaseWorker':
                 continue
@@ -85,7 +85,7 @@ class WorkersManager(AbstractManager):
             workers_list.append(worker)
         return workers_list
 
-    def _manager(self):
+    def _manager(self) -> None:
         """
         Restart eventual dead workers.
         """
@@ -100,11 +100,11 @@ class WorkersManager(AbstractManager):
             self._workers.append(new_worker)
             new_worker.start()
 
-    def _to_run_forever(self):
+    def _to_run_forever(self) -> None:
         self._manager()
 
 
-def main():
+def main() -> None:
     wm = WorkersManager()
     wm.run(sleep_in_sec=60)
 

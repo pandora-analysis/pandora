@@ -158,7 +158,7 @@ def to_datetime(iso):
     return datetime.fromisoformat(str(iso)) if iso else datetime.now()
 
 
-def html_answer(func):
+def html_answer(func) -> str:
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
