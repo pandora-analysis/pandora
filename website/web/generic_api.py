@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import calendar
 import functools
 import logging
@@ -8,7 +10,7 @@ import logging.config
 from collections import defaultdict
 from datetime import datetime, time, timedelta
 from io import BytesIO
-from typing import Dict, List, Tuple, Optional, Union, Any
+from typing import Any, Callable
 
 import flask_login  # type: ignore
 
@@ -39,7 +41,7 @@ api = Namespace('PandoraAPI', description='Pandora API', path='/')
 seed_manager = Seed()
 
 
-def api_auth_check(method):
+def api_auth_check(method):  # type: ignore[no-untyped-def]
     if load_user_from_request(request) or flask_login.current_user.is_authenticated:
         return method
     abort(403, 'Authentication required.')
@@ -47,15 +49,15 @@ def api_auth_check(method):
 
 @api.route('/redis_up')
 @api.doc(description='Check if redis is up and running')
-class RedisUp(Resource):
+class RedisUp(Resource):  # type: ignore[misc]
 
-    def get(self):
+    def get(self) -> bool:
         return pandora.check_redis_up()
 
 
-def json_answer(func) -> Dict[str, Any]:
+def json_answer(func) -> Callable[[str], Any]:  # type: ignore[no-untyped-def]
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs):  # type: ignore[no-untyped-def]
         try:
             res = func(*args, **kwargs)
         except PandoraException as e:
@@ -73,34 +75,34 @@ def json_answer(func) -> Dict[str, Any]:
 
 @api.route('/api/get_token')
 @api.doc(description='Get the API token required for authenticated calls')
-class AuthToken(Resource):
+class AuthToken(Resource):  # type: ignore[misc]
 
     users_table = build_users_table()
 
-    @api.param('username', 'Your username')
-    @api.param('password', 'Your password')
-    def get(self):
-        username = request.args['username'] if request.args.get('username') else False
-        password = request.args['password'] if request.args.get('password') else False
-        if username in self.users_table and check_password_hash(self.users_table[username]['password'], password):
+    @api.param('username', 'Your username')  # type: ignore[misc]
+    @api.param('password', 'Your password')  # type: ignore[misc]
+    def get(self) -> dict[str, str] | tuple[dict[str, str], int]:
+        username: str = request.args['username'] if request.args.get('username') else ''
+        password: str = request.args['password'] if request.args.get('password') else ''
+        if username and username in self.users_table and check_password_hash(self.users_table[username]['password'], password):
             return {'authkey': self.users_table[username]['authkey']}
         return {'error': 'User/Password invalid.'}, 401
 
 
 @api.route('/role/<action>', methods=['POST'], strict_slashes=False, doc=False)
 @api.doc(description='Update or reload roles')
-class ApiRole(Resource):
+class ApiRole(Resource):  # type: ignore[misc]
 
     @admin_required
     @json_answer
-    def post(self, action):
+    def post(self, action: str) -> dict[str, bool]:
 
         if action not in ('update', 'reload'):
             raise Unsupported(f"unknown action '{action}'")
         if not flask_login.current_user.role.can(Action.update_role):
             raise Forbidden("Your user isn't allowed to edit the roles.")
         if action == 'update' and flask_login.current_user.role.can(Action.update_role):
-            data: Dict[str, str] = request.get_json()  # type: ignore
+            data: dict[str, str] = request.get_json()
             if 'role_name' not in data:
                 raise Unsupported("missing mandatory key 'role_name'")
             if 'permission' not in data:
@@ -116,6 +118,7 @@ class ApiRole(Resource):
             for role in roles_from_config().values():
                 role.store()
             return {'success': True}
+        return {'success': False}
 
 
 upload_parser = api.parser()
@@ -132,10 +135,10 @@ upload_parser.add_argument('password', type=str, required=False,
 
 @api.route('/submit', methods=['POST'], strict_slashes=False)
 @api.expect(upload_parser)
-class ApiSubmit(Resource):
+class ApiSubmit(Resource):  # type: ignore[misc]
 
     @json_answer
-    def post(self):
+    def post(self) -> dict[str, Any] | tuple[dict[str, Any], int]:
         if not flask_login.current_user.role.can(Action.submit_file):
             raise Forbidden('User not allowed to submit a file')
         args = upload_parser.parse_args(request)
@@ -179,10 +182,10 @@ status_parser.add_argument('details', type=int, required=False,
 
 @api.route('/task_status', methods=['GET'], strict_slashes=False)
 @api.expect(status_parser)
-class ApiTaskStatus(Resource):
+class ApiTaskStatus(Resource):  # type: ignore[misc]
 
     @json_answer
-    def get(self):
+    def get(self) -> dict[str, Any] | tuple[dict[str, Any], int]:
         args = status_parser.parse_args(request)
         task_id = args['task_id']
         seed = args['seed'] if args.get('seed') else None
@@ -217,10 +220,10 @@ worker_parser.add_argument('details', type=int, required=False,
 
 @api.route('/worker_status', methods=['GET'], strict_slashes=False)
 @api.expect(worker_parser)
-class ApiWorkerDetails(Resource):
+class ApiWorkerDetails(Resource):  # type: ignore[misc]
 
     @json_answer
-    def get(self):
+    def get(self) -> dict[str, Any]:
         args = worker_parser.parse_args(request)
         task_id = args['task_id']
         seed = args['seed'] if args.get('seed') else None
@@ -235,7 +238,7 @@ class ApiWorkerDetails(Resource):
         update_user_role(pandora, task, seed)
         if not flask_login.current_user.role.can(Action.read_analysis):
             raise Forbidden('Not allowed to read the report')
-        to_return = {}
+        to_return: dict[str, Any] = {}
         if all_workers:
             for r in task.reports.values():
                 to_return[r.worker_name] = {'status': r.status.name}
@@ -254,10 +257,10 @@ class ApiWorkerDetails(Resource):
 @api.route('/task-action/<task_id>/<action>',
            '/task-action/<task_id>/seed-<seed>/<action>', methods=['POST'],
            strict_slashes=False, doc=False)
-class ApiTaskAction(Resource):
+class ApiTaskAction(Resource):  # type: ignore[misc]
 
     @json_answer
-    def post(self, task_id, action, seed=None):
+    def post(self, task_id: str, action: str, seed: str | None=None) -> dict[str, Any] | tuple[dict[str, Any], int]:
         if action not in ('refresh', 'share', 'notify', 'rescan', 'delete'):
             raise Unsupported(f"unexpected action '{action}'")
         task = pandora.get_task(task_id=task_id)
@@ -277,7 +280,7 @@ class ApiTaskAction(Resource):
                     'file': task.file.to_web}
 
         if action == 'share' and flask_login.current_user.role.can(Action.share_analysis):
-            data: Dict[str, str] = request.get_json()  # type: ignore
+            data: dict[str, Any] = request.get_json()
             if "validity" not in data:
                 data['validity'] = get_config('generic', 'default_share_time')
             seed, expire = seed_manager.add(task.uuid, data['validity'])
@@ -285,7 +288,7 @@ class ApiTaskAction(Resource):
             return {'success': True, 'seed': seed, 'lifetime': expire, 'link': link}
 
         if action == 'notify' and flask_login.current_user.role.can(Action.notify_cert):
-            data: Dict[str, str] = request.get_json()  # type: ignore
+            data = request.get_json()
             if 'email' not in data:
                 raise Unsupported("missing mandatory key 'email'")
             if 'message' not in data:
@@ -311,11 +314,12 @@ class ApiTaskAction(Resource):
 
         if action == 'rescan' and flask_login.current_user.role.can(Action.rescan_file):
             try:
-                # FIXME this is disgusting
-                data: Dict[str, str] = request.get_json()  # type: ignore
+                data = request.get_json()
             except Exception:
                 data = {}
             # Here we create a brand new task.
+            if task.file.data is None:
+                return {'success': False, 'error': 'No Data, unable to rescan'}, 400
             try:
                 new_task = Task.new_task(flask_login.current_user,
                                          sample=task.file.data,
@@ -344,14 +348,14 @@ class ApiTaskAction(Resource):
            '/api/search/<query>/<int:days>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Search a task by hash or name. The 'days' parameter (10 by default) is there to limit how far in the past we go for the search", security='apikey')
-class ApiSearch(Resource):
+class ApiSearch(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, query: str, days: int=10):
-        first_date: Union[datetime, int] = datetime.now() - timedelta(days=days)
-        to_return: Dict = {'matching_tasks': []}
+    def get(self, query: str, days: int=10) -> dict[str, Any]:
+        first_date: datetime | int = datetime.now() - timedelta(days=days)
+        to_return: dict[str, Any] = {'matching_tasks': []}
         for task in pandora.get_tasks(user=flask_login.current_user, first_date=first_date):
             if (query in [task.file.md5, task.file.sha1, task.file.sha256]
                     or [name for name in [task.file.original_filename, task.file.path.name] if query in name]):
@@ -360,7 +364,7 @@ class ApiSearch(Resource):
 
 
 # Stats related API stuff
-def _intervals(freq: int, first: datetime, last: datetime) -> List[Tuple[datetime, datetime]]:
+def _intervals(freq: int, first: datetime, last: datetime) -> list[tuple[datetime, datetime]]:
     to_return = []
     first = datetime.combine(first.date(), time.min)
     last = datetime.combine(last.date(), time.max)
@@ -382,7 +386,7 @@ def _intervals(freq: int, first: datetime, last: datetime) -> List[Tuple[datetim
     return to_return
 
 
-def _normalize_year(year: Optional[str]) -> Tuple[datetime, datetime]:
+def _normalize_year(year: str | None) -> tuple[datetime, datetime]:
     if year:
         last_date = datetime(int(year), 12, 31)
     else:
@@ -391,7 +395,7 @@ def _normalize_year(year: Optional[str]) -> Tuple[datetime, datetime]:
     return first_date, last_date
 
 
-def _normalize_month(year: Optional[Union[str, int]], month: Optional[Union[str, int]]) -> Tuple[datetime, datetime]:
+def _normalize_month(year: str | int | None, month: str | int | None) -> tuple[datetime, datetime]:
     if month:
         if not year:
             year = datetime.now().year
@@ -402,7 +406,7 @@ def _normalize_month(year: Optional[Union[str, int]], month: Optional[Union[str,
     return first_date, last_date
 
 
-def _normalize_week(year: Optional[Union[str, int]], week: Optional[Union[str, int]]) -> Tuple[datetime, datetime]:
+def _normalize_week(year: str | int | None, week: str | int | None) -> tuple[datetime, datetime]:
     if week:
         if not year:
             year = datetime.now().year
@@ -416,8 +420,8 @@ def _normalize_week(year: Optional[Union[str, int]], week: Optional[Union[str, i
     return first_date, last_date
 
 
-def _normalize_day(year: Optional[Union[str, int]], month: Optional[Union[str, int]],
-                   day: Optional[Union[str, int]]) -> Tuple[datetime, datetime]:
+def _normalize_day(year: str | int | None, month: str | int | None,
+                   day: str | int | None) -> tuple[datetime, datetime]:
     if day:
         if not month:
             month = datetime.now().month
@@ -433,14 +437,14 @@ def _normalize_day(year: Optional[Union[str, int]], month: Optional[Union[str, i
            '/api/stats/submit/year/<string:year>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Get the yearly submit stats", security='apikey')
-class ApiSubmitStatsYear(Resource):
+class ApiSubmitStatsYear(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, year: Optional[str]=None):
+    def get(self, year: str | None=None) -> dict[str, Any]:
         first_date, last_date = _normalize_year(year)
-        to_return: Dict[str, Any] = {'date_start': first_date.date().isoformat(),
+        to_return: dict[str, Any] = {'date_start': first_date.date().isoformat(),
                                      'date_end': last_date.date().isoformat(),
                                      'sub_months': []}
         for first, last in _intervals(rrule.MONTHLY, first_date, last_date):
@@ -455,14 +459,14 @@ class ApiSubmitStatsYear(Resource):
            '/api/stats/submit/month/<string:month>/<string:year>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Get the monthly submit stats", security='apikey')
-class ApiSubmitStatsMonth(Resource):
+class ApiSubmitStatsMonth(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, year: Optional[str]=None, month: Optional[str]=None):
+    def get(self, year: str | None=None, month: str | None=None) -> dict[str, Any]:
         first_date, last_date = _normalize_month(year, month)
-        to_return: Dict[str, Any] = {'date_start': first_date.date().isoformat(),
+        to_return: dict[str, Any] = {'date_start': first_date.date().isoformat(),
                                      'date_end': last_date.date().isoformat(),
                                      'sub_weeks': []}
         for first, last in _intervals(rrule.DAILY, first_date, last_date):
@@ -477,14 +481,14 @@ class ApiSubmitStatsMonth(Resource):
            '/api/stats/submit/week/<string:week>/<string:year>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Get the weekly submit stats", security='apikey')
-class ApiSubmitStatsWeek(Resource):
+class ApiSubmitStatsWeek(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, year: Optional[str]=None, week: Optional[str]=None):
+    def get(self, year: str | None=None, week: str | None=None) -> dict[str, Any]:
         first_date, last_date = _normalize_week(year, week)
-        to_return: Dict[str, Any] = {'date_start': first_date.date().isoformat(),
+        to_return: dict[str, Any] = {'date_start': first_date.date().isoformat(),
                                      'date_end': last_date.date().isoformat(),
                                      'sub_days': []}
         for first, last in _intervals(rrule.DAILY, first_date, last_date):
@@ -500,14 +504,14 @@ class ApiSubmitStatsWeek(Resource):
            '/api/stats/submit/day/<string:day>/<string:month>/<string:year>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Get the daily submit stats", security='apikey')
-class ApiSubmitStatsDay(Resource):
+class ApiSubmitStatsDay(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, year: Optional[str]=None, month: Optional[str]=None, day: Optional[str]=None):
+    def get(self, year: str | None=None, month: str | None=None, day: str | None=None) -> dict[str, Any]:
         first_date, last_date = _normalize_day(year, month, day)
-        to_return: Dict[str, Any] = {'date_start': first_date.date().isoformat(),
+        to_return: dict[str, Any] = {'date_start': first_date.date().isoformat(),
                                      'date_end': last_date.date().isoformat(),
                                      'sub_hours': []}
         for first, last in _intervals(rrule.HOURLY, first_date, last_date):
@@ -517,8 +521,8 @@ class ApiSubmitStatsDay(Resource):
         return to_return
 
 
-def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
-    to_return: Dict[str, Any] = {'date_start': intervals[0][0].date().isoformat(),
+def _stats(intervals: list[tuple[datetime, datetime]]) -> dict[str, Any]:
+    to_return: dict[str, Any] = {'date_start': intervals[0][0].date().isoformat(),
                                  'date_end': intervals[-1][1].date().isoformat()}
     # NOTE: the actual source of the submission isn't stored yet.
     to_return['submit'] = defaultdict(int)
@@ -566,12 +570,12 @@ def _stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
            '/api/stats/year/<string:year>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Get the yearly stats", security='apikey')
-class ApiStatsYear(Resource):
+class ApiStatsYear(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, year: Optional[str]=None):
+    def get(self, year: str | None=None) -> dict[str, Any]:
         first_date, last_date = _normalize_year(year)
         intervals = _intervals(rrule.MONTHLY, first_date, last_date)
         return _stats(intervals)
@@ -582,12 +586,12 @@ class ApiStatsYear(Resource):
            '/api/stats/month/<string:month>/<string:year>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Get the monthly stats", security='apikey')
-class ApiStatsMonth(Resource):
+class ApiStatsMonth(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, year: Optional[str]=None, month: Optional[str]=None):
+    def get(self, year: str | None=None, month: str | None=None) -> dict[str, Any]:
         first_date, last_date = _normalize_month(year, month)
         intervals = _intervals(rrule.DAILY, first_date, last_date)
         return _stats(intervals)
@@ -598,12 +602,12 @@ class ApiStatsMonth(Resource):
            '/api/stats/week/<string:week>/<string:year>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Get the weekly stats", security='apikey')
-class ApiStatsWeek(Resource):
+class ApiStatsWeek(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, year: Optional[str]=None, week: Optional[str]=None):
+    def get(self, year: str | None=None, week: str | None=None) -> dict[str, Any]:
         first_date, last_date = _normalize_week(year, week)
         intervals = _intervals(rrule.WEEKLY, first_date, last_date)
         return _stats(intervals)
@@ -615,19 +619,19 @@ class ApiStatsWeek(Resource):
            '/api/stats/day/<string:day>/<string:month>/<string:year>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Get the daily stats", security='apikey')
-class ApiStatsDay(Resource):
+class ApiStatsDay(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, year: Optional[str]=None, month: Optional[str]=None, day: Optional[str]=None):
+    def get(self, year: str | None=None, month: str | None=None, day: str | None=None) -> dict[str, Any]:
         first_date, last_date = _normalize_day(year, month, day)
         intervals = _intervals(rrule.HOURLY, first_date, last_date)
         return _stats(intervals)
 
 
-def _workers_stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
-    to_return: Dict[str, Any] = {'date_start': intervals[0][0].date().isoformat(),
+def _workers_stats(intervals: list[tuple[datetime, datetime]]) -> dict[str, Any]:
+    to_return: dict[str, Any] = {'date_start': intervals[0][0].date().isoformat(),
                                  'date_end': intervals[-1][1].date().isoformat()}
     to_return['workers_stats'] = {name: defaultdict(dict) for name in pandora.get_enabled_workers()}
     for first, last in intervals:
@@ -648,12 +652,12 @@ def _workers_stats(intervals: List[Tuple[datetime, datetime]]) -> Dict:
            '/api/workers_stats/year/<string:year>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Get the yearly stats for each workers", security='apikey')
-class ApiWorkersStatsYear(Resource):
+class ApiWorkersStatsYear(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, year: Optional[str]=None):
+    def get(self, year: str | None=None) -> dict[str, Any]:
         first_date, last_date = _normalize_year(year)
         intervals = _intervals(rrule.MONTHLY, first_date, last_date)
         return _workers_stats(intervals)
@@ -664,12 +668,12 @@ class ApiWorkersStatsYear(Resource):
            '/api/workers_stats/month/<string:month>/<string:year>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Get the monthly stats for each workers", security='apikey')
-class ApiWorkersStatsMonth(Resource):
+class ApiWorkersStatsMonth(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, year: Optional[str]=None, month: Optional[str]=None):
+    def get(self, year: str | None=None, month: str | None=None) -> dict[str, Any]:
         first_date, last_date = _normalize_month(year, month)
         intervals = _intervals(rrule.DAILY, first_date, last_date)
         return _workers_stats(intervals)
@@ -680,12 +684,12 @@ class ApiWorkersStatsMonth(Resource):
            '/api/workers_stats/week/<string:week>/<string:year>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Get the weekly stats for each workers", security='apikey')
-class ApiWorkersStatsWeek(Resource):
+class ApiWorkersStatsWeek(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, year: Optional[str]=None, week: Optional[str]=None):
+    def get(self, year: str | None=None, week: str | None=None) -> dict[str, Any]:
         first_date, last_date = _normalize_week(year, week)
         intervals = _intervals(rrule.WEEKLY, first_date, last_date)
         return _workers_stats(intervals)
@@ -697,12 +701,12 @@ class ApiWorkersStatsWeek(Resource):
            '/api/workers_stats/day/<string:day>/<string:month>/<string:year>', methods=['GET'],
            strict_slashes=False)
 @api.doc(description="Get the daily stats for each workers", security='apikey')
-class ApiWorkersStatsDay(Resource):
+class ApiWorkersStatsDay(Resource):  # type: ignore[misc]
     method_decorators = [api_auth_check]
 
     @admin_required
     @json_answer
-    def get(self, year: Optional[str]=None, month: Optional[str]=None, day: Optional[str]=None):
+    def get(self, year: str | None=None, month: str | None=None, day: str | None=None) -> dict[str, Any]:
         first_date, last_date = _normalize_day(year, month, day)
         intervals = _intervals(rrule.HOURLY, first_date, last_date)
         return _workers_stats(intervals)

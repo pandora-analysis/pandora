@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import hashlib
 import json
 import os
 
 from functools import lru_cache, wraps
 from pathlib import Path
-from typing import Dict, Union, List, Optional
+from typing import Callable, Any
 
-from flask import abort
+from flask import abort, Request
 import flask_login  # type: ignore
 from werkzeug.security import generate_password_hash
 
@@ -20,7 +22,7 @@ from pandora.task import Task
 
 # Method to make sizes in bytes human readable
 # Source: https://stackoverflow.com/questions/1094841/reusable-library-to-get-human-readable-version-of-file-size
-def sizeof_fmt(num, suffix='B'):
+def sizeof_fmt(num: int | float, suffix: str='B') -> str:
     for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
         if abs(num) < 1024.0:
             return f"{num:3.1f}{unit}{suffix}"
@@ -28,7 +30,7 @@ def sizeof_fmt(num, suffix='B'):
     return ("{:.1f}{}{}".format(num, 'Yi', suffix)).strip()
 
 
-def src_request_ip(request) -> str:
+def src_request_ip(request: Request) -> str | None:
     # NOTE: X-Real-IP is the IP passed by the reverse proxy in the headers.
     real_ip = request.headers.get('X-Real-IP')
     if not real_ip:
@@ -47,7 +49,7 @@ def get_secret_key() -> bytes:
         return f.read()
 
 
-def update_user_role(pandora: Pandora, task: Task, seed: Optional[str]=None):
+def update_user_role(pandora: Pandora, task: Task, seed: str | None=None) -> None:
     if flask_login.current_user.is_admin:
         flask_login.current_user.role = pandora.get_role(role_name=RoleName.admin)
     elif task.user and task.user.get_id() == flask_login.current_user.get_id():
@@ -58,9 +60,9 @@ def update_user_role(pandora: Pandora, task: Task, seed: Optional[str]=None):
         flask_login.current_user.role = pandora.get_role(role_name=RoleName.other)
 
 
-def admin_required(func):
+def admin_required(func) -> Callable[..., Any]:  # type: ignore[no-untyped-def]
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs):  # type: ignore[no-untyped-def]
         if not flask_login.current_user.is_admin:
             return abort(403)
         return func(*args, **kwargs)
@@ -69,13 +71,13 @@ def admin_required(func):
 
 
 @lru_cache(64)
-def get_users() -> Dict[str, Union[str, List[str]]]:
+def get_users() -> dict[str, str | list[str]]:
     return get_config('generic', 'users')
 
 
 @lru_cache(64)
-def build_users_table() -> Dict[str, Dict[str, str]]:
-    users_table: Dict[str, Dict[str, str]] = {}
+def build_users_table() -> dict[str, dict[str, str]]:
+    users_table: dict[str, dict[str, str]] = {}
     for username, authstuff in get_users().items():
         if isinstance(authstuff, str):
             # just a password, make a key
@@ -100,7 +102,7 @@ def build_users_table() -> Dict[str, Dict[str, str]]:
 
 
 @lru_cache(64)
-def build_keys_table() -> Dict[str, str]:
+def build_keys_table() -> dict[str, str]:
     keys_table = {}
     for username, authstuff in build_users_table().items():
         if 'authkey' in authstuff:
@@ -108,7 +110,7 @@ def build_keys_table() -> Dict[str, str]:
     return keys_table
 
 
-def load_user_from_request(request) -> Optional[str]:
+def load_user_from_request(request: Request) -> str | None:
     '''Returns the username if the auth key matches'''
     api_key = request.headers.get('Authorization')
     if not api_key:
@@ -121,6 +123,6 @@ def load_user_from_request(request) -> Optional[str]:
 
 
 @lru_cache(64)
-def sri_load() -> Dict[str, Dict[str, str]]:
+def sri_load() -> dict[str, dict[str, str]]:
     with (get_homedir() / 'website' / 'web' / 'sri.txt').open() as f:
         return json.load(f)

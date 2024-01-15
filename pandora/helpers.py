@@ -208,7 +208,7 @@ class Seed():
     def get_task_uuid(self, seed: str) -> str | None:
         return self.redis.get(f'seed:{seed}')
 
-    def add(self, task_uuid: str, time: str | None=None, seed: str | None=None) -> tuple[str, int]:
+    def add(self, task_uuid: str, time: str | int | None=None, seed: str | None=None) -> tuple[str, int]:
         expire = expire_in_sec(time)
         if not seed:
             seed = secrets.token_urlsafe()

@@ -38,10 +38,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import annotations
+
 import logging
 import pickle  # nosec
 
-from typing import Optional, Dict
+from typing import Any
 from uuid import uuid4
 
 from flask import Flask, Request, Response
@@ -53,19 +55,21 @@ from itsdangerous.url_safe import URLSafeSerializer
 from werkzeug.datastructures import CallbackDict
 
 
-class RedisSession(CallbackDict, SessionMixin):
+class RedisSession(CallbackDict, SessionMixin):  # type: ignore[type-arg]
     """Baseclass for server-side based sessions."""
 
     sid: str
     modified: bool
     permanent: bool
 
-    def __init__(self, redis: Redis, key_prefix: str, sid: Optional[str]=None,
-                 initial: Optional[Dict]=None):
-        def on_update(self):
+    def __init__(self, redis: Redis, key_prefix: str, sid: str | None=None,  # type: ignore[type-arg]
+                 initial: dict[str, Any] | None=None) -> None:
+
+        def on_update(self) -> None:  # type: ignore[no-untyped-def]
             self.modified = True
+
         CallbackDict.__init__(self, initial, on_update)
-        self.redis: Redis = redis
+        self.redis: Redis = redis  # type: ignore[type-arg]
         self.key_prefix: str = key_prefix
         if sid is None:
             self.sid = str(uuid4())
@@ -74,7 +78,7 @@ class RedisSession(CallbackDict, SessionMixin):
         self.permanent = True
         self.modified = False
 
-    def clear(self):
+    def clear(self) -> None:
         self.redis.delete(f'{self.key_prefix}{self.sid}')
         self.sid = str(uuid4())
 
@@ -87,10 +91,10 @@ class RedisSessionInterface(SessionInterface):
     :param secret_key: Used to sign the sid.
     """
 
-    def __init__(self, redis: Redis, key_prefix: str, secret_key: str):
+    def __init__(self, redis: Redis, key_prefix: str, secret_key: str) -> None:  # type: ignore[type-arg]
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
         self.logger.setLevel('INFO')
-        self.redis: Redis = redis
+        self.redis: Redis = redis  # type: ignore[type-arg]
         self.key_prefix: str = key_prefix
         self.safe_serializer = URLSafeSerializer(secret_key)
 
@@ -115,7 +119,7 @@ class RedisSessionInterface(SessionInterface):
         self.logger.debug(f'Key in redis for session id {sid}')
         return RedisSession(redis=self.redis, key_prefix=self.key_prefix)
 
-    def save_session(self, app: Flask, session: RedisSession, response: Response):  # type: ignore[override]
+    def save_session(self, app: Flask, session: RedisSession, response: Response) -> None:  # type: ignore[override]
         # if not self.should_set_cookie(app, session):
         #    return
 
@@ -146,12 +150,12 @@ class RedisSessionInterface(SessionInterface):
 
 class Session():
 
-    def __init__(self, app: Optional[Flask]=None):
+    def __init__(self, app: Flask | None=None):
         self.app = app
         if app is not None:
             self.init_app(app)
 
-    def init_app(self, app: Flask):
+    def init_app(self, app: Flask) -> None:
         """This is used to set up session for your app object.
 
         :param app: the Flask app object with proper configuration.

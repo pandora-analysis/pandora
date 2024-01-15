@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import functools
 import json
 import logging
@@ -12,7 +14,7 @@ import email.utils
 from importlib.metadata import version
 from io import BytesIO
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Callable
 
 import flask_moment  # type: ignore
 import flask_login  # type: ignore
@@ -20,17 +22,18 @@ import flask_wtf  # type: ignore
 import pyzipper  # type: ignore
 
 from flask import (Flask, request, session, abort, render_template,
-                   redirect, send_file, url_for, flash)
+                   redirect, send_file, url_for, flash, Request)
 from flask_restx import Api  # type: ignore
 from flask_bootstrap import Bootstrap5  # type: ignore
-from pymisp import MISPEvent, PyMISP
+from pymisp import MISPEvent, PyMISP  # type: ignore[attr-defined]
 from pymisp.abstract import describe_types
 from werkzeug.security import check_password_hash
 from werkzeug.exceptions import Forbidden
+from werkzeug import Response as WerkzeugResponse
 
-from pandora.default import get_config
-from pandora.exceptions import PandoraException, Unsupported
-from pandora.helpers import workers, get_homedir, Status, get_disclaimers
+from pandora.default import get_config, PandoraException, get_homedir
+from pandora.exceptions import Unsupported
+from pandora.helpers import workers, Status, get_disclaimers
 from pandora.pandora import Pandora
 from pandora.role import Action
 from pandora.user import User
@@ -91,7 +94,7 @@ api = Api(title='Pandora API',
 api.add_namespace(generic_api)
 
 
-def default_icon():
+def default_icon() -> str:
     return 'question'
 
 
@@ -105,7 +108,7 @@ status_icons = defaultdict(default_icon, {
 
 
 @app.context_processor
-def inject_enums():
+def inject_enums() -> dict[str, Any]:
     '''All the templates have the Action and Status enum'''
     return {"action": Action, "status": Status, "status_icons": status_icons}
 
@@ -121,22 +124,23 @@ app.jinja_env.globals.update(get_sri=get_sri)
 app.jinja_env.globals.update(sizeof_fmt=sizeof_fmt)
 
 
-@login_manager.user_loader
-def load_user(user_id):
+@login_manager.user_loader  # type: ignore[misc]
+def load_user(user_id: str) -> User | None:
     return pandora.get_user(user_id)
 
 
-@login_manager.request_loader
-def _load_user_from_request(req):
+@login_manager.request_loader  # type: ignore[misc]
+def _load_user_from_request(req: Request) -> User | None:
     user_name = load_user_from_request(req)
     if user_name:
-        return User(session.sid, last_ip=src_request_ip(req),
-                    name=user_name, role='admin')
+        if last_ip := src_request_ip(req):
+            return User(session.sid, last_ip=last_ip, name=user_name, role='admin')  # type: ignore[attr-defined]
+        raise Exception('No IP in request Oo.')
     return None
 
 
 @app.before_request
-def update_user():
+def update_user() -> None:
     if (user := _load_user_from_request(request)):
         flask_login.login_user(user)
     elif flask_login.current_user.is_authenticated:
@@ -154,13 +158,13 @@ def update_user():
 
 
 @app.template_filter()
-def to_datetime(iso):
+def to_datetime(iso: str) -> datetime:
     return datetime.fromisoformat(str(iso)) if iso else datetime.now()
 
 
-def html_answer(func) -> str:
+def html_answer(func) -> Callable[..., Any]:  # type: ignore[no-untyped-def]
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs):  # type: ignore[no-untyped-def]
         try:
             res = func(*args, **kwargs)
         except (PandoraException, Exception):
@@ -172,21 +176,21 @@ def html_answer(func) -> str:
 
 
 @app.errorhandler(404)
-def api_error_404(_):
+def api_error_404(_) -> tuple[str, int]:  # type: ignore[no-untyped-def]
     return render_template('error.html',
                            show_project_page=get_config('generic', 'show_project_page'),
                            status=404), 404
 
 
 @app.errorhandler(403)
-def api_error_403(_):
+def api_error_403(_) -> tuple[str, int]:  # type: ignore[no-untyped-def]
     return render_template('error.html',
                            show_project_page=get_config('generic', 'show_project_page'),
                            status=403), 403
 
 
 @app.route('/', strict_slashes=False)
-def api_root():
+def api_root() -> Any:
     if request.method == 'HEAD':
         # Just returns ack if the webserver is running
         return 'Ack'
@@ -194,7 +198,7 @@ def api_root():
 
 
 @app.route('/toggle_detailed_view', methods=['POST'], strict_slashes=False)
-def api_toggle_detailed_view():
+def api_toggle_detailed_view() -> str:
     try:
         flask_login.current_user.toggle_detailed_view()
         flask_login.current_user.store()
@@ -206,7 +210,7 @@ def api_toggle_detailed_view():
 
 @app.route('/submit', methods=['GET'], strict_slashes=False)
 @html_answer
-def api_submit_page():
+def api_submit_page() -> str:
     if not flask_login.current_user.role.can(Action.submit_file):
         raise Forbidden('User not allowed to submit a file')
     enaled_workers = pandora.get_enabled_workers()
@@ -224,7 +228,7 @@ def api_submit_page():
 @app.route('/analysis/<task_id>', methods=['GET'], strict_slashes=False)
 @app.route('/analysis/<task_id>/seed-<seed>', methods=['GET'], strict_slashes=False)
 @html_answer
-def api_analysis(task_id, seed=None):
+def api_analysis(task_id: str, seed: str | None=None) -> str:
     task = pandora.get_task(task_id=task_id)
     if not task:
         raise PandoraException('analysis not found')
@@ -233,7 +237,7 @@ def api_analysis(task_id, seed=None):
     if not flask_login.current_user.role.can(Action.read_analysis):
         raise Forbidden('Not allowed to read the report')
 
-    task.linked_tasks = []
+    task.linked_tasks = []  # type: ignore[assignment]
 
     if hasattr(task, 'parent') and task.parent and seed and not pandora.is_seed_valid(task.parent, seed):
         task.parent = None
@@ -255,7 +259,7 @@ def api_analysis(task_id, seed=None):
 @app.route('/task-misp-submit/<task_id>', methods=['GET'], strict_slashes=False)
 @app.route('/task-misp-submit/<task_id>/seed-<seed>', methods=['GET'], strict_slashes=False)
 @html_answer
-def task_misp_submit(task_id, seed: Optional[str]=None):
+def task_misp_submit(task_id: str, seed: str | None=None) -> WerkzeugResponse:
     task = pandora.get_task(task_id=task_id)
     if not task:
         raise PandoraException('analysis not found')
@@ -277,7 +281,7 @@ def task_misp_submit(task_id, seed: Optional[str]=None):
 @app.route('/task-download/<task_id>/<source>', methods=['GET'], strict_slashes=False)
 @app.route('/task-download/<task_id>/<source>/<int:idx>', methods=['GET'], strict_slashes=False)
 @html_answer
-def api_task_download(task_id, source, seed=None, idx=None):
+def api_task_download(task_id: str, source: str, seed: str | None=None, idx: int | None=None) -> WerkzeugResponse:
     if source not in ('img', 'pdf', 'txt', 'zip', 'txt_preview', 'misp'):
         raise Unsupported(f"unexpected source '{source}'")
     task = pandora.get_task(task_id=task_id)
@@ -290,7 +294,8 @@ def api_task_download(task_id, source, seed=None, idx=None):
             raise PandoraException('content not available')
         if idx is not None:
             return send_file(task.file.previews[idx])
-        return send_file(task.file.previews_archive)
+        if task.file.previews_archive:
+            return send_file(task.file.previews_archive)
 
     if source == 'pdf' and flask_login.current_user.role.can(Action.download_pdf):
         # NOTE: need to also return a PDF of office doc.
@@ -311,7 +316,8 @@ def api_task_download(task_id, source, seed=None, idx=None):
         to_return = BytesIO()
         with pyzipper.AESZipFile(to_return, 'w', encryption=pyzipper.WZ_AES) as archive:
             archive.setpassword(get_config('generic', 'sample_password').encode())
-            archive.writestr(task.file.original_filename, task.file.data.getvalue())
+            if task.file.data:
+                archive.writestr(task.file.original_filename, task.file.data.getvalue())
         to_return.seek(0)
         return send_file(to_return, download_name=f'{task.file.path.name}.zip')
 
@@ -325,16 +331,20 @@ def api_task_download(task_id, source, seed=None, idx=None):
 @app.route('/admin/<int:error>', methods=['GET'], strict_slashes=False)
 @app.route('/admin', methods=['GET'], strict_slashes=False)
 @html_answer
-def api_admin_page(error=None):
-    error_messages = {1: 'Invalid Credentials', 2: 'Unable to initialize credentials, see logs.'}
+def api_admin_page(error: int | None=None) -> str:
+    error_messages: dict[int, str] = {1: 'Invalid Credentials', 2: 'Unable to initialize credentials, see logs.'}
+    if error is not None:
+        msg = error_messages.get(error, 'Unknown error')
+    else:
+        msg = 'Unknown error'
     return render_template('admin.html',
                            show_project_page=get_config('generic', 'show_project_page'),
-                           error=error_messages.get(error))
+                           error=msg)
 
 
 @app.route('/admin', methods=['POST'], strict_slashes=False)
 @html_answer
-def api_admin_submit():
+def api_admin_submit() -> WerkzeugResponse:
     if flask_login.current_user.is_admin:
         return redirect(url_for('api_admin_page'))
 
@@ -363,7 +373,7 @@ def api_admin_submit():
 
 @app.route('/admin/logout', methods=['GET'], strict_slashes=False)
 @html_answer
-def api_logout():
+def api_logout() -> WerkzeugResponse:
     flask_login.logout_user()
     flask_login.current_user.name = None
     session.clear()
@@ -381,7 +391,7 @@ def api_tasks() -> str:
     if not search:
         # filter results by date, keep last 3 days,
         # TODO: up to a max amount of tasks
-        first_date: Union[datetime, int] = datetime.now() - timedelta(days=get_config('generic', 'max_days_index'))
+        first_date: datetime | int = datetime.now() - timedelta(days=get_config('generic', 'max_days_index'))
     else:
         # FIXME: This will be slow and the way to search must be improved.
         first_date = 0
@@ -407,7 +417,7 @@ def api_tasks() -> str:
 @app.route('/users', methods=['GET'], strict_slashes=False)
 @admin_required
 @html_answer
-def api_users():
+def api_users() -> str:
 
     if not flask_login.current_user.role.can(Action.list_users):
         raise Forbidden('Not allowed to list users')
@@ -420,7 +430,7 @@ def api_users():
 @app.route('/users/clear', methods=['GET'], strict_slashes=False)
 @admin_required
 @html_answer
-def api_clear_users():
+def api_clear_users() -> WerkzeugResponse:
 
     if not flask_login.current_user.role.can(Action.list_users):
         raise Forbidden('Not allowed to list users')
@@ -431,7 +441,7 @@ def api_clear_users():
 @app.route('/roles', methods=['GET'], strict_slashes=False)
 @admin_required
 @html_answer
-def api_roles():
+def api_roles() -> str:
 
     if not flask_login.current_user.role.can(Action.list_roles):
         raise Forbidden('Not allowed to list roles')
@@ -444,7 +454,7 @@ def api_roles():
 @app.route('/observables_lists', methods=['GET'], strict_slashes=False)
 @admin_required
 @html_answer
-def observables_lists():
+def observables_lists() -> str:
 
     if not flask_login.current_user.role.can(Action.manage_observables_lists):
         raise Forbidden('Not allowed to manage observables list')
@@ -459,7 +469,7 @@ def observables_lists():
 @app.route('/observables_lists/insert', methods=['POST'], strict_slashes=False)
 @admin_required
 @html_answer
-def observables_lists_insert():
+def observables_lists_insert() -> WerkzeugResponse:
 
     data = request.form
     if 'observable' not in data:
@@ -480,7 +490,7 @@ def observables_lists_insert():
 @app.route('/observables_lists/delete/<int:list_type>/<string:observable>', strict_slashes=False)
 @admin_required
 @html_answer
-def observables_lists_delete(list_type, observable):
+def observables_lists_delete(list_type: int, observable: str) -> WerkzeugResponse:
     if list_type == 0:
         pandora.delete_legitimate_observable(observable.strip())
     else:
@@ -491,7 +501,7 @@ def observables_lists_delete(list_type, observable):
 @app.route('/previews/<task_id>', methods=['GET'], strict_slashes=False)
 @app.route('/previews/<task_id>/seed-<seed>', methods=['GET'], strict_slashes=False)
 @html_answer
-def html_previews(task_id: str, seed: Optional[str]=None):
+def html_previews(task_id: str, seed: str | None=None) -> str:
     task = pandora.get_task(task_id=task_id)
     if not task:
         raise PandoraException('analysis not found')
@@ -505,7 +515,7 @@ def html_previews(task_id: str, seed: Optional[str]=None):
 @app.route('/observables/<task_id>', methods=['GET'], strict_slashes=False)
 @app.route('/observables/<task_id>/seed-<seed>', methods=['GET'], strict_slashes=False)
 @html_answer
-def html_observables(task_id: str, seed: Optional[str]=None):
+def html_observables(task_id: str, seed: str | None=None) -> str:
     task = pandora.get_task(task_id=task_id)
     if not task:
         raise PandoraException('analysis not found')
@@ -518,7 +528,7 @@ def html_observables(task_id: str, seed: Optional[str]=None):
 @app.route('/extracted/<task_id>', methods=['GET'], strict_slashes=False)
 @app.route('/extracted/<task_id>/seed-<seed>', methods=['GET'], strict_slashes=False)
 @html_answer
-def html_extracted(task_id: str, seed: Optional[str]=None):
+def html_extracted(task_id: str, seed: str | None=None) -> str:
     task = pandora.get_task(task_id=task_id)
     if not task:
         raise PandoraException('analysis not found')
@@ -530,7 +540,7 @@ def html_extracted(task_id: str, seed: Optional[str]=None):
 @app.route('/workers_results_html/<task_id>/<worker_name>', methods=['GET'], strict_slashes=False)
 @app.route('/workers_results_html/<task_id>/<worker_name>/seed-<seed>', methods=['GET'], strict_slashes=False)
 @html_answer
-def html_workers_result(task_id: str, worker_name: str, seed: Optional[str]=None):
+def html_workers_result(task_id: str, worker_name: str, seed: str | None=None) -> str:
     task = pandora.get_task(task_id=task_id)
     if not task:
         raise PandoraException('analysis not found')
@@ -553,7 +563,7 @@ def html_workers_result(task_id: str, worker_name: str, seed: Optional[str]=None
 @app.route('/manual_trigger_worker/<task_id>/<worker_name>', methods=['GET'], strict_slashes=False)
 @app.route('/manual_trigger_worker/<task_id>/<worker_name>/seed-<seed>', methods=['GET'], strict_slashes=False)
 @html_answer
-def manual_trigger_worker(task_id: str, worker_name: str, seed: Optional[str]=None):
+def manual_trigger_worker(task_id: str, worker_name: str, seed: str | None=None) -> WerkzeugResponse:
     task = pandora.get_task(task_id=task_id)
     if not task:
         raise PandoraException('analysis not found')
@@ -569,7 +579,7 @@ def manual_trigger_worker(task_id: str, worker_name: str, seed: Optional[str]=No
 @app.route('/stats', methods=['GET'], strict_slashes=False)
 @admin_required
 @html_answer
-def api_stats():
+def api_stats() -> str:
     if not flask_login.current_user.role.can(Action.list_stats):
         raise Forbidden('Not allowed to show stats')
     return render_template('stats.html',
