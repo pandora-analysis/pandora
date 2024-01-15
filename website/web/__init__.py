@@ -135,7 +135,7 @@ def _load_user_from_request(req: Request) -> User | None:
     if user_name:
         if last_ip := src_request_ip(req):
             return User(session.sid, last_ip=last_ip, name=user_name, role='admin')  # type: ignore[attr-defined]
-        raise Exception('No IP in request Oo.')
+        raise PandoraException('No IP in request Oo.')
     return None
 
 
