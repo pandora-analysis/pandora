@@ -91,7 +91,7 @@ class RedisSessionInterface(SessionInterface):
     :param secret_key: Used to sign the sid.
     """
 
-    def __init__(self, redis: Redis, key_prefix: str, secret_key: str) -> None:  # type: ignore[type-arg]
+    def __init__(self, redis: Redis, key_prefix: str, secret_key: str | bytes) -> None:  # type: ignore[type-arg]
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
         self.logger.setLevel('INFO')
         self.redis: Redis = redis  # type: ignore[type-arg]
@@ -165,6 +165,9 @@ class Session():
     def _get_interface(self, app: Flask) -> SessionInterface:
         config = app.config.copy()
         config.setdefault('SESSION_KEY_PREFIX', 'session:')
+
+        if app.secret_key is None:
+            raise RuntimeError('The secret_key is required to use the session interface.')
 
         return RedisSessionInterface(redis=config['SESSION_REDIS'],
                                      key_prefix=config['SESSION_KEY_PREFIX'],
