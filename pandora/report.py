@@ -8,6 +8,14 @@ from .default import PandoraException
 from .helpers import Status
 
 
+def default_json(obj: Any) -> Any:
+    if isinstance(obj, set):
+        return list(obj)
+    if isinstance(obj, bytes):
+        return str(obj)
+    raise TypeError(f'Object of type {obj.__class__.__name__} is not JSON serializable')
+
+
 class Report:
     def __init__(self, task_uuid: str, worker_name: str, status: str | None= None,
                  details: str | None=None, extras: str | None=None,):
@@ -42,7 +50,7 @@ class Report:
             'end_date': getattr(self, 'end_date', None),
             'error': getattr(self, 'error', None),
             'error_trace': getattr(self, 'error_trace', None),
-            'details': json.dumps({key: json.dumps(value) for key, value in self.details.items()}) if self.details else None,
+            'details': json.dumps({key: json.dumps(value, default=default_json) for key, value in self.details.items()}) if self.details else None,
             'extras': json.dumps(self.extras) if self.extras else None,
         }.items() if v is not None}
 

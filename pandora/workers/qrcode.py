@@ -40,7 +40,7 @@ class QrCodeDecoder(BaseWorker):
             x, y, w, h = cv2.boundingRect(approx)
             area = cv2.contourArea(c)
             ar = w / float(h)
-            if len(approx) == 4 and area > 1000 and (ar > .85 and ar < 1.3):
+            if len(approx) == 4 and area > 1000 and (ar > .85 and ar < 1.3):  # pylint: disable=R1716
                 # print(x, y, w, h)
                 # print(y, y + w, x, x + h)
                 yield x, y, w, h
@@ -51,8 +51,8 @@ class QrCodeDecoder(BaseWorker):
             image = cv2.imread(str(image_path))
             qrCodeDetector = cv2.QRCodeDetector()
             # foo = qrCodeDetector.detectAndDecode(image[270: 395, 70: 200])
-            foo = qrCodeDetector.detectAndDecode(image)
-            # print('direct', foo)
+            foo = qrCodeDetector.detectAndDecode(image)  # pylint: disable=C0104
+            print('direct', foo)
             decoded_text, _, _ = foo
             if decoded_text:
                 report.status = Status.WARN
