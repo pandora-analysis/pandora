@@ -21,6 +21,7 @@ from .base import BaseWorker
 class QrCodeDecoder(BaseWorker):
 
     def _find_boxes(self, image: np.ndarray) -> Generator[tuple[int, int, int, int], None, None]:  # type: ignore[type-arg]
+        # code from: https://stackoverflow.com/questions/60359398/python-detect-a-qr-code-from-an-image-and-crop-using-opencv#60384780
         # Load imgae, grayscale, Gaussian blur, Otsu's threshold
         gray = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (9, 9), 0)
