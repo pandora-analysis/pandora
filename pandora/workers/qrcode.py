@@ -41,8 +41,6 @@ class QrCodeDecoder(BaseWorker):
             area = cv2.contourArea(c)
             ar = w / float(h)
             if len(approx) == 4 and area > 1000 and (ar > .85 and ar < 1.3):  # pylint: disable=R1716
-                # print(x, y, w, h)
-                # print(y, y + w, x, x + h)
                 yield x, y, w, h
 
     def _process_image(self, task: Task, report: Report, image_path: Path) -> None:
@@ -50,10 +48,7 @@ class QrCodeDecoder(BaseWorker):
         try:
             image = cv2.imread(str(image_path))
             qrCodeDetector = cv2.QRCodeDetector()
-            # foo = qrCodeDetector.detectAndDecode(image[270: 395, 70: 200])
-            foo = qrCodeDetector.detectAndDecode(image)  # pylint: disable=C0104
-            print('direct', foo)
-            decoded_text, _, _ = foo
+            decoded_text, _, _ = qrCodeDetector.detectAndDecode(image)
             if decoded_text:
                 report.status = Status.WARN
                 report.add_details('qrcode', 'Found a QR Code in the image, go to the observables to see it.')
@@ -62,9 +57,13 @@ class QrCodeDecoder(BaseWorker):
                 else:
                     task.add_observable(decoded_text, 'text')
             for x, y, w, h in self._find_boxes(image):
-                # print('From boxes', y, y + w, x, x + h)
-                detect_decode = qrCodeDetector.detectAndDecode(image[y: y + w + 15, x: x + h + 15])
-                # print('From boxes', detect_decode)
+                qrcode = image[y - 2: y + w + 2, x - 2: x + h + 2]
+                width = int(qrcode.shape[1] * 2)
+                height = int(qrcode.shape[0] * 2)
+                dim = (width, height)
+                # resize image
+                to_check = cv2.resize(qrcode, dim, interpolation=cv2.INTER_LINEAR)
+                detect_decode = qrCodeDetector.detectAndDecode(to_check)
                 if detect_decode[0]:
                     report.status = Status.WARN
                     report.add_details('qrcode', 'Found a QR Code in the image, go to the observables to see it.')
