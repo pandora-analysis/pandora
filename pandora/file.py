@@ -497,7 +497,7 @@ class File:
             if self.path.suffix in extensions:
                 return type_
 
-        # if the mimetype starts with text, it is text (needs to be after the other checks becuase HTML is also text)
+        # if the mimetype starts with text, it is text (needs to be after the other checks because HTML is also text)
         if self.mime_type.startswith('text'):
             return 'TXT'
 
