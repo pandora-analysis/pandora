@@ -12,6 +12,7 @@
     <tr>
       <th>Date</th>
       <th>Name</th>
+      <th>Size</th>
       <th>Status</th>
     </tr>
     {% for extracted_task in task.extracted %}
@@ -24,6 +25,9 @@
           {{ render_icon(task.file.icon) }}
           <span>{{ extracted_task.file.original_filename }}</span>
         </a>
+      </td>
+      <td>
+        {{ sizeof_fmt(extracted_task.file.size) }}
       </td>
       <td>
         {{ display_task_status(extracted_task.status, status) }}

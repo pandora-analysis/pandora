@@ -487,6 +487,11 @@ class File:
         Guess file type from mimeType or extension.
         :return (str): file type or None if file is not reachable
         """
+
+        # if the mimetype starts with text, it is text, no need to mess around.
+        if self.mime_type.startswith('text'):
+            return 'TXT'
+
         # Guess type from mime-type
         if self.mime_type in self.MIME_TYPE_EQUAL:
             return self.MIME_TYPE_EQUAL[self.mime_type][0]
@@ -553,21 +558,25 @@ class File:
             text_width = 0
             lines = self.text.splitlines()
             for line in lines:
-                left, top, right, bottom = font.getbbox(line.encode('latin-1', 'ignore'))
-                w = font.getlength(line.encode('latin-1', 'ignore'))
+                if not line:
+                    continue
+                left, top, right, bottom = font.getbbox(line)
+                w = font.getlength(line)
                 text_height = bottom
                 if w > text_width:
                     text_width = w
-            text_height = text_height * len(lines)
+            text_width = round(text_width + 1)
+            text_height = round(text_height * len(lines) + 1)
             out = Image.new("L", (text_width if text_width < max_width else max_width,
                                   text_height if text_height < max_height else max_height), 255)
             d = ImageDraw.Draw(out)
-            d.text((10, 10), self.text.encode('latin-1', 'ignore'), font=font, fill=0)
+            d.text((10, 10), self.text, font=font, fill=0)
             to_return = BytesIO()
             out.save(to_return, 'PNG', optimize=True)
             to_return.seek(0)
         except Exception as e:
             # Cannot build preview
+            self.logger.exception('Unable to generate text preview')
             out = Image.new("L", (500, 50), 255)
             d = ImageDraw.Draw(out)
             d.multiline_text((5, 5), f"Unable to generate text preview:\n{e}", fill=0)
@@ -668,6 +677,8 @@ class File:
         """
         metadata: dict[str, str] = {}
         if not self.path.exists():
+            return {}
+        if not self.size:
             return {}
         exiftool_path = get_config('generic', 'exiftool_path')
         if not exiftool_path or not Path(exiftool_path).exists():

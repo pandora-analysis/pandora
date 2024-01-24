@@ -183,7 +183,7 @@
               {% if task.file.size is not none %}
                 <tr>
                   <th>Size</th>
-                  <td>{{ task.file.size }} bytes</td>
+                  <td>{{ sizeof_fmt(task.file.size) }}</td>
                 </tr>
               {% endif %}
               {% if task.parent %}

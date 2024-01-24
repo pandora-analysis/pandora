@@ -492,7 +492,11 @@ class Extractor(BaseWorker):
                         report.status = Status.ERROR if self.max_is_error else Status.ALERT
                         report.add_details('Warning', f'File {archive_file.path.name} too big ({file_content.getbuffer().nbytes}).')
                         continue
-                    extracted.append((sub_file_entry.name, BytesIO(file_object.read())))
+                    if not file_content.getbuffer().nbytes:
+                        # empty file
+                        report.add_details('Warning', f'File {archive_file.path.name} is empty.')
+                        self.logger.warning(f'File {archive_file.path.name} is empty.')
+                    extracted.append((sub_file_entry.name, file_content))
                 elif sub_file_entry.IsDirectory():
                     process_dir(sub_file_entry)
 
