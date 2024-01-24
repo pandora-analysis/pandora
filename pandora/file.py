@@ -488,10 +488,6 @@ class File:
         :return (str): file type or None if file is not reachable
         """
 
-        # if the mimetype starts with text, it is text, no need to mess around.
-        if self.mime_type.startswith('text'):
-            return 'TXT'
-
         # Guess type from mime-type
         if self.mime_type in self.MIME_TYPE_EQUAL:
             return self.MIME_TYPE_EQUAL[self.mime_type][0]
@@ -500,6 +496,10 @@ class File:
         for type_, extensions in self.TYPE_EXTENSIONS.items():
             if self.path.suffix in extensions:
                 return type_
+
+        # if the mimetype starts with text, it is text (needs to be after the other checks becuase HTML is also text)
+        if self.mime_type.startswith('text'):
+            return 'TXT'
 
         # Default type to BIN (??)
         return 'BIN'

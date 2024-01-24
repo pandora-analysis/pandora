@@ -492,6 +492,21 @@
                     <div class="img-thumbnail small-status-flag status-flag-error">Content preview is not available</div>
                   </div>
                   {% endif %}
+                  {% if task.file.is_html %}
+                    <div class="row">
+                    {% if 'lookyloo' in task.reports and 'permaurl' in task.reports['lookyloo'].details %}
+                      <a href="{{task.reports['lookyloo'].details['permaurl']}}" target="_blank" rel="noopener noreferrer">See capture on Lookyloo</a>
+                    {% else %}
+                      This document can probably be opened in a browser,
+                      you can submit it to lookyloo and see.
+                      Note that as it is sending the sample to a 3rd party service,
+                      the module needs to be triggered manually.
+                      <a href="{{url_for('manual_trigger_worker', task_id=task.uuid, seed=seed, worker_name='lookyloo')}}">
+                          Click here to do so.
+                      </a>
+                    {% endif %}
+                    </div>
+                  {% endif %}
                 </div>
               </div>
             </div>

@@ -24,7 +24,8 @@ class Blocklists(BaseWorker):
         'application/x-cab': ['application/vnd.ms-cab-compressed'],
         'application/x-msdos-program': ['application/x-dosexec'],
         'message/rfc822': ['application/vnd.ms-outlook', 'text/plain'],
-        'application/rar': ['application/x-rar']
+        'application/rar': ['application/x-rar'],
+        'application/msword': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
     }
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
