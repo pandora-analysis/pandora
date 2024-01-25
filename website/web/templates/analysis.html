@@ -496,7 +496,7 @@
                     <div class="row">
                     {% if 'lookyloo' in task.reports and 'permaurl' in task.reports['lookyloo'].details %}
                       <a href="{{task.reports['lookyloo'].details['permaurl']}}" target="_blank" rel="noopener noreferrer">See capture on Lookyloo</a>
-                    {% else %}
+                    {% elif 'lookyloo' in task.reports and task.reports['lookyloo'].status == status.MANUAL %}
                       This document can probably be opened in a browser,
                       you can submit it to lookyloo and see.
                       Note that as it is sending the sample to a 3rd party service,
