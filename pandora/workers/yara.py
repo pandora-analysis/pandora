@@ -46,6 +46,8 @@ class YaraWorker(BaseWorker):
                  loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
         super().__init__(module, worker_id, cache, timeout, loglevel, **options)
 
+        self._init_rules()
+
         if not list(self.rulespath.glob('**/*.yar')):
             self.disabled = True
             return
@@ -61,6 +63,9 @@ class YaraWorker(BaseWorker):
         except yara.Error as e:
             self.disabled = True
             self.logger.critical(f'Unable to initialize rules: {e}')
+
+    def _init_rules(self) -> None:
+        self.logger.info('No need to initialize the Yara rules')
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.data:

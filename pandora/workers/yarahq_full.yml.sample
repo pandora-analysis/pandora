@@ -1,0 +1,4 @@
+meta:
+  name: Yara HQ Full package
+  description: Yara HQ Full package
+  replicas: 2
