@@ -20,13 +20,13 @@ import sys
 from extract_msg.msg_classes import MessageBase, AppointmentMeeting
 from extract_msg.attachments import AttachmentBase, SignedAttachment
 from extract_msg import MSGFile
-from hachoir.stream import StringInputStream  # type: ignore
-from hachoir.parser.archive import CabFile  # type: ignore
+from hachoir.stream import StringInputStream  # type: ignore[import-untyped]
+from hachoir.parser.archive import CabFile  # type: ignore[import-untyped]
 import py7zr
 import pycdlib
 from pycdlib.facade import PyCdlibJoliet, PyCdlibUDF, PyCdlibRockRidge, PyCdlibISO9660
-import pyzipper  # type: ignore
-import rarfile  # type: ignore
+import pyzipper  # type: ignore[import-untyped]
+import rarfile  # type: ignore[import-untyped]
 from tzlocal import get_localzone_name
 
 from ..default import safe_create_dir, PandoraException
@@ -39,8 +39,8 @@ from ..file import File
 from .base import BaseWorker, WorkerOption
 
 if TYPE_CHECKING:
-    from dfvfs.path.path_spec import PathSpec   # type: ignore
-    from dfvfs.volume import tsk_volume_system  # type: ignore
+    from dfvfs.path.path_spec import PathSpec   # type: ignore[import-untyped]
+    from dfvfs.volume import tsk_volume_system  # type: ignore[import-untyped]
 
 
 if sys.version_info >= (3, 11):

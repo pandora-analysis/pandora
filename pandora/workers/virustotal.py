@@ -5,7 +5,7 @@ from __future__ import annotations
 import traceback
 import sys
 
-import vt  # type: ignore
+import vt  # type: ignore[import-untyped]
 from vt import error
 
 from ..helpers import Status, get_useragent_for_requests

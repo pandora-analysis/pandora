@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from XLMMacroDeobfuscator.deobfuscator import process_file  # type: ignore
-from xlrd2.biffh import XLRDError  # type: ignore
+from XLMMacroDeobfuscator.deobfuscator import process_file  # type: ignore[import-untyped]
+from xlrd2.biffh import XLRDError  # type: ignore[import-untyped]
 
 
 from ..helpers import Status

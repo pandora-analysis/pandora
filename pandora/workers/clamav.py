@@ -6,7 +6,7 @@ import os
 
 import sys
 
-import clamd  # type: ignore
+import clamd  # type: ignore[import-untyped]
 
 from ..helpers import Status
 from ..task import Task

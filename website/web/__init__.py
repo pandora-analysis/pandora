@@ -25,7 +25,7 @@ from flask import (Flask, request, session, abort, render_template,
                    redirect, send_file, url_for, flash, Request)
 from flask_restx import Api  # type: ignore
 from flask_bootstrap import Bootstrap5  # type: ignore
-from pymisp import MISPEvent, PyMISP  # type: ignore[attr-defined]
+from pymisp import MISPEvent, PyMISP
 from pymisp.abstract import describe_types
 from werkzeug.security import check_password_hash
 from werkzeug.exceptions import Forbidden

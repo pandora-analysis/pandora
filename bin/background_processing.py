@@ -7,7 +7,7 @@ import logging.config
 
 from datetime import datetime, timedelta
 
-from pymisp import PyMISP, MISPAttribute, MISPEvent  # type: ignore[attr-defined]
+from pymisp import PyMISP, MISPAttribute, MISPEvent
 
 from pandora.default import AbstractManager, get_config
 from pandora.helpers import Status
@@ -42,7 +42,7 @@ class BackgroundProcessing(AbstractManager):
 
     def _task_on_misp(self, internal_ref: str) -> bool:
         attributes = self.misp.search('attributes', value=internal_ref, limit=1, page=1, pythonify=True)
-        if not attributes or not isinstance(attributes[0], MISPAttribute):
+        if not attributes or not isinstance(attributes, list) or not isinstance(attributes[0], MISPAttribute):
             return False
         return True
 

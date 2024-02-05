@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 
-import yara  # type: ignore
+import yara  # type: ignore[import-not-found]
 
 from ..default import get_homedir
 from ..helpers import Status

@@ -5,7 +5,7 @@ from __future__ import annotations
 import traceback
 import sys
 
-from jbxapi import JoeSandbox, JoeException  # type: ignore
+from jbxapi import JoeSandbox, JoeException  # type: ignore[import-untyped]
 
 from ..helpers import Status, get_useragent_for_requests
 from ..task import Task

@@ -14,24 +14,24 @@ from typing import cast, Any, Dict, Union, List
 from uuid import uuid4
 from zipfile import ZipFile
 
-import exiftool  # type: ignore
-import fitz  # type: ignore
+import exiftool  # type: ignore[import-untyped]
+import fitz  # type: ignore[import-untyped]
 import magic
 import pikepdf
 
-from oletools.msodde import process_maybe_encrypted  # type: ignore
-from PIL import Image, ImageDraw, ImageFont  # type: ignore
-from pymisp import MISPEvent, MISPObject  # type: ignore[attr-defined]
-from pymisp.tools import make_binary_objects, FileObject  # type: ignore[attr-defined]
-from svglib.svglib import svg2rlg  # type: ignore
-from reportlab.graphics import renderPDF  # type: ignore
-import textract  # type: ignore
-from weasyprint import HTML, default_url_fetcher  # type: ignore
+from oletools.msodde import process_maybe_encrypted  # type: ignore[import-untyped]
+from PIL import Image, ImageDraw, ImageFont  # type: ignore[import-untyped]
+from pymisp import MISPEvent
+from pymisp.tools import make_binary_objects, FileObject, PEObject, ELFObject, MachOObject, PESectionObject, ELFSectionObject, MachOSectionObject
+from svglib.svglib import svg2rlg  # type: ignore[import-untyped]
+from reportlab.graphics import renderPDF  # type: ignore[import-untyped]
+import textract  # type: ignore[import-untyped]
+from weasyprint import HTML, default_url_fetcher  # type: ignore[import-untyped]
 
 from eml_parser import EmlParser
 from extract_msg import openMsg
 from extract_msg.msg_classes import MessageBase, AppointmentMeeting
-from unoserver.client import UnoClient  # type: ignore
+from unoserver.client import UnoClient  # type: ignore[import-untyped]
 
 from .default import get_config
 from .exceptions import Unsupported, NoPreview, InvalidPandoraObject
@@ -841,7 +841,7 @@ class File:
         """
         return self.type == 'EXE'
 
-    def misp_export(self) -> tuple[FileObject, MISPObject | None, list[MISPObject] | None] | None:
+    def misp_export(self) -> tuple[FileObject, PEObject | ELFObject | MachOObject | None, list[PESectionObject] | list[ELFSectionObject] | list[MachOSectionObject]] | None:
         try:
             # Currently only extract indicators from binary files (PE, ELF, MachO)
             return make_binary_objects(pseudofile=self.data, filename=self.original_filename)
@@ -862,8 +862,8 @@ class File:
             if hasattr(peo, 'certificates') and hasattr(peo, 'signers'):
                 for c in peo.certificates:
                     event.add_object(c)
-                for s in peo.signers:
-                    event.add_object(s)
+                for _s in peo.signers:
+                    event.add_object(_s)
                 del peo.certificates
                 del peo.signers
             if hasattr(peo, 'sections'):

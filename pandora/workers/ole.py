@@ -11,12 +11,12 @@ from datetime import datetime
 from typing import Any
 
 from olefile import OleMetadata  # type: ignore[import-untyped]
-from oletools import oleid, ooxml  # type: ignore
-from oletools.ftguess import FTYPE, CONTAINER, FType_Generic_OLE, FType_Generic_OpenXML, FileTypeGuesser  # type: ignore
-from oletools.oleid import RISK  # type: ignore
-from oletools.oleobj import get_logger, find_ole, find_external_relationships, OleObject  # type: ignore
-from oletools.olevba import VBA_Parser  # type: ignore
-from oletools.rtfobj import RtfObjParser, re_executable_extensions  # type: ignore
+from oletools import oleid, ooxml  # type: ignore[import-untyped]
+from oletools.ftguess import FTYPE, CONTAINER, FType_Generic_OLE, FType_Generic_OpenXML, FileTypeGuesser  # type: ignore[import-untyped]
+from oletools.oleid import RISK  # type: ignore[import-untyped]
+from oletools.oleobj import get_logger, find_ole, find_external_relationships, OleObject  # type: ignore[import-untyped]
+from oletools.olevba import VBA_Parser  # type: ignore[import-untyped]
+from oletools.rtfobj import RtfObjParser, re_executable_extensions  # type: ignore[import-untyped]
 # from oletools.thirdparty.xxxswf import xxxswf  # type: ignore
 
 from ..helpers import Status

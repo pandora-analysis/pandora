@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from oletools import msodde  # type: ignore
+from oletools import msodde  # type: ignore[import-untyped]
 
 from ..helpers import Status
 from ..task import Task

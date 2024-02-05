@@ -12,7 +12,7 @@ from functools import lru_cache
 from importlib.metadata import version
 from typing import Any
 
-from publicsuffix2 import PublicSuffixList, fetch  # type: ignore
+from publicsuffix2 import PublicSuffixList, fetch  # type: ignore[import-untyped]
 from pymispwarninglists import WarningLists  # type: ignore[attr-defined]
 from redis import Redis
 import yaml

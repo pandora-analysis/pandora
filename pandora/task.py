@@ -7,7 +7,7 @@ from io import BytesIO
 from typing import overload, Any
 from uuid import uuid4
 
-from pymisp import MISPEvent, MISPAttribute  # type: ignore[attr-defined]
+from pymisp import MISPEvent, MISPAttribute
 from werkzeug.utils import secure_filename
 
 from .default import get_homedir, safe_create_dir, PandoraException, get_config
