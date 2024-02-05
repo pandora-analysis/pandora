@@ -556,6 +556,7 @@ class File:
         try:
             font = ImageFont.load_default()
             text_width = 0
+            text_height = 5
             lines = self.text.splitlines()
             for line in lines:
                 if not line:
@@ -565,6 +566,8 @@ class File:
                 text_height = bottom
                 if w > text_width:
                     text_width = w
+                if bottom > text_height:
+                    text_height = bottom
             text_width = round(text_width + 1)
             text_height = round(text_height * len(lines) + 1)
             out = Image.new("L", (text_width if text_width < max_width else max_width,
