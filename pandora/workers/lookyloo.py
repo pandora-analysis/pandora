@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 import sys
 
-from pylookyloo import Lookyloo  # type: ignore[attr-defined]
+from pylookyloo import Lookyloo
 
 from ..helpers import Status, get_useragent_for_requests
 from ..task import Task
