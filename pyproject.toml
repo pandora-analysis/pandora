@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pandora"
-version = "1.6.0"
+version = "1.8.0"
 description = "Pandora analysis framework."
 authors = ["Raphaël Vinot <raphael.vinot@circl.lu>"]
 license = "AGPL-3.0-or-later"
@@ -18,7 +18,7 @@ imap_fetcher = "bin.imap_fetcher:main"
 background_processing = "bin.background_processing:main"
 
 [tool.poetry.dependencies]
-python = "^3.8.1,<3.12"
+python = "^3.8.1,<3.13"
 redis = {version = "^5.0.1", extras = ["hiredis"]}
 flask-restx = "^1.3.0"
 gunicorn = {version = "^21.2.0", extras = ["setproctitle"]}
