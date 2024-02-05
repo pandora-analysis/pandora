@@ -117,7 +117,7 @@ class BaseWorker(multiprocessing.Process):
         else:
             yield
         end = time.time()
-        logger.info(f'Runtime: {end-start:.2f}s')
+        logger.info(f'Runtime: {end - start:.2f}s')
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         """
