@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 import sys
 
-from pyhashlookup import Hashlookup  # type: ignore[attr-defined]
+from pyhashlookup import Hashlookup
 
 from ..helpers import Status, get_useragent_for_requests
 from ..task import Task

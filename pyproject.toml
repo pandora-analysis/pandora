@@ -54,11 +54,11 @@ pikepdf = "^8.12.0"
 Pillow = "^10.2.0"
 imapclient = "^3.0.1"
 pyzipper = "^0.3.6"
-pymisp = {version = "^2.4.184", extras = ["fileobjects"]}
+pymisp = {version = "^2.4.184.1", extras = ["fileobjects"]}
 python-dateutil = "^2.8.2"
 pycdlib = "^1.14.0"
 werkzeug = "^3.0.1"
-pyhashlookup = "^1.2.1"
+pyhashlookup = "^1.2.2"
 pylookyloo = "^1.23.0"
 hachoir = "^3.3.0"
 aiohttp = "^3.9.3"
