@@ -33,7 +33,7 @@ class YaraHQFullWorker(YaraWorker):
         try:
             (self.rulespath / 'lock').touch(exist_ok=False)
         except FileExistsError:
-            self.logger.info('Another process is alredy fetching the rules.')
+            self.logger.info('Another process is already fetching the rules.')
             # just making sure the lock isn't very old and should be removed
             if (self.rulespath / 'lock').stat().st_mtime < time.time() - 3600:
                 self.logger.info('Removing old lock')
