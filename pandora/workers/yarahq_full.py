@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import time
 
 from datetime import datetime, timedelta
 from io import BytesIO
@@ -24,10 +25,21 @@ class YaraHQFullWorker(YaraWorker):
     creation_date: datetime
 
     def _init_rules(self) -> None:
-        self.logger.info(f'Initializing yara rules from {self.url}')
-        self.fetch_rules()
+        if not self.rulesfile.exists():
+            self.logger.info(f'Initializing yara rules from {self.url}')
+            self.fetch_rules()
 
     def fetch_rules(self) -> None:
+        try:
+            (self.rulespath / 'lock').touch(exist_ok=False)
+        except FileExistsError:
+            self.logger.info('Another process is alredy fetching the rules.')
+            # just making sure the lock isn't very old and should be removed
+            if (self.rulespath / 'lock').stat().st_mtime < time.time() - 3600:
+                self.logger.info('Removing old lock')
+                (self.rulespath / 'lock').unlink()
+            else:
+                return
         self.logger.info(f'Fetching yara rules from {self.url}')
         self.rulespath.mkdir(parents=True, exist_ok=True)
         full_rules_zip = requests.get(self.url, timeout=10)
@@ -35,12 +47,17 @@ class YaraHQFullWorker(YaraWorker):
             with zip_file.open('packages/full/yara-rules-full.yar') as rulesfile:
                 with self.rulesfile.open('wb') as savefile:
                     savefile.write(rulesfile.read())
+        (self.rulespath / 'lock').unlink()
 
     @property
     def rules(self) -> yara.Rules:
         if not self.rulesfile.exists():
             # That should not happen, the module should have been disabled
             raise PandoraException(f'YaraHQFull rules file {self.rulesfile} does not exist')
+
+        # The file isn't necessarely updated every day, so we check the modification date
+        if self.rulesfile.stat().st_mtime > time.time() - 86400:
+            file_fetched_today = True
 
         with self.rulesfile.open() as _f:
             _creation_date = re.findall("Creation Date: (.*)", _f.read())
@@ -49,6 +66,6 @@ class YaraHQFullWorker(YaraWorker):
         else:
             raise PandoraException(f'YaraHQFull rules file {self.rulesfile} does not contain a creation date')
 
-        if self.creation_date < datetime.today() - timedelta(days=1):
+        if self.creation_date < datetime.today() - timedelta(days=1) and not file_fetched_today:
             self.fetch_rules()
         return super().rules
