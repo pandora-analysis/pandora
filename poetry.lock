@@ -3446,13 +3446,13 @@ files = [
 
 [[package]]
 name = "publicsuffixlist"
-version = "0.10.0.20240205"
+version = "0.10.0.20240207"
 description = "publicsuffixlist implement"
 optional = false
 python-versions = ">=2.6"
 files = [
-    {file = "publicsuffixlist-0.10.0.20240205-py2.py3-none-any.whl", hash = "sha256:d8d15322b3813b0c34cbe13c6f626f85d7f89f0cb30de5c54f46508446510e0e"},
-    {file = "publicsuffixlist-0.10.0.20240205.tar.gz", hash = "sha256:cc7ab0562c25180aa53aec8fe3b4a47312aefaf15016201f593d0df94628cea1"},
+    {file = "publicsuffixlist-0.10.0.20240207-py2.py3-none-any.whl", hash = "sha256:803acd756d27b047adb309c33f130603294f0bad254b2c63227a18472bb1afaa"},
+    {file = "publicsuffixlist-0.10.0.20240207.tar.gz", hash = "sha256:3fd542eb2ee186120cefe0c2b4b0c32163b02d035dbdd3aa80b83f87e2409e1b"},
 ]
 
 [package.extras]
@@ -3889,13 +3889,13 @@ docs = ["Sphinx (<7.2)", "Sphinx (>=7.2,<8.0)"]
 
 [[package]]
 name = "pymisp"
-version = "2.4.184.1"
+version = "2.4.184.2"
 description = "Python API for MISP."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pymisp-2.4.184.1-py3-none-any.whl", hash = "sha256:2556c56cca319adce41e012888453e2ce0206be7f538a2cc19e19dcf5886cec4"},
-    {file = "pymisp-2.4.184.1.tar.gz", hash = "sha256:e12bc93ad883c4514fafa161e17cfcfc0d6bcab9ed111969b1596d71c390bc5d"},
+    {file = "pymisp-2.4.184.2-py3-none-any.whl", hash = "sha256:4e6d4eb00e8943a28fe5acf415421e72420e3107d2d600a3eefba39b64320cc7"},
+    {file = "pymisp-2.4.184.2.tar.gz", hash = "sha256:f85341b903cd32aca89d44f29522d0c02ee3d8404be0336c1b2cd9ca299af80a"},
 ]
 
 [package.dependencies]
@@ -5737,4 +5737,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "e1e64e5feb67dfd28230e9ee381606eb8dec99fc58975406bd6976d7dee92d05"
+content-hash = "6c32fbaf1685efd163d86fd6a042bac0cab9e4a77961a61492a8938f05d60e3a"
