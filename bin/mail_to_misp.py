@@ -160,8 +160,10 @@ class MailToMISP(AbstractManager):
 
             submitted_file = task.file.data
             if not submitted_file:
-                # This should really not happen
+                # NOTE: This should really not happen
                 self.logger.critical(f'Unable to get the mail for task {task_uuid}')
+                self.pandora.redis.zrem(self.redis_queue, task_uuid)
+                self.pandora.redis.delete(f'{self.redis_queue}:{task_uuid}')
                 continue
             email_message = email.message_from_bytes(submitted_file.getvalue(), policy=policy.default)
 
@@ -183,6 +185,8 @@ class MailToMISP(AbstractManager):
                         client.append(sent_dir, reply.as_string())
                 if email_uid := self.pandora.redis.hget(f'{self.redis_queue}:{task_uuid}', 'email_uid'):
                     client.add_flags(email_uid, ('\\Answered'))
+            self.pandora.redis.zrem(self.redis_queue, task_uuid)
+            self.pandora.redis.delete(f'{self.redis_queue}:{task_uuid}')
 
         self.logger.debug('Done with responding to mails.')
 
