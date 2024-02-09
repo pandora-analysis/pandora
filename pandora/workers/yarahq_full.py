@@ -56,10 +56,7 @@ class YaraHQFullWorker(YaraWorker):
             raise PandoraException(f'YaraHQFull rules file {self.rulesfile} does not exist')
 
         # The file isn't necessarely updated every day, so we check the modification date
-        if self.rulesfile.stat().st_mtime > time.time() - 86400:
-            file_fetched_today = True
-        else:
-            file_fetched_today = False
+        file_fetched_today = self.rulesfile.stat().st_mtime > time.time() - 86400
 
         with self.rulesfile.open() as _f:
             _creation_date = re.findall("Creation Date: (.*)", _f.read())

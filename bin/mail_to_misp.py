@@ -25,19 +25,19 @@ from pandora.user import User
 
 logging.config.dictConfig(get_config('logging'))
 
-"""
-This script needs a dedicated configuration file in the config directory.
-See config/misptest_local.json.sample for an example.
-
-You need to pass the name of that file to the MailToMISP class in the main method below.
-
-Example: the file name is misptest_local.json, you will call MailToMISP('misptest_local')
-
-The email_template_path must point to a file in the config directory.
-"""
-
 
 def main() -> None:
+    '''
+    This script needs a dedicated configuration file in the config directory.
+    See config/misptest_local.json.sample for an example.
+
+    You need to pass the name of that file to the MailToMISP class.
+
+    Example: the file name is misptest_local.json, you will call MailToMISP('misptest_local')
+
+    The email_template_path in the config must point to a file in the config directory.
+    '''
+
     f = MailToMISP('misptest_local')
     f.run(sleep_in_sec=10)
 
