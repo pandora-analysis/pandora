@@ -1802,21 +1802,21 @@ files = [
 
 [[package]]
 name = "jaraco-classes"
-version = "3.3.0"
+version = "3.3.1"
 description = "Utility functions for Python class constructs"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jaraco.classes-3.3.0-py3-none-any.whl", hash = "sha256:10afa92b6743f25c0cf5f37c6bb6e18e2c5bb84a16527ccfc0040ea377e7aaeb"},
-    {file = "jaraco.classes-3.3.0.tar.gz", hash = "sha256:c063dd08e89217cee02c8d5e5ec560f2c8ce6cdc2fcdc2e68f7b2e5547ed3621"},
+    {file = "jaraco.classes-3.3.1-py3-none-any.whl", hash = "sha256:86b534de565381f6b3c1c830d13f931d7be1a75f0081c57dff615578676e2206"},
+    {file = "jaraco.classes-3.3.1.tar.gz", hash = "sha256:cb28a5ebda8bc47d8c8015307d93163464f9f2b91ab4006e09ff0ce07e8bfb30"},
 ]
 
 [package.dependencies]
 more-itertools = "*"
 
 [package.extras]
-docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
-testing = ["pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy (>=0.9.1)", "pytest-ruff"]
+docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (<7.2.5)", "sphinx (>=3.5)", "sphinx-lint"]
+testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy", "pytest-ruff (>=0.2.1)"]
 
 [[package]]
 name = "jbxapi"
@@ -3872,13 +3872,13 @@ testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "pylookyloo"
-version = "1.23.0"
+version = "1.23.1"
 description = "Python CLI and module for Lookyloo"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pylookyloo-1.23.0-py3-none-any.whl", hash = "sha256:f0f71b16866b2f661f7b58675955c6b3627469413a9325fd14ef9bc69ce9361b"},
-    {file = "pylookyloo-1.23.0.tar.gz", hash = "sha256:b780cbca8a32df3fb0fd935e3efb327da2e882eb52e9fab926f64e861ce26e2e"},
+    {file = "pylookyloo-1.23.1-py3-none-any.whl", hash = "sha256:4dee9d701cb0d1ba20ac17fc5d0eba62cc2e533de4525b2dbe7c7c5179023860"},
+    {file = "pylookyloo-1.23.1.tar.gz", hash = "sha256:74a8e9c2ce544a00787cd623caaf4c03e1e161c1b17e2635efe993f07c460456"},
 ]
 
 [package.dependencies]
@@ -4458,13 +4458,13 @@ rpds-py = ">=0.7.0"
 
 [[package]]
 name = "reportlab"
-version = "4.0.9"
+version = "4.1.0"
 description = "The Reportlab Toolkit"
 optional = false
 python-versions = ">=3.7,<4"
 files = [
-    {file = "reportlab-4.0.9-py3-none-any.whl", hash = "sha256:c9656216321897486e323be138f7aea67851cedc116b8cc35f8ec7f8cc763538"},
-    {file = "reportlab-4.0.9.tar.gz", hash = "sha256:f32bff66a0fda234202e1e33eaf77f25008871a61cb01cd91584a521a04c0047"},
+    {file = "reportlab-4.1.0-py3-none-any.whl", hash = "sha256:28a40d5000afbd8ccae15a47f7abe2841768461354bede1a9d42841132997c98"},
+    {file = "reportlab-4.1.0.tar.gz", hash = "sha256:3a99faf412691159c068b3ff01c15307ce2fd2cf6b860199434874e002040a84"},
 ]
 
 [package.dependencies]
@@ -4748,16 +4748,16 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.59.1"
+version = "1.60.1"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "semgrep-1.59.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-any.whl", hash = "sha256:e54580c5ef3ee640f61e4b2dfcce23de84ffd3457b0f894540c9258d67f7e84a"},
-    {file = "semgrep-1.59.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:b7fa9709194422fbb5e6e76759640943355edae510562bcad0399afaada85110"},
-    {file = "semgrep-1.59.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:99c5bb159a5823abe3dea66016a07f59bcf51fedf8f69d421149d9c3475d6c05"},
-    {file = "semgrep-1.59.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c91c35558b15af8dcbef43b68c1d2c570f35c6b1183eeb5d905de5b519a0a5e7"},
-    {file = "semgrep-1.59.1.tar.gz", hash = "sha256:1ef9fde9f24abec865c44c5191d6cae3248c3da66d8453e8da76530aa24407d3"},
+    {file = "semgrep-1.60.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-any.whl", hash = "sha256:c2c5051596aa2b4ecf220084d6d12ee0ce88cd71e535debaa13abf74f577a37f"},
+    {file = "semgrep-1.60.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:ec344a30d934cfe1d2a08afdaada4b8efee6c757c0629f9b1ddd713f87b0f970"},
+    {file = "semgrep-1.60.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:0c45034ca90cbcffc54cb0d99e75692b252c10ecbb2767bad941da4c0f9aff77"},
+    {file = "semgrep-1.60.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1d65edc720052690a8e2469e46a2106e591b652b5f8c982f0fedd2c827af63be"},
+    {file = "semgrep-1.60.1.tar.gz", hash = "sha256:fe0e632192d1f1cac43638cd4140e011d738c698b17929d5d1ee69ef51f9686d"},
 ]
 
 [package.dependencies]
@@ -5737,4 +5737,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "6c32fbaf1685efd163d86fd6a042bac0cab9e4a77961a61492a8938f05d60e3a"
+content-hash = "185f949461e794ac170059f931cc4131ea08daebe3c7a223de5ac6e30e06602c"
