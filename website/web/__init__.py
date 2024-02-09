@@ -268,7 +268,7 @@ def task_misp_submit(task_id: str, seed: str | None=None) -> WerkzeugResponse:
     if not flask_login.current_user.role.can(Action.submit_to_misp):
         raise Forbidden('Not allowed to submit the report to MISP')
 
-    event: MISPEvent = task.misp_export()
+    event: MISPEvent = task.misp_export(with_extracted_tasks=False)
     misp_settings = get_config('generic', 'misp')
     pymisp = PyMISP(misp_settings['url'], misp_settings['apikey'], ssl=misp_settings['tls_verify'])
     pymisp.add_event(event)
@@ -322,7 +322,7 @@ def api_task_download(task_id: str, source: str, seed: str | None=None, idx: int
         return send_file(to_return, download_name=f'{task.file.path.name}.zip')
 
     if source == 'misp' and flask_login.current_user.role.can(Action.download_misp):
-        event = task.misp_export()
+        event = task.misp_export(with_extracted_tasks=False)
         return send_file(BytesIO(event.to_json().encode()), download_name=f'{task.uuid}.json', mimetype='application/json', as_attachment=True)
 
     raise Forbidden('You do not have the right to get {source}')

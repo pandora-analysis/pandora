@@ -55,7 +55,7 @@ class BackgroundProcessing(AbstractManager):
             if (self.misp_autosubmit
                     and task.status >= self.misp_autosubmit_status
                     and not self._task_on_misp(task.uuid)):
-                event = task.misp_export()
+                event = task.misp_export(with_extracted_tasks=False)
                 new_event = self.misp.add_event(event, pythonify=True)
                 if isinstance(new_event, MISPEvent) and self.misp_autopublish:
                     self.misp.publish(new_event)

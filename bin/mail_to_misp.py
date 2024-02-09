@@ -18,13 +18,28 @@ from imapclient import imapclient, IMAPClient  # type: ignore
 from pymisp import PyMISP, MISPAttribute, MISPEvent
 
 
-from pandora.default import AbstractManager, get_config, ConfigError
-from pandora.helpers import get_email_template
+from pandora.default import AbstractManager, get_config, ConfigError, get_homedir
 from pandora.pandora import Pandora
 from pandora.task import Task
 from pandora.user import User
 
 logging.config.dictConfig(get_config('logging'))
+
+"""
+This script needs a dedicated configuration file in the config directory.
+See config/misptest_local.json.sample for an example.
+
+You need to pass the name of that file to the MailToMISP class in the main method below.
+
+Example: the file name is misptest_local.json, you will call MailToMISP('misptest_local')
+
+The email_template_path must point to a file in the config directory.
+"""
+
+
+def main() -> None:
+    f = MailToMISP('misptest_local')
+    f.run(sleep_in_sec=10)
 
 
 class MailToMISP(AbstractManager):
@@ -39,17 +54,12 @@ class MailToMISP(AbstractManager):
         self.imap_folder = get_config(self.configname, 'imap_folder')
         if not self.imap_server or not self.imap_login or not self.imap_password:
             raise ConfigError(f'Missing configuration for Mail to MISP {self.configname}.')
-        self.smtp_server = get_config(self.configname, 'smtp_server')
-        self.smtp_port = get_config(self.configname, 'smtp_port')
-        if not self.smtp_server:
-            self.smtp_server = self.imap_server
-        self.smtp_requires_login = get_config(self.configname, 'smtp_requires_login')
         self.pandora = Pandora()
 
         # Prepare MISP submitter
         misp_settings = get_config(self.configname, 'misp')
         self.misp = PyMISP(misp_settings['url'], misp_settings['apikey'], ssl=misp_settings['tls_verify'])
-        self.misp_autopublish = misp_settings['autosubmit'].get('autopublish')
+        self.misp_autopublish = misp_settings.get('auto_publish')
 
         self.timeout = 60
 
@@ -60,18 +70,17 @@ class MailToMISP(AbstractManager):
         self._misp_submitter()
         self._email_responder()
 
-    def _prepare_reply(self, initial_message: Message, permaurl: str, permaurl_misp: str) -> EmailMessage | None:
+    def _prepare_reply(self, reply_config: dict[str, str], initial_message: Message, permaurl: str, permaurl_misp: str) -> EmailMessage | None:
         msg = EmailMessage()
-        msg['From'] = get_config(self.configname, 'from')
+        msg['From'] = reply_config['from']
         if initial_message.get('reply-to'):
             msg['to'] = initial_message['reply-to']
         else:
             msg['To'] = initial_message['from']
         msg['subject'] = f'Re: {initial_message["subject"]}'
         msg['message-id'] = initial_message['message-id']
-        body = get_email_template(self.configname)
         recipient = msg['to']
-        if recipient.addresses[0].username == get_config(self.configname, 'from'):
+        if recipient.addresses[0].username == reply_config['from']:
             # this is going to cause a loop.
             self.logger.warning(f'The recipient if the same as the sender ({recipient.addresses[0].username}), do not send a reply')
             return None
@@ -80,9 +89,12 @@ class MailToMISP(AbstractManager):
                 recipient = recipient.addresses[0].display_name
         except Exception as e:
             self.logger.warning(e)
-        body = body.format(recipient=recipient, permaurl=permaurl,
-                           permaurl_misp=permaurl_misp,
-                           sender=msg['From'].addresses[0].display_name)
+
+        with (get_homedir() / reply_config['email_template_path']).open() as f:
+            template = f.read()
+        body = template.format(recipient=recipient, permaurl=permaurl,
+                               permaurl_misp=permaurl_misp,
+                               sender=msg['From'].addresses[0].display_name)
         msg.set_content(body)
         return msg
 
@@ -126,21 +138,35 @@ class MailToMISP(AbstractManager):
                 continue
             if not self._task_on_misp(task_uuid):
                 # task is not on misp yet
-                event = task.misp_export()
-                new_event = self.misp.add_event(event, pythonify=True)
-                if not isinstance(new_event, MISPEvent):
-                    self.logger.warning(f'Unable to add event to MISP: {new_event}')
-                    # NOTE: tell the user something went wrong
+                events = task.misp_export(with_extracted_tasks=True)
+                root_event = events[0]
+                new_root_event = self.misp.add_event(root_event, pythonify=True)
+                if not isinstance(new_root_event, MISPEvent):
+                    self.logger.warning(f'Unable to add root event to MISP: {new_root_event}')
                     self.pandora.redis.zrem(self.redis_queue, task_uuid)
                     self.pandora.redis.delete(f'{self.redis_queue}:{task_uuid}')
                 else:
-                    self.logger.info(f'Event {new_event.uuid} added to MISP.')
-                    self.pandora.redis.hset(f'{self.redis_queue}:{task_uuid}', 'misp_uuid', new_event.uuid)
+                    to_publish = [new_root_event]
+                    self.logger.info(f'Root event {new_root_event.uuid} added to MISP.')
+                    for event in events[1:]:
+                        new_event = self.misp.add_event(event, pythonify=True)
+                        if not isinstance(new_event, MISPEvent):
+                            self.logger.warning(f'Unable to add event to MISP: {new_event}')
+                        else:
+                            to_publish.append(new_event)
+                            self.logger.info(f'Event {new_event.uuid} added to MISP.')
                     if self.misp_autopublish:
-                        self.misp.publish(new_event)
+                        for event in to_publish:
+                            self.misp.publish(event.uuid)
+                    self.pandora.redis.hset(f'{self.redis_queue}:{task_uuid}', 'misp_uuid', new_root_event.uuid)
 
     def _email_responder(self) -> None:
-        # At this stage, all the tasks have been processed.
+        reply_config = get_config(self.configname, 'reply')
+        smtp_server = reply_config['smtp_server']
+        smtp_port = reply_config['smtp_port']
+        if not smtp_server:
+            smtp_server = self.imap_server
+        smtp_requires_login = reply_config['smtp_requires_login']
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
@@ -167,13 +193,15 @@ class MailToMISP(AbstractManager):
                 continue
             email_message = email.message_from_bytes(submitted_file.getvalue(), policy=policy.default)
 
-            reply = self._prepare_reply(email_message, permaurl, permaurl_misp)
+            reply = self._prepare_reply(reply_config, email_message, permaurl, permaurl_misp)
 
             with IMAPClient(host=self.imap_server, ssl_context=ssl_context) as client:
+                client.login(self.imap_login, self.imap_password)
+                client.select_folder(self.imap_folder, readonly=False)
                 if reply:
                     try:
-                        with SMTP(self.smtp_server, port=self.smtp_port) as smtp:
-                            if self.smtp_requires_login:
+                        with SMTP(smtp_server, port=smtp_port) as smtp:
+                            if smtp_requires_login:
                                 smtp.starttls(context=ssl_context)
                                 smtp.login(self.imap_login, self.imap_password)
                             smtp.send_message(reply)
@@ -189,15 +217,6 @@ class MailToMISP(AbstractManager):
             self.pandora.redis.delete(f'{self.redis_queue}:{task_uuid}')
 
         self.logger.debug('Done with responding to mails.')
-
-
-def main() -> None:
-    if not get_config('generic', 'enable_imap_fetcher'):
-        print('IMAP fetcher is disabled in config, quitting.')
-        return
-
-    f = MailToMISP('testing')
-    f.run(sleep_in_sec=10)
 
 
 if __name__ == '__main__':

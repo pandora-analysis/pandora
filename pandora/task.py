@@ -4,7 +4,7 @@ import json
 
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
-from typing import overload, Any
+from typing import overload, Any, Literal
 from uuid import uuid4
 
 from pymisp import MISPEvent, MISPAttribute
@@ -293,7 +293,19 @@ class Task:
     def __str__(self) -> str:
         return f'<uuid: {self.uuid} - file: {self.file}>'
 
-    def misp_export(self) -> MISPEvent:
+    @overload
+    def misp_export(self, with_extracted_tasks: Literal[True]) -> list[MISPEvent]:
+        ...
+
+    @overload
+    def misp_export(self, with_extracted_tasks: Literal[False]) -> MISPEvent:
+        ...
+
+    @overload
+    def misp_export(self, with_extracted_tasks: bool) -> MISPEvent | list[MISPEvent]:
+        ...
+
+    def misp_export(self, with_extracted_tasks: bool) -> MISPEvent | list[MISPEvent]:
         public_url = get_config('generic', 'public_url')
         event = MISPEvent()
         event.info = f'Pandora analysis ({self.file.original_filename})'
@@ -306,4 +318,12 @@ class Task:
         self.file.populate_misp_event(event)
         for observable in self.observables:
             event.add_attribute(observable.observable_type, observable.value, to_ids=False)
-        return event
+        if not with_extracted_tasks:
+            return event
+        to_return = [event]
+        for extracted in self.extracted:
+            e_events = extracted.misp_export(with_extracted_tasks)
+            for e_event in e_events:
+                e_event.extends_uuid = event.uuid
+                to_return.append(e_event)
+        return to_return
