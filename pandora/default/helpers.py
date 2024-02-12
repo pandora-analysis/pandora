@@ -33,7 +33,10 @@ def get_homedir() -> Path:
         raise MissingEnv(f"{env_global_name} is missing. \
 Run the following command (assuming you run the code from the clonned repository):\
     export {env_global_name}='{guessed_home}'")
-    return Path(os.environ[env_global_name])
+    homedir = Path(os.environ[env_global_name])
+    if not homedir.exists():
+        raise ConfigError(f"{env_global_name} points to a non-existing directory: {homedir}")
+    return homedir
 
 
 @lru_cache(64)
