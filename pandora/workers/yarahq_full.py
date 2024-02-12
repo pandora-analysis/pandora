@@ -25,6 +25,7 @@ class YaraHQFullWorker(YaraWorker):
     creation_date: datetime
 
     def _init_rules(self) -> None:
+        self.rulespath.mkdir(parents=True, exist_ok=True)
         if not self.rulesfile.exists():
             self.logger.info(f'Initializing yara rules from {self.url}')
             self.fetch_rules()
@@ -41,7 +42,6 @@ class YaraHQFullWorker(YaraWorker):
             else:
                 return
         self.logger.info(f'Fetching yara rules from {self.url}')
-        self.rulespath.mkdir(parents=True, exist_ok=True)
         full_rules_zip = requests.get(self.url, timeout=10)
         with ZipFile(BytesIO(full_rules_zip.content)) as zip_file:
             with zip_file.open('packages/full/yara-rules-full.yar') as rulesfile:

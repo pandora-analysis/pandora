@@ -22,7 +22,7 @@ else:
 
 class YaraWorker(BaseWorker):
     rulespath = get_homedir() / 'yara_rules'
-    savepath = get_homedir() / 'yara_rules' / 'yara.compiled'
+    savepath = rulespath / 'yara.compiled'
     needs_external: list[str] = []  # list of filenames, used for children classes with yara files requiring external variables
     last_change: float | None = None
 
