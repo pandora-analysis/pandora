@@ -104,7 +104,7 @@ class Pandora():
             'task_uuid': task.uuid,
             'disabled_workers': json.dumps(task.disabled_workers)
         }
-        self.redis.xadd(name='tasks_queue', fields=fields, id='*',  # type: ignore[arg-type]
+        self.redis.xadd(name='tasks_queue', fields=fields, id='*',
                         maxlen=get_config('generic', 'tasks_max_len'))
         return task.uuid
 
@@ -113,7 +113,7 @@ class Pandora():
             'task_uuid': task.uuid,
             'manual_worker': worker
         }
-        self.redis.xadd(name='tasks_queue', fields=fields, id='*',  # type: ignore[arg-type]
+        self.redis.xadd(name='tasks_queue', fields=fields, id='*',
                         maxlen=get_config('generic', 'tasks_max_len'))
 
     def add_extracted_reference(self, task: Task, extracted_task: Task) -> None:
