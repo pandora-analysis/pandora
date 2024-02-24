@@ -29,7 +29,7 @@ PyYAML = "^6.0.1"
 Flask-WTF = "^1.2.1"
 validators = "^0.22.0"
 python-magic = "^0.4.27"
-PyMuPDF = "^1.23.22"
+PyMuPDF = "^1.23.25"
 requests = "^2.31.0"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.6"
@@ -50,11 +50,11 @@ clamd = "^1.0.2"
 rarfile = "^4.1"
 publicsuffix2 = "^2.20191221"
 pymispwarninglists = "^1.5"
-pikepdf = "^8.12.0"
+pikepdf = "^8.13.0"
 Pillow = "^10.2.0"
 imapclient = "^3.0.1"
 pyzipper = "^0.3.6"
-pymisp = {version = "^2.4.184.3", extras = ["fileobjects"]}
+pymisp = {version = "^2.4.185", extras = ["fileobjects"]}
 python-dateutil = "^2.8.2"
 pycdlib = "^1.14.0"
 werkzeug = "^3.0.1"
@@ -69,20 +69,20 @@ dfvfs = "^20231208"
 # The libyall libs that are sneakily for testing purpose only
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^3.0.3"
+pylint = "^3.0.4"
 ipython = [
     {version = "<8.13.0", python = "<3.9"},
     {version = "^8.18.0", python = ">=3.9"},
     {version = "^8.19.0", python = ">=3.10"}
 ]
 mypy = "^1.8.0"
-types-redis = {version = "^4.6.0.20240106"}
+types-redis = {version = "^4.6.0.20240218"}
 types-PyYAML = "^6.0.12.12"
-types-requests = "^2.31.0.20240125"
+types-requests = "^2.31.0.20240218"
 types-python-dateutil = "^2.8.19.20240106"
 bandit = {extras = ["toml"], version = "^1.7.7"}
 flake8 = "^7.0.0"
-semgrep = "^1.61.1"
+semgrep = "^1.62.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
