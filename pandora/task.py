@@ -243,8 +243,7 @@ class Task:
             return self._status
 
         if self.workers_done:
-            if self._status < Status.CLEAN:
-                self._status = Status.CLEAN
+            self._status = max(self._status, Status.CLEAN)
             # All the workers are done, return success/error
             for _, report in self.reports.items():
                 # Status code order: ALERT - WARN - CLEAN - ERROR
@@ -252,8 +251,7 @@ class Task:
                 #       it has no impact on the general status of the task
                 if report.status in [Status.DISABLED, Status.NOTAPPLICABLE]:
                     continue
-                if report.status > self._status:
-                    self._status = report.status
+                self._status = max(self._status, report.status)
         else:
             # At least one worker isn't done yet
             self._status = Status.WAITING
