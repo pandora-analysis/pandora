@@ -165,13 +165,13 @@ test = ["coverage", "mypy", "pexpect", "ruff", "wheel"]
 
 [[package]]
 name = "astroid"
-version = "3.0.3"
+version = "3.1.0"
 description = "An abstract syntax tree for Python with inference support."
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "astroid-3.0.3-py3-none-any.whl", hash = "sha256:92fcf218b89f449cdf9f7b39a269f8d5d617b27be68434912e11e79203963a17"},
-    {file = "astroid-3.0.3.tar.gz", hash = "sha256:4148645659b08b70d72460ed1921158027a9e53ae8b7234149b1400eddacbb93"},
+    {file = "astroid-3.1.0-py3-none-any.whl", hash = "sha256:951798f922990137ac090c53af473db7ab4e70c770e6d7fae0cec59f74411819"},
+    {file = "astroid-3.1.0.tar.gz", hash = "sha256:ac248253bfa4bd924a0de213707e7ebeeb3138abeb48d798784ead1e56d419d4"},
 ]
 
 [package.dependencies]
@@ -1596,13 +1596,13 @@ testing = ["flufl.flake8", "importlib-resources (>=1.3)", "packaging", "pyfakefs
 
 [[package]]
 name = "importlib-resources"
-version = "6.1.1"
+version = "6.1.2"
 description = "Read resources from Python packages"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "importlib_resources-6.1.1-py3-none-any.whl", hash = "sha256:e8bf90d8213b486f428c9c39714b920041cb02c184686a3dee24905aaa8105d6"},
-    {file = "importlib_resources-6.1.1.tar.gz", hash = "sha256:3893a00122eafde6894c59914446a512f728a0c1a45f9bb9b63721b6bacf0b4a"},
+    {file = "importlib_resources-6.1.2-py3-none-any.whl", hash = "sha256:9a0a862501dc38b68adebc82970140c9e4209fc99601782925178f8386339938"},
+    {file = "importlib_resources-6.1.2.tar.gz", hash = "sha256:308abf8474e2dba5f867d279237cd4076482c3de7104a40b41426370e891549b"},
 ]
 
 [package.dependencies]
@@ -1610,7 +1610,7 @@ zipp = {version = ">=3.1.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
 docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (<7.2.5)", "sphinx (>=3.5)", "sphinx-lint"]
-testing = ["pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy (>=0.9.1)", "pytest-ruff", "zipp (>=3.17)"]
+testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy", "pytest-ruff (>=0.2.1)", "zipp (>=3.17)"]
 
 [[package]]
 name = "inflate64"
@@ -2379,17 +2379,28 @@ files = [
 
 [[package]]
 name = "libvsapm-python"
-version = "20231123"
+version = "20240226"
 description = "Python bindings module for libvsapm"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "libvsapm-python-20231123.tar.gz", hash = "sha256:9889d15e8172de9576af53cd847b29151a7817b19558d7eb80f2ea1024a45a3f"},
-    {file = "libvsapm_python-20231123-cp310-cp310-macosx_12_0_x86_64.whl", hash = "sha256:15c0d4cee5c4c32340f04a1fbc04a8305f4c490481de575c0d7921f3697007b5"},
-    {file = "libvsapm_python-20231123-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:020c4b54c0cfc56bcc7cf566637ec33607a0211986127e7148c79ec11cede73f"},
-    {file = "libvsapm_python-20231123-cp312-cp312-macosx_12_0_x86_64.whl", hash = "sha256:50d2b20c08cfc068e844ab612af8ade3da18f874c13b06f264e0cd813b761ff5"},
-    {file = "libvsapm_python-20231123-cp38-cp38-macosx_12_0_x86_64.whl", hash = "sha256:b00c6a50ff87eee866d971e982280628c2dd6abca305c13dcb3db6b1a3aa496e"},
-    {file = "libvsapm_python-20231123-cp39-cp39-macosx_12_0_x86_64.whl", hash = "sha256:8b52dfa2d0b2ebb3424ef14473b7764471dc1faea8d0289fafa217da17024f44"},
+    {file = "libvsapm-python-20240226.tar.gz", hash = "sha256:862a2b610df1c3afab04a0f47e7da5636cb33dc57196361c99dd77b147d8ae41"},
+    {file = "libvsapm_python-20240226-cp310-cp310-macosx_12_0_x86_64.whl", hash = "sha256:ffa96d466ee07d61f49304538077843a7b4f463837dd4c33d17a2b3d3f58a49e"},
+    {file = "libvsapm_python-20240226-cp310-cp310-manylinux_2_34_x86_64.manylinux_2_35_x86_64.whl", hash = "sha256:d7c68b64a5dd1138a592b5cef7c2dde30fa7394321dd34dc7444f871a69ade91"},
+    {file = "libvsapm_python-20240226-cp310-cp310-win32.whl", hash = "sha256:9d62a9285d4a04cac920dfc4e0645ca4821bf5ccd7f9d1ed9b99d15fba7e0301"},
+    {file = "libvsapm_python-20240226-cp310-cp310-win_amd64.whl", hash = "sha256:bcbb98288906d202e2ab9efa1c03eb57727ed85354a9048b6211a5b07f9f06d3"},
+    {file = "libvsapm_python-20240226-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:623511bbba4b8ea23f47f28b582c2a2211761c000f37727426c2c36e4dbd38e1"},
+    {file = "libvsapm_python-20240226-cp311-cp311-win32.whl", hash = "sha256:2c1c4c67752451af60a98e2e9f9fdad59b5e15ae5b317a4f5d039f505821c4b8"},
+    {file = "libvsapm_python-20240226-cp311-cp311-win_amd64.whl", hash = "sha256:1664c0275fba291214499d62d5e694decedf7f9ea6b44c235567bda7262bd3a0"},
+    {file = "libvsapm_python-20240226-cp312-cp312-macosx_12_0_x86_64.whl", hash = "sha256:1093fba4973fcc329d26f6516095d312efe84e141e3949ed0e5d32bc5af852b4"},
+    {file = "libvsapm_python-20240226-cp312-cp312-win32.whl", hash = "sha256:608efb8dab82c434c25f697aba94335d3c5ef5aae914e1d3d4922cf3f9080ca0"},
+    {file = "libvsapm_python-20240226-cp312-cp312-win_amd64.whl", hash = "sha256:2e4d08a6f8b6dad10f0f8a79ee31c5d1864a04157752a57193bbdd19d50527bc"},
+    {file = "libvsapm_python-20240226-cp38-cp38-macosx_12_0_x86_64.whl", hash = "sha256:4e3db7c020f50aaf203cbca2edfa58e740b92c9822f6a03df061c543aaec1d9d"},
+    {file = "libvsapm_python-20240226-cp38-cp38-win32.whl", hash = "sha256:8b79440c6460d986fca9f866c6aa69b4661fe87f41bc0720aa05e9b38603a0ea"},
+    {file = "libvsapm_python-20240226-cp38-cp38-win_amd64.whl", hash = "sha256:77ffeb05ab494e993c79f032a24308ff8ba04a7761acb46371ed19895f3bd518"},
+    {file = "libvsapm_python-20240226-cp39-cp39-macosx_12_0_x86_64.whl", hash = "sha256:b8a8a0d9ab0e2d62094608e9e88de328955ee8d97a51cab1ce4952bdb5cda96f"},
+    {file = "libvsapm_python-20240226-cp39-cp39-win32.whl", hash = "sha256:09405a7aad4b8ae6c74309bcbd77c705cd6bf763803d454496c91b0d70debca0"},
+    {file = "libvsapm_python-20240226-cp39-cp39-win_amd64.whl", hash = "sha256:93babc7fbc2f532c67df8ceb75fcbfbdab0d5ceb3285d635aa25de7ce0a7609f"},
 ]
 
 [[package]]
@@ -3863,13 +3874,13 @@ files = [
 
 [[package]]
 name = "pydyf"
-version = "0.8.0"
+version = "0.9.0"
 description = "A low-level PDF generator."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pydyf-0.8.0-py3-none-any.whl", hash = "sha256:901186a2e9f897108139426a6486f5225bdcc9b70be2ec965f25111e42f8ac5d"},
-    {file = "pydyf-0.8.0.tar.gz", hash = "sha256:b22b1ef016141b54941ad66ed4e036a7bdff39c0b360993b283875c3f854dd9a"},
+    {file = "pydyf-0.9.0-py3-none-any.whl", hash = "sha256:f0e447d9f69ca20cfa3ab3d17e274e26cc877bb6e36b4a83d196616a089db0dd"},
+    {file = "pydyf-0.9.0.tar.gz", hash = "sha256:d5b244e8fc24119ce7bd5d51ea2d6773c0ff88aa81597db556bc440c6b880610"},
 ]
 
 [package.extras]
@@ -3938,17 +3949,17 @@ docs = ["Sphinx (<7.2)", "Sphinx (>=7.2,<8.0)"]
 
 [[package]]
 name = "pylint"
-version = "3.0.4"
+version = "3.1.0"
 description = "python code static checker"
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "pylint-3.0.4-py3-none-any.whl", hash = "sha256:59ab3532506f32affefeb50d5057a221bb351f5a1383fa36c424c2c6c05e7005"},
-    {file = "pylint-3.0.4.tar.gz", hash = "sha256:d73b70b3fff8f3fbdcb49a209b9c7d71d8090c138d61d576d1895e152cb392b3"},
+    {file = "pylint-3.1.0-py3-none-any.whl", hash = "sha256:507a5b60953874766d8a366e8e8c7af63e058b26345cfcb5f91f89d987fd6b74"},
+    {file = "pylint-3.1.0.tar.gz", hash = "sha256:6a69beb4a6f63debebaab0a3477ecd0f559aa726af4954fc948c51f7a2549e23"},
 ]
 
 [package.dependencies]
-astroid = ">=3.0.1,<=3.1.0-dev0"
+astroid = ">=3.1.0,<=3.2.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
 dill = [
     {version = ">=0.2", markers = "python_version < \"3.11\""},
@@ -5136,13 +5147,13 @@ files = [
 
 [[package]]
 name = "tomlkit"
-version = "0.12.3"
+version = "0.12.4"
 description = "Style preserving TOML library"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "tomlkit-0.12.3-py3-none-any.whl", hash = "sha256:b0a645a9156dc7cb5d3a1f0d4bab66db287fcb8e0430bdd4664a095ea16414ba"},
-    {file = "tomlkit-0.12.3.tar.gz", hash = "sha256:75baf5012d06501f07bee5bf8e801b9f343e7aac5a92581f20f80ce632e6b5a4"},
+    {file = "tomlkit-0.12.4-py3-none-any.whl", hash = "sha256:5cd82d48a3dd89dee1f9d64420aa20ae65cfbd00668d6f094d7578a78efbb77b"},
+    {file = "tomlkit-0.12.4.tar.gz", hash = "sha256:7ca1cfc12232806517a8515047ba66a19369e71edf2439d0f5824f91032b6cc3"},
 ]
 
 [[package]]
@@ -5252,13 +5263,13 @@ types-pytz = "*"
 
 [[package]]
 name = "typing-extensions"
-version = "4.9.0"
+version = "4.10.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "typing_extensions-4.9.0-py3-none-any.whl", hash = "sha256:af72aea155e91adfc61c3ae9e0e342dbc0cba726d6cba4b6c72c1f34e47291cd"},
-    {file = "typing_extensions-4.9.0.tar.gz", hash = "sha256:23478f88c37f27d76ac8aee6c905017a143b0b1b886c3c9f66bc2fd94f9f5783"},
+    {file = "typing_extensions-4.10.0-py3-none-any.whl", hash = "sha256:69b1a937c3a517342112fb4c6df7e72fc39a38e7891a5730ed4985b5214b5475"},
+    {file = "typing_extensions-4.10.0.tar.gz", hash = "sha256:b0abd7c89e8fb96f98db18d86106ff1d90ab692004eb746cf6eda2682f91b3cb"},
 ]
 
 [[package]]
@@ -5401,13 +5412,13 @@ files = [
 
 [[package]]
 name = "weasyprint"
-version = "61.0"
+version = "61.1"
 description = "The Awesome Document Factory"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "weasyprint-61.0-py3-none-any.whl", hash = "sha256:1dd5e929389b7ebcbff3088da7af13ae7ab201dce3a2faca7832b1dd5cec60ea"},
-    {file = "weasyprint-61.0.tar.gz", hash = "sha256:d91b11a05426fef1d63de826f30a80521d48c6a356455d338c2c429989fa586d"},
+    {file = "weasyprint-61.1-py3-none-any.whl", hash = "sha256:a5622f2c67d408e5d2e94df0ae07b9bd0fa9bb5e1ee466e2211391807f1ece41"},
+    {file = "weasyprint-61.1.tar.gz", hash = "sha256:7cbc824dc4026d82a97362647755f837dd15799949639cc8a428dd33d385009a"},
 ]
 
 [package.dependencies]
@@ -5900,4 +5911,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "44c95a1907e1e821bed025af1e1aadb49c75ad6e8c9134cb27aa43bf19997cdd"
+content-hash = "07f747985e1cc62e87ee33da83b9c2e9b924353e99fe380befcd96fc21574f0e"
