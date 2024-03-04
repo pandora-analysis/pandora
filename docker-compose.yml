@@ -9,6 +9,13 @@ services:
     ports:
         - 6101:6666
     command: "--bind 0.0.0.0"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "127.0.0.1", "-p", "6666", "ping"]
+      interval: 10s
+      timeout: 1s
+      retries: 3
+      start_period: 30s
+      start_interval: 10s
 
   redis:
     image: redis:7
@@ -16,11 +23,25 @@ services:
     command: ./cache.conf --daemonize no
     volumes:
         - ./cache:/cache
+    healthcheck:
+      test: ["CMD", "redis-cli", "-s", "/cache/cache.sock", "ping"]
+      interval: 10s
+      timeout: 1s
+      retries: 3
+      start_period: 10s
+      start_interval: 10s
 
   clamav:
     image: clamav/clamav
     volumes:
         - clamav-socket:/tmp
+    healthcheck:
+      test: ["CMD", "clamdscan", "--config=/etc/clamav/clamd.conf", "--ping", "1"]
+      interval: 10s
+      timeout: 1s
+      retries: 3
+      start_period: 120s
+      start_interval: 10s
 
   pandora:
     build: .
