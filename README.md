@@ -182,7 +182,7 @@ Then, check if `/var/run/clamav/clamd.ctl` exists. If it doesn't, start the serv
 sudo service clamav-daemon start
 ```
 
-#### Comodo
+#### Comodo (install only if you really want it, ignore otherwise)
 
 Install it from the official website:
 
