@@ -35,7 +35,7 @@ textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.6"
 eml-parser = "^1.17.5"
 unoserver = "^2.0.1"
-weasyprint = "^61.1"
+weasyprint = "^61.2"
 extract-msg = {version = "^0.48.0"}
 oletools = {version = "0.60.1", extras = ["full"]}
 py7zr = "^0.21"
@@ -54,7 +54,7 @@ pikepdf = "^8.13.0"
 Pillow = "^10.2.0"
 imapclient = "^3.0.1"
 pyzipper = "^0.3.6"
-pymisp = {version = "^2.4.186", extras = ["fileobjects"]}
+pymisp = {version = "^2.4.187", extras = ["fileobjects"]}
 python-dateutil = "^2.9.0.post0"
 pycdlib = "^1.14.0"
 werkzeug = "^3.0.1"
@@ -75,14 +75,14 @@ ipython = [
     {version = "^8.18.0", python = ">=3.9"},
     {version = "^8.19.0", python = ">=3.10"}
 ]
-mypy = "^1.8.0"
+mypy = "^1.9.0"
 types-redis = {version = "^4.6.0.20240218"}
 types-PyYAML = "^6.0.12.12"
 types-requests = "^2.31.0.20240218"
 types-python-dateutil = "^2.8.19.20240106"
-bandit = {extras = ["toml"], version = "^1.7.7"}
+bandit = {extras = ["toml"], version = "^1.7.8"}
 flake8 = "^7.0.0"
-semgrep = "^1.63.0"
+semgrep = "^1.64.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
