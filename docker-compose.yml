@@ -6,6 +6,8 @@ services:
     working_dir: /kvrocks
     volumes:
         - ./storage:/kvrocks/conf
+    ports:
+        - 6101:6666
     command: "--bind 0.0.0.0"
     healthcheck:
       test: ["CMD", "redis-cli", "-h", "127.0.0.1", "-p", "6666", "ping"]
