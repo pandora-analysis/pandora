@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 
-from pymisp import PyMISP, MISPAttribute
+from pymisp import PyMISP
 
 from ..helpers import Status
 from ..task import Task
