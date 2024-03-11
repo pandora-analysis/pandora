@@ -61,8 +61,8 @@ class MISP(BaseWorker):
         report.status = Status.ALERT
         events = []
         for attribute in result['Attribute']:
-          if len(events) < self.max_event_count and attribute['event_id'] not in events:
-            events.append(attribute['event_id'])
+            if len(events) < self.max_event_count and attribute['event_id'] not in events:
+                events.append(attribute['event_id'])
         report.add_details('permaurl', '\n'.join([f'{self.apiurl}/events/view/{i}' for i in events]))
 
         report.add_details('malicious', f'{result["Attribute"][0]["category"]} - {result["Attribute"][0]["comment"]}')
