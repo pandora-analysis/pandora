@@ -1,0 +1,10 @@
+meta:
+  name: MISP
+  description: MISP Threat Sharing
+
+settings:
+  apikey: null
+  apiurl: https://misp.example.com
+  tls_verify: true
+  max_event_count: 10
+  max_attribute_count: 10
