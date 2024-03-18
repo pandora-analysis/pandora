@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import re
 
 from datetime import datetime, timezone
 from functools import cached_property
@@ -14,6 +15,10 @@ from pymispwarninglists.api import WarningList
 from .default import get_config
 from .helpers import get_warninglists, Status
 from .storage_client import Storage
+
+always_suspicious_observables: dict[str, list[str]] = {
+    'url': ['^file://']
+}
 
 
 class Observable:
@@ -115,6 +120,9 @@ class Observable:
 
     @cached_property
     def status(self) -> Status:
+        if suspicious := always_suspicious_observables.get(self.observable_type):
+            if re.match('|'.join(suspicious), self.value):
+                return Status.WARN
         if suspicious_observables := self.storage.get_suspicious_observables():
             if self.value in suspicious_observables:
                 return Status.ALERT
