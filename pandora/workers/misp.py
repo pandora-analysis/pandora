@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 
-from pymisp import PyMISP
+from pymisp import PyMISP, MISPAttribute
 
 from ..helpers import Status
 from ..task import Task
@@ -44,14 +44,24 @@ class MISP(BaseWorker):
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         self.logger.info(f'analysing file {task.file.path}...')
         try:
-            result = self.client.search(controller='attributes', value=[task.file.md5, task.file.sha1, task.file.sha256], to_ids=1, limit=self.max_attribute_count)
+            response = self.client.search(controller='attributes', value=[task.file.md5, task.file.sha1, task.file.sha256],  # type: ignore[type-var]
+                                          to_ids=1, limit=self.max_attribute_count, pythonify=True)
         except Exception as e:
             self.logger.error('unable to reach MISP, exception %s', e)
             report.status = Status.ERROR
             report.add_details('warning', 'Unable to reach MISP.')
             return
 
-        if 'Attribute' in result and not result['Attribute']:
+        # If something goes poorly but isn't an exception, we don't have a list of attributes, but a dict with an errors key, log that
+        if isinstance(response, dict) and 'errors' in response:
+            self.logger.error('MISP returned an error: %s', response['errors'])
+            report.status = Status.ERROR
+            report.add_details('warning', 'MISP returned an error.')
+            return
+
+        attributes: list[MISPAttribute] = response  # type: ignore[assignment]
+
+        if not attributes:
             self.logger.info('no attribute found')
             report.status = Status.NOTAPPLICABLE
             return
@@ -59,10 +69,10 @@ class MISP(BaseWorker):
         # Hash is known so malicious
         self.logger.info('file %s is malicious', task.file.path)
         report.status = Status.ALERT
-        events = []
-        for attribute in result['Attribute']:
-            if len(events) < self.max_event_count and attribute['event_id'] not in events:
-                events.append(attribute['event_id'])
+        events: list[int] = []
+        for attribute in attributes:
+            if len(events) < self.max_event_count and attribute.event_id not in events:
+                events.append(attribute.event_id)
         report.add_details('permaurl', '\n'.join([f'{self.apiurl}/events/view/{i}' for i in events]))
 
-        report.add_details('malicious', f'{result["Attribute"][0]["category"]} - {result["Attribute"][0]["comment"]}')
+        report.add_details('malicious', f'{attributes[0]["category"]} - {attributes[0]["comment"]}')
