@@ -5009,16 +5009,16 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.66.0"
+version = "1.66.1"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "semgrep-1.66.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-any.whl", hash = "sha256:3d1fe1e22edc9ba8a6ea45fd9c9a253703b39c13fd6a300438f0011770c0d2c9"},
-    {file = "semgrep-1.66.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:09deda5eab7b2261f8e6a65d63f5f3c986a9362066ad00e280c6efe5a5207ca1"},
-    {file = "semgrep-1.66.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:fe17ceebf94d829c0700496e93062a643630c2da40135dc1198c5b75cab9867b"},
-    {file = "semgrep-1.66.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f50d920f92aa2f280d36f9fc5f9fec016c248edf8e45225eaf37c507e4b4f20c"},
-    {file = "semgrep-1.66.0.tar.gz", hash = "sha256:8c5279ce20c1b122aabc0c073832a089f238f92739fa61895d51cfafa59d7fa6"},
+    {file = "semgrep-1.66.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-any.whl", hash = "sha256:89cf8d3e83df84b576ea6969717d1361a304ce4970c5672d59479b8d0c0f4bb8"},
+    {file = "semgrep-1.66.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:e02e7b4f60e085b82964b09e6ff05739be482a024e9aed1ab2b0845e12cbbc55"},
+    {file = "semgrep-1.66.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:069cf3615360db182828008a8e91e659ba6d177c4f0b8065087d96fee79f9531"},
+    {file = "semgrep-1.66.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:8b96af16d896dbf10b12e54377b04577ef1fabea811410c78f0b4af1a044900f"},
+    {file = "semgrep-1.66.1.tar.gz", hash = "sha256:1998bf94f8a97e9b27bf5d665ceac0432cb391852fedc906cb12b0bf45bfd3a6"},
 ]
 
 [package.dependencies]
@@ -5458,13 +5458,13 @@ devenv = ["check-manifest", "pytest (>=4.3)", "pytest-cov", "pytest-mock (>=3.3)
 
 [[package]]
 name = "unoserver"
-version = "2.0.2"
+version = "2.1"
 description = "A server for file conversions with Libre Office"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "unoserver-2.0.2-py3-none-any.whl", hash = "sha256:8a9bede41666ff47b69de12582b36d9aacb035960fcb7497a982b5dbaf4ce487"},
-    {file = "unoserver-2.0.2.tar.gz", hash = "sha256:f277f5a247faf10e4dfd84a72a64c8f3285936d0caa137ef8f1c08cd184612c2"},
+    {file = "unoserver-2.1-py3-none-any.whl", hash = "sha256:f77f9f6f56b0cbc81fa0f9f0ff7b86eeb328b7cf27259cd0fbcf876f959a116a"},
+    {file = "unoserver-2.1.tar.gz", hash = "sha256:d11b42a3668f991b69841f6cfc7bce1cfefc00ae464eedb3f0e603c5262d60c6"},
 ]
 
 [package.extras]
@@ -6128,4 +6128,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "6a964fd1653c970d2b8577d241b1e0bccaead07f66f8bb9a9de93954dc9347e1"
+content-hash = "bce9bd1b6b0a9debf619ed1054f73e653e0cc6e69c9e139e803dae947a6f397c"
