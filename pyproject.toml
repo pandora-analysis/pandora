@@ -82,7 +82,7 @@ types-requests = "^2.31.0.20240311"
 types-python-dateutil = "^2.9.0.20240316"
 bandit = {extras = ["toml"], version = "^1.7.8"}
 flake8 = "^7.0.0"
-semgrep = "^1.66.1"
+semgrep = "^1.67.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]

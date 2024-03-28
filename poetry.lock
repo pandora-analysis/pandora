@@ -5009,16 +5009,16 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.66.1"
+version = "1.67.0"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "semgrep-1.66.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-any.whl", hash = "sha256:89cf8d3e83df84b576ea6969717d1361a304ce4970c5672d59479b8d0c0f4bb8"},
-    {file = "semgrep-1.66.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:e02e7b4f60e085b82964b09e6ff05739be482a024e9aed1ab2b0845e12cbbc55"},
-    {file = "semgrep-1.66.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:069cf3615360db182828008a8e91e659ba6d177c4f0b8065087d96fee79f9531"},
-    {file = "semgrep-1.66.1-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:8b96af16d896dbf10b12e54377b04577ef1fabea811410c78f0b4af1a044900f"},
-    {file = "semgrep-1.66.1.tar.gz", hash = "sha256:1998bf94f8a97e9b27bf5d665ceac0432cb391852fedc906cb12b0bf45bfd3a6"},
+    {file = "semgrep-1.67.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-any.whl", hash = "sha256:8afd362ff76f71f23ff57b9b0be10e7aa31a570757874b2a2efd368f57e7d5a3"},
+    {file = "semgrep-1.67.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:c0c90e645bd1e870414efbbc997443176b3432aa7f2e48551f623edac2086bde"},
+    {file = "semgrep-1.67.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:00a35cf52c576ca6fa59d16513a6aacc50ddb4c1b397edcb8574db36f1521d84"},
+    {file = "semgrep-1.67.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c05b847200ae72200e47c30d0b11d6f130a88e2f7b83b75751fd3a3344fd3168"},
+    {file = "semgrep-1.67.0.tar.gz", hash = "sha256:fbbc043c155e153be837fdf208063f3d7748934077968bc20b21efed502a2d6d"},
 ]
 
 [package.dependencies]
@@ -5853,6 +5853,7 @@ description = "Python interface for YARA"
 optional = false
 python-versions = "*"
 files = [
+    {file = "yara-python-4.5.0.tar.gz", hash = "sha256:4feecc56d2fe1d23ecb17cb2d3bc2e3859ebf7a2201d0ca3ae0756a728122b27"},
     {file = "yara_python-4.5.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:3feb72c2146c50e583d7e3cacbb49f280fb5cac0494cae1b48e5980ecbdc1571"},
     {file = "yara_python-4.5.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:1a036c41eaebdf6c0a674e0bd9d37c9d06d1d7427455866ace09d3a159c442b0"},
     {file = "yara_python-4.5.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:acbc950b051a576dd4c6825bf4ebb1c0f0c5eea35b3e01bde921b744e2cc92e1"},
@@ -6128,4 +6129,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "bce9bd1b6b0a9debf619ed1054f73e653e0cc6e69c9e139e803dae947a6f397c"
+content-hash = "aa225db114eac8463570d7bc21b0ab9e95d919876cc1713c6b6305200032f01a"
