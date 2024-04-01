@@ -5592,13 +5592,13 @@ files = [
 
 [[package]]
 name = "werkzeug"
-version = "3.0.1"
+version = "3.0.2"
 description = "The comprehensive WSGI web application library."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "werkzeug-3.0.1-py3-none-any.whl", hash = "sha256:90a285dc0e42ad56b34e696398b8122ee4c681833fb35b8334a095d82c56da10"},
-    {file = "werkzeug-3.0.1.tar.gz", hash = "sha256:507e811ecea72b18a404947aded4b3390e1db8f826b494d76550ef45bb3b1dcc"},
+    {file = "werkzeug-3.0.2-py3-none-any.whl", hash = "sha256:3aac3f5da756f93030740bc235d3e09449efcf65f2f55e3602e1d851b8f48795"},
+    {file = "werkzeug-3.0.2.tar.gz", hash = "sha256:e39b645a6ac92822588e7b39a692e7828724ceae0b0d702ef96701f90e70128d"},
 ]
 
 [package.dependencies]
@@ -5853,6 +5853,7 @@ description = "Python interface for YARA"
 optional = false
 python-versions = "*"
 files = [
+    {file = "yara-python-4.5.0.tar.gz", hash = "sha256:4feecc56d2fe1d23ecb17cb2d3bc2e3859ebf7a2201d0ca3ae0756a728122b27"},
     {file = "yara_python-4.5.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:3feb72c2146c50e583d7e3cacbb49f280fb5cac0494cae1b48e5980ecbdc1571"},
     {file = "yara_python-4.5.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:1a036c41eaebdf6c0a674e0bd9d37c9d06d1d7427455866ace09d3a159c442b0"},
     {file = "yara_python-4.5.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:acbc950b051a576dd4c6825bf4ebb1c0f0c5eea35b3e01bde921b744e2cc92e1"},
@@ -6128,4 +6129,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "bce9bd1b6b0a9debf619ed1054f73e653e0cc6e69c9e139e803dae947a6f397c"
+content-hash = "d983a26e3424f15d44cccb8ad79c206830f5285e26fb4bd58c80895a809766b3"
