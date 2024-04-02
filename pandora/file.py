@@ -20,7 +20,7 @@ import magic
 import pikepdf
 
 from oletools.msodde import process_maybe_encrypted  # type: ignore[import-untyped]
-from PIL import Image, ImageDraw, ImageFont  # type: ignore[import-untyped]
+from PIL import Image, ImageDraw, ImageFont
 from pymisp import MISPEvent
 from pymisp.tools import make_binary_objects, FileObject, PEObject, ELFObject, MachOObject, PESectionObject, ELFSectionObject, MachOSectionObject
 from svglib.svglib import svg2rlg  # type: ignore[import-untyped]
@@ -561,8 +561,8 @@ class File:
             for line in lines:
                 if not line:
                     continue
-                left, top, right, bottom = font.getbbox(line)
-                w = font.getlength(line)
+                left, top, right, bottom = font.getbbox(line)  # type: ignore[no-untyped-call]
+                w = font.getlength(line)  # type: ignore[no-untyped-call]
                 text_width = max(w, text_width)
                 text_height = max(bottom, text_height)
             text_width = round(text_width + 1)
