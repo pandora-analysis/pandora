@@ -4133,17 +4133,17 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyhashlookup"
-version = "1.2.2"
+version = "1.2.3"
 description = "Python CLI and module for CIRCL hash lookup"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = "<4.0,>=3.8"
 files = [
-    {file = "pyhashlookup-1.2.2-py3-none-any.whl", hash = "sha256:cfe2cd45489891294011ce9fa8d7864a8d766870975f23546e047f5a53b0e734"},
-    {file = "pyhashlookup-1.2.2.tar.gz", hash = "sha256:3addb19f88eaa44e11067cb235c75b4f8ce06fb60a51d9d247cde50e05f85c24"},
+    {file = "pyhashlookup-1.2.3-py3-none-any.whl", hash = "sha256:2d5a00754edbcf94544ee45be95025e21b97e81905662b436ab5eed2a127152d"},
+    {file = "pyhashlookup-1.2.3.tar.gz", hash = "sha256:d598e745cb3d1e59b07005bc803932873c758729662b293f719f3ed6065b2fe5"},
 ]
 
 [package.dependencies]
-dnspython = ">=2.5.0,<3.0.0"
+dnspython = ">=2.6.1,<3.0.0"
 requests = ">=2.31.0,<3.0.0"
 
 [package.extras]
@@ -5893,6 +5893,7 @@ description = "Python interface for YARA"
 optional = false
 python-versions = "*"
 files = [
+    {file = "yara-python-4.5.0.tar.gz", hash = "sha256:4feecc56d2fe1d23ecb17cb2d3bc2e3859ebf7a2201d0ca3ae0756a728122b27"},
     {file = "yara_python-4.5.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:3feb72c2146c50e583d7e3cacbb49f280fb5cac0494cae1b48e5980ecbdc1571"},
     {file = "yara_python-4.5.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:1a036c41eaebdf6c0a674e0bd9d37c9d06d1d7427455866ace09d3a159c442b0"},
     {file = "yara_python-4.5.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:acbc950b051a576dd4c6825bf4ebb1c0f0c5eea35b3e01bde921b744e2cc92e1"},
@@ -6168,4 +6169,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "aafd18e90d0afb34c602558d03393086841291110cf88b1211e3f2c37ab13e04"
+content-hash = "27b9c909ae4db6cbc8d2a95f84bae1346d5754e8b9b0e97d8cc2415c60920eda"
