@@ -63,7 +63,7 @@ pylookyloo = "^1.24.0"
 hachoir = "^3.3.0"
 aiohttp = "^3.9.3"
 opencv-python = "^4.9.0.80"
-typing-extensions = {version = "^4.10.0", python = "<3.11"}
+typing-extensions = {version = "^4.11.0", python = "<3.11"}
 # The libyall libs
 dfvfs = "^20240115"
 # The libyall libs that are sneakily for testing purpose only
