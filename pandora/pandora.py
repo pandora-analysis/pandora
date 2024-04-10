@@ -146,7 +146,7 @@ class Pandora():
 
     # #### Observables Lists ####
 
-    def get_suspicious_observables(self) -> dict[str, str] | None:
+    def get_suspicious_observables(self) -> dict[str, str]:
         return self.storage.get_suspicious_observables()
 
     def add_suspicious_observable(self, observable: str, observable_type: str) -> None:
@@ -155,7 +155,7 @@ class Pandora():
     def delete_suspicious_observable(self, observable: str) -> None:
         return self.storage.delete_suspicious_observable(observable)
 
-    def get_legitimate_observables(self) -> dict[str, str] | None:
+    def get_legitimate_observables(self) -> dict[str, str]:
         return self.storage.get_legitimate_observables()
 
     def add_legitimate_observable(self, observable: str, observable_type: str) -> None:
