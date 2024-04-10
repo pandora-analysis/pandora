@@ -56,9 +56,9 @@
         {% for observable, type in suspicious.items() %}
         <tr>
           <td>{{ observable }}</td>
-          <td>{{ type }}</td>
+          <td>{{ type[0] }}</td>
           <td>
-            <form action="{{ url_for('observables_lists_delete', list_type=1, observable=observable) }}">
+            <form action="{{ url_for('observables_lists_delete', list_type=1, observable=type[1]) }}">
               <button type="submit" class="btn btn-secondary" id="insertSubmit">delete</button>
             </form>
           </td>
@@ -81,9 +81,9 @@
         {% for observable, type in legitimate.items() %}
         <tr>
           <td>{{ observable }}</td>
-          <td>{{ type }}</td>
+          <td>{{ type[0] }}</td>
           <td>
-            <form action="{{ url_for('observables_lists_delete', list_type=0, observable=observable) }}">
+            <form action="{{ url_for('observables_lists_delete', list_type=0, observable=type[1]) }}">
               <button type="submit" class="btn btn-secondary" id="insertSubmit">delete</button>
             </form>
           </td>
