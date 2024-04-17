@@ -1890,13 +1890,13 @@ testing = ["jaraco.classes", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-c
 
 [[package]]
 name = "jbxapi"
-version = "3.22.0"
+version = "3.23.0"
 description = "API for Joe Sandbox"
 optional = false
-python-versions = ">=2.7, !=3.0, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+python-versions = "!=3.0,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 files = [
-    {file = "jbxapi-3.22.0-py2.py3-none-any.whl", hash = "sha256:3dc4eed81a3ce4d1d6fb1bab311932f7114056ad7d736f7ee75ca25a02582b7d"},
-    {file = "jbxapi-3.22.0.tar.gz", hash = "sha256:c4a21a8f837ec0273e846a032216e81c88697f46e1725ed2983c63b442cffb8a"},
+    {file = "jbxapi-3.23.0-py2.py3-none-any.whl", hash = "sha256:bf50e59ce542013bcd5ec9dd6a1c23f331301b053cce27296c6149af7bbc65e2"},
+    {file = "jbxapi-3.23.0.tar.gz", hash = "sha256:200590caaa5cfb64ffb36388e6af64d9d9dd83be02155e4a0c64ccbc1cba0b04"},
 ]
 
 [package.dependencies]
@@ -2768,6 +2768,7 @@ files = [
     {file = "lxml-5.2.1-cp36-cp36m-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:c38d7b9a690b090de999835f0443d8aa93ce5f2064035dfc48f27f02b4afc3d0"},
     {file = "lxml-5.2.1-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5670fb70a828663cc37552a2a85bf2ac38475572b0e9b91283dc09efb52c41d1"},
     {file = "lxml-5.2.1-cp36-cp36m-manylinux_2_28_x86_64.whl", hash = "sha256:958244ad566c3ffc385f47dddde4145088a0ab893504b54b52c041987a8c1863"},
+    {file = "lxml-5.2.1-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:b6241d4eee5f89453307c2f2bfa03b50362052ca0af1efecf9fef9a41a22bb4f"},
     {file = "lxml-5.2.1-cp36-cp36m-musllinux_1_1_aarch64.whl", hash = "sha256:2a66bf12fbd4666dd023b6f51223aed3d9f3b40fef06ce404cb75bafd3d89536"},
     {file = "lxml-5.2.1-cp36-cp36m-musllinux_1_1_ppc64le.whl", hash = "sha256:9123716666e25b7b71c4e1789ec829ed18663152008b58544d95b008ed9e21e9"},
     {file = "lxml-5.2.1-cp36-cp36m-musllinux_1_1_s390x.whl", hash = "sha256:0c3f67e2aeda739d1cc0b1102c9a9129f7dc83901226cc24dd72ba275ced4218"},
@@ -5894,6 +5895,7 @@ description = "Python interface for YARA"
 optional = false
 python-versions = "*"
 files = [
+    {file = "yara-python-4.5.0.tar.gz", hash = "sha256:4feecc56d2fe1d23ecb17cb2d3bc2e3859ebf7a2201d0ca3ae0756a728122b27"},
     {file = "yara_python-4.5.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:3feb72c2146c50e583d7e3cacbb49f280fb5cac0494cae1b48e5980ecbdc1571"},
     {file = "yara_python-4.5.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:1a036c41eaebdf6c0a674e0bd9d37c9d06d1d7427455866ace09d3a159c442b0"},
     {file = "yara_python-4.5.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:acbc950b051a576dd4c6825bf4ebb1c0f0c5eea35b3e01bde921b744e2cc92e1"},
@@ -6169,4 +6171,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "0bfee18101bc4404837eb13fea8dfdb8b2f959694676da50f4cecc3ed0c4fd7f"
+content-hash = "fd8da849cad38c569d3257b8969b11a93680ae1ef90db479dbd6b50d2d9d69a9"
