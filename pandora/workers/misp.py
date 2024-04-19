@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 
-from pymisp import PyMISP, MISPAttribute
+from pymisp import PyMISP, MISPAttribute, PyMISPError
 
 from ..helpers import Status
 from ..task import Task
@@ -38,8 +38,13 @@ class MISP(BaseWorker):
             self.disabled = True
             self.logger.warning('Disabled, missing apikey.')
             return
+        try:
+            self.client = PyMISP(self.apiurl, self.apikey, self.tls_verify)
+        except PyMISPError as e:
+            self.disabled = True
+            self.logger.warning(f'Unable to enable the MISP Worker: {e}.')
+            return
         self.logger.info('misp initialized successfully')
-        self.client = PyMISP(self.apiurl, self.apikey, self.tls_verify)
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         self.logger.info(f'analysing file {task.file.path}...')
