@@ -29,7 +29,7 @@ PyYAML = "^6.0.1"
 Flask-WTF = "^1.2.1"
 validators = "^0.28.0"
 python-magic = "^0.4.27"
-PyMuPDF = "^1.24.1"
+PyMuPDF = "^1.24.2"
 requests = "^2.31.0"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.6"
@@ -39,7 +39,7 @@ weasyprint = "^61.2"
 extract-msg = {version = "^0.48.0"}
 oletools = {version = "0.60.1", extras = ["full"]}
 py7zr = "^0.21"
-jbxapi = "^3.22.0"
+jbxapi = "^3.23.0"
 defusedxml = "^0.7.1"
 mwdblib = "^4.5.0"
 vt-py = "^0.18"
@@ -54,7 +54,7 @@ pikepdf = "^8.15.1"
 Pillow = "^10.3.0"
 imapclient = "^3.0.1"
 pyzipper = "^0.3.6"
-pymisp = {version = "^2.4.188", extras = ["fileobjects"]}
+pymisp = {version = "^2.4.190", extras = ["fileobjects"]}
 python-dateutil = "^2.9.0.post0"
 pycdlib = "^1.14.0"
 werkzeug = "^3.0.2"
