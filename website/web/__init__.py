@@ -15,6 +15,7 @@ from importlib.metadata import version
 from io import BytesIO
 from pathlib import Path
 from typing import Any, Callable
+from urllib.parse import quote_plus, unquote_plus
 
 import flask_moment  # type: ignore
 import flask_login  # type: ignore
@@ -458,8 +459,8 @@ def observables_lists() -> str:
 
     if not flask_login.current_user.role.can(Action.manage_observables_lists):
         raise Forbidden('Not allowed to manage observables list')
-    suspicious = pandora.get_suspicious_observables()
-    legitimate = pandora.get_legitimate_observables()
+    suspicious = {o: (o_type, quote_plus(o)) for o, o_type in pandora.get_suspicious_observables().items()}
+    legitimate = {o: (o_type, quote_plus(o)) for o, o_type in pandora.get_legitimate_observables().items()}
     observable_types = [t for t in describe_types['types'] if '|' not in t]
     return render_template('observables_lists.html',
                            show_project_page=get_config('generic', 'show_project_page'),
@@ -492,9 +493,9 @@ def observables_lists_insert() -> WerkzeugResponse:
 @html_answer
 def observables_lists_delete(list_type: int, observable: str) -> WerkzeugResponse:
     if list_type == 0:
-        pandora.delete_legitimate_observable(observable.strip())
+        pandora.delete_legitimate_observable(unquote_plus(observable.strip()))
     else:
-        pandora.delete_suspicious_observable(observable.strip())
+        pandora.delete_suspicious_observable(unquote_plus(observable.strip()))
     return redirect(url_for('observables_lists'))
 
 

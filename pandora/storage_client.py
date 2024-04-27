@@ -123,7 +123,7 @@ class Storage():
 
     # #### Observables lists ####
 
-    def get_suspicious_observables(self) -> dict[str, str] | None:
+    def get_suspicious_observables(self) -> dict[str, str]:
         return self.storage.hgetall('suspicious_observables')
 
     def add_suspicious_observable(self, observable: str, observable_type: str) -> None:
@@ -132,7 +132,7 @@ class Storage():
     def delete_suspicious_observable(self, observable: str) -> None:
         self.storage.hdel('suspicious_observables', observable.strip())
 
-    def get_legitimate_observables(self) -> dict[str, str] | None:
+    def get_legitimate_observables(self) -> dict[str, str]:
         return self.storage.hgetall('legitimate_observables')
 
     def add_legitimate_observable(self, observable: str, observable_type: str) -> None:
