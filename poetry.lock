@@ -2768,6 +2768,7 @@ files = [
     {file = "lxml-5.2.1-cp36-cp36m-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:c38d7b9a690b090de999835f0443d8aa93ce5f2064035dfc48f27f02b4afc3d0"},
     {file = "lxml-5.2.1-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5670fb70a828663cc37552a2a85bf2ac38475572b0e9b91283dc09efb52c41d1"},
     {file = "lxml-5.2.1-cp36-cp36m-manylinux_2_28_x86_64.whl", hash = "sha256:958244ad566c3ffc385f47dddde4145088a0ab893504b54b52c041987a8c1863"},
+    {file = "lxml-5.2.1-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:b6241d4eee5f89453307c2f2bfa03b50362052ca0af1efecf9fef9a41a22bb4f"},
     {file = "lxml-5.2.1-cp36-cp36m-musllinux_1_1_aarch64.whl", hash = "sha256:2a66bf12fbd4666dd023b6f51223aed3d9f3b40fef06ce404cb75bafd3d89536"},
     {file = "lxml-5.2.1-cp36-cp36m-musllinux_1_1_ppc64le.whl", hash = "sha256:9123716666e25b7b71c4e1789ec829ed18663152008b58544d95b008ed9e21e9"},
     {file = "lxml-5.2.1-cp36-cp36m-musllinux_1_1_s390x.whl", hash = "sha256:0c3f67e2aeda739d1cc0b1102c9a9129f7dc83901226cc24dd72ba275ced4218"},
@@ -2792,7 +2793,6 @@ files = [
     {file = "lxml-5.2.1-cp37-cp37m-musllinux_1_2_x86_64.whl", hash = "sha256:9e2addd2d1866fe112bc6f80117bcc6bc25191c5ed1bfbcf9f1386a884252ae8"},
     {file = "lxml-5.2.1-cp37-cp37m-win32.whl", hash = "sha256:f51969bac61441fd31f028d7b3b45962f3ecebf691a510495e5d2cd8c8092dbd"},
     {file = "lxml-5.2.1-cp37-cp37m-win_amd64.whl", hash = "sha256:b0b58fbfa1bf7367dde8a557994e3b1637294be6cf2169810375caf8571a085c"},
-    {file = "lxml-5.2.1-cp38-cp38-macosx_10_9_universal2.whl", hash = "sha256:3e183c6e3298a2ed5af9d7a356ea823bccaab4ec2349dc9ed83999fd289d14d5"},
     {file = "lxml-5.2.1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:804f74efe22b6a227306dd890eecc4f8c59ff25ca35f1f14e7482bbce96ef10b"},
     {file = "lxml-5.2.1-cp38-cp38-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:08802f0c56ed150cc6885ae0788a321b73505d2263ee56dad84d200cab11c07a"},
     {file = "lxml-5.2.1-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0f8c09ed18ecb4ebf23e02b8e7a22a05d6411911e6fabef3a36e4f371f4f2585"},
@@ -5024,16 +5024,16 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.70.0"
+version = "1.71.0"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "semgrep-1.70.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-any.whl", hash = "sha256:0e322fe4b4ce65b8c8afc045aa72291f9874f4ab71ae082d037c5d099f8ebd9f"},
-    {file = "semgrep-1.70.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:9d1a6424478ef3f710992720f2f36e44b15f29c259eef1bba4fdfb16a81c3654"},
-    {file = "semgrep-1.70.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:4b3a8563258914dc96e47e7111cc45d46b2e2caf46a1aaa2031f785fbe784292"},
-    {file = "semgrep-1.70.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d3dcde56849beb559e28725938b2075c73fe9ba5f993bc77f2253c8e5a6e6c19"},
-    {file = "semgrep-1.70.0.tar.gz", hash = "sha256:ac05f4441e211355bbb196dc2de7000849fb885ee9621af3f1251998aba27f7c"},
+    {file = "semgrep-1.71.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-any.whl", hash = "sha256:d29129c4861e774674f3a9756a9257b84556d47972e076aecc70fc6e3c51d59c"},
+    {file = "semgrep-1.71.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:c2009a4bb2f0d453f8da63999a13b9bf6373f0f9c312410fda06f1afb686b439"},
+    {file = "semgrep-1.71.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:2197364596c06297e592cce5e6516eb718a4c2d3ba5c6a32c9e1c922153f2be9"},
+    {file = "semgrep-1.71.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e9579f800e1816263b7eccbbb1b4055c28ec24d338faf96feae2d2af305ddaa2"},
+    {file = "semgrep-1.71.0.tar.gz", hash = "sha256:5b8068505fcd86dfabf2624d348b90022144901fc0f1df8277065dbd85d1ac2e"},
 ]
 
 [package.dependencies]
@@ -5895,6 +5895,7 @@ description = "Python interface for YARA"
 optional = false
 python-versions = "*"
 files = [
+    {file = "yara-python-4.5.0.tar.gz", hash = "sha256:4feecc56d2fe1d23ecb17cb2d3bc2e3859ebf7a2201d0ca3ae0756a728122b27"},
     {file = "yara_python-4.5.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:3feb72c2146c50e583d7e3cacbb49f280fb5cac0494cae1b48e5980ecbdc1571"},
     {file = "yara_python-4.5.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:1a036c41eaebdf6c0a674e0bd9d37c9d06d1d7427455866ace09d3a159c442b0"},
     {file = "yara_python-4.5.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:acbc950b051a576dd4c6825bf4ebb1c0f0c5eea35b3e01bde921b744e2cc92e1"},
@@ -6170,4 +6171,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "1e0b84de4af4b838fa91a3335244adff44eb7a54b438b22e1065edaeba319fa4"
+content-hash = "829fbf12720aaee0a9dfb500919fe8e8f70f7dec196fb3fd2f00f1ed53cb3ce7"
