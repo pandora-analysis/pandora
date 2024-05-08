@@ -2581,6 +2581,22 @@ optional = false
 python-versions = ">=3.7"
 files = [
     {file = "libvshadow-python-20240504.tar.gz", hash = "sha256:44107e3364b3cab58939729516886e201ec45a90ab2c0b5dbf3f0690bcc6c494"},
+    {file = "libvshadow_python-20240504-cp310-cp310-macosx_12_0_x86_64.whl", hash = "sha256:c6aefdaaa8dd26d2dc91baa434043a6abca70b5d13592938e5d7c2a0ce6297fc"},
+    {file = "libvshadow_python-20240504-cp310-cp310-manylinux_2_34_x86_64.manylinux_2_35_x86_64.whl", hash = "sha256:983ca198d41bd632ae0c826eb733389fc2c2d96bab7e5c2018d6d52db1e71952"},
+    {file = "libvshadow_python-20240504-cp310-cp310-win32.whl", hash = "sha256:8bf0c7ffc88a531da65df8395df3c5e5ff10a9e8a34cf2b3dcbbd8f66efb5d2c"},
+    {file = "libvshadow_python-20240504-cp310-cp310-win_amd64.whl", hash = "sha256:385a1a08e33246738c0d4457ac9344ff4d8862fbc1d7939a62abf41efedd15ed"},
+    {file = "libvshadow_python-20240504-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:f847903959a81c492b40dc71827dc314c198f02f82a760228ebcf6c28e450dfa"},
+    {file = "libvshadow_python-20240504-cp311-cp311-win32.whl", hash = "sha256:71108cedfd03aa507186a5fd5074dd31975b5963f2b1c8b6a85abec2203fa2e1"},
+    {file = "libvshadow_python-20240504-cp311-cp311-win_amd64.whl", hash = "sha256:30c07c725a2f6d8647b6eee042b0bae38d9dd8fd7c117ca110c869e22c26ec71"},
+    {file = "libvshadow_python-20240504-cp312-cp312-macosx_12_0_x86_64.whl", hash = "sha256:bf5bc6a913da322eae4a73995d8c70c5217631e2a02c275580aff97e7abd9d84"},
+    {file = "libvshadow_python-20240504-cp312-cp312-win32.whl", hash = "sha256:dc5b80099f10149881e9f2aa49d6f87f3a17179378b14c8141ca62fa8b9d9942"},
+    {file = "libvshadow_python-20240504-cp312-cp312-win_amd64.whl", hash = "sha256:eb11f3bf331c2bc01dcd0274985d57c54b8ec5490da287dca0be10f12a921a0e"},
+    {file = "libvshadow_python-20240504-cp38-cp38-macosx_12_0_x86_64.whl", hash = "sha256:e580f897794061bade65a67ffea7115761d34e9690d396234826f66482e584c5"},
+    {file = "libvshadow_python-20240504-cp38-cp38-win32.whl", hash = "sha256:4b0293a550790e0d9d5669b09d22bc81ee61d8ad129ab136fe03153179e827fd"},
+    {file = "libvshadow_python-20240504-cp38-cp38-win_amd64.whl", hash = "sha256:7825630b1821578bd3c57fc7629bfeba7ede47bbbedde8fa834fa3dbb5f02e55"},
+    {file = "libvshadow_python-20240504-cp39-cp39-macosx_12_0_x86_64.whl", hash = "sha256:3ec29304591e6f641e3207798bef7d0385c0f8650dc92b4757dc1aa16673a51d"},
+    {file = "libvshadow_python-20240504-cp39-cp39-win32.whl", hash = "sha256:bb0416e20a4ec8b8d15db429834b482bf3e8fbc07512774e0dd4f9ae27611b05"},
+    {file = "libvshadow_python-20240504-cp39-cp39-win_amd64.whl", hash = "sha256:c09877d1f9ec4db0674d35cfd0d4aed09e72487ffd74ed4b1a41cfcfedf911ce"},
 ]
 
 [[package]]
@@ -2591,6 +2607,22 @@ optional = false
 python-versions = ">=3.7"
 files = [
     {file = "libvslvm-python-20240504.tar.gz", hash = "sha256:56080a5aeef671f14a5eb0c58a87f69da5a6400e897363965522345d597d1777"},
+    {file = "libvslvm_python-20240504-cp310-cp310-macosx_12_0_x86_64.whl", hash = "sha256:e64d5cf952a83a548c8be779266a64c77092b85db8007646989877cb6231ddb2"},
+    {file = "libvslvm_python-20240504-cp310-cp310-manylinux_2_34_x86_64.manylinux_2_35_x86_64.whl", hash = "sha256:633b9fd66402c96fef85240a65e9153a2180dd11fd9ea6b067c4475b9a688ef6"},
+    {file = "libvslvm_python-20240504-cp310-cp310-win32.whl", hash = "sha256:08cc37c4b8cb86c7adef2a78e318c5748d6b6496088448e81581675ee6d62ee1"},
+    {file = "libvslvm_python-20240504-cp310-cp310-win_amd64.whl", hash = "sha256:6ca02b43610a5091ad5714e6caf6d9f83a53f953c7136e39e7c29a25603c696f"},
+    {file = "libvslvm_python-20240504-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:b50fd3b1ab47c46f10b988f2b6e024d356bc5e52fb7d06e772e78f95076f72ae"},
+    {file = "libvslvm_python-20240504-cp311-cp311-win32.whl", hash = "sha256:02e5338f268c0aef134a7ded0b72dfc479a423ea114356ac82bf679ca3128dd0"},
+    {file = "libvslvm_python-20240504-cp311-cp311-win_amd64.whl", hash = "sha256:13814211796268cf905e2ab0084188c518ba2466aaaaeba8d4808cbe2dad2469"},
+    {file = "libvslvm_python-20240504-cp312-cp312-macosx_12_0_x86_64.whl", hash = "sha256:26bd75c7cecd8ec3a2d9f6add6d3236d5fadae1c53ab4953ba1e578ed394571a"},
+    {file = "libvslvm_python-20240504-cp312-cp312-win32.whl", hash = "sha256:cee942649ba8db93567375520dda2f33002c7f42fb938e9e03dd5c3ac38236ed"},
+    {file = "libvslvm_python-20240504-cp312-cp312-win_amd64.whl", hash = "sha256:217ad9d7125707cfd1a3e2894a4ddb518598d927d3023f8da9e55d80440c385b"},
+    {file = "libvslvm_python-20240504-cp38-cp38-macosx_12_0_x86_64.whl", hash = "sha256:e31f724a2e686901786b3c3bb382a81ef4a490322f30993ec2cab7feacb831df"},
+    {file = "libvslvm_python-20240504-cp38-cp38-win32.whl", hash = "sha256:9ad0f89f0022be7189e92c18ad9c0c7e358c146aab1b2732d5527502a8418694"},
+    {file = "libvslvm_python-20240504-cp38-cp38-win_amd64.whl", hash = "sha256:ea1b76943ab81725484666dd458c0f03fe9e1dff21aedde9444ea3f191942f7d"},
+    {file = "libvslvm_python-20240504-cp39-cp39-macosx_12_0_x86_64.whl", hash = "sha256:e2c85b460acb77de4454d72ba7288cc0f1d4c0f7b33219ab55c350630b4c1c8f"},
+    {file = "libvslvm_python-20240504-cp39-cp39-win32.whl", hash = "sha256:e447e096c85952bad3102005573b286384422077a10491cbf61599facfb04ad8"},
+    {file = "libvslvm_python-20240504-cp39-cp39-win_amd64.whl", hash = "sha256:d08a00de271ca7be48bf948383357ea7c48e3a8cd9bc5ceb7d531ca118bd0ab6"},
 ]
 
 [[package]]
@@ -2731,7 +2763,6 @@ files = [
     {file = "lxml-5.2.1-cp37-cp37m-musllinux_1_2_x86_64.whl", hash = "sha256:9e2addd2d1866fe112bc6f80117bcc6bc25191c5ed1bfbcf9f1386a884252ae8"},
     {file = "lxml-5.2.1-cp37-cp37m-win32.whl", hash = "sha256:f51969bac61441fd31f028d7b3b45962f3ecebf691a510495e5d2cd8c8092dbd"},
     {file = "lxml-5.2.1-cp37-cp37m-win_amd64.whl", hash = "sha256:b0b58fbfa1bf7367dde8a557994e3b1637294be6cf2169810375caf8571a085c"},
-    {file = "lxml-5.2.1-cp38-cp38-macosx_10_9_universal2.whl", hash = "sha256:3e183c6e3298a2ed5af9d7a356ea823bccaab4ec2349dc9ed83999fd289d14d5"},
     {file = "lxml-5.2.1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:804f74efe22b6a227306dd890eecc4f8c59ff25ca35f1f14e7482bbce96ef10b"},
     {file = "lxml-5.2.1-cp38-cp38-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:08802f0c56ed150cc6885ae0788a321b73505d2263ee56dad84d200cab11c07a"},
     {file = "lxml-5.2.1-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0f8c09ed18ecb4ebf23e02b8e7a22a05d6411911e6fabef3a36e4f371f4f2585"},
@@ -4962,16 +4993,16 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.71.0"
+version = "1.72.0"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "semgrep-1.71.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-any.whl", hash = "sha256:d29129c4861e774674f3a9756a9257b84556d47972e076aecc70fc6e3c51d59c"},
-    {file = "semgrep-1.71.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:c2009a4bb2f0d453f8da63999a13b9bf6373f0f9c312410fda06f1afb686b439"},
-    {file = "semgrep-1.71.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:2197364596c06297e592cce5e6516eb718a4c2d3ba5c6a32c9e1c922153f2be9"},
-    {file = "semgrep-1.71.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e9579f800e1816263b7eccbbb1b4055c28ec24d338faf96feae2d2af305ddaa2"},
-    {file = "semgrep-1.71.0.tar.gz", hash = "sha256:5b8068505fcd86dfabf2624d348b90022144901fc0f1df8277065dbd85d1ac2e"},
+    {file = "semgrep-1.72.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-any.whl", hash = "sha256:fd7673cc36ec5baa70f0b0bc0e0a1f6751abede790c87ef5f4dcc90c2a178699"},
+    {file = "semgrep-1.72.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:8f2905397382b44b654f137acf5ee6f04da0d96a5beea757c7ac382fac3e0db6"},
+    {file = "semgrep-1.72.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:d1d0648b7cbdb4c7634517d86f1b65d1f5530d73bcb4ba71efa10f212c6d0b2e"},
+    {file = "semgrep-1.72.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ef30b2d886f1b0d3b5265fde7eef5dc12cafbfa6b41d8bea101cf15694f3a803"},
+    {file = "semgrep-1.72.0.tar.gz", hash = "sha256:65cd19df8b8cafafdfd420303cc1bc81412a27e4b6895e01852d5f92d7aef347"},
 ]
 
 [package.dependencies]
@@ -6135,4 +6166,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "53cd27a0530311fb2db62443cb13f55c003425887e41ff9967f021442800c942"
+content-hash = "6284abbacc9ca2ae0352508d18a721ef44deeeb9ccfbebfbbde4c48b0378f787"
