@@ -58,7 +58,7 @@ class Ole(BaseWorker):
             to_return[attrib] = attribute
         return to_return
 
-    def process_ole(self, ole: OleObject) -> tuple[Status, dict[str, Any]]:
+    def process_oleobject(self, ole: OleObject) -> tuple[Status, dict[str, Any]]:
         details = {'malicious': ''}
         status = Status.CLEAN
         if ole.format_id == OleObject.TYPE_EMBEDDED:
@@ -117,6 +117,78 @@ class Ole(BaseWorker):
             details[type_entry].append(description)
         return Status.ALERT, details
 
+    def process_internal_olefile(self, oid: oleid.OleID, report: Report, malicious: list[str], suspicious: list[str], info: list[str]) -> None:
+        self.process_oid_ole(oid, report, malicious, suspicious, info)
+        self.check_macros_from_oid(oid, report, info)
+
+    def check_macros_from_oid(self, oid: oleid.OleID, report: Report, info: list[str]) -> None:
+        if (issubclass(oid.ftg.ftype, FType_Generic_OLE)
+                or issubclass(oid.ftg.ftype, FType_Generic_OpenXML)):
+            # Macros, RTF don't have that
+            vba_indicator, xlm_indicator = oid.check_macros()
+            info.append(vba_indicator.description)
+            info.append(xlm_indicator.description)
+            if vba_indicator.risk != RISK.NONE or xlm_indicator.risk != RISK.NONE:
+                # has macro
+                # NOTE: must pass the file on disk:
+                # https://github.com/decalage2/oletools/blob/be16ef425c30c689c92ef33cb1af7f930adfd69f/oletools/oleid.py#L459
+                status, details = self._process_macros(oid.ftg)
+                report.status = status
+                for k, v in details.items():
+                    report.add_details(k, v)
+
+    def process_oid_ole(self, oid: oleid.OleID, report: Report, malicious: list[str], suspicious: list[str], info: list[str]) -> None:
+        # Get meta
+        meta = oid.ole.get_metadata()
+        summary = self._get_meta_attributes(meta, meta.SUMMARY_ATTRIBS)
+        docsum = self._get_meta_attributes(meta, meta.DOCSUM_ATTRIBS)
+        report.add_details('summary', summary)
+        report.add_details('docsum', docsum)
+
+        # Check encryption
+        encryption = oid.check_encrypted()
+        if encryption.risk == RISK.ERROR:
+            report.status = Status.ALERT
+            malicious.append(encryption.description)
+        elif encryption.risk in [RISK.LOW, RISK.NONE]:
+            info.append(encryption.description)
+        else:
+            # New risk level from lib, shouldn't happen.
+            report.status = Status.ALERT
+            malicious.append(encryption.description)
+
+        # get object pool
+        pool = oid.check_object_pool()
+        if pool.value:
+            report.status = Status.ALERT
+            suspicious.append(pool.description)
+            # in theory, we can get to the pool stuff with
+            # oid.ole.openstream('ObjectPool')
+            # https://github.com/decalage2/olefile/blob/master/olefile/olefile.py#L1929
+            # and get a OleStream out of that (BytesIO pseudofile)
+            # https://github.com/decalage2/olefile/blob/5ae06e937cd18afebfb49239e8f20b099605136f/olefile/olefile.py#L563
+            # what to do with that is unclear but we might be able to pass it to OleFileIO
+            # and keep going.
+
+        flash = oid.check_flash()
+        if flash.value > 0:
+            # Nothing good in that.
+            report.status = Status.ALERT
+            malicious.append(encryption.description)
+
+            # NOTE Taken from
+            # https://github.com/decalage2/oletools/blob/master/oletools/pyxswf.py#L124
+            # Commented because it prints instead of returning something we can use
+            # xxxswf.disneyland must be rewritten
+
+            # for direntry in oid.ole.direntries:
+            #    if direntry is not None and direntry.entry_type == olefile.STGTY_STREAM:
+            #        f = oid.ole._open(direntry.isectStart, direntry.size)
+            #        data = f.getvalue()
+            #        if b'FWS' in data or b'CWS' in data:
+            #            xxxswf.disneyland(f, direntry.name, options)
+            #        f.close()
+
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.data:
             report.status = Status.NOTAPPLICABLE
@@ -141,56 +213,7 @@ class Ole(BaseWorker):
         info: list[str] = []
 
         if oid.ole:
-            # Get meta
-            meta = oid.ole.get_metadata()
-            summary = self._get_meta_attributes(meta, meta.SUMMARY_ATTRIBS)
-            docsum = self._get_meta_attributes(meta, meta.DOCSUM_ATTRIBS)
-            report.add_details('summary', summary)
-            report.add_details('docsum', docsum)
-
-            # Check encryption
-            encryption = oid.check_encrypted()
-            if encryption.risk == RISK.ERROR:
-                report.status = Status.ALERT
-                malicious.append(encryption.description)
-            elif encryption.risk in [RISK.LOW, RISK.NONE]:
-                info.append(encryption.description)
-            else:
-                # New risk level from lib, shouldn't happen.
-                report.status = Status.ALERT
-                malicious.append(encryption.description)
-
-            # get object pool
-            pool = oid.check_object_pool()
-            if pool.value:
-                report.status = Status.ALERT
-                suspicious.append(pool.description)
-                # in theory, we can get to the pool stuff with
-                # oid.ole.openstream('ObjectPool')
-                # https://github.com/decalage2/olefile/blob/master/olefile/olefile.py#L1929
-                # and get a OleStream out of that (BytesIO pseudofile)
-                # https://github.com/decalage2/olefile/blob/5ae06e937cd18afebfb49239e8f20b099605136f/olefile/olefile.py#L563
-                # what to do with that is unclear but we might be able to pass it to OleFileIO
-                # and keep going.
-
-            flash = oid.check_flash()
-            if flash.value > 0:
-                # Nothing good in that.
-                report.status = Status.ALERT
-                malicious.append(encryption.description)
-
-                # NOTE Taken from
-                # https://github.com/decalage2/oletools/blob/master/oletools/pyxswf.py#L124
-                # Commented because it prints instead of returning something we can use
-                # xxxswf.disneyland must be rewritten
-
-                # for direntry in oid.ole.direntries:
-                #    if direntry is not None and direntry.entry_type == olefile.STGTY_STREAM:
-                #        f = oid.ole._open(direntry.isectStart, direntry.size)
-                #        data = f.getvalue()
-                #        if b'FWS' in data or b'CWS' in data:
-                #            xxxswf.disneyland(f, direntry.name, options)
-                #        f.close()
+            self.process_oid_ole(oid, report, malicious, suspicious, info)
 
         elif oid.ftg.is_openxml():
             # okay, this is hell.
@@ -207,9 +230,19 @@ class Ole(BaseWorker):
                     malicious.append(f'{rel_type} - {attribute}')
 
             for olefile in find_ole(task.file.original_filename, task.file.data.getvalue()):
-                report.status = Status.ALERT
-                malicious.append('Has embedded OLE resource.')
+                report.status = Status.WARN
+                suspicious.append('Has embedded OLE resource.')
                 # TODO Process as a normal olefile
+                _oid = oleid.OleID(filename=olefile, data=olefile.fp.read())
+                # We must initialize a bunch of internal variables in order to run the calls below
+                # And we cannot simply run oid.check() because it closes the olefile
+                _oid.ftg = FileTypeGuesser(data=_oid.data)
+                if _oid.ftg.container == CONTAINER.OLE:
+                    _oid.ole = _oid.ftg.olefile
+
+                if _oid.ftg.filetype in [FTYPE.UNKNOWN, FTYPE.EXE_PE]:
+                    continue
+                self.process_internal_olefile(_oid, report, malicious, suspicious, info)
 
         elif oid.ftg.filetype == FTYPE.RTF:
             # process RTF
@@ -221,7 +254,7 @@ class Ole(BaseWorker):
             for obj in rtf.objects:
                 if not obj.is_ole:
                     continue
-                status, details = self.process_ole(obj)
+                status, details = self.process_oleobject(obj)
                 report.status = status
                 for k, v in details.items():
                     report.add_details(k, v)
@@ -236,20 +269,7 @@ class Ole(BaseWorker):
             #        f = BytesIO(obj.rawdata)
             #        xxxswf.disneyland(f, name, options)
 
-        if (issubclass(oid.ftg.ftype, FType_Generic_OLE)
-                or issubclass(oid.ftg.ftype, FType_Generic_OpenXML)):
-            # Macros, RTF don't have that
-            vba_indicator, xlm_indicator = oid.check_macros()
-            info.append(vba_indicator.description)
-            info.append(xlm_indicator.description)
-            if vba_indicator.risk != RISK.NONE or xlm_indicator.risk != RISK.NONE:
-                # has macro
-                # NOTE: must pass the file on disk:
-                # https://github.com/decalage2/oletools/blob/be16ef425c30c689c92ef33cb1af7f930adfd69f/oletools/oleid.py#L459
-                status, details = self._process_macros(oid.ftg)
-                report.status = status
-                for k, v in details.items():
-                    report.add_details(k, v)
+        self.check_macros_from_oid(oid, report, info)
 
         if malicious:
             report.add_details('malicious', malicious)
