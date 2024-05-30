@@ -17,7 +17,6 @@ from oletools.oleid import RISK  # type: ignore[import-untyped]
 from oletools.oleobj import get_logger, find_ole, find_external_relationships, OleObject  # type: ignore[import-untyped]
 from oletools.olevba import VBA_Parser  # type: ignore[import-untyped]
 from oletools.rtfobj import RtfObjParser, re_executable_extensions  # type: ignore[import-untyped]
-# from oletools.thirdparty.xxxswf import xxxswf  # type: ignore
 
 from ..helpers import Status
 from ..task import Task
