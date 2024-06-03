@@ -65,7 +65,7 @@ pyhashlookup = "^1.2.4"
 pylookyloo = "^1.24.0"
 hachoir = "^3.3.0"
 aiohttp = "^3.9.5"
-opencv-python = "^4.9.0.80"
+opencv-python = "^4.10.0.82"
 typing-extensions = {version = "^4.12.0", python = "<3.11"}
 # The libyall libs
 dfvfs = "^20240115"
