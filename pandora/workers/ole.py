@@ -57,9 +57,9 @@ class Ole(BaseWorker):
             to_return[attrib] = attribute
         return to_return
 
-    def process_oleobject(self, ole: OleObject) -> tuple[Status, dict[str, Any]]:
+    def process_oleobject(self, ole: OleObject) -> tuple[Status | str, dict[str, Any]]:
         details = {'malicious': ''}
-        status = Status.CLEAN
+        status: Status | str = Status.CLEAN
         if ole.format_id == OleObject.TYPE_EMBEDDED:
             details['format'] = 'Embedded'
         elif ole.format_id == OleObject.TYPE_LINKED:
@@ -67,7 +67,7 @@ class Ole(BaseWorker):
         else:
             details['format'] = 'Unknown'
         if ole.is_package:
-            status = Status.WARN
+            status = 'ole_is_package'
             details['package'] = f'Filename: {ole.filename}\nSource path: {ole.src_path}\nTemp path = {ole.temp_path}\nMD5 = {ole.olepkgdata_md5}'
             _, temp_ext = os.path.splitext(ole.temp_path)
             _, file_ext = os.path.splitext(ole.filename)
@@ -229,7 +229,7 @@ class Ole(BaseWorker):
                     malicious.append(f'{rel_type} - {attribute}')
 
             for olefile in find_ole(task.file.original_filename, task.file.data.getvalue()):
-                report.status = Status.WARN
+                report.status = 'embedded_ole'
                 suspicious.append('Has embedded OLE resource.')
                 # TODO Process as a normal olefile
                 _oid = oleid.OleID(filename=olefile, data=olefile.fp.read())
@@ -254,7 +254,7 @@ class Ole(BaseWorker):
                 if not obj.is_ole:
                     continue
                 status, details = self.process_oleobject(obj)
-                report.status = status
+                report.status = status  # type: ignore[assignment]
                 for k, v in details.items():
                     report.add_details(k, v)
 

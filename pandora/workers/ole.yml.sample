@@ -4,4 +4,8 @@ meta:
   replicas: 5
 
 settings:
-    timeout: 3m
+  timeout: 5m
+
+status_in_report:
+  ole_is_package: WARN
+  embedded_ole: WARN
