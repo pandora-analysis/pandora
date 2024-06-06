@@ -73,7 +73,7 @@ dfvfs = "^20240115"
 setuptools = "^70.0.0"
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^3.2.2"
+pylint = "^3.2.3"
 ipython = [
     {version = "<8.13.0", python = "<3.9"},
     {version = "^8.18.0", python = ">=3.9"},
