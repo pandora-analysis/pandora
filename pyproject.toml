@@ -19,7 +19,7 @@ background_processing = "bin.background_processing:main"
 
 [tool.poetry.dependencies]
 python = "^3.8.1,<3.13"
-redis = {version = "^5.0.4", extras = ["hiredis"]}
+redis = {version = "^5.0.6", extras = ["hiredis"]}
 flask-restx = "^1.3.0"
 gunicorn = {version = "^22.0.0", extras = ["setproctitle"]}
 Flask-Moment = "^1.0.6"
@@ -57,7 +57,7 @@ pikepdf = "^9.0.0"
 Pillow = "^10.3.0"
 imapclient = "^3.0.1"
 pyzipper = "^0.3.6"
-pymisp = {version = "^2.4.190", extras = ["fileobjects"]}
+pymisp = {version = "^2.4.193", extras = ["fileobjects"]}
 python-dateutil = "^2.9.0.post0"
 pycdlib = "^1.14.0"
 werkzeug = "^3.0.3"
@@ -66,14 +66,14 @@ pylookyloo = "^1.24.0"
 hachoir = "^3.3.0"
 aiohttp = "^3.9.5"
 opencv-python = "^4.10.0.82"
-typing-extensions = {version = "^4.12.1", python = "<3.11"}
+typing-extensions = {version = "^4.12.2", python = "<3.11"}
 # The libyall libs
 dfvfs = "^20240115"
 # The libyall libs that are sneakily for testing purpose only
 setuptools = "^70.0.0"
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^3.2.2"
+pylint = "^3.2.3"
 ipython = [
     {version = "<8.13.0", python = "<3.9"},
     {version = "^8.18.0", python = ">=3.9"},
@@ -84,7 +84,7 @@ types-redis = {version = "^4.6.0.20240425"}
 types-PyYAML = "^6.0.12.20240311"
 types-requests = "^2.32.0.20240602"
 types-python-dateutil = "^2.9.0.20240316"
-bandit = {extras = ["toml"], version = "^1.7.8"}
+bandit = {extras = ["toml"], version = "^1.7.9"}
 flake8 = "^7.0.0"
 semgrep = "^1.75.0"
 types-tzlocal = "^5.1.0.1"
