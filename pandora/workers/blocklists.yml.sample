@@ -28,3 +28,15 @@ settings:
   enable_mimetypes: false
   malicious_mimetypes:
     - application/octet-stream
+
+status_in_report:
+  # the extension is one of the malicious extensions listed above
+  malicious_extension: ALERT
+  # The mimetype is one of the malicious mimetypes listed above
+  malicious_mimetype: ALERT
+  # Unable to guess the mimetype of the file from the content (magic failed)
+  no_mimetype: ALERT
+  # Unable to guess the mimetype o the file from its extension
+  cannot_guess_mimetype: ALERT
+  # The mimetype of the file does not match its extension
+  missmatch_mimetype: WARN

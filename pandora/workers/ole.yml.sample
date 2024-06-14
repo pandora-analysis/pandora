@@ -7,5 +7,7 @@ settings:
   timeout: 5m
 
 status_in_report:
+  # is the OLE analysed a package containing other files?
   ole_is_package: WARN
+  # Does the OLE contains other OLE?
   embedded_ole: WARN
