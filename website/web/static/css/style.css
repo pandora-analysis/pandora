@@ -1,90 +1,108 @@
-a, *[onclick], *[title] {
-    cursor: pointer;
+a,
+*[onclick],
+*[title] {
+  cursor: pointer;
 }
 
 .img-hover img {
-  position:relative;
-  margin:5px;
-  border-width:1px;
-  border-color:#AAAAAA;
-  border-style:solid;
-  transition: all .5s ease;
-  z-index:0;
+  position: relative;
+  margin: 5px;
+  border-width: 1px;
+  border-color: #aaaaaa;
+  border-style: solid;
+  transition: all 0.5s ease;
+  z-index: 0;
 }
 
 .img-hover img:hover {
-  z-index:10;
+  z-index: 10;
   backface-visibility: hidden;
   transform: scale(4) translate(-35%, 35%);
 }
 
 .tab-pane {
-    padding:10px;
+  padding: 10px;
 }
 
 .overall-status-flag {
-  color:white;
-  font-size:130px;
-  text-align:center;
+  color: white;
+  font-size: 130px;
+  text-align: center;
 }
 
 .small-status-flag {
-  color:white;
-  font-size:14px;
-  text-align:center;
-  padding:0 5px !important;
+  color: white;
+  font-size: 14px;
+  text-align: center;
+  padding: 0 5px !important;
 }
 
 .status-flag-overwrite {
-  background-color:#808080 !important;
+  background-color: #808080 !important;
 }
 
 .status-flag-error {
-  background-color:#000000 !important;
+  background-color: #000000 !important;
 }
 
 .status-flag-alert {
-  background-color:#c9302c !important;
+  background-color: #c9302c !important;
 }
 
 .status-flag-warn {
-  background-color:#ec971f !important;
+  background-color: #ec971f !important;
 }
 
 .status-flag-clean {
-  background-color:#449d44 !important;
+  background-color: #449d44 !important;
 }
 
 .status-flag-running {
-  background-color:#5bc0de !important;
+  background-color: #5bc0de !important;
 }
 
 .status-flag-waiting {
-  background-color:#5bc0de !important;
+  background-color: #5bc0de !important;
 }
 
 .alert-error {
-  background-image: linear-gradient(to bottom,#555555 0,#222222 100%);
+  background-image: linear-gradient(to bottom, #555555 0, #222222 100%);
   background-repeat: repeat-x;
   border-color: #bcbcbc;
   color: #bcbcbc;
 }
 
-#dropzone{
-    background-color:#eee;
-    height:300px;
-    margin-bottom: 20px;
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    border-radius: 5px;
-    border: 2px dashed;
+#dropzone {
+  background-color: #eee;
+  height: 300px;
+  margin-bottom: 20px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  border-radius: 5px;
+  border: 2px dashed;
 }
 
 /* Bootstrap 5 tweak: do not underline links unless hovered over */
 a:not([class*="btn"]) {
-    text-decoration: none;
+  text-decoration: none;
 }
 a:not([class*="btn"]):hover {
-    text-decoration: underline;
+  text-decoration: underline;
+}
+
+.selected-lang {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  line-height: 2;
+  width: 100px;
+}
+
+.selected-lang:before {
+  content: "";
+  display: block;
+  width: 32px;
+  height: 32px;
+  background-image: url(https://flagsapi.com/US/shiny/32.png);
 }
