@@ -34,7 +34,6 @@ class ComodoWorker(BaseWorker):
                 or not os.path.exists(self.comodo_path)
                 or not os.path.exists(self.comodo_bases)):
             self.disabled = True
-            return
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         self.logger.debug(f'analysing file {task.file.path}...')

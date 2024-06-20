@@ -51,6 +51,8 @@ def html_to_pdf(source: str | bytes | Path, dest: str) -> None:
         html = HTML(file_obj=BytesIO(source), url_fetcher=default_url_fetcher if get_config('generic', 'weasyprint_fetch_ressources') else disable_fetch_weasyprint)
     elif isinstance(source, Path):
         html = HTML(source, url_fetcher=default_url_fetcher if get_config('generic', 'weasyprint_fetch_ressources') else disable_fetch_weasyprint)
+    else:
+        raise ValueError('Invalid type for the source document')
     html.write_pdf(dest)
 
 

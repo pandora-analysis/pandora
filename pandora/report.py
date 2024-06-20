@@ -17,7 +17,7 @@ def default_json(obj: Any) -> Any:
 
 
 class Report:
-    def __init__(self, task_uuid: str, worker_name: str, status: str | None= None,
+    def __init__(self, task_uuid: str, worker_name: str, status: str | None=None,
                  details: str | None=None, extras: str | None=None,):
         """
         Generate module report.
@@ -39,6 +39,8 @@ class Report:
         if extras:
             self._extras = json.loads(extras)
 
+        self._status_indicators: dict[str, str] = {}
+
     @property
     def to_dict(self) -> dict[str, Any]:
         return {k: v for k, v in {
@@ -55,12 +57,29 @@ class Report:
         }.items() if v is not None}
 
     @property
+    def status_indicators(self) -> dict[str, str]:
+        return self._status_indicators
+
+    @status_indicators.setter
+    def status_indicators(self, status_indicators: dict[str, str]) -> None:
+        self._status_indicators = status_indicators
+
+    @property
     def status(self) -> Status:
         return self._status
 
     @status.setter
-    def status(self, status: Status) -> None:
-        self._status = max(self._status, status)
+    def status(self, status: str | Status) -> None:
+        if isinstance(status, Status):
+            status_tmp = status
+        else:
+            if status in self.status_indicators:
+                status = self.status_indicators[status]
+            try:
+                status_tmp = Status[status]
+            except Exception as e:
+                raise PandoraException(f'Invalid status provided: "{status}".') from e
+        self._status = max(self._status, status_tmp)
 
     @property
     def is_done(self) -> bool:

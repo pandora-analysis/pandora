@@ -38,7 +38,6 @@ class LookylooWorker(BaseWorker):
         if not self.client.is_up:
             self.disabled = True
             self.logger.warning(f'Unable to connect to the Lookyloo instance: {self.apiurl}.')
-            return
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.data:

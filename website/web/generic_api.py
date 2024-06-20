@@ -377,6 +377,8 @@ def _intervals(freq: int, first: datetime, last: datetime) -> list[tuple[datetim
         dates = rrule.rrule(freq, byhour=0, dtstart=first, until=last)
     elif freq == rrule.HOURLY:
         dates = rrule.rrule(freq, byminute=0, dtstart=first, until=last)
+    else:
+        raise Unsupported(f"unsupported frequency '{freq}'")
 
     begin = dates[0]
     for dt in dates[1:]:

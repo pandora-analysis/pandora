@@ -113,13 +113,20 @@ def workers() -> dict[str, dict[str, Any]]:
 
         all_configs[configfile.stem] = {
             'meta': {**default_config['meta'], **module_config_sample['meta'], **module_config['meta']},
-            'settings': default_config['settings'].copy()
+            'settings': default_config['settings'].copy(),
+            'status_in_report': {}
         }
 
         if 'settings' in module_config_sample:
             all_configs[configfile.stem]['settings'].update(module_config_sample['settings'])
         if 'settings' in module_config:
             all_configs[configfile.stem]['settings'].update(module_config['settings'])
+
+        if 'status_in_report' in module_config_sample:
+            all_configs[configfile.stem]['status_in_report'].update(module_config_sample['status_in_report'])
+        if 'status_in_report' in module_config:
+            all_configs[configfile.stem]['status_in_report'].update(module_config['status_in_report'])
+
     return {name: all_configs[name] for name in sorted(all_configs)}
 
 

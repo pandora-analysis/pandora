@@ -31,7 +31,7 @@ def get_homedir() -> Path:
     if not os.environ.get(env_global_name):
         guessed_home = Path(__file__).resolve().parent.parent.parent
         raise MissingEnv(f"{env_global_name} is missing. \
-Run the following command (assuming you run the code from the clonned repository):\
+Run the following command (assuming you run the code from the cloned repository):\
     export {env_global_name}='{guessed_home}'")
     homedir = Path(os.environ[env_global_name])
     if not homedir.exists():

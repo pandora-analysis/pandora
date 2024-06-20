@@ -62,6 +62,9 @@ class WorkersManager(AbstractManager):
             key: value for key, value in worker_conf['settings'].items()
             if key not in ('cache', 'timeout')
         }
+        status_in_report = {}
+        if 'status_in_report' in worker_conf:
+            status_in_report = worker_conf['status_in_report']
 
         # [re]Create workers
         if restart:
@@ -74,6 +77,7 @@ class WorkersManager(AbstractManager):
                     cache=worker_conf['settings']['cache'],
                     timeout=worker_conf['settings']['timeout'],
                     loglevel=self.loglevel,
+                    status_in_report=status_in_report,
                     **options
                 )
                 if i == 1 and not worker.disabled:

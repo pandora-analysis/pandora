@@ -48,7 +48,9 @@ class WorkerOption(TypedDict):
 class BaseWorker(multiprocessing.Process):
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
+                 loglevel: int | None=None,
+                 status_in_report: dict[str, str] | None=None,
+                 **options: Unpack[WorkerOption]) -> None:
         """
         Create a worker.
         :param module: module of the worker
@@ -90,6 +92,8 @@ class BaseWorker(multiprocessing.Process):
         self.cache = expire_in_sec(cache)
         self.timeout = expire_in_sec(timeout)
 
+        self.status_in_report = status_in_report if status_in_report else {}
+
         for key, value in options.items():
             setattr(self, key, value)
 
@@ -118,6 +122,17 @@ class BaseWorker(multiprocessing.Process):
             yield
         end = time.time()
         logger.info(f'Runtime: {end - start:.2f}s')
+
+    def set_report_status(self, report: Report, detection_id: str, status: Status) -> None:
+        """
+        Set the status of the report.
+        :param report: The report object to update
+        :param detection_id: The detection ID that can be overwritten in the workers config
+        :param status: The default status level from the worker
+        """
+        report = Report(detection_id, self.module)
+        report.status = status
+        self.storage.set_report(report.to_dict)
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         """
@@ -172,6 +187,7 @@ class BaseWorker(multiprocessing.Process):
 
                 # From this point, the worker is generating the report
                 report = Report(task.uuid, self.module)
+                report.status_indicators = self.status_in_report
 
                 try:
                     if self.disabled:
