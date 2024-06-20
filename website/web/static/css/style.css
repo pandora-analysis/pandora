@@ -90,19 +90,3 @@ a:not([class*="btn"]) {
 a:not([class*="btn"]):hover {
   text-decoration: underline;
 }
-
-.selected-lang {
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  line-height: 2;
-  width: 100px;
-}
-
-.selected-lang:before {
-  content: "";
-  display: block;
-  width: 32px;
-  height: 32px;
-  background-image: url(https://flagsapi.com/US/shiny/32.png);
-}
