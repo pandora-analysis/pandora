@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import math
 import re
 import shutil
 import traceback
@@ -553,8 +554,8 @@ class File:
 
     @cached_property
     def text_preview(self) -> BytesIO:
-        max_width = 2000
-        max_height = 5000
+        max_width: int = 2000
+        max_height: int = 5000
         try:
             font = ImageFont.load_default()
             text_width = 0
@@ -563,10 +564,10 @@ class File:
             for line in lines:
                 if not line:
                     continue
-                left, top, right, bottom = font.getbbox(line)  # type: ignore[no-untyped-call]
-                w = font.getlength(line)  # type: ignore[no-untyped-call]
-                text_width = max(w, text_width)
-                text_height = max(bottom, text_height)
+                left, top, right, bottom = font.getbbox(line)
+                w = font.getlength(line)
+                text_width = math.ceil(max(w, text_width))
+                text_height = math.ceil(max(bottom, text_height))
             text_width = round(text_width + 1)
             text_height = round(text_height * len(lines) + 1)
             out = Image.new("L", (text_width if text_width < max_width else max_width,
