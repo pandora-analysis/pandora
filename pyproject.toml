@@ -40,7 +40,7 @@ weasyprint = [
     {version = "^62.1", python = ">=3.9"}
 ]
 extract-msg = {version = "^0.48.0"}
-oletools = {version = "0.60.1", extras = ["full"]}
+oletools = {version = "0.60.2", extras = ["full"]}
 py7zr = "^0.21"
 jbxapi = "^3.23.0"
 defusedxml = "^0.7.1"
