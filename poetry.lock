@@ -3375,13 +3375,13 @@ tests = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "oletools"
-version = "0.60.1"
+version = "0.60.2"
 description = "Python tools to analyze security characteristics of MS Office and OLE files (also called Structured Storage, Compound File Binary Format or Compound Document File Format), for Malware Analysis and Incident Response #DFIR"
 optional = false
 python-versions = "*"
 files = [
-    {file = "oletools-0.60.1-py2.py3-none-any.whl", hash = "sha256:edef92374e688989a39269eb9a11142fb20a023629c23538c849c14d1d1144ea"},
-    {file = "oletools-0.60.1.zip", hash = "sha256:67a796da4c4b8e2feb9a6b2495bef8798a3323a75512de4e5669d9dc9d1fae31"},
+    {file = "oletools-0.60.2-py2.py3-none-any.whl", hash = "sha256:72ad8bd748fd0c4e7b5b4733af770d11543ebb2bf2697455f99f975fcd50cc96"},
+    {file = "oletools-0.60.2.zip", hash = "sha256:ad452099f4695ffd8855113f453348200d195ee9fa341a09e197d66ee7e0b2c3"},
 ]
 
 [package.dependencies]
@@ -3390,7 +3390,7 @@ easygui = "*"
 msoffcrypto-tool = {version = "*", markers = "platform_python_implementation != \"PyPy\" or python_version >= \"3\" and (platform_system != \"Windows\" and platform_system != \"Darwin\")"}
 olefile = ">=0.46"
 pcodedmp = ">=1.2.5"
-pyparsing = ">=2.1.0,<3"
+pyparsing = ">=2.1.0,<4"
 XLMMacroDeobfuscator = {version = "*", optional = true, markers = "extra == \"full\""}
 
 [package.extras]
@@ -3795,13 +3795,13 @@ files = [
 
 [[package]]
 name = "publicsuffixlist"
-version = "1.0.1.20240701"
+version = "1.0.1.20240702"
 description = "publicsuffixlist implement"
 optional = false
 python-versions = ">=3.5"
 files = [
-    {file = "publicsuffixlist-1.0.1.20240701-py2.py3-none-any.whl", hash = "sha256:9a21839e322879eccfdcf60916f9415ec70cead68ff334bfc2a4a50757f81fc9"},
-    {file = "publicsuffixlist-1.0.1.20240701.tar.gz", hash = "sha256:d94ae0b3310ff4df229cd4fc9bac9eeedd7d318084d3a76d01fb60cb571ec135"},
+    {file = "publicsuffixlist-1.0.1.20240702-py2.py3-none-any.whl", hash = "sha256:c31bd0cb7bc9f50d500c812b0aead6cb8fa53f7dfc66bdad5da730170d5b9c8e"},
+    {file = "publicsuffixlist-1.0.1.20240702.tar.gz", hash = "sha256:79ab5c0f4a2a89556a717eaf0b7a5cfdf39e105cf718aed64ae7118be18e506c"},
 ]
 
 [package.extras]
@@ -4354,14 +4354,17 @@ files = [
 
 [[package]]
 name = "pyparsing"
-version = "2.4.7"
-description = "Python parsing module"
+version = "3.1.2"
+description = "pyparsing module - Classes and methods to define and execute parsing grammars"
 optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+python-versions = ">=3.6.8"
 files = [
-    {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
-    {file = "pyparsing-2.4.7.tar.gz", hash = "sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"},
+    {file = "pyparsing-3.1.2-py3-none-any.whl", hash = "sha256:f9db75911801ed778fe61bb643079ff86601aca99fcae6345aa67292038fb742"},
+    {file = "pyparsing-3.1.2.tar.gz", hash = "sha256:a1bac0ce561155ecc3ed78ca94d3c9378656ad4c94c1270de543f621420f94ad"},
 ]
+
+[package.extras]
+diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pyphen"
@@ -6257,4 +6260,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "1f0fee8ee84adaa453680a5f688a22d02becbbd94d09f2992ae07f2b4d89c4d7"
+content-hash = "686c20808cb4f1904078b9cf7828d2c90b98f4ef21af60eda955cb4e53645cfa"
