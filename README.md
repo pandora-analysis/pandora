@@ -32,13 +32,13 @@ You need poetry installed, see the [install guide](https://python-poetry.org/doc
 
 ## Prerequisites
 
-### Redis
+### Valkey (formerly Redis)
 
-[Redis](https://redis.io/): An open source (BSD licensed), in-memory data structure store, used as a database, cache and message broker.
+[Valkey](https://valkey.io/): An open source (BSD licensed), in-memory data structure store, used as a database, cache and message broker.
 
-NOTE: Redis should be installed from the source, and the repository must be in the same directory as the one you will be cloning Pandora into.
+NOTE: Valkey should be installed from the source, and the repository must be in the same directory as the one you will be cloning Pandora into.
 
-In order to compile and test redis, you will need a few packages:
+In order to compile and test valkey, you will need a few packages:
 
 ```bash
 sudo apt-get update
@@ -46,8 +46,8 @@ sudo apt install build-essential tcl
 ```
 
 ```bash
-git clone https://github.com/redis/redis.git
-cd redis
+git clone https://github.com/valkey-io/valkey.git
+cd valkey
 git checkout 7.2
 make
 # Optionally, you can run the tests:
@@ -57,8 +57,8 @@ cd ..
 
 ### Kvrocks
 
-[Kvrocks](https://github.com/apache/kvrocks) is a distributed key value NoSQL database that uses RocksDB as storage engine and is compatible with Redis protocol.
-Kvrocks intends to decrease the cost of memory and increase the capability while compared to Redis.
+[Kvrocks](https://github.com/apache/kvrocks) is a distributed key value NoSQL database that uses RocksDB as storage engine and is compatible with Valkey protocol.
+Kvrocks intends to decrease the cost of memory and increase the capability while compared to valkey.
 
 NOTE: Kvrocks should be installed from the source, and the repository must be in the same directory as the one you will be cloning Pandora into.
 
@@ -70,9 +70,9 @@ sudo apt install git gcc g++ make cmake autoconf automake libtool python3 libssl
 ```
 
 ```bash
-git clone --recursive https://github.com/apache/incubator-kvrocks.git kvrocks
+git clone --recursive  https://github.com/apache/kvrocks.git kvrocks
 cd kvrocks
-git checkout 2.6
+git checkout 2.8
 ./x.py build
 cd ..
 ```
@@ -87,16 +87,16 @@ git clone https://github.com/pandora-analysis/pandora.git
 
 ### Ready to install pandora?
 
-And at this point, you should be in a directory that contains `redis`, `kvrocks`, and `pandora`.
+And at this point, you should be in a directory that contains `valkey`, `kvrocks`, and `pandora`.
 
-Make sure it is the case by running `ls redis kvrocks pandora`. If you see `No such file or directory`,
+Make sure it is the case by running `ls valkey kvrocks pandora`. If you see `No such file or directory`,
 one of them is missing and you need to fix the installation.
 
 The directory tree must look like that:
 
 ```
 .
-├── redis  => compiled redis
+├── valkey  => compiled valkey
 ├── kvrocks => compiled kvrocks
 └── pandora => not installed pandora yet
 ```
