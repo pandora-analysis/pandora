@@ -70,7 +70,7 @@ typing-extensions = {version = "^4.12.2", python = "<3.11"}
 # The libyall libs
 dfvfs = "^20240115"
 # The libyall libs that are sneakily for testing purpose only
-setuptools = "^70.3.0"
+setuptools = "^71.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.2.6"
