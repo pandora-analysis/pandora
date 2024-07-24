@@ -34,7 +34,7 @@ requests = "^2.32.3"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.6"
 eml-parser = "^1.17.5"
-unoserver = "^2.1"
+unoserver = "^2.2"
 weasyprint = [
     {version = "<62", python = "<3.9"},
     {version = "^62.1", python = ">=3.9"}

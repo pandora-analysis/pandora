@@ -5724,13 +5724,13 @@ devenv = ["check-manifest", "pytest (>=4.3)", "pytest-cov", "pytest-mock (>=3.3)
 
 [[package]]
 name = "unoserver"
-version = "2.1"
+version = "2.2.1"
 description = "A server for file conversions with Libre Office"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "unoserver-2.1-py3-none-any.whl", hash = "sha256:f77f9f6f56b0cbc81fa0f9f0ff7b86eeb328b7cf27259cd0fbcf876f959a116a"},
-    {file = "unoserver-2.1.tar.gz", hash = "sha256:d11b42a3668f991b69841f6cfc7bce1cfefc00ae464eedb3f0e603c5262d60c6"},
+    {file = "unoserver-2.2.1-py3-none-any.whl", hash = "sha256:ad2d792df067368943367aed647eb81d795ed99c8c5c00122b6afc0e9749e1a8"},
+    {file = "unoserver-2.2.1.tar.gz", hash = "sha256:134239a71a3aa52c4579d2285f4a1fcc79785145482b187a2fc3d117e14eebfc"},
 ]
 
 [package.extras]
@@ -6423,4 +6423,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "1cc2695dbd78656d29454a1df596c73c6311872287c3d989576fa3d234c82f73"
+content-hash = "aedd9c703823035286194f80a772f58384e2fab5a5805d679259cc799fc3c970"
