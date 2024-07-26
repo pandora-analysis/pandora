@@ -10,7 +10,7 @@
           integrity="{{get_sri('static/js', 'role.js')}}"
           crossorigin="anonymous"></script>
   <script>
-      var role = new Role("{{ csrf_token() }}", "{{ url_for('PandoraAPI_api_role', action='update') }}", "{{ url_for('PandoraAPI_api_role', action='reload') }}");
+      var pandoraRole = new Role("{{ csrf_token() }}", "{{ url_for('PandoraAPI_api_role', action='update') }}", "{{ url_for('PandoraAPI_api_role', action='reload') }}");
   </script>
 {% endblock %}
 
@@ -32,11 +32,11 @@
         {% for action, perm in role.actions.items() %}
         <td class="text-center">
             <span class="badge bg-success {% if not perm %} d-none {% endif %}"
-                  id="true-{{ role.name.name }}-{{ action.name }}" onclick="role.update('{{ role.name.name }}', '{{ action.name }}', 0)">
+                  id="true-{{ role.name.name }}-{{ action.name }}" onclick="pandoraRole.update('{{ role.name.name }}', '{{ action.name }}', 0)">
                 TRUE
             </span>
             <span class="badge bg-danger{% if perm %} d-none {% endif %}"
-                  id="false-{{ role.name.name }}-{{ action.name }}" onclick="role.update('{{ role.name.name }}', '{{ action.name }}', 1)">
+                  id="false-{{ role.name.name }}-{{ action.name }}" onclick="pandoraRole.update('{{ role.name.name }}', '{{ action.name }}', 1)">
                 FALSE
             </span>
         </td>
@@ -46,6 +46,6 @@
     </tbody>
   </table>
   <div class="text-center">
-    <button class="btn btn-primary" onclick="role.reload()">Reload roles from config file</button>
+    <button class="btn btn-primary" onclick="pandoraRole.reload()">Reload roles from config file</button>
   </div>
 {% endblock %}
