@@ -27,14 +27,14 @@ Flask-Login = "^0.6.3"
 Bootstrap-Flask = "^2.4.0"
 PyYAML = "^6.0.1"
 Flask-WTF = "^1.2.1"
-validators = "^0.30.0"
+validators = "^0.33.0"
 python-magic = "^0.4.27"
-PyMuPDF = "^1.24.8"
+PyMuPDF = "^1.24.9"
 requests = "^2.32.3"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.6"
 eml-parser = "^1.17.5"
-unoserver = "^2.1"
+unoserver = "^2.2.1"
 weasyprint = [
     {version = "<62", python = "<3.9"},
     {version = "^62.1", python = ">=3.9"}
@@ -70,7 +70,7 @@ typing-extensions = {version = "^4.12.2", python = "<3.11"}
 # The libyall libs
 dfvfs = "^20240115"
 # The libyall libs that are sneakily for testing purpose only
-setuptools = "^70.3.0"
+setuptools = "^71.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.2.6"
@@ -80,13 +80,13 @@ ipython = [
     {version = "^8.19.0", python = ">=3.10"}
 ]
 mypy = "^1.11.0"
-types-redis = {version = "^4.6.0.20240425"}
-types-PyYAML = "^6.0.12.20240311"
+types-redis = {version = "^4.6.0.20240726"}
+types-PyYAML = "^6.0.12.20240724"
 types-requests = "^2.32.0.20240712"
 types-python-dateutil = "^2.9.0.20240316"
 bandit = {extras = ["toml"], version = "^1.7.9"}
 flake8 = "^7.1.0"
-semgrep = "^1.80.0"
+semgrep = "^1.81.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
