@@ -20,6 +20,7 @@ import fitz  # type: ignore[import-untyped]
 import magic
 import pikepdf
 
+from bs4 import BeautifulSoup
 from oletools.msodde import process_maybe_encrypted  # type: ignore[import-untyped]
 from PIL import Image, ImageDraw, ImageFont
 from pymisp import MISPEvent
@@ -588,6 +589,14 @@ class File:
             to_return.seek(0)
         return to_return
 
+    def __extract_urls_from_html(self, html_doc: str) -> set[str]:
+        urls = set()
+        soup = BeautifulSoup(html_doc, 'lxml')
+        for link in soup.find_all('a'):
+            if link.get('href'):
+                urls.add(link['href'])
+        return urls
+
     @property
     def observables(self) -> dict[str, set[str]]:
         """
@@ -603,6 +612,9 @@ class File:
                     observables['url'].update(body['uri'])
                 if 'email' in body:
                     observables['email'].update(body['email'])
+
+                if body['content_type'] == 'text/html':
+                    observables['url'].update(self.__extract_urls_from_html(body['content']))
         elif self.is_pdf and self.data:
             try:
                 with pikepdf.open(self.data) as pdf_file:
