@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import asyncio
 import traceback
 import sys
+
+from typing import Any
 
 import vt  # type: ignore[import-untyped]
 from vt import error
@@ -31,12 +34,15 @@ class VirusTotal(BaseWorker):
             self.disabled = True
             self.logger.warning('Disabled, missing apikey.')
             return
-        self.client = vt.Client(self.apikey, agent=get_useragent_for_requests())
+
+    async def get_json_vt(self, sha256: str) -> dict[str, Any]:
+        async with vt.Client(self.apikey, agent=get_useragent_for_requests()) as client:
+            return await client.get_json_async(f'/files/{sha256}')
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         try:
             self.logger.debug(f'analysing file {task.file.path}...')
-            response = self.client.get_json(f'/files/{task.file.sha256}')
+            response = asyncio.run(self.get_json_vt(task.file.sha256))
             if 'last_analysis_stats' in response['data']['attributes']:
                 if response['data']['attributes']['last_analysis_stats'].get('malicious'):
                     report.status = Status.ALERT
