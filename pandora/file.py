@@ -659,7 +659,8 @@ class File:
         if not self.is_eml:
             return None
         ep = EmlParser(include_raw_body=True, include_attachment_data=True)
-        return ep.decode_email(eml_file=self.path)
+        decoded = ep.decode_email_bytes(self.data.getvalue().decode(encoding='ascii', errors='ignore').encode())
+        return decoded
 
     @cached_property
     def msg_data(self) -> MessageBase | AppointmentMeeting | None:
