@@ -33,7 +33,6 @@ class VirusTotal(BaseWorker):
         if not self.apikey:
             self.disabled = True
             self.logger.warning('Disabled, missing apikey.')
-            return
 
     async def get_json_vt(self, sha256: str) -> dict[str, Any]:
         async with vt.Client(self.apikey, agent=get_useragent_for_requests()) as client:
