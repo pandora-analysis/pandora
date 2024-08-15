@@ -7,8 +7,7 @@ import logging.config
 
 from subprocess import Popen
 
-from pandora.default import AbstractManager
-from pandora.default import get_config, get_homedir
+from pandora.default import get_config, get_homedir, AbstractManager
 
 logging.config.dictConfig(get_config('logging'))
 
@@ -18,7 +17,7 @@ class Website(AbstractManager):
     def __init__(self, loglevel: int | None=None) -> None:
         super().__init__(loglevel)
         self.script_name = 'website'
-        self.process = self._launch_website()
+        self.process: Popen = self._launch_website()  # type: ignore[type-arg]
         self.set_running()
 
     def _launch_website(self) -> Popen:  # type: ignore[type-arg]
@@ -29,6 +28,9 @@ class Website(AbstractManager):
                       '--graceful-timeout', '2', '--timeout', '300',
                       '-b', f'{ip}:{port}',
                       '--log-level', 'info',
+                      '--max-requests', '2000',
+                      '--max-requests-jitter', '100',
+                      '--name', 'website_pandora',
                       'web:app'],
                      cwd=website_dir)
 
