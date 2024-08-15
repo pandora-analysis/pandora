@@ -668,11 +668,10 @@ class File:
 
     @cached_property
     def eml_data(self) -> dict[str, Any] | None:
-        if not self.is_eml:
+        if not self.is_eml or not self.data:
             return None
         ep = EmlParser(include_raw_body=True, include_attachment_data=True)
-        decoded = ep.decode_email_bytes(self.data.getvalue().decode(encoding='ascii', errors='ignore').encode())
-        return decoded
+        return ep.decode_email_bytes(self.data.getvalue().decode(encoding='ascii', errors='ignore').encode())
 
     @cached_property
     def msg_data(self) -> MessageBase | AppointmentMeeting | None:

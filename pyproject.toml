@@ -16,6 +16,7 @@ workers_manager = "bin.workers_manager:main"
 start_website = "bin.start_website:main"
 imap_fetcher = "bin.imap_fetcher:main"
 background_processing = "bin.background_processing:main"
+scripts_controller = "bin.scripts_controller:main"
 
 [tool.poetry.dependencies]
 python = "^3.8.1,<3.13"
@@ -72,6 +73,7 @@ dfvfs = "^20240115"
 # The libyall libs that are sneakily for testing purpose only
 setuptools = "^72.2.0"
 beautifulsoup4 = {version= "^4.12.3", extras = ["lxml", "charset_normalizer"]}
+psutil = "^6.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.2.6"
@@ -85,6 +87,8 @@ types-redis = {version = "^4.6.0.20240806"}
 types-PyYAML = "^6.0.12.20240808"
 types-requests = "^2.32.0.20240712"
 types-python-dateutil = "^2.9.0.20240316"
+types-psutil = "^6.0.0.20240621"
+types-beautifulsoup4 = "^4.12.0.20240511"
 bandit = {extras = ["toml"], version = "^1.7.9"}
 flake8 = "^7.1.1"
 semgrep = "^1.84.1"
