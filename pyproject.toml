@@ -20,7 +20,7 @@ scripts_controller = "bin.scripts_controller:main"
 
 [tool.poetry.dependencies]
 python = "^3.8.1,<3.13"
-redis = {version = "^5.0.8", extras = ["hiredis"]}
+redis = {version = "^5.1.1", extras = ["hiredis"]}
 flask-restx = "^1.3.0"
 gunicorn = {version = "^23.0.0", extras = ["setproctitle"]}
 Flask-Moment = "^1.0.6"
