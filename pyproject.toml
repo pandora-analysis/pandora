@@ -69,9 +69,9 @@ python-dateutil = "^2.9.0.post0"
 pycdlib = "^1.14.0"
 werkzeug = "^3.0.4"
 pyhashlookup = "^1.2.5"
-pylookyloo = "^1.25.0"
+pylookyloo = "^1.26.1"
 hachoir = "^3.3.0"
-aiohttp = "^3.10.9"
+aiohttp = "^3.10.10"
 opencv-python = "^4.10.0.84"
 typing-extensions = {version = "^4.12.2", python = "<3.11"}
 # The libyall libs
