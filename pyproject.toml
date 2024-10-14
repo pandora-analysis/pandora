@@ -43,7 +43,7 @@ weasyprint = [
     {version = "<62", python = "<3.9"},
     {version = "^62.1", python = ">=3.9"}
 ]
-extract-msg = {version = "^0.50.0"}
+extract-msg = {version = "^0.51.1"}
 oletools = {version = "^0.60.2", extras = ["full"]}
 py7zr = "^0.22"
 jbxapi = "^3.23.0"
