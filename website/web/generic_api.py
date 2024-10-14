@@ -227,7 +227,7 @@ class ApiWorkerDetails(Resource):  # type: ignore[misc]
         args = worker_parser.parse_args(request)
         task_id = args['task_id']
         seed = args['seed'] if args.get('seed') else None
-        worker_name = args['worker_name'] if args.get('worker_name') else None
+        worker_name: str | None = args['worker_name'] if args.get('worker_name') else None
         details = bool(args.get('details'))
         all_workers = bool(args.get('all_workers'))
 
@@ -244,8 +244,7 @@ class ApiWorkerDetails(Resource):  # type: ignore[misc]
                 to_return[r.worker_name] = {'status': r.status.name}
                 if details:
                     to_return[r.worker_name]['details'] = r.details
-        else:
-            # FIXME: this will fail if the worker_name is incorrect and doesn't exists.
+        elif worker_name:
             report = pandora.get_report(task_id, worker_name)
             to_return[report.worker_name] = {'status': report.status.name}
             if details:
