@@ -30,7 +30,7 @@ jobs:
       with:
         repository: valkey-io/valkey
         path: valkey-tmp
-        ref: 8.0
+        ref: '8.0'
 
     - name: Install valkey
       run: |
