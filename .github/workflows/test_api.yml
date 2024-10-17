@@ -25,44 +25,18 @@ jobs:
       with:
         python-version: ${{matrix.python-version}}
 
-    - name: Cache kvrocks
-      id: kvrocks
-      uses: actions/cache@v4
-      with:
-        path: ../kvrocks
-        key: ${{ runner.os }}-kvrocks
-
-    - name: Clone Kvrocks
+    - name: Clone Valkey
       uses: actions/checkout@v4
       with:
-        repository: apache/kvrocks
-        path: kvrocks-tmp
-        ref: 2.6
-        submodules: true
+        repository: valkey/valkey
+        path: valkey-tmp
+        ref: 8.0
 
-    - name: Install kvrocks
+    - name: Install valkey
       run: |
-        sudo apt-get update
-        sudo apt-get install gcc g++ make libsnappy-dev autoconf automake libtool libgtest-dev
-        mv kvrocks-tmp ../kvrocks
+        mv valkey-tmp ../valkey
         pushd ..
-        pushd kvrocks
-        ./x.py build
-        popd
-        popd
-
-    - name: Clone Redis
-      uses: actions/checkout@v4
-      with:
-        repository: redis/redis
-        path: redis-tmp
-        ref: 7.2
-
-    - name: Install redis
-      run: |
-        mv redis-tmp ../redis
-        pushd ..
-        pushd redis
+        pushd valkey
         make
         popd
         popd

@@ -60,7 +60,13 @@ cd ..
 [Kvrocks](https://github.com/apache/kvrocks) is a distributed key value NoSQL database that uses RocksDB as storage engine and is compatible with Valkey protocol.
 Kvrocks intends to decrease the cost of memory and increase the capability while compared to valkey.
 
+
+#### Installing from source
+
 NOTE: Kvrocks should be installed from the source, and the repository must be in the same directory as the one you will be cloning Pandora into.
+
+NOTE: Compiling Kvrocks takes well over 1 hour, you may want to use docker instead (see below).
+
 
 In order to compile kvrocks, you will need a few packages:
 
@@ -72,10 +78,16 @@ sudo apt install git gcc g++ make cmake autoconf automake libtool python3 libssl
 ```bash
 git clone --recursive  https://github.com/apache/kvrocks.git kvrocks
 cd kvrocks
-git checkout 2.8
+git checkout 2.10
 ./x.py build
 cd ..
 ```
+
+#### Using docker
+
+If you have docker installed you don't have anything to do. It expects docker instlaled in [rootless mode](https://docs.docker.com/engine/security/rootless/) (no sudo required).
+In case you have docker installed in normal mode, you will need to edit `storage/run_kvrocks.sh` and prepend `sudo` to the docker call.
+
 
 ### Clone pandora
 
