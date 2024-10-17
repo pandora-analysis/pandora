@@ -85,7 +85,7 @@ cd ..
 
 #### Using docker
 
-If you have docker installed you don't have anything to do. It expects docker instlaled in [rootless mode](https://docs.docker.com/engine/security/rootless/) (no sudo required).
+If you have docker installed you don't have anything to do. It expects docker installed in [rootless mode](https://docs.docker.com/engine/security/rootless/) (no sudo required).
 In case you have docker installed in normal mode, you will need to edit `storage/run_kvrocks.sh` and prepend `sudo` to the docker call.
 
 
