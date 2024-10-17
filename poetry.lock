@@ -5539,16 +5539,16 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.91.0"
+version = "1.92.0"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "semgrep-1.91.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-any.whl", hash = "sha256:80b319ec5d55c07f651bde00f6454936367df4a3096d31e3d7b7340cdeade74b"},
-    {file = "semgrep-1.91.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:31cc054b5651b81ffd747f4d16e74bb597e0352f98298f332b8761de0d940588"},
-    {file = "semgrep-1.91.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:c9974b1964ce4dc9f048985663a55ac63758a6d33b1c81db35beb09f29ac2346"},
-    {file = "semgrep-1.91.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:48b0e811227cebeebdd061d99ed1c9baae86970cbffbe7cfe5b6a6dfeabec7e5"},
-    {file = "semgrep-1.91.0.tar.gz", hash = "sha256:227f4988fedb67e164e996e99bc2155461e3e663093126f50a9a704d6b7507bb"},
+    {file = "semgrep-1.92.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-any.whl", hash = "sha256:983dcc5aefd957d61758e8f24be82468c60e30210bd4cdcdfd150825eff3433a"},
+    {file = "semgrep-1.92.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:7cd1929c9d1fe70697813a24b52d374c034657efb5f0adc25dfe6b74fc140f15"},
+    {file = "semgrep-1.92.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:9aa2d64b4a4a9a85b038cf356ed8536a2cafaa0c8ca1c760815a65bae2033a88"},
+    {file = "semgrep-1.92.0-cp38.cp39.cp310.cp311.py37.py38.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a7a0b5d121e9a86953e57cd9ddd00e257190fbdaee9e6612ddda7ba597f71e70"},
+    {file = "semgrep-1.92.0.tar.gz", hash = "sha256:11da564419a15eb408999b497779743f179e43f75ecfba657c35d813a848dab9"},
 ]
 
 [package.dependencies]
@@ -6788,4 +6788,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1,<3.13"
-content-hash = "62f6fbdc686311a8f43728a7d4c2d9f15f6bd1c6734610cc7cc853c93bf5e618"
+content-hash = "633d1a01ba66d649bfdf97a511201d93e31b29155e3ca3989a90b9c72753703f"
