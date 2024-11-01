@@ -19,31 +19,25 @@ background_processing = "bin.background_processing:main"
 scripts_controller = "bin.scripts_controller:main"
 
 [tool.poetry.dependencies]
-python = "^3.8.1,<3.13"
-redis = {version = "^5.1.1", extras = ["hiredis"]}
+python = "^3.9,<3.13"
+redis = {version = "^5.2.0", extras = ["hiredis"]}
 flask-restx = "^1.3.0"
 gunicorn = {version = "^23.0.0", extras = ["setproctitle"]}
 Flask-Moment = "^1.0.6"
 Flask-Login = "^0.6.3"
 Bootstrap-Flask = "^2.4.1"
 PyYAML = "^6.0.2"
-Flask-WTF = "^1.2.1"
+Flask-WTF = "^1.2.2"
 validators = "^0.34.0"
 python-magic = "^0.4.27"
-PyMuPDF = "^1.24.11"
+PyMuPDF = "^1.24.13"
 requests = "^2.32.3"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.6"
-eml-parser = [
-    {version = "<2", python = "<3.9"},
-    {version = "^2.0.0", python = ">=3.9"}
-]
-unoserver = "^2.2.2"
-weasyprint = [
-    {version = "<62", python = "<3.9"},
-    {version = "^62.1", python = ">=3.9"}
-]
-extract-msg = {version = "^0.51.0"}
+eml-parser = "^2.0.0"
+unoserver = "^3.0.1"
+weasyprint = "^63.0"
+extract-msg = {version = "^0.52.0"}
 oletools = {version = "^0.60.2", extras = ["full"]}
 py7zr = "^0.22"
 jbxapi = "^3.23.0"
@@ -57,17 +51,14 @@ clamd = "^1.0.2"
 rarfile = "^4.2"
 publicsuffix2 = "^2.20191221"
 pymispwarninglists = "^1.6"
-pikepdf = [
-    {version = "<9.3", python = "<3.9"},
-    {version = "^9.3.0", python = ">=3.9"}
-]
+pikepdf = "^9.4.0"
 Pillow = "^10.4.0"
 imapclient = "^3.0.1"
 pyzipper = "^0.3.6"
-pymisp = {version = "^2.5.0", extras = ["fileobjects"]}
+pymisp = {version = "^2.5.1", extras = ["fileobjects"]}
 python-dateutil = "^2.9.0.post0"
 pycdlib = "^1.14.0"
-werkzeug = "^3.0.4"
+werkzeug = "^3.1.0"
 pyhashlookup = "^1.2.5"
 pylookyloo = "^1.26.1"
 hachoir = "^3.3.0"
@@ -77,30 +68,26 @@ typing-extensions = {version = "^4.12.2", python = "<3.11"}
 # The libyall libs
 dfvfs = "^20240505"
 # The libyall libs that are sneakily for testing purpose only
-setuptools = "^75.1.0"
+setuptools = "^75.3.0"
 beautifulsoup4 = {version= "^4.12.3", extras = ["lxml", "charset_normalizer"]}
-psutil = "^6.0.0"
+psutil = "^6.1.0"
 
 [tool.poetry.group.dev.dependencies]
-pylint = [
-    {version = "<3.3", python = "<3.9"},
-    {version = "^3.3.1", python = ">=3.9"}
-]
+pylint = "^3.3.1"
 ipython = [
-    {version = "<8.13.0", python = "<3.9"},
-    {version = "^8.18.0", python = ">=3.9"},
-    {version = "^8.19.0", python = ">=3.10"}
+    {version = "^8.18", python = "<3.10"},
+    {version = "^8.19", python = ">=3.10"}
 ]
-mypy = "^1.12.0"
+mypy = "^1.13.0"
 types-redis = {version = "^4.6.0.20241004"}
 types-PyYAML = "^6.0.12.20240917"
-types-requests = "^2.32.0.20240914"
+types-requests = "^2.32.0.20241016"
 types-python-dateutil = "^2.9.0.20241003"
-types-psutil = "^6.0.0.20241011"
-types-beautifulsoup4 = "^4.12.0.20240907"
+types-psutil = "^6.1.0.20241022"
+types-beautifulsoup4 = "^4.12.0.20241020"
 bandit = {extras = ["toml"], version = "^1.7.10"}
 flake8 = "^7.1.1"
-semgrep = "^1.91.0"
+semgrep = "^1.95.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
