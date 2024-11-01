@@ -25,6 +25,10 @@ jobs:
       with:
         python-version: ${{matrix.python-version}}
 
+    - name: Install System deps
+      run: |
+        sudo apt install libfuzzy-dev  # for pydeep, until the wheel is available for python 3.13
+
     - name: Install poetry
       run: |
         python -m pip install --upgrade pip poetry
