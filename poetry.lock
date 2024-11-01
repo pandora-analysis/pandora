@@ -2881,13 +2881,13 @@ source = ["Cython (>=3.0.11)"]
 
 [[package]]
 name = "malwarebazaar"
-version = "0.2.6"
+version = "0.2.7"
 description = "CLI wrapper for malware bazaar API (bazaar.abuse.ch) and YARAify API (yaraify.abuse.ch)"
 optional = false
-python-versions = ">=3.8,<3.13"
+python-versions = "<3.14,>=3.9"
 files = [
-    {file = "malwarebazaar-0.2.6-py3-none-any.whl", hash = "sha256:91aad6c18f397ba9f1acd1781aded70819b66a8b91567eeee21f7531923aec9d"},
-    {file = "malwarebazaar-0.2.6.tar.gz", hash = "sha256:e96bd45cebd3fac5c0dcf599bcf608f2ed5ac9ba81f0c36e31659fab31716039"},
+    {file = "malwarebazaar-0.2.7-py3-none-any.whl", hash = "sha256:4f8b507c447abaf6f62002fa133d839fc053a6792c2054fd581002e12034eab5"},
+    {file = "malwarebazaar-0.2.7.tar.gz", hash = "sha256:50e0e40043934562bcfa0e956465ca5f250f9b1892385f5f402b76d84171758e"},
 ]
 
 [package.dependencies]
@@ -4254,7 +4254,10 @@ files = [
 [package.dependencies]
 annotated-types = ">=0.6.0"
 pydantic-core = "2.23.4"
-typing-extensions = {version = ">=4.6.1", markers = "python_version < \"3.13\""}
+typing-extensions = [
+    {version = ">=4.6.1", markers = "python_version < \"3.13\""},
+    {version = ">=4.12.2", markers = "python_version >= \"3.13\""},
+]
 
 [package.extras]
 email = ["email-validator (>=2.0.0)"]
@@ -6510,5 +6513,5 @@ test = ["pytest"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.9,<3.13"
-content-hash = "61906eb8d19a32cfc2c4de818ba19fab81c34dd6492df26b552ebd1b10cdd69e"
+python-versions = "^3.9,<3.14"
+content-hash = "9a38984357eb3e81d759d3f8329e30c574b292e1e5c365850cec8b17e0a9d214"
