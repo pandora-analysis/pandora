@@ -177,7 +177,7 @@ status_parser.add_argument('seed', required=False,
                            help="The seed of the task you'd like to get the status of")
 status_parser.add_argument('details', type=int, required=False,
                            location='args',
-                           help="Do you want details about the report status of every worker ? If yes, print 1, else print 0")
+                           help="Do you want details about the report status of every worker? 1 for yes, 0 for no")
 
 
 @api.route('/task_status', methods=['GET'], strict_slashes=False)
@@ -209,13 +209,13 @@ worker_parser.add_argument('seed', required=False,
                            help="The seed of the task you'd like to get the status of")
 worker_parser.add_argument('all_workers', type=int, required=False,
                            location='args',
-                           help="Do you want the details of every workers ? If yes, print 1, else print 0")
+                           help="Do you want details about the report status of every worker? 1 for yes, 0 for no")
 worker_parser.add_argument('worker_name', required=False,
                            location='args',
                            help="The name of the worker you want to get the report of")
 worker_parser.add_argument('details', type=int, required=False,
                            location='args',
-                           help="Do you want the details of the worker status ? If yes, print 1, else print 0")
+                           help="Do you want details about the report status of every worker? 1 for yes, 0 for no")
 
 
 @api.route('/worker_status', methods=['GET'], strict_slashes=False)
@@ -629,6 +629,15 @@ class ApiStatsDay(Resource):  # type: ignore[misc]
         first_date, last_date = _normalize_day(year, month, day)
         intervals = _intervals(rrule.HOURLY, first_date, last_date)
         return _stats(intervals)
+
+
+@api.route('/api/enabled_workers', methods=['GET'], strict_slashes=False)
+@api.doc(description="Get the list of enabled workers")
+class ApiEnabledWorkers(Resource):  # type: ignore[misc]
+
+    @json_answer
+    def get(self) -> list[str]:
+        return list(pandora.get_enabled_workers())
 
 
 def _workers_stats(intervals: list[tuple[datetime, datetime]]) -> dict[str, Any]:

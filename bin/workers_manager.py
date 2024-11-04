@@ -107,6 +107,9 @@ class WorkersManager(AbstractManager):
     def _to_run_forever(self) -> None:
         self._manager()
 
+    def _wait_to_finish(self) -> None:
+        self.redis.delete('enabled_workers')
+
 
 def main() -> None:
     wm = WorkersManager()
