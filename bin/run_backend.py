@@ -33,7 +33,15 @@ def launch_cache(storage_directory: Path | None=None) -> None:
     if not storage_directory:
         storage_directory = get_homedir()
     if not check_running('cache'):
-        Popen(["./run_redis.sh"], cwd=storage_directory / 'cache')
+        process = Popen(["./run_redis.sh"], cwd=(storage_directory / 'cache'))
+        try:
+            # Give time for the process to start (and potentailly fail)
+            process.wait(timeout=5)
+        except TimeoutError:
+            pass
+        process.poll()
+        if process.returncode == 1:
+            raise Exception('Failed to start Redis cache database.')
 
 
 def shutdown_cache() -> None:
