@@ -68,7 +68,7 @@ typing-extensions = {version = "^4.12.2", python = "<3.11"}
 # The libyall libs
 dfvfs = "^20240505"
 # The libyall libs that are sneakily for testing purpose only
-setuptools = "^75.3.0"
+setuptools = "^75.5.0"
 beautifulsoup4 = {version= "^4.12.3", extras = ["lxml", "charset_normalizer"]}
 psutil = "^6.1.0"
 
