@@ -62,7 +62,7 @@ werkzeug = "^3.1.0"
 pyhashlookup = "^1.2.5"
 pylookyloo = "^1.26.1"
 hachoir = "^3.3.0"
-aiohttp = "^3.10.10"
+aiohttp = "^3.11.1"
 opencv-python = "^4.10.0.84"
 typing-extensions = {version = "^4.12.2", python = "<3.11"}
 # The libyall libs
