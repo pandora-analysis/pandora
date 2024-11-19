@@ -1,0 +1,4 @@
+meta:
+  name: YaraHub
+  description: Abuse.ch YaraHub
+  replicas: 2
