@@ -1,0 +1,10 @@
+meta:
+  name: Pdf
+  description: Pdf documents parser and object extractor
+  replicas: 3
+
+settings:
+  check_encrypted: true
+  check_javascript: true
+  check_suspicious_object: true
+  check_embedded_files: true
