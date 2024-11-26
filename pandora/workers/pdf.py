@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-import fitz # type: ignore[import-untyped]
+import fitz  # type: ignore[import-untyped]
 
 from ..helpers import Status
 from ..task import Task
 from ..report import Report
 
 from .base import BaseWorker
+
 
 class Pdf(BaseWorker):
 
@@ -63,8 +64,8 @@ class Pdf(BaseWorker):
                         try:
                             content = doc.xref_stream(xref)
                             suspicious_objects.append(content.decode('utf-8', errors='ignore'))
-                        except:
-                            pass
+                        except Exception as e:
+                            self.logger.warning(f'Unable to extract object content: {e}')
 
         except Exception as e:
             self.logger.warning(f'Unable to detect suspicious objects in PDF file: {e}')
@@ -82,7 +83,6 @@ class Pdf(BaseWorker):
             self.logger.warning(f'Unable to detect embedded files in PDF file: {e}')
 
         return embedded_files
-
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.is_pdf:
