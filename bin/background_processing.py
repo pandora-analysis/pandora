@@ -35,6 +35,7 @@ class BackgroundProcessing(AbstractManager):
             self.misp_autopublish = misp_settings['autosubmit'].get('autopublish')
         else:
             self.misp_autosubmit = False
+        self.broken_misp_submit: list[str] = []
 
     def _to_run_forever(self) -> None:
         # Run processing after a task is done
@@ -48,17 +49,25 @@ class BackgroundProcessing(AbstractManager):
 
     def postprocessing(self) -> None:
         # Only try to run postprocessing on tasks from the last 24h
-        cut_date = datetime.now() - timedelta(hours=24)
+        cut_date = datetime.now() - timedelta(hours=1)
         u = User('admin', last_ip='127.0.0.1', role='admin')
+
         for task in self.pandora.get_tasks(u, first_date=cut_date):
+            if task.uuid in self.broken_misp_submit:
+                continue
             # if MISP autosubmit enabled & task status is ALERT & task not already submitted => submit
-            if (self.misp_autosubmit
-                    and task.status >= self.misp_autosubmit_status
-                    and not self._task_on_misp(task.uuid)):
-                event = task.misp_export(with_extracted_tasks=False)
-                new_event = self.misp.add_event(event, pythonify=True)
-                if isinstance(new_event, MISPEvent) and self.misp_autopublish:
-                    self.misp.publish(new_event)
+            try:
+                if (self.misp_autosubmit
+                        and task.status >= self.misp_autosubmit_status
+                        and not self._task_on_misp(task.uuid)):
+                    event = task.misp_export(with_extracted_tasks=False)
+                    new_event = self.misp.add_event(event, pythonify=True)
+                    if isinstance(new_event, MISPEvent) and self.misp_autopublish:
+                        self.misp.publish(new_event)
+            except Exception as e:
+                self.logger.error(f'Error during MISP postprocessing: {e}')
+                self.broken_misp_submit.append(task.uuid)
+                continue
 
 
 def main() -> None:
