@@ -24,6 +24,7 @@ class YaraHubWorker(YaraWorker):
     needs_external = [
         'yes.yar',  # broken (?)
         'Sus_Obf_Enc_Spoof_Hide_PE.yar',  # matches on everything
+        'golang_david_CSC846.yar',  # matches on everything
     ]
 
     def _init_rules(self) -> None:
