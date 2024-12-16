@@ -69,6 +69,8 @@ class RedisSession(CallbackDict, SessionMixin):  # type: ignore[type-arg]
             self.modified = True
 
         CallbackDict.__init__(self, initial, on_update)
+        super().__init__(initial, on_update)
+        super().__init__()
         self.redis: Redis = redis  # type: ignore[type-arg]
         self.key_prefix: str = key_prefix
         if sid is None:
