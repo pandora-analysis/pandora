@@ -78,7 +78,7 @@ ipython = [
     {version = "^8.18", python = "<3.10"},
     {version = "^8.19", python = ">=3.10"}
 ]
-mypy = "^1.13.0"
+mypy = "^1.14.0"
 types-redis = {version = "^4.6.0.20241004"}
 types-PyYAML = "^6.0.12.20240917"
 types-requests = "^2.32.0.20241016"
