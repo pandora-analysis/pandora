@@ -44,6 +44,7 @@ jobs:
 
     - name: Install System deps
       run: |
+        sudo apt update
         sudo apt install python3-dev  # for compiling things
         sudo apt install libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0  # For HTML -> PDF
         sudo apt install libreoffice  # For Office -> PDF
