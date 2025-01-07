@@ -179,7 +179,7 @@ class File:
         'XLS': 'MS Excel document',
     }
     OLETOOLS_TYPES: set[str] = {'DOC', 'PPT', 'RTF', 'XLS'}
-    UNOCONV_TYPES: set[str] = {'CSS', 'DOC', 'JSC', 'PPT', 'RTF', 'TXT', 'XLS'}
+    UNOCONV_TYPES: set[str] = {'CSS', 'DOC', 'JSC', 'PPT', 'RTF', 'TXT', 'XLS', 'ODF'}
     FOLDER_MODE = 0o2775
     FILE_MODE = 0o0664
     SUBPROCESS_TIMEOUT: int = 30
