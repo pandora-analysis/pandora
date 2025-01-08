@@ -54,6 +54,16 @@ class TypeObservable(Enum):
 
 
 @lru_cache(64)
+def email_blocklist() -> list[str]:
+    _path = get_homedir() / 'config' / 'email_blocklist.yml'
+    if _path.exists():
+        with _path.open() as config_file:
+            config = yaml.safe_load(config_file.read())
+        return config['blocklist']
+    return []
+
+
+@lru_cache(64)
 def allowlist_default() -> list[str]:
     with (get_homedir() / 'config' / 'allowlist.yml').open() as config_file:
         config = yaml.safe_load(config_file.read())

@@ -31,11 +31,11 @@ def sizeof_fmt(num: int | float, suffix: str='B') -> str:
 
 
 def src_request_ip(request: Request) -> str | None:
-    # NOTE: X-Real-IP is the IP passed by the reverse proxy in the headers.
-    real_ip = request.headers.get('X-Real-IP')
-    if not real_ip:
-        real_ip = request.remote_addr
-    return real_ip
+    if real_ip := request.headers.get('X-Forwarded-For'):
+        return real_ip
+    if real_ip := request.headers.get('X-Real-IP'):
+        return real_ip
+    return request.remote_addr
 
 
 @lru_cache(64)

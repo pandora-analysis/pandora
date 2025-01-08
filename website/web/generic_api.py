@@ -28,9 +28,10 @@ from pandora.mail import Mail
 from pandora.role import Action
 from pandora.task import Task
 from pandora.file import File
-from pandora.helpers import roles_from_config, Status, Seed
+from pandora.helpers import roles_from_config, Status, Seed, email_blocklist
 
-from .helpers import admin_required, update_user_role, build_users_table, load_user_from_request, sizeof_fmt
+from .helpers import (admin_required, update_user_role, build_users_table,
+                      load_user_from_request, sizeof_fmt, src_request_ip)
 
 logging.config.dictConfig(get_config('logging'))
 
@@ -290,6 +291,10 @@ class ApiTaskAction(Resource):  # type: ignore[misc]
             data = request.get_json()
             if 'email' not in data:
                 raise Unsupported("missing mandatory key 'email'")
+            if data['email'] in email_blocklist():
+                # the email address is in the blocklist, silently dropping the request.
+                logging.warning(f'IP {src_request_ip(request)} tried to send a notification as {data["email"]} for task {task.uuid} but the email is in the blocklist.')
+                return {'success': True}
             if 'message' not in data:
                 raise Unsupported("missing mandatory key 'message'")
             if not seed:
@@ -297,7 +302,7 @@ class ApiTaskAction(Resource):  # type: ignore[misc]
             domain = get_config('generic', 'public_url')
             permaurl = f'{domain}/analysis/{task.uuid}/seed-{seed}'
             message = '\n'.join([
-                f'-- Message from {data["email"]} --',
+                f'-- Message from {data["email"]} ({src_request_ip(request)})--',
                 f'-- Page {permaurl} --',
                 '',
                 data['message']
