@@ -7,7 +7,7 @@
         "dropzone.css": "b3Wb3Os4sxJRdYkfCWtFjvuN/OlfBNtBGJknON+zbxU6M7GRYdII8m1W7TMsls/kwuwtq1wt7TvuF58Sd/4AGg=="
       },
       "ribbon.css": "2hAsQwCClHQ7b6VthbKYIkUPam4Ef6wbSxa3+nK0UuqCHezvPMr3aqpz16gD0lyYop55VEd/dhzZJLA4WMAplQ==",
-      "style.css": "P+uDhEXPpEd6kypt5NaBQOP7fT+4NkM98Wqu+w0FsQu+aucA8xVMQwJp/nY2ZW8++LeQFC+rhPv8FZ4fI+89xA=="
+      "style.css": "5tR+N2rAS7EVbcFeEJB8vizeG3AQ8ej1I8Iu+UuLDVe8GVcrnDMUFS+5xwHw95XqiVTKFbbJ8HZL+klvSno+CQ=="
     },
     "images": {
       "favicons": {
