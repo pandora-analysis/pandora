@@ -30,7 +30,7 @@ PyYAML = "^6.0.2"
 Flask-WTF = "^1.2.2"
 validators = "^0.34.0"
 python-magic = "^0.4.27"
-PyMuPDF = "^1.25.1"
+PyMuPDF = "^1.25.2"
 requests = "^2.32.3"
 textract = {git = "https://github.com/rafiot/textract.git", branch = "master"}
 PyExifTool = "^0.5.6"
