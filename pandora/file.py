@@ -615,6 +615,10 @@ class File:
 
                 if body['content_type'] == 'text/html':
                     observables['url'].update(self.__extract_urls_from_html(body['content']))
+        elif self.msg_data:
+            if self.msg_data.htmlBody:
+                observables['url'].update(self.__extract_urls_from_html(self.msg_data.htmlBody.decode()))
+
         elif self.is_pdf and self.data:
             try:
                 with pikepdf.open(self.data) as pdf_file:
