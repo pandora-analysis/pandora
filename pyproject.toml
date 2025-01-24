@@ -1,11 +1,24 @@
-[tool.poetry]
+[project]
 name = "pandora"
 version = "1.9.0"
 description = "Pandora analysis framework."
-authors = ["Raphaël Vinot <raphael.vinot@circl.lu>"]
+authors = [{name="Raphaël Vinot", email="raphael.vinot@circl.lu"}]
 license = "AGPL-3.0-or-later"
+readme = "README.md"
+requires-python = ">=3.9,<3.14"
 
-[tool.poetry.scripts]
+dynamic = [ "dependencies", "classifiers" ]
+
+[tool.poetry]
+classifiers = [
+    'Intended Audience :: Science/Research',
+    'Intended Audience :: Telecommunications Industry',
+    'Intended Audience :: Information Technology',
+    'Topic :: Security',
+    'Topic :: Internet'
+]
+
+[project.scripts]
 start = "bin.start:main"
 stop = "bin.stop:main"
 update = "bin.update:main"
@@ -63,21 +76,17 @@ pyhashlookup = "^1.2.5"
 pylookyloo = "^1.26.1"
 hachoir = "^3.3.0"
 aiohttp = "^3.11.11"
-opencv-python = "^4.10.0.84"
+opencv-python = "^4.11.0.86"
 typing-extensions = {version = "^4.12.2", python = "<3.11"}
 # The libyall libs
 dfvfs = "^20240505"
 # The libyall libs that are sneakily for testing purpose only
-setuptools = "^75.6.0"
+setuptools = "^75.8.0"
 beautifulsoup4 = {version= "^4.12.3", extras = ["lxml", "charset_normalizer"]}
 psutil = "^6.1.1"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.3.3"
-ipython = [
-    {version = "^8.18", python = "<3.10"},
-    {version = "^8.19", python = ">=3.10"}
-]
 mypy = "^1.14.1"
 types-redis = {version = "^4.6.0.20241004"}
 types-PyYAML = "^6.0.12.20241230"
@@ -85,13 +94,13 @@ types-requests = "^2.32.0.20241016"
 types-python-dateutil = "^2.9.0.20241206"
 types-psutil = "^6.1.0.20241221"
 types-beautifulsoup4 = "^4.12.0.20241020"
-bandit = {extras = ["toml"], version = "^1.8.0"}
+bandit = {extras = ["toml"], version = "^1.8.2"}
 flake8 = "^7.1.1"
-semgrep = "^1.101.0"
+semgrep = "^1.104.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core=>2.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.bandit]
