@@ -35,7 +35,7 @@ class VirusTotal(BaseWorker):
             self.logger.warning('Disabled, missing apikey.')
 
     async def get_json_vt(self, sha256: str) -> dict[str, Any]:
-        async with vt.Client(self.apikey, agent=get_useragent_for_requests()) as client:
+        async with vt.Client(self.apikey, agent=get_useragent_for_requests(), trust_env=True) as client:
             return await client.get_json_async(f'/files/{sha256}')
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
