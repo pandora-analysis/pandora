@@ -49,7 +49,7 @@ sudo apt install build-essential tcl
 git clone https://github.com/valkey-io/valkey.git
 cd valkey
 git checkout 8.0
-make
+make -j4
 # Optionally, you can run the tests:
 make test
 cd ..
