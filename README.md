@@ -79,7 +79,7 @@ sudo apt install git gcc g++ make cmake autoconf automake libtool python3 libssl
 git clone --recursive  https://github.com/apache/kvrocks.git kvrocks
 cd kvrocks
 git checkout 2.10
-./x.py build
+./x.py build -j4
 cd ..
 ```
 
