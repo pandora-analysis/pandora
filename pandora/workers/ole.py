@@ -225,7 +225,11 @@ class Ole(BaseWorker):
                 if rel_type == 'hyperlink':
                     task.add_observable(attribute, 'url')
                 else:
-                    report.status = Status.ALERT
+                    # fun fact: an attached template should be a local path, but it could be a URL too.
+                    if rel_type == 'attachedTemplate' and attribute.startswith('file'):
+                        report.status = Status.WARN
+                    else:
+                        report.status = Status.ALERT
                     malicious.append(f'{rel_type} - {attribute}')
 
             for olefile in find_ole(task.file.original_filename, task.file.data.getvalue()):
