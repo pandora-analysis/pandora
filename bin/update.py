@@ -94,7 +94,7 @@ def check_unconfigured_workers(default_yes: bool=False) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description='Pull latest release, update dependencies, update and validate the config files, update 3rd deps for the website.')
-    parser.add_argument('--yes', default=False, action='store_true', help='Run all commands without asking.')
+    parser.add_argument('--yes', default=False, action='store_true', help='Run all commands without asking, ignore new or disabled workers.')
     args = parser.parse_args()
 
     old_hash = compute_hash_self()
@@ -122,9 +122,10 @@ def main() -> None:
     keep_going(args.yes)
     run_command(f'poetry run {(Path("tools") / "validate_config_files.py").as_posix()} --update')
 
-    print('* Check if new workers are available')
-    keep_going(args.yes)
-    check_unconfigured_workers(args.yes)
+    if not args.yes:
+        print('* Check if new workers are available')
+        keep_going(args.yes)
+        check_unconfigured_workers(args.yes)
 
     print('* Update third party dependencies for the website.')
     keep_going(args.yes)
