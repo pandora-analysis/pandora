@@ -171,7 +171,7 @@ class AbstractManager(ABC):
         self.force_stop = True
 
     async def _to_run_forever_async(self) -> None:
-        raise NotImplementedError('This method must be implemented by the child')
+        self.logger.info('Not implemented, nothing to wait for.')
 
     async def _wait_to_finish_async(self) -> None:
         self.logger.info('Not implemented, nothing to wait for.')
