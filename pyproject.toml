@@ -89,13 +89,13 @@ pylint = "^3.3.4"
 mypy = "^1.15.0"
 types-redis = {version = "^4.6.0.20241004"}
 types-PyYAML = "^6.0.12.20241230"
-types-requests = "^2.32.0.20250301"
+types-requests = "^2.32.0.20250306"
 types-python-dateutil = "^2.9.0.20241206"
 types-psutil = "^7.0.0.20250218"
 types-beautifulsoup4 = "^4.12.0.20250204"
 bandit = {extras = ["toml"], version = "^1.8.3"}
 flake8 = "^7.1.2"
-semgrep = "^1.110.0"
+semgrep = "^1.111.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
