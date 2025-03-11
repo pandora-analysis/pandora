@@ -9,9 +9,7 @@ import time
 import traceback
 
 from logging import LoggerAdapter
-from typing import MutableMapping, Any, TypedDict, Iterator
-
-import sys
+from typing import MutableMapping, Any, Iterator
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
@@ -24,12 +22,6 @@ from ..storage_client import Storage
 from ..task import Task
 
 
-if sys.version_info >= (3, 11):
-    from typing import Unpack
-else:
-    from typing_extensions import Unpack
-
-
 class WorkerLogAdapter(LoggerAdapter):  # type: ignore[type-arg]
     """
     Prepend log entry with the UUID of the task
@@ -40,17 +32,12 @@ class WorkerLogAdapter(LoggerAdapter):  # type: ignore[type-arg]
         return msg, kwargs
 
 
-class WorkerOption(TypedDict):
-    key: str
-    value: str | int
-
-
 class BaseWorker(multiprocessing.Process):
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
                  loglevel: int | None=None,
                  status_in_report: dict[str, str] | None=None,
-                 **options: Unpack[WorkerOption]) -> None:
+                 **options: Any) -> None:
         """
         Create a worker.
         :param module: module of the worker

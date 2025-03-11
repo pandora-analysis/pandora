@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import sys
-
 import yara  # type: ignore[import-not-found]
 
 from ..default import get_homedir
@@ -11,13 +9,7 @@ from ..helpers import Status
 from ..task import Task
 from ..report import Report
 
-from .base import BaseWorker, WorkerOption
-
-
-if sys.version_info >= (3, 11):
-    from typing import Unpack
-else:
-    from typing_extensions import Unpack
+from .base import BaseWorker
 
 
 class YaraWorker(BaseWorker):
@@ -43,8 +35,10 @@ class YaraWorker(BaseWorker):
         return rules
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
-        super().__init__(module, worker_id, cache, timeout, loglevel, **options)
+                 loglevel: int | None=None,
+                 status_in_report: dict[str, str] | None=None,
+                 **options: dict[str, str | int | bool]) -> None:
+        super().__init__(module, worker_id, cache, timeout, loglevel, status_in_report, **options)
 
         self._init_rules()
 

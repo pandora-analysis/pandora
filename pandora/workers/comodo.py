@@ -6,19 +6,11 @@ import os
 import re
 import subprocess
 
-import sys
-
 from ..helpers import Status
 from ..task import Task
 from ..report import Report
 
-from .base import BaseWorker, WorkerOption
-
-
-if sys.version_info >= (3, 11):
-    from typing import Unpack
-else:
-    from typing_extensions import Unpack
+from .base import BaseWorker
 
 
 class ComodoWorker(BaseWorker):
@@ -27,8 +19,9 @@ class ComodoWorker(BaseWorker):
     comodo_bases: str = '/opt/COMODO/scanners/bases.cav'  # this seems to be hardcoded
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
-        super().__init__(module, worker_id, cache, timeout, loglevel, **options)
+                 loglevel: int | None=None, status_in_report: dict[str, str] | None=None,
+                 **options: dict[str, str | int | bool]) -> None:
+        super().__init__(module, worker_id, cache, timeout, loglevel, status_in_report, **options)
 
         if (not self.comodo_path
                 or not os.path.exists(self.comodo_path)

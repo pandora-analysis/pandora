@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import traceback
 
-import sys
 from urllib.parse import urljoin
 
 import requests
@@ -13,13 +12,7 @@ from ..helpers import Status, get_useragent_for_requests
 from ..task import Task
 from ..report import Report
 
-from .base import BaseWorker, WorkerOption
-
-
-if sys.version_info >= (3, 11):
-    from typing import Unpack
-else:
-    from typing_extensions import Unpack
+from .base import BaseWorker
 
 
 class HybridAnalysis(BaseWorker):
@@ -28,8 +21,10 @@ class HybridAnalysis(BaseWorker):
     apiurl: str
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
-        super().__init__(module, worker_id, cache, timeout, loglevel, **options)
+                 loglevel: int | None=None,
+                 status_in_report: dict[str, str] | None=None,
+                 **options: dict[str, str | int | bool]) -> None:
+        super().__init__(module, worker_id, cache, timeout, loglevel, status_in_report, **options)
         if not self.apikey:
             self.disabled = True
             self.logger.warning('Disabled, missing apikey.')

@@ -6,6 +6,7 @@ import importlib
 import inspect
 import logging
 import logging.config
+from typing import Mapping
 
 from redis import Redis
 
@@ -43,7 +44,7 @@ class WorkersManager(AbstractManager):
                 return worker
         raise MissingWorker(f'The worker class is missing in {module}')
 
-    def _init_worker(self, module_name: str, worker_conf: dict[str, dict[str, str]], restart: bool=False) -> list[BaseWorker]:
+    def _init_worker(self, module_name: str, worker_conf: dict[str, dict[str, str | int | bool]], restart: bool=False) -> list[BaseWorker]:
         """
         Create a new worker with given conf.
         :param worker_conf: dict extracted from yaml
@@ -58,7 +59,7 @@ class WorkersManager(AbstractManager):
 
         # Import module
         module = importlib.import_module(f'pandora.workers.{module_name}')
-        options = {
+        options: Mapping[str, str | int | bool] = {
             key: value for key, value in worker_conf['settings'].items()
             if key not in ('cache', 'timeout')
         }
@@ -74,10 +75,10 @@ class WorkersManager(AbstractManager):
             try:
                 worker = self._get_worker_class(module)(
                     module=module_name, worker_id=i,
-                    cache=worker_conf['settings']['cache'],
-                    timeout=worker_conf['settings']['timeout'],
+                    cache=worker_conf['settings']['cache'],  # type: ignore[arg-type]
+                    timeout=worker_conf['settings']['timeout'],  # type: ignore[arg-type]
                     loglevel=self.loglevel,
-                    status_in_report=status_in_report,
+                    status_in_report=status_in_report,  # type: ignore[arg-type]
                     **options
                 )
                 if i == 1 and not worker.disabled:

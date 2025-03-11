@@ -2,21 +2,13 @@
 
 from __future__ import annotations
 
-import sys
-
 from pymisp import PyMISP, MISPAttribute, PyMISPError
 
 from ..helpers import Status
 from ..task import Task
 from ..report import Report
 
-from .base import BaseWorker, WorkerOption
-
-
-if sys.version_info >= (3, 11):
-    from typing import Unpack
-else:
-    from typing_extensions import Unpack
+from .base import BaseWorker
 
 
 class MISP(BaseWorker):
@@ -28,8 +20,10 @@ class MISP(BaseWorker):
     max_attribute_count: int
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
-                 loglevel: int | None=None, **options: Unpack[WorkerOption]) -> None:
-        super().__init__(module, worker_id, cache, timeout, loglevel, **options)
+                 loglevel: int | None=None,
+                 status_in_report: dict[str, str] | None=None,
+                 **options: dict[str, str | int | bool]) -> None:
+        super().__init__(module, worker_id, cache, timeout, loglevel, status_in_report, **options)
         if not self.apiurl or self.apiurl == '':
             self.disabled = True
             self.logger.warning('Disabled, missing apiurl.')
