@@ -73,7 +73,11 @@
           <tr>
             <td>{{ worker_config.meta.name }}</td>
             <td>{{ worker_config.meta.description }}</td>
-            <td><input type="checkbox" name="{{ worker_name }}" checked/></td>
+            <td><input type="checkbox" name="{{ worker_name }}"
+                {% if worker_config.settings.required or worker_config.settings.run_by_default %}checked{%endif%}
+                {% if worker_config.settings.required %}disabled{%endif%}
+                />
+            </td>
           </tr>
           {% endif %}
         {% endfor %}

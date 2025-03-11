@@ -221,7 +221,8 @@ def api_submit_page() -> str:
         'submit.html', error=request.args.get('error', ''),
         show_project_page=get_config('generic', 'show_project_page'),
         max_file_size=get_config('generic', 'max_file_size'),
-        workers={worker_name: config for worker_name, config in workers().items() if worker_name in enaled_workers},
+        workers={worker_name: config for worker_name, config in workers().items()
+                 if worker_name in enaled_workers},
         generic_disclaimer=disclaimers['disclaimer'],
         special_disclaimer=disclaimers['special_disclaimer']
     )

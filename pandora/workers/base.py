@@ -70,22 +70,25 @@ class BaseWorker(multiprocessing.Process):
 
         self.module = module
         self.logger.debug('Create redis stream group...')
-        self.disabled = False
-        try:
-            self.redis.xgroup_create(name='tasks_queue', groupname=self.module, mkstream=True)
-            self.logger.debug('Redis stream group created.')
-        except ResponseError:
-            self.logger.debug('Redis stream group already exists.')
-        except RedisConnectionError:
-            self.logger.critical('Redis not started, shutting down.')
-            self.disabled = True
-        except Exception as e:
-            self.logger.critical(f'Unexpected error, shutting down: {e}.')
-            self.disabled = True
-        finally:
-            if self.disabled:
-                self.logger.critical(f'General error, unable to initialize the workers for {module}.')
-                raise PandoraException(f'General error, unable to initialize the workers for {module}.')
+        self.disabled = options.pop('disabled', False)
+        if self.disabled:
+            self.logger.info(f'{module} is disabled in the config file.')
+        else:
+            try:
+                self.redis.xgroup_create(name='tasks_queue', groupname=self.module, mkstream=True)
+                self.logger.debug('Redis stream group created.')
+            except ResponseError:
+                self.logger.debug('Redis stream group already exists.')
+            except RedisConnectionError:
+                self.logger.critical('Redis not started, shutting down.')
+                self.disabled = True
+            except Exception as e:
+                self.logger.critical(f'Unexpected error, shutting down: {e}.')
+                self.disabled = True
+            finally:
+                if self.disabled:
+                    self.logger.critical(f'General error, unable to initialize the workers for {module}.')
+                    raise PandoraException(f'General error, unable to initialize the workers for {module}.')
 
         self.storage = Storage()
 
@@ -93,6 +96,9 @@ class BaseWorker(multiprocessing.Process):
         self.timeout = expire_in_sec(timeout)
 
         self.status_in_report = status_in_report if status_in_report else {}
+
+        self.required = options.pop('required', False)
+        self.run_by_default = options.pop('run_by_default', True)
 
         for key, value in options.items():
             setattr(self, key, value)

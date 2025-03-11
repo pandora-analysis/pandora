@@ -6,3 +6,9 @@ meta:
 settings:
   cache: 1h
   timeout: 1m
+  # If required, the module will be run by default *and* cannot be disabled by the user
+  required: false
+  # Is true, the module is run by default, but can be disabled by the user
+  run_by_default: true
+  # The module is disabled, and the user cannot trigger it.
+  disabled: false
