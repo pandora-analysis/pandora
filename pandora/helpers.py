@@ -97,6 +97,7 @@ def workers() -> dict[str, dict[str, Any]]:
             default_config = yaml.safe_load(f.read())
     else:
         logger.warning(f'Workers config file ({worker_default_config_file}) does not exists, falling back to default.')
+        default_config = {}
 
     all_configs = {}
     # load all individual config files
@@ -126,7 +127,7 @@ def workers() -> dict[str, dict[str, Any]]:
             module_config_sample = yaml.safe_load(f.read())
 
         all_configs[configfile.stem] = {
-            'meta': {**default_sample_config['meta'], **default_config['meta'],
+            'meta': {**default_sample_config['meta'], **default_config.get('meta', {}),
                      **module_config_sample['meta'], **module_config['meta']},
             'settings': {**default_sample_config['settings'], **default_config['settings']},
             'status_in_report': {}
