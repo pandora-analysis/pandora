@@ -95,12 +95,13 @@ def check_unconfigured_workers(default_yes: bool=False) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description='Pull latest release, update dependencies, update and validate the config files, update 3rd deps for the website.')
     parser.add_argument('--yes', default=False, action='store_true', help='Run all commands without asking, ignore new or disabled workers.')
+    parser.add_argument('--init', default=False, action='store_true', help='Run all commands without starting the service.')
     args = parser.parse_args()
 
     old_hash = compute_hash_self()
 
     print('* Update repository.')
-    keep_going(args.yes)
+    keep_going(args.yes or args.init)
     run_command('git submodule init')
     run_command('git pull --recurse-submodules')
     new_hash = compute_hash_self()
@@ -111,46 +112,47 @@ def main() -> None:
     check_poetry_version()
 
     print('* Install/update dependencies.')
-    keep_going(args.yes)
+    keep_going(args.yes or args.init)
     run_command('poetry install')
 
     print('* Validate configuration files.')
-    keep_going(args.yes)
+    keep_going(args.yes or args.init)
     run_command(f'poetry run {(Path("tools") / "validate_config_files.py").as_posix()} --check')
 
     print('* Update configuration files.')
-    keep_going(args.yes)
+    keep_going(args.yes or args.init)
     run_command(f'poetry run {(Path("tools") / "validate_config_files.py").as_posix()} --update')
 
-    if not args.yes:
+    if not args.yes and not args.init:
         print('* Check if new workers are available')
-        keep_going(args.yes)
+        keep_going()
         check_unconfigured_workers(args.yes)
 
     print('* Update third party dependencies for the website.')
-    keep_going(args.yes)
+    keep_going(args.yes or args.init)
     run_command(f'poetry run {(Path("tools") / "3rdparty.py").as_posix()}')
 
-    print('* Restarting')
-    keep_going(args.yes)
-    if platform.system() == 'Windows':
-        print('Restarting with poetry...')
-        run_command('poetry run stop', expect_fail=True)
-        run_command('poetry run start', capture_output=False)
-        print('Started.')
-    else:
-        service = get_config('generic', 'systemd_service_name')
-        p = subprocess.run(["systemctl", "is-active", "--quiet", service])
-        try:
-            p.check_returncode()
-            print('Restarting with systemd...')
-            run_command(f'sudo service {service} restart')
-            print('done.')
-        except subprocess.CalledProcessError:
+    if not args.init:
+        print('* Restarting')
+        keep_going(args.yes)
+        if platform.system() == 'Windows':
             print('Restarting with poetry...')
             run_command('poetry run stop', expect_fail=True)
             run_command('poetry run start', capture_output=False)
             print('Started.')
+        else:
+            service = get_config('generic', 'systemd_service_name')
+            p = subprocess.run(["systemctl", "is-active", "--quiet", service])
+            try:
+                p.check_returncode()
+                print('Restarting with systemd...')
+                run_command(f'sudo service {service} restart')
+                print('done.')
+            except subprocess.CalledProcessError:
+                print('Restarting with poetry...')
+                run_command('poetry run stop', expect_fail=True)
+                run_command('poetry run start', capture_output=False)
+                print('Started.')
 
 
 if __name__ == '__main__':
