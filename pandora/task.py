@@ -8,9 +8,10 @@ from typing import overload, Any, Literal
 from uuid import uuid4
 
 from pymisp import MISPEvent, MISPAttribute
+from redis import Redis
 from werkzeug.utils import secure_filename
 
-from .default import get_homedir, safe_create_dir, PandoraException, get_config
+from .default import get_homedir, safe_create_dir, PandoraException, get_config, get_socket_path
 from .exceptions import TooManyObservables, Unsupported
 from .file import File
 from .helpers import Status, workers, Seed
@@ -80,6 +81,8 @@ class Task:
         :param parent: parent task if file has been extracted
         """
         self.storage = Storage()
+        # This redis is there just to make sure we ony wait for workers that are currently enabled
+        self.redis = Redis(unix_socket_path=get_socket_path('cache'), decode_responses=True)
 
         if uuid:
             # Loading existing task
@@ -204,8 +207,9 @@ class Task:
     @property
     def reports(self) -> dict[str, Report]:
         to_return: dict[str, Report] = {}
-        for worker_name, config in workers().items():
-            if worker_name in self.disabled_workers or config['settings']['disabled'] is True:
+        enabled_workers = self.redis.smembers('enabled_workers')
+        for worker_name in workers():
+            if worker_name in self.disabled_workers or worker_name not in enabled_workers:
                 continue
             stored_report = self.storage.get_report(task_uuid=self.uuid, worker_name=worker_name)
             if stored_report:
