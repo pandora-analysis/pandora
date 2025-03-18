@@ -55,6 +55,11 @@ jobs:
         sudo apt install libcairo2-dev  # Required by reportlab
         sudo apt install libfuzzy-dev  # for pydeep, until the wheel is available for python 3.13
 
+    - name: Install KvRocks
+      run: |
+        wget https://github.com/RocksLabs/kvrocks-fpm/releases/download/202502091/kvrocks_2.11.1-1_amd64.deb -O kvrocks.deb
+        sudo dpkg -i kvrocks.deb
+
     - name: Install with poetry
       run: |
         python -m pip install --upgrade pip poetry
