@@ -204,8 +204,8 @@ class Task:
     @property
     def reports(self) -> dict[str, Report]:
         to_return: dict[str, Report] = {}
-        for worker_name in workers():
-            if worker_name in self.disabled_workers:
+        for worker_name, config in workers().items():
+            if worker_name in self.disabled_workers or config['settings']['disabled'] is True:
                 continue
             stored_report = self.storage.get_report(task_uuid=self.uuid, worker_name=worker_name)
             if stored_report:
