@@ -161,6 +161,10 @@ class BaseWorker(multiprocessing.Process):
         """
         Run current worker and execute tasks from queue.
         """
+        if self.disabled:
+            self.logger.info(f'{self.module} is disabled')
+            return
+
         self.logger.info('Worker is running...')
 
         while True:
