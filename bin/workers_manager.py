@@ -95,6 +95,8 @@ class WorkersManager(AbstractManager):
         Restart eventual dead workers.
         """
         for worker in self._workers:
+            if worker.disabled:
+                continue
             if worker.is_alive():
                 continue
             self.logger.info(f'restart dead worker {worker.module}')
