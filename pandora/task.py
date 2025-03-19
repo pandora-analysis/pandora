@@ -81,7 +81,7 @@ class Task:
         :param parent: parent task if file has been extracted
         """
         self.storage = Storage()
-        # This redis is there just to make sure we ony wait for workers that are currently enabled
+        # This redis is there just to make sure we only wait for workers that are currently enabled
         self.redis = Redis(unix_socket_path=get_socket_path('cache'), decode_responses=True)
 
         if uuid:
