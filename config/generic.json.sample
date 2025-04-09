@@ -44,6 +44,7 @@
         "verify_certificate": false
     },
     "weasyprint_fetch_ressources": false,
+    "disable_unoserver": false,
     "exiftool_path": "",
     "systemd_service_name": "pandora",
     "_notes": {
@@ -69,6 +70,7 @@
         "email": "Email configuration",
         "email_smtp_auth": "Email SMTP auth configuration",
         "weasyprint_fetch_ressources": "If true, weasyprint will fetch resources linked in HTML content",
+        "disable_unoserver": "[Not recommended] If true, the unoserver is disabled. It disables previews generation and libreoffice.",
         "exiftool_path": "Pandora requires exiftool >=12.15 (check with exiftool -ver), if you have an older version see: https://github.com/sylikc/pyexiftool#pyexiftool-dependencies",
         "systemd_service_name": "(Optional) Name of the systemd service if your project has one."
     }

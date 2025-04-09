@@ -19,8 +19,14 @@ logging.config.dictConfig(get_config('logging'))
 class UnoserverLauncher(AbstractManager):
 
     def __init__(self, loglevel: int | None=None) -> None:
-        super().__init__(loglevel)
         self.script_name = 'unoserver'
+        super().__init__(loglevel)
+        disable_unoserver: bool = get_config('generic', 'disable_unoserver')
+        if disable_unoserver:
+            self.logger.info('Unoserver is disabled by configuration')
+            self.force_stop = True
+            return
+
         # Initialize the server, doesn't start it.
         sys.path.append('/usr/lib/python3/dist-packages')
         module = importlib.import_module('unoserver.server')
@@ -38,6 +44,8 @@ class UnoserverLauncher(AbstractManager):
 
 def main() -> None:
     u = UnoserverLauncher()
+    if u.force_stop:
+        return
     u.run(sleep_in_sec=5)
 
 

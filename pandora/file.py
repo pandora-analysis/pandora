@@ -218,11 +218,11 @@ class File:
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
         self.logger.setLevel(get_config('generic', 'loglevel'))
         self.storage = Storage()
-        self.libreoffice_client = UnoClient()
 
         # NOTE: they're alny used by the text conversion method, is it expected?
         self.error = ''
         self.error_trace = ''
+        self._libreoffice_client: UnoClient | None = None
 
         if isinstance(path, str):
             self.path: Path = Path(path)
@@ -276,6 +276,8 @@ class File:
 
     def convert(self) -> None:
         if self.is_unoconv_concerned:
+            if not self.libreoffice_client:
+                raise Unsupported('LibreOffice client is not available')
             try:
                 self.libreoffice_client.convert(inpath=str(self.path), outpath=f'{self.path}.pdf')
             except AttributeError as e:
@@ -296,6 +298,8 @@ class File:
 
         if self.msg_data:
             if self.msg_data.body:
+                if not self.libreoffice_client:
+                    raise Unsupported('LibreOffice client is not available')
                 self.libreoffice_client.convert(indata=self.msg_data.body.encode(), outpath=f'{self.path}_body_txt.pdf')
 
             try:
@@ -313,12 +317,28 @@ class File:
                         if body_part_type == 'HTM':
                             html_to_pdf(body_part['content'], f'{self.path}_body_{i}.pdf')
                         elif body_part_type == 'TXT':
+                            if not self.libreoffice_client:
+                                raise Unsupported('LibreOffice client is not available')
                             self.libreoffice_client.convert(indata=body_part['content'].encode(), outpath=f'{self.path}_body_{i}.pdf')
                         else:
                             print('Unexpected body type:', body_part_type)
                     else:
                         # Assume txt
+                        if not self.libreoffice_client:
+                            raise Unsupported('LibreOffice client is not available')
                         self.libreoffice_client.convert(indata=body_part['content'].encode(), outpath=f'{self.path}_body_{i}.pdf')
+
+    @property
+    def libreoffice_client(self) -> UnoClient | None:
+        """
+        Return the LibreOffice client.
+        :return: LibreOffice client
+        """
+        if get_config('generic', 'disable_unoserver'):
+            return None
+        if not self._libreoffice_client:
+            self._libreoffice_client = UnoClient()
+        return self._libreoffice_client
 
     def paths_to_preview(self) -> list[Path]:
         if self.is_pdf:
