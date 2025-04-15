@@ -22,7 +22,7 @@ Pandora is an analysis framework to discover if a file is suspicious and conveni
 
 # Install guide
 
-Note that is is *strongly* recommended to use Ubuntu 24.04, which comes with a more recent version of libreoffice.
+Note that it is *strongly* recommended to use Ubuntu 24.04, which comes with a more recent version of libreoffice.
 Using anything older will result in annoying issues when restarting the service: libreoffice
 isn't always stopped properly and it results in dead processes using 100% CPU.
 
