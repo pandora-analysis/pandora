@@ -26,7 +26,9 @@ class YaraSignatureBaseWorker(YaraWorker):
                       'yara-rules_vuln_drivers_strict_renamed.yar',
                       'expl_citrix_netscaler_adc_exploitation_cve_2023_3519.yar',
                       'gen_vcruntime140_dll_sideloading.yar',
-                      'expl_connectwise_screenconnect_vuln_feb24.yar',]
+                      'expl_connectwise_screenconnect_vuln_feb24.yar',
+                      'gen_susp_obfuscation.yar',
+                      'apt43_machine_names.yar',]
     last_change: float | None = None
 
     def rules_with_external_vars(self, filename: str, filepath: str, filetype: str, owner: str) -> yara.Rules:
