@@ -28,14 +28,14 @@ class YaraSignatureBaseWorker(YaraWorker):
                       'gen_vcruntime140_dll_sideloading.yar',
                       'expl_connectwise_screenconnect_vuln_feb24.yar',
                       'gen_susp_obfuscation.yar',
-                      'apt43_machine_names.yar',  # This one requires the magic module enabled with yara-python, this is not possible without compiling manually
                       ]
     last_change: float | None = None
 
     def rules_with_external_vars(self, filename: str, filepath: str, filetype: str, owner: str) -> yara.Rules:
         extension = os.path.splitext(filename)[1]
         yara_files = [y_file for y_file in self.rulespath.glob('**/*.yar')
-                      if y_file.name in self.needs_external and y_file.name != 'apt43_machine_names.yar']
+                      if y_file.name in self.needs_external]
+        print(yara_files)
         rules = yara.compile(filepaths={str(path): str(path) for path in yara_files},
                              includes=True,
                              externals={'filename': filename, 'filepath': filepath,

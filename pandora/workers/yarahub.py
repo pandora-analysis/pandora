@@ -26,6 +26,8 @@ class YaraHubWorker(YaraWorker):
         'Sus_Obf_Enc_Spoof_Hide_PE.yar',  # matches on everything
         'golang_david_CSC846.yar',  # matches on everything
         'RANSOMWARE.yar',  # Too many false positives (matches on everything containing "encrypted")
+        'apt43_machine_names.yar',  # This one requires the magic module enabled with yara-python, this is not possible without compiling manually
+        'Win_b64_pwshl.yar',  # This one requires the magic module enabled with yara-python, this is not possible without compiling manually
     ]
 
     def _init_rules(self) -> None:
