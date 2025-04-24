@@ -72,16 +72,16 @@ python-dateutil = "^2.9.0.post0"
 pycdlib = "^1.14.0"
 werkzeug = "^3.1.3"
 pyhashlookup = "^1.2.6"
-pylookyloo = "^1.28.1"
+pylookyloo = "^1.29.0"
 hachoir = "^3.3.0"
-aiohttp = "^3.11.16"
+aiohttp = "^3.11.18"
 opencv-python = "^4.11.0.86"
 typing-extensions = {version = "^4.13.2", python = "<3.11"}
 # The libyall libs
 dfvfs = "^20240505"
 # The libyall libs that are sneakily for testing purpose only
-setuptools = "^78.1.0"
-beautifulsoup4 = {version= "^4.13.3", extras = ["lxml", "charset_normalizer"]}
+setuptools = "^79.0.1"
+beautifulsoup4 = {version= "^4.13.4", extras = ["lxml", "charset_normalizer"]}
 psutil = "^7.0.0"
 
 [tool.poetry.group.dev.dependencies]
@@ -95,7 +95,7 @@ types-psutil = "^7.0.0.20250401"
 types-beautifulsoup4 = "^4.12.0.20250204"
 bandit = {extras = ["toml"], version = "^1.8.3"}
 flake8 = "^7.2.0"
-semgrep = "^1.118.0"
+semgrep = "^1.120.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
