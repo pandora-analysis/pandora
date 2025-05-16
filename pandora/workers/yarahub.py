@@ -28,6 +28,7 @@ class YaraHubWorker(YaraWorker):
         'RANSOMWARE.yar',  # Too many false positives (matches on everything containing "encrypted")
         'apt43_machine_names.yar',  # This one requires the magic module enabled with yara-python, this is not possible without compiling manually
         'Win_b64_pwshl.yar',  # This one requires the magic module enabled with yara-python, this is not possible without compiling manually
+        'XWorm_3_0_3_1_Detection2.yar',  # The rule matches on XWorm 3.0 or 3.1 in the file, it is too generic
     ]
 
     def _init_rules(self) -> None:
