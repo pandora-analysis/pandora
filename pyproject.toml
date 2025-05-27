@@ -76,7 +76,7 @@ hachoir = "^3.3.0"
 aiohttp = "^3.11.18"
 opencv-python = "^4.11.0.86"
 typing-extensions = {version = "^4.13.2", python = "<3.11"}
-setuptools = "^80.8.0"
+setuptools = "^80.9.0"
 beautifulsoup4 = {version= "^4.13.4", extras = ["lxml", "charset_normalizer"]}
 psutil = "^7.0.0"
 textract-py3 = "^2.1.1"
