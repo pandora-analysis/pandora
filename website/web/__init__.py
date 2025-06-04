@@ -243,7 +243,7 @@ def api_analysis(task_id: str, seed: str | None=None) -> str:
     task.linked_tasks = []  # type: ignore[assignment]
 
     if hasattr(task, 'parent') and task.parent and seed and not pandora.is_seed_valid(task.parent, seed):
-        task.parent = None
+        task.parent = None  # type: ignore[assignment]
 
     email_config = get_config('generic', 'email')
     admin_name = ''

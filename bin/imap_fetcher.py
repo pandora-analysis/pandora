@@ -111,7 +111,7 @@ class IMAPFetcher(AbstractManager):
             user.store()
             for uid, message_data in client.fetch(messages, "RFC822").items():
                 self.logger.info('Processing new mail...')
-                email_message = email.message_from_bytes(message_data[b"RFC822"], policy=policy.default)  # type: ignore[arg-type]
+                email_message = email.message_from_bytes(message_data[b"RFC822"], policy=policy.default)
                 # TODO: Add disabled workers? set filename to some identifier?
                 new_task = Task.new_task(user=user, sample=BytesIO(email_message.as_bytes()),
                                          disabled_workers=[],

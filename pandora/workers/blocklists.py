@@ -37,25 +37,25 @@ class Blocklists(BaseWorker):
                 report.add_details('Info', f'The result for files with extension {ext} is overwritten by the admin. It generally means we cannot decide on the status of the file. Contact your admin for more details.')
 
             if ext in self.malicious_extensions:
-                report.status = 'malicious_extension'  # type: ignore[assignment]
+                report.status = 'malicious_extension'
                 report.add_details('Warning', f'The extension {ext} is considered as malicious by default.')
 
         if self.enable_mimetypes:
             if not task.file.mime_type:
-                report.status = 'no_mimetype'  # type: ignore[assignment]
+                report.status = 'no_mimetype'
                 report.add_details('Warning', 'Unable to find a mime type.')
             elif task.file.mime_type in self.malicious_mimetypes:
-                report.status = 'malicious_mimetype'  # type: ignore[assignment]
+                report.status = 'malicious_mimetype'
                 report.add_details('Warning', f'The mimetype {task.file.mime_type} is considered as malicious by default.')
             else:
                 guessed_type, encoding = mimetypes.guess_type(task.file.original_filename)
                 if not guessed_type:
-                    report.status = 'cannot_guess_mimetype'  # type: ignore[assignment]
+                    report.status = 'cannot_guess_mimetype'
                     report.add_details('Warning', 'Unable to guess the mimetype based on the filename. This is a known technique used to bypass detection. If you are unsure what do to, talk to your administrator.')
                 else:
                     list_valid_mimetypes = [guessed_type]
                     if guessed_type in self.synonyms:
                         list_valid_mimetypes += self.synonyms[guessed_type]
                     if task.file.mime_type not in list_valid_mimetypes:
-                        report.status = 'missmatch_mimetype'  # type: ignore[assignment]
+                        report.status = 'missmatch_mimetype'
                         report.add_details('Warning', f'The mimetype guessed from the filename ({guessed_type}) differs from the one guessed by magic ({task.file.mime_type}). It is a known technique used to bypass detections.')

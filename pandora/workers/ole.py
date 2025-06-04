@@ -229,7 +229,7 @@ class Ole(BaseWorker):
                     malicious.append(f'{rel_type} - {attribute}')
 
             for olefile in find_ole(task.file.original_filename, task.file.data.getvalue()):
-                report.status = 'embedded_ole'  # type: ignore[assignment]
+                report.status = 'embedded_ole'
                 suspicious.append('Has embedded OLE resource.')
                 # TODO Process as a normal olefile
                 _oid = oleid.OleID(filename=olefile, data=olefile.fp.read())
@@ -254,7 +254,7 @@ class Ole(BaseWorker):
                 if not obj.is_ole:
                     continue
                 status, details = self.process_oleobject(obj)
-                report.status = status  # type: ignore[assignment]
+                report.status = status
                 for k, v in details.items():
                     report.add_details(k, v)
 
