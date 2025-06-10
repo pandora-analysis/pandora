@@ -73,7 +73,7 @@ werkzeug = "^3.1.3"
 pyhashlookup = "^1.2.6"
 pylookyloo = "^1.30.0"
 hachoir = "^3.3.0"
-aiohttp = "^3.12.9"
+aiohttp = "^3.12.12"
 opencv-python = "^4.11.0.86"
 typing-extensions = {version = "^4.14.0", python = "<3.11"}
 setuptools = "^80.9.0"
