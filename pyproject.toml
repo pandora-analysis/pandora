@@ -94,7 +94,7 @@ types-psutil = "^7.0.0.20250601"
 types-beautifulsoup4 = "^4.12.0.20250516"
 bandit = {extras = ["toml"], version = "^1.8.3"}
 flake8 = "^7.2.0"
-semgrep = "^1.123.0"
+semgrep = "^1.124.1"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
