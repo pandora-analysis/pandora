@@ -19,7 +19,7 @@ import exiftool  # type: ignore[import-untyped]
 import fitz  # type: ignore[import-untyped]
 import magic
 import pikepdf
-import pillow_heif
+import pillow_heif  # type: ignore[import-untyped]
 
 from bs4 import BeautifulSoup
 from oletools.msodde import process_maybe_encrypted  # type: ignore[import-untyped]
