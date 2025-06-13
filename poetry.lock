@@ -3724,13 +3724,13 @@ image = ["Pillow"]
 
 [[package]]
 name = "peewee"
-version = "3.18.1"
+version = "3.18.2"
 description = "a little orm"
 optional = false
 python-versions = "*"
 groups = ["dev"]
 files = [
-    {file = "peewee-3.18.1.tar.gz", hash = "sha256:a76a694b3b3012ce22f00d51fd83e55bf80b595275a90ed62cd36eb45496cf1d"},
+    {file = "peewee-3.18.2.tar.gz", hash = "sha256:77a54263eb61aff2ea72f63d2eeb91b140c25c1884148e28e4c0f7c4f64996a0"},
 ]
 
 [[package]]
@@ -4092,14 +4092,14 @@ files = [
 
 [[package]]
 name = "publicsuffixlist"
-version = "1.0.2.20250707"
+version = "1.0.2.20250708"
 description = "publicsuffixlist implement"
 optional = false
 python-versions = ">=3.5"
 groups = ["main"]
 files = [
-    {file = "publicsuffixlist-1.0.2.20250707-py2.py3-none-any.whl", hash = "sha256:9dd5c9c5825544526b9f62e5295259ed53526b40af878d3d1bea279209d69a43"},
-    {file = "publicsuffixlist-1.0.2.20250707.tar.gz", hash = "sha256:a00d950de30423b1b346214f3548bb43f95fe591b2774593e546b3d6b7375ecf"},
+    {file = "publicsuffixlist-1.0.2.20250708-py2.py3-none-any.whl", hash = "sha256:411b210339a9d7f3b47c4254f875cd19192f6fac5c62902279d22af2bb0dc3dd"},
+    {file = "publicsuffixlist-1.0.2.20250708.tar.gz", hash = "sha256:2bc16f242bd08f1dcf56a6bf56d2437331531f9a26f7841a9ce9a872948508ff"},
 ]
 
 [package.extras]
@@ -5856,14 +5856,14 @@ types-setuptools = "*"
 
 [[package]]
 name = "types-html5lib"
-version = "1.1.11.20250516"
+version = "1.1.11.20250708"
 description = "Typing stubs for html5lib"
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "types_html5lib-1.1.11.20250516-py3-none-any.whl", hash = "sha256:5e407b14b1bd2b9b1107cbd1e2e19d4a0c46d60febd231c7ab7313d7405663c1"},
-    {file = "types_html5lib-1.1.11.20250516.tar.gz", hash = "sha256:65043a6718c97f7d52567cc0cdf41efbfc33b1f92c6c0c5e19f60a7ec69ae720"},
+    {file = "types_html5lib-1.1.11.20250708-py3-none-any.whl", hash = "sha256:bb898066b155de7081cb182179e2ded31b9e0e234605e2cb46536894e68a6954"},
+    {file = "types_html5lib-1.1.11.20250708.tar.gz", hash = "sha256:24321720fdbac71cee50d5a4bec9b7448495b7217974cffe3fcf1ede4eef7afe"},
 ]
 
 [[package]]
@@ -5896,14 +5896,14 @@ types-cffi = "*"
 
 [[package]]
 name = "types-python-dateutil"
-version = "2.9.0.20250516"
+version = "2.9.0.20250708"
 description = "Typing stubs for python-dateutil"
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "types_python_dateutil-2.9.0.20250516-py3-none-any.whl", hash = "sha256:2b2b3f57f9c6a61fba26a9c0ffb9ea5681c9b83e69cd897c6b5f668d9c0cab93"},
-    {file = "types_python_dateutil-2.9.0.20250516.tar.gz", hash = "sha256:13e80d6c9c47df23ad773d54b2826bd52dbbb41be87c3f339381c1700ad21ee5"},
+    {file = "types_python_dateutil-2.9.0.20250708-py3-none-any.whl", hash = "sha256:4d6d0cc1cc4d24a2dc3816024e502564094497b713f7befda4d5bc7a8e3fd21f"},
+    {file = "types_python_dateutil-2.9.0.20250708.tar.gz", hash = "sha256:ccdbd75dab2d6c9696c350579f34cffe2c281e4c5f27a585b2a2438dd1d5c8ab"},
 ]
 
 [[package]]
