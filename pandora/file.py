@@ -19,6 +19,7 @@ import exiftool  # type: ignore[import-untyped]
 import fitz  # type: ignore[import-untyped]
 import magic
 import pikepdf
+import pillow_heif
 
 from bs4 import BeautifulSoup
 from oletools.msodde import process_maybe_encrypted  # type: ignore[import-untyped]
@@ -103,6 +104,8 @@ class File:
         'image/svg+xml': ['SVG', 'svg'],
         'image/tiff': ['IMG', 'tiff'],
         'image/webp': ['IMG', 'webp'],
+        'image/heic': ['IMG', 'heic'],
+        'image/heif': ['IMG', 'heif'],
         'application/vnd.ms-outlook': ['MSG', 'msg'],
         'application/pdf': ['PDF', 'pdf'],
         'application/vnd.ms-powerpoint': ['PPT', 'ppt'],
@@ -130,7 +133,7 @@ class File:
         'EML': {'.eml'},
         'EXE': {'.exe', '.dll'},
         'HTM': {'.htm', '.html', '.xht', '.xhtml'},
-        'IMG': {'.png', '.gif', '.bmp', '.jpg', '.jpeg', '.ico'},
+        'IMG': {'.png', '.gif', '.bmp', '.jpg', '.jpeg', '.ico', '.heic', '.heif'},
         'JSC': {'.js'},
         'MSG': {'.msg'},
         'PDF': {'.pdf'},
@@ -289,9 +292,23 @@ class File:
             renderPDF.drawToFile(drawing, f'{self.path}.pdf')
 
         if self.is_image:
-            image = Image.open(self.path)
-            im = image.convert('RGB')
-            im.save(f'{self.path}.pdf')
+            try:
+                if self.mime_type in ['image/heic', 'image/heif']:
+                    heif_file = pillow_heif.read_heif(str(self.path))
+                    image = Image.frombytes(
+                        heif_file.mode,
+                        heif_file.size,
+                        heif_file.data,
+                        "raw",
+                        heif_file.mode,
+                        heif_file.stride,
+                    )
+                else:
+                    image = Image.open(self.path)
+                im = image.convert('RGB')
+                im.save(f'{self.path}.pdf')
+            except Exception as e:
+                self.logger.warning(f'Unable to generate a preview of the HTML body: {e}')
 
         if self.is_html:
             html_to_pdf(self.path, f'{self.path}.pdf')
