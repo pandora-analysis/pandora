@@ -20,7 +20,7 @@ from .base import BaseWorker
 
 class QrCodeDecoder(BaseWorker):
 
-    def _find_boxes(self, image: np.ndarray) -> Generator[tuple[int, int, int, int], None, None]:  # type: ignore[type-arg]
+    def _find_boxes(self, image: np.ndarray) -> Generator[tuple[int, int, int, int]]:
         # code from: https://stackoverflow.com/questions/60359398/python-detect-a-qr-code-from-an-image-and-crop-using-opencv#60384780
         # Load imgae, grayscale, Gaussian blur, Otsu's threshold
         gray = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2GRAY)
@@ -46,31 +46,33 @@ class QrCodeDecoder(BaseWorker):
     def _process_image(self, task: Task, report: Report, image_path: Path) -> None:
         self.logger.debug(f'analysing file {image_path}...')
         try:
-            image = cv2.imread(str(image_path))
-            qrCodeDetector = cv2.QRCodeDetector()
-            decoded_text, _, _ = qrCodeDetector.detectAndDecode(image)
-            if decoded_text:
-                report.status = Status.WARN
-                report.add_details('qrcode', 'Found a QR Code in the image, go to the observables to see it.')
-                if decoded_text.startswith('http'):
-                    task.add_observable(decoded_text, 'url')
-                else:
-                    task.add_observable(decoded_text, 'text')
-            for x, y, w, h in self._find_boxes(image):
-                qrcode = image[y - 2: y + w + 2, x - 2: x + h + 2]
-                width = int(qrcode.shape[1] * 2)
-                height = int(qrcode.shape[0] * 2)
-                dim = (width, height)
-                # resize image
-                to_check = cv2.resize(qrcode, dim, interpolation=cv2.INTER_LINEAR)
-                detect_decode = qrCodeDetector.detectAndDecode(to_check)
-                if detect_decode[0]:
+            original_image = cv2.imread(str(image_path))
+            inverted_image = cv2.bitwise_not(original_image)
+            for image in (original_image, inverted_image):
+                qrCodeDetector = cv2.QRCodeDetector()
+                decoded_text, _, _ = qrCodeDetector.detectAndDecode(image)
+                if decoded_text:
                     report.status = Status.WARN
                     report.add_details('qrcode', 'Found a QR Code in the image, go to the observables to see it.')
-                    if detect_decode[0].startswith('http'):
-                        task.add_observable(detect_decode[0], 'url')
+                    if decoded_text.startswith('http'):
+                        task.add_observable(decoded_text, 'url')
                     else:
-                        task.add_observable(detect_decode[0], 'text')
+                        task.add_observable(decoded_text, 'text')
+                for x, y, w, h in self._find_boxes(image):
+                    qrcode = image[y - 2: y + w + 2, x - 2: x + h + 2]
+                    width = int(qrcode.shape[1] * 2)
+                    height = int(qrcode.shape[0] * 2)
+                    dim = (width, height)
+                    # resize image
+                    to_check = cv2.resize(qrcode, dim, interpolation=cv2.INTER_LINEAR)
+                    detect_decode = qrCodeDetector.detectAndDecode(to_check)
+                    if detect_decode[0]:
+                        report.status = Status.WARN
+                        report.add_details('qrcode', 'Found a QR Code in the image, go to the observables to see it.')
+                        if detect_decode[0].startswith('http'):
+                            task.add_observable(detect_decode[0], 'url')
+                        else:
+                            task.add_observable(detect_decode[0], 'text')
         except Exception as e:
             self.logger.warning(f'Unable to process image: {e}')
 
