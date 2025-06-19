@@ -5217,18 +5217,18 @@ typing-extensions = {version = ">=4.4.0", markers = "python_version < \"3.13\""}
 
 [[package]]
 name = "reportlab"
-version = "4.4.1"
+version = "4.4.2"
 description = "The Reportlab Toolkit"
 optional = false
 python-versions = "<4,>=3.7"
 groups = ["main"]
 files = [
-    {file = "reportlab-4.4.1-py3-none-any.whl", hash = "sha256:9217a1c8c1917217f819718b24972a96ad0c485a1c494749562d097b58d974b7"},
-    {file = "reportlab-4.4.1.tar.gz", hash = "sha256:5f9b9fc0b7a48e8912c25ccf69d26b82980ab0da718e4f583fa720e8f8f5073f"},
+    {file = "reportlab-4.4.2-py3-none-any.whl", hash = "sha256:58e11be387457928707c12153b7e41e52533a5da3f587b15ba8f8fd0805c6ee2"},
+    {file = "reportlab-4.4.2.tar.gz", hash = "sha256:fc6283048ddd0781a9db1d671715990e6aa059c8d40ec9baf34294c4bd583a36"},
 ]
 
 [package.dependencies]
-chardet = "*"
+charset-normalizer = "*"
 pillow = ">=9.0.0"
 
 [package.extras]
@@ -5533,18 +5533,18 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.125.0"
+version = "1.126.0"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "semgrep-1.125.0-cp39.cp310.cp311.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:bd40f32e888a92ff6d41707f65e23778bbfb4d4a43a20901ec0b2719f428181a"},
-    {file = "semgrep-1.125.0-cp39.cp310.cp311.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:5a050678823ae13fe6f6ee29c0d49391f1eb8d285a8f37b30485f4a2c4974f22"},
-    {file = "semgrep-1.125.0-cp39.cp310.cp311.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:045087e6110a771deaee1057e0b176ef90781d353bfc1340338c352d46589fbf"},
-    {file = "semgrep-1.125.0-cp39.cp310.cp311.py39.py310.py311-none-musllinux_1_0_x86_64.manylinux2014_x86_64.whl", hash = "sha256:020152a08298b57978e754490bbf2cd98f7db73d0a8b9469c7d411c92ea7228b"},
-    {file = "semgrep-1.125.0-cp39.cp310.cp311.py39.py310.py311-none-win_amd64.whl", hash = "sha256:74ebdb9e89d7b749a60d81bc5e3de23ad1215fc14ea3360570e7950679e06e52"},
-    {file = "semgrep-1.125.0.tar.gz", hash = "sha256:1e60d462b2d41c2804f4ba55b73cca11eabaad35f2fdf52a5bf00f1b7ccde51a"},
+    {file = "semgrep-1.126.0-cp39.cp310.cp311.py39.py310.py311-none-macosx_10_14_x86_64.whl", hash = "sha256:5f768f30e41574a654ba6b4717264957a2c11b082a3392aedee598d58108aa76"},
+    {file = "semgrep-1.126.0-cp39.cp310.cp311.py39.py310.py311-none-macosx_11_0_arm64.whl", hash = "sha256:5294395375c598a667cfa0b9be741fab5c7f05617f65ed6ad12fd6cf6558a70c"},
+    {file = "semgrep-1.126.0-cp39.cp310.cp311.py39.py310.py311-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1949399daf7cede12d44b6a83fb67c3e10dfc9da6b3eb6bf01e5bb05108a9e3b"},
+    {file = "semgrep-1.126.0-cp39.cp310.cp311.py39.py310.py311-none-musllinux_1_0_x86_64.manylinux2014_x86_64.whl", hash = "sha256:dbf19a85b8bcaf650d213d7b709e95b629f91bed8adbef5a8d4e77b1e09507bd"},
+    {file = "semgrep-1.126.0-cp39.cp310.cp311.py39.py310.py311-none-win_amd64.whl", hash = "sha256:967c3696d4f79c7f1d2d41c4c4b2b6d39f69a78e3a14c59b58231238667beca7"},
+    {file = "semgrep-1.126.0.tar.gz", hash = "sha256:3158e1c84ee416f102739d8205689a74d6552178424d028f2e5d39bea31c15ad"},
 ]
 
 [package.dependencies]
@@ -6171,14 +6171,14 @@ defusedxml = ">=0.7.1,<0.8.0"
 
 [[package]]
 name = "urllib3"
-version = "2.4.0"
+version = "2.5.0"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 optional = false
 python-versions = ">=3.9"
 groups = ["main", "dev"]
 files = [
-    {file = "urllib3-2.4.0-py3-none-any.whl", hash = "sha256:4e16665048960a0900c702d4a66415956a584919c03361cac9f1df5c5dd7e813"},
-    {file = "urllib3-2.4.0.tar.gz", hash = "sha256:414bc6535b787febd7567804cc015fee39daab8ad86268f1310a9250697de466"},
+    {file = "urllib3-2.5.0-py3-none-any.whl", hash = "sha256:e6b01673c0fa6a13e374b50871808eb3bf7046c4b125b216f6bf1cc604cff0dc"},
+    {file = "urllib3-2.5.0.tar.gz", hash = "sha256:3fc47733c7e419d4bc3f6b3dc2b4f890bb743906a30d56ba4a5bfa4bbff92760"},
 ]
 
 [package.extras]
@@ -6855,4 +6855,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9.2,<3.14"
-content-hash = "bfe36b9b7edecc7eac50ef59b2c06ee78c31e12022c3f419fdf6fd0058b6f56d"
+content-hash = "484b440e26e71f7c3cb41c08751e8b0212e5c8c42471d75a9a7751193f57a6cb"
