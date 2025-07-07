@@ -74,7 +74,7 @@ pyhashlookup = "^1.2.7"
 pylookyloo = "^1.31.1"
 hachoir = "^3.3.0"
 aiohttp = "^3.12.13"
-opencv-python = "^4.11.0.86"
+opencv-python = "^4.12.0.88"
 typing-extensions = {version = "^4.14.1", python = "<3.11"}
 setuptools = "^80.9.0"
 beautifulsoup4 = {version= "^4.13.4", extras = ["lxml", "charset_normalizer"]}
