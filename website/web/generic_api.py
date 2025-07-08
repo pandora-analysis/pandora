@@ -10,7 +10,7 @@ import logging.config
 from collections import defaultdict
 from datetime import datetime, time, timedelta
 from io import BytesIO
-from typing import Any, Callable
+from typing import Any, Callable, Literal
 
 import flask_login  # type: ignore
 
@@ -368,7 +368,7 @@ class ApiSearch(Resource):  # type: ignore[misc]
 
 
 # Stats related API stuff
-def _intervals(freq: int, first: datetime, last: datetime) -> list[tuple[datetime, datetime]]:
+def _intervals(freq: Literal[0, 1, 2, 3, 4, 5, 6], first: datetime, last: datetime) -> list[tuple[datetime, datetime]]:
     to_return = []
     first = datetime.combine(first.date(), time.min)
     last = datetime.combine(last.date(), time.max)

@@ -20,7 +20,7 @@ from .base import BaseWorker
 
 class QrCodeDecoder(BaseWorker):
 
-    def _find_boxes(self, image: np.ndarray) -> Generator[tuple[int, int, int, int]]:
+    def _find_boxes(self, image: np.ndarray) -> Generator[tuple[int, int, int, int]]:  # type: ignore[type-arg]
         # code from: https://stackoverflow.com/questions/60359398/python-detect-a-qr-code-from-an-image-and-crop-using-opencv#60384780
         # Load imgae, grayscale, Gaussian blur, Otsu's threshold
         gray = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2GRAY)
@@ -47,6 +47,8 @@ class QrCodeDecoder(BaseWorker):
         self.logger.debug(f'analysing file {image_path}...')
         try:
             original_image = cv2.imread(str(image_path))
+            if not original_image:
+                return None
             inverted_image = cv2.bitwise_not(original_image)
             for image in (original_image, inverted_image):
                 qrCodeDetector = cv2.QRCodeDetector()
