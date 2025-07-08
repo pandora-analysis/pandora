@@ -50,7 +50,7 @@ unoserver = "^3.3.2"
 weasyprint = "^65.1"
 extract-msg = {version = "^0.54.1"}
 oletools = {version = "^0.60.2", extras = ["full"]}
-py7zr = "^0.22.0"
+py7zr = "^1.0.0"
 jbxapi = "^3.23.0"
 defusedxml = "^0.7.1"
 mwdblib = "^4.5.0"
