@@ -165,6 +165,13 @@ class Extractor(BaseWorker):
         found_password = False
         extracted_files: list[Path] = []
         with zip_reader(str(archive_file.path)) as archive:
+            all_infos = archive.infolist()
+            top_level_file_count = len([i for i in all_infos if not i.is_dir()])
+            report.add_details("Top-Level File Count", top_level_file_count)
+            self.logger.info("Starting Zip extraction")
+
+
+            
             for file_number, info in enumerate(archive.infolist()):
                 if file_number >= self.max_files_in_archive:
                     warning_msg = f'Too many files ({len(archive.infolist())}) in the archive, stopping at {self.max_files_in_archive}.'
@@ -172,35 +179,49 @@ class Extractor(BaseWorker):
                     report.status = Status.ERROR if self.max_is_error else Status.ALERT
                     report.add_details('Warning', warning_msg)
                     break
-                is_encrypted = info.flag_bits & 0x1  # from https://github.com/python/cpython/blob/3.10/Lib/zipfile.py
-                if is_encrypted and not found_password:
-                    for pwd in self.passwords:
-                        try:
-                            archive.read(info, pwd=pwd.encode())
-                            archive.setpassword(pwd.encode())
-                            found_password = True
-                            break
-                        except RuntimeError:
-                            continue
-                    else:
-                        report.status = Status.WARN
-                        report.add_details('Warning', 'File encrypted and unable to find password')
-                        report.add_extra('no_password', True)
-                        break
                 if info.is_dir():
                     continue
+                
                 if info.file_size > self.max_extracted_filesize:
                     warning_msg = f'Skipping file {info.filename}, too big ({info.file_size}).'
                     self.logger.warning(warning_msg)
                     report.status = Status.ERROR if self.max_is_error else Status.ALERT
                     report.add_details('Warning', warning_msg)
                     continue
-                file_path = archive.extract(info, dest_dir)
-                extracted_files.append(Path(file_path))
-            else:
-                # was able to extract everything, except files that are too big.
-                if report.status == Status.RUNNING:
-                    report.status = Status.CLEAN
+                
+                is_encrypted = info.flag_bits & 0x1
+                if is_encrypted and not found_password:
+                    for pwd in self.passwords:
+                        try:
+                            archive.read(info, pwd = pwd.encode())
+                            archive.setpassword(pwd.encode())
+                            found_password = True
+                            break
+                        except RuntimeError:
+                            continue
+                else:
+                    report.status = Status.WARN
+                    report.add_details('Warning', 'File encrypted and unable to find password')
+                    report.add_extra('no_password', True)
+                    break
+
+                try:
+                    file_path = archive.extract(info, dest_dir)
+                    extracted_files.append(Path(file_path))
+                except zipfile.BadZipFile as e:
+                    warning_msg = f"File {info.filename} could not be extracted due to CRC error or corruption: {e}"
+                    self.logger.warning(warning_msg)
+                    report.status = Status.ALERT
+                    report.add_details("Warning", warning_msg)
+                    continue
+    
+                
+        
+        report.add_details("Extracted File Count", len(extracted_files))
+        if report.status == Status.RUNNING:
+            report.status = Status.CLEAN
+
+
         return extracted_files
 
     def _extract_rar(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
