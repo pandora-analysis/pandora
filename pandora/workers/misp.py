@@ -68,10 +68,10 @@ class MISP(BaseWorker):
         # Hash is known so malicious
         self.logger.info('file %s is malicious', task.file.path)
         report.status = Status.ALERT
-        events: list[int] = []
+        events: list[str] = []
         for attribute in attributes:
-            if len(events) < self.max_event_count and attribute.event_uuid not in events:
-                events.append(attribute.event_uuid)
+            if len(events) < self.max_event_count and attribute.event_uuid not in events:  # type: ignore
+                events.append(attribute.event_uuid)  # type: ignore
         report.add_details('permaurl', '\n'.join([f'{self.apiurl}/events/view/{i}' for i in events]))
 
         report.add_details('malicious', f'{attributes[0]["category"]} - {attributes[0]["comment"]}')
