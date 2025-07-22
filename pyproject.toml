@@ -62,7 +62,7 @@ clamd = "^1.0.2"
 rarfile = "^4.2"
 publicsuffix2 = "^2.20191221"
 pymispwarninglists = "^1.6.1"
-pikepdf = "^9.9.0"
+pikepdf = "^9.10.2"
 Pillow = "^11.3.0"
 pillow-heif = "^1.0.0"
 imapclient = "^3.0.1"
@@ -71,10 +71,10 @@ pymisp = {version = "^2.5.12", extras = ["fileobjects"]}
 python-dateutil = "^2.9.0.post0"
 pycdlib = "^1.14.0"
 werkzeug = "^3.1.3"
-pyhashlookup = "^1.2.7"
-pylookyloo = "^1.31.1"
+pyhashlookup = "^1.2.8"
+pylookyloo = "^1.31.2"
 hachoir = "^3.3.0"
-aiohttp = "^3.12.13"
+aiohttp = "^3.12.14"
 opencv-python = "^4.12.0.88"
 typing-extensions = {version = "^4.14.1", python = "<3.11"}
 setuptools = "^80.9.0"
@@ -86,16 +86,16 @@ dfvfs = "^20240505"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.3.7"
-mypy = "^1.16.1"
+mypy = "^1.17.0"
 types-redis = {version = "^4.6.0.20241004"}
 types-PyYAML = "^6.0.12.20250516"
 types-requests = "^2.32.4.20250611"
-types-python-dateutil = "^2.9.0.20250516"
+types-python-dateutil = "^2.9.0.20250708"
 types-psutil = "^7.0.0.20250601"
 types-beautifulsoup4 = "^4.12.0.20250516"
 bandit = {extras = ["toml"], version = "^1.8.6"}
 flake8 = "^7.3.0"
-semgrep = "^1.128.0"
+semgrep = "^1.128.1"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
