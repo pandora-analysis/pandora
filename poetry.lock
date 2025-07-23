@@ -2923,14 +2923,14 @@ htmlsoup = ["BeautifulSoup4"]
 
 [[package]]
 name = "malwarebazaar"
-version = "0.2.7"
+version = "0.2.8"
 description = "CLI wrapper for malware bazaar API (bazaar.abuse.ch) and YARAify API (yaraify.abuse.ch)"
 optional = false
 python-versions = "<3.14,>=3.9"
 groups = ["main"]
 files = [
-    {file = "malwarebazaar-0.2.7-py3-none-any.whl", hash = "sha256:4f8b507c447abaf6f62002fa133d839fc053a6792c2054fd581002e12034eab5"},
-    {file = "malwarebazaar-0.2.7.tar.gz", hash = "sha256:50e0e40043934562bcfa0e956465ca5f250f9b1892385f5f402b76d84171758e"},
+    {file = "malwarebazaar-0.2.8-py3-none-any.whl", hash = "sha256:4ef536f8528d97a1b362e1ac073ff031e53fecc601402d1f313aa16cd48241ca"},
+    {file = "malwarebazaar-0.2.8.tar.gz", hash = "sha256:0990fb84e77ff800ef0dd9030690d81b25e221d0f6a0f0458af61502a0183ca9"},
 ]
 
 [package.dependencies]
@@ -6826,4 +6826,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9.2,<3.14"
-content-hash = "eed565b7c619349ab01d6c3f6f9178b6a2da5017c2810254ec7fff7a2222718e"
+content-hash = "9e61259ae29c0b9715e95456e0fe3ad8e54bbc52c8ff4fc9a0a5a34475d58a0c"
