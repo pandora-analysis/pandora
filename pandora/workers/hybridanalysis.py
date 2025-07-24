@@ -52,9 +52,13 @@ class HybridAnalysis(BaseWorker):
             response = self._session.get(urljoin(self.apiurl, 'search/hash'), params=data)
             response.raise_for_status()
             result = response.json()
+            if not result.get('report'):
+                # Hash unknown.
+                report.status = Status.NOTAPPLICABLE
+                return
 
             malicious = []
-            for entries in result:
+            for entries in result['reports']:
                 if entries['verdict'] == 'malicious':
                     report.status = Status.ALERT
                     if entries['vx_family']:
