@@ -49,7 +49,7 @@ class HybridAnalysis(BaseWorker):
         try:
             self.logger.debug(f'analysing file {task.file.path}...')
             data = {'hash': task.file.sha256}
-            response = self._session.post(urljoin(self.apiurl, 'search/hash'), data=data)
+            response = self._session.get(urljoin(self.apiurl, 'search/hash'), params=data)
             response.raise_for_status()
             result = response.json()
 
