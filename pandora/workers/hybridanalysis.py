@@ -50,11 +50,22 @@ class HybridAnalysis(BaseWorker):
             self.logger.debug(f'analysing file {task.file.path}...')
             data = {'hash': task.file.sha256}
             response = self._session.get(urljoin(self.apiurl, 'search/hash'), params=data)
-            response.raise_for_status()
+            if response.status_code == 404:
+                # Hash unknown
+                report.status = Status.NOTAPPLICABLE
+                return
+
+            try:
+                response.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                self.logger.error(f'Unexpected error during query: {e}')
+                report.status = Status.ERROR
+                return
+
             result = response.json()
             if not result.get('report'):
-                # Hash unknown.
-                report.status = Status.NOTAPPLICABLE
+                self.logger.error(f'Missing report key: {result}.')
+                report.status = Status.ERROR
                 return
 
             malicious = []
