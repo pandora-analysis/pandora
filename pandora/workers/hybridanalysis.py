@@ -63,8 +63,8 @@ class HybridAnalysis(BaseWorker):
                 return
 
             result = response.json()
-            if not result.get('report'):
-                self.logger.error(f'Missing report key: {result}.')
+            if not result.get('reports'):
+                self.logger.error(f'Missing reports key: {result}.')
                 report.status = Status.ERROR
                 return
 
@@ -74,6 +74,11 @@ class HybridAnalysis(BaseWorker):
                     report.status = Status.ALERT
                     if entries['vx_family']:
                         malicious.append(entries['vx_family'])
+                elif entries['verdict'] == 'no specific threat':
+                    report.status = Status.CLEAN
+                else:
+                    self.logger.info(f'Unexpected verdict: {entries}')
+
             if malicious:
                 report.add_details('malicious', set(malicious))
         except requests.exceptions.HTTPError as e:
