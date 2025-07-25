@@ -22,6 +22,7 @@ from extract_msg import MSGFile
 from hachoir.stream import StringInputStream  # type: ignore[import-untyped]
 from hachoir.parser.archive import CabFile  # type: ignore[import-untyped]
 import py7zr
+import py7zr.io
 import pycdlib
 from pycdlib.facade import PyCdlibJoliet, PyCdlibUDF, PyCdlibRockRidge, PyCdlibISO9660
 import pyzipper  # type: ignore[import-untyped]
@@ -257,7 +258,9 @@ class Extractor(BaseWorker):
                 with py7zr.SevenZipFile(file=path, mode='r', password=pwd) as archive:
                     files_in_archive = archive.getnames()
                     if files_in_archive:
-                        archive.read(files_in_archive[0])
+                        file_name = files_in_archive[0]
+                        factory = py7zr.io.BytesIOFactory(1024)
+                        archive.extract(targets=[file_name], factory=factory)
                         return pwd
             except py7zr.exceptions.PasswordRequired:
                 continue
@@ -273,7 +276,9 @@ class Extractor(BaseWorker):
             with py7zr.SevenZipFile(file=archive_file.path, mode='r') as archive:
                 files_in_archive = archive.getnames()
                 if files_in_archive:
-                    archive.read(files_in_archive[0])
+                    file_name = files_in_archive[0]
+                    factory = py7zr.io.BytesIOFactory(1024)
+                    archive.extract(targets=[file_name], factory=factory)
         except py7zr.exceptions.PasswordRequired:
             needs_password = True
 
