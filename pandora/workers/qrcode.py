@@ -47,7 +47,7 @@ class QrCodeDecoder(BaseWorker):
         self.logger.debug(f'analysing file {image_path}...')
         try:
             original_image = cv2.imread(str(image_path))
-            if not original_image:
+            if original_image is None or len(original_image) == 0:
                 return None
             inverted_image = cv2.bitwise_not(original_image)
             for image in (original_image, inverted_image):
