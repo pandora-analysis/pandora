@@ -35,7 +35,6 @@ class YaraSignatureBaseWorker(YaraWorker):
         extension = os.path.splitext(filename)[1]
         yara_files = [y_file for y_file in self.rulespath.glob('**/*.yar')
                       if y_file.name in self.needs_external]
-        print(yara_files)
         rules = yara.compile(filepaths={str(path): str(path) for path in yara_files},
                              includes=True,
                              externals={'filename': filename, 'filepath': filepath,
