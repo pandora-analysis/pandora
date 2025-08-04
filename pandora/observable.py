@@ -121,13 +121,13 @@ class Observable:
     @cached_property
     def status(self) -> Status:
         if suspicious := always_suspicious_observables.get(self.observable_type):
-            if re.match('|'.join(suspicious), self.value):
+            if re.match('|'.join(suspicious), self.value.strip()):
                 return Status.WARN
         if suspicious_observables := self.storage.get_suspicious_observables():
-            if self.value in suspicious_observables:
+            if self.value.strip() in suspicious_observables:
                 return Status.ALERT
         if legitimate_observbles := self.storage.get_legitimate_observables():
-            if self.value in legitimate_observbles:
+            if self.value.strip() in legitimate_observbles:
                 return Status.CLEAN
         return Status.NOTAPPLICABLE
 
