@@ -85,7 +85,7 @@ textract-py3 = "^2.1.1"
 dfvfs = "^20240505"
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^3.3.7"
+pylint = "^3.3.8"
 mypy = "^1.17.1"
 types-redis = {version = "^4.6.0.20241004"}
 types-PyYAML = "^6.0.12.20250516"
