@@ -20,14 +20,14 @@ jobs:
     name: Python ${{ matrix.python-version }} sample
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{matrix.python-version}}
 
     - name: Clone Valkey
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: valkey-io/valkey
         path: valkey-tmp
@@ -67,7 +67,7 @@ jobs:
         echo PANDORA_HOME=`pwd` > .env
 
     - name: Clone PyPandora
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: pandora-analysis/pypandora
         path: pypandora
