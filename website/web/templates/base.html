@@ -29,13 +29,21 @@
           crossorigin="anonymous">
     {% endblock %}
 
+    {% set overrides_css = load_custom_css('overrides.css') %}
+    {% if overrides_css %}
+    <link rel="stylesheet" href="{{ overrides_css[0] }}"
+          integrity="{{ overrides_css[1] }}"
+          crossorigin="anonymous">
+    {% endif %}
+
     <title>{% block title %}Pandora{% endblock %}</title>
     {% endblock %}
   </head>
 
   <body>
+    {% include "custom_header.html" ignore missing %}
     <nav class="navbar navbar-expand-md navbar-light bg-light">
-      <div class="container-fluid">
+      <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <a class="navbar-brand" href="{{ url_for('api_root') }}">
           <img src="{{ url_for('static', filename='images/logo-h.svg') }}" style="width:250px;" alt="PANDORA"
@@ -105,9 +113,11 @@
       {% endif %}
     </nav>
 
-    <div class="container-fluid">
+    <div class="container">
       {% block content %}{% endblock %}
     </div>
+
+    {% include "custom_footer.html" ignore missing %}
 
     {% block scripts %}
     <!-- Included scripts -->
@@ -116,6 +126,12 @@
             integrity="{{get_sri('static/js/lib', 'jquery.min.js')}}"
             crossorigin="anonymous"></script>
 
+    {% set overrides_js = load_custom_js('overrides.js') %}
+    {% if overrides_js %}
+    <script src="{{  overrides_js[0] }}"
+            integrity="{{ overrides_js[1] }}"
+            crossorigin="anonymous"></script>
+    {% endif %}
     <script>
         function toggle_detailed_view() {
             fetch("{{ url_for('api_toggle_detailed_view') }}", {

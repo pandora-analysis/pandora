@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import base64
 import functools
+import hashlib
 import json
 import logging
 import logging.config
@@ -116,11 +118,33 @@ def inject_enums() -> dict[str, Any]:
 # ##### Global methods passed to jinja
 
 
+def load_custom_css(filename: str) -> tuple[str, str]:
+    return load_custom_local_ressource('css', filename)
+
+
+def load_custom_js(filename: str) -> tuple[str, str]:
+    return load_custom_local_ressource('js', filename)
+
+
+def load_custom_local_ressource(ressource_type: str, filename: str) -> tuple[str, str]:
+    """Loads a custom file from /static/<ressource_type>/, returns the URL and the SRI"""
+    fullpath = get_homedir() / 'website' / 'web' / 'static' / ressource_type / filename
+    if not fullpath.exists() or not fullpath.is_file():
+        return ()
+    # generate the hash for the custom file on the fly
+    with fullpath.open('rb') as f:
+        sri_hash = base64.b64encode(hashlib.sha512(f.read()).digest()).decode('utf-8')
+    url = url_for('static', filename=f'{ressource_type}/{filename}')
+    return (url, sri_hash)
+
+
 def get_sri(directory: str, filename: str) -> str:
     sha512 = functools.reduce(operator.getitem, directory.split('/'), sri_load())[filename]  # type: ignore
     return f'sha512-{sha512}'
 
 
+app.jinja_env.globals.update(load_custom_css=load_custom_css)
+app.jinja_env.globals.update(load_custom_js=load_custom_js)
 app.jinja_env.globals.update(get_sri=get_sri)
 app.jinja_env.globals.update(sizeof_fmt=sizeof_fmt)
 
