@@ -9,6 +9,7 @@ import json
 import logging
 import logging.config
 import operator
+import os
 
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -25,7 +26,7 @@ import flask_wtf  # type: ignore
 import pyzipper  # type: ignore
 
 from flask import (Flask, request, session, abort, render_template,
-                   redirect, send_file, url_for, flash, Request)
+                   redirect, send_file, url_for, flash, Request, send_from_directory)
 from flask_restx import Api  # type: ignore
 from flask_bootstrap import Bootstrap5  # type: ignore
 from pymisp import MISPEvent, PyMISP
@@ -118,15 +119,19 @@ def inject_enums() -> dict[str, Any]:
 # ##### Global methods passed to jinja
 
 
-def load_custom_css(filename: str) -> tuple[str, str]:
+def load_custom_css(filename: str) -> tuple[str, str] | tuple[()]:
     return load_custom_local_ressource('css', filename)
 
 
-def load_custom_js(filename: str) -> tuple[str, str]:
+def load_custom_js(filename: str) -> tuple[str, str] | tuple[()]:
     return load_custom_local_ressource('js', filename)
 
 
-def load_custom_local_ressource(ressource_type: str, filename: str) -> tuple[str, str]:
+def load_custom_image(filename: str) -> tuple[str, str] | tuple[()]:
+    return load_custom_local_ressource('images', filename)
+
+
+def load_custom_local_ressource(ressource_type: str | Path, filename: str) -> tuple[str, str] | tuple[()]:
     """Loads a custom file from /static/<ressource_type>/, returns the URL and the SRI"""
     fullpath = get_homedir() / 'website' / 'web' / 'static' / ressource_type / filename
     if not fullpath.exists() or not fullpath.is_file():
@@ -213,6 +218,20 @@ def api_error_403(_) -> tuple[str, int]:  # type: ignore[no-untyped-def]
     return render_template('error.html',
                            show_project_page=get_config('generic', 'show_project_page'),
                            status=403), 403
+
+
+@app.route('/favicon.ico')
+def favicon():
+    """Load either the default favicon from static/images/favicons/favicon.ico
+    or static/images/favicons/custom-favicon.ico (if it exists)"""
+
+    favicon_path = get_homedir() / 'website' / 'web' / 'static' / 'images' / 'favicons'
+    if (favicon_path / 'custom-favicon.ico').exists():
+        path = 'images/favicons/custom-favicon.ico'
+    else:
+        path = 'images/favicons/favicon.ico'
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               path, mimetype='image/vnd.microsoft.icon')
 
 
 @app.route('/', strict_slashes=False)

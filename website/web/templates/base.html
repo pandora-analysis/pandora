@@ -3,17 +3,8 @@
   <head>
     {% block head %}
     <meta charset="utf-8">
-    <link rel="icon" href="{{ url_for('static', filename='images/favicons/favicon.ico') }}" sizes="any"
-          integrity="{{get_sri('static/images/favicons', 'favicon.ico')}}"
-          crossorigin="anonymous">
     <link rel="icon" href="{{ url_for('static', filename='images/logo.svg') }}" type="image/svg+xml"
           integrity="{{get_sri('static/images', 'logo.svg')}}"
-          crossorigin="anonymous">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/favicons/apple-touch-icon.png') }}"
-          integrity="{{get_sri('static/images/favicons', 'apple-touch-icon.png')}}"
-          crossorigin="anonymous">
-    <link rel="manifest" href="{{ url_for('static', filename='images/favicons/manifest.webmanifest') }}"
-          integrity="{{get_sri('static/images/favicons', 'site.webmanifest')}}"
           crossorigin="anonymous">
 
     {{ moment.include_moment(local_js='/static/js/lib/moment-with-locales.min.js',
