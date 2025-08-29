@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ribbon.css') }}"
           integrity="{{get_sri('static/css', 'ribbon.css')}}"
           crossorigin="anonymous">
-    {% endblock %}
 
     {% set overrides_css = load_custom_css('overrides.css') %}
     {% if overrides_css %}
@@ -26,6 +25,7 @@
           integrity="{{ overrides_css[1] }}"
           crossorigin="anonymous">
     {% endif %}
+    {% endblock %}
 
     <title>{% block title %}Pandora{% endblock %}</title>
     {% endblock %}
