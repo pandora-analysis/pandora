@@ -221,7 +221,7 @@ def api_error_403(_) -> tuple[str, int]:  # type: ignore[no-untyped-def]
 
 
 @app.route('/favicon.ico')
-def favicon():
+def favicon() -> WerkzeugResponse:
     """Load either the default favicon from static/images/favicons/favicon.ico
     or static/images/favicons/custom-favicon.ico (if it exists)"""
 
