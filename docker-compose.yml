@@ -5,8 +5,8 @@ services:
     image: apache/kvrocks
     working_dir: /kvrocks
     volumes:
-        - ./storage:/kvrocks/conf
-    command: ["-c", "/kvrocks/conf/kvrocks.conf", "--log-dir", "stdout"]
+        - ./storage:/var/lib/kvrocks
+    command: ["--log-dir", "stdout"]
     healthcheck:
       test: ["CMD", "redis-cli", "-h", "127.0.0.1", "-p", "6101", "ping"]
       interval: 10s
