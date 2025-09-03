@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import fitz  # type: ignore[import-untyped]
 import re
+import fitz  # type: ignore[import-untyped]
 
 from ..helpers import Status
 from ..task import Task
