@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import fitz  # type: ignore[import-untyped]
 
 from ..helpers import Status
@@ -56,9 +57,10 @@ class Pdf(BaseWorker):
             doc = fitz.open(file_path)
             for xref in range(1, doc.xref_length()):
                 obj_dict = doc.xref_object(xref, compressed=True)
-                # Check for /AA and /OpenAction
-                for keyword in ["/AA", "/OpenAction"]:
-                    if keyword in obj_dict:
+                # Check for /AA, /OpenAction OR /Launch
+                for keyword in ["/AA", "/OpenAction", "/Launch"]:
+                    # Use regex to reduce FPs, especially with /AA
+                    if len(re.findall(keyword + '(?![A-Za-z])', obj_dict)) > 0:
                         suspicious_objects.append(f'{keyword} found in object {xref}: {obj_dict}')
                         # Attempt to extract the object content if possible
                         try:
