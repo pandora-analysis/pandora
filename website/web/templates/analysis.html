@@ -25,7 +25,7 @@
 
 {% block content %}
   {{ render_messages(container=True, dismissible=True) }}
-  <div class="container-fluid" style="margin-bottom:50px">
+  <div class="container-fluid">
     <!-- Eventual JS Error -->
     <div class="row d-none" id="errorJS">
       <div class="col-md-12">
@@ -130,35 +130,22 @@
 
           <div class="col-md-6" id="taskStatusMessage">
               <div class="alert alert-overwrite {% if task.status != status.OVERWRITE %}d-none{% endif %}">
-              <strong>Result overwritten! </strong><br>You're on your own, get in touch with your admin!
+                {{ task_status_messages['overwrite'] | safe }}
             </div>
             <div class="alert alert-error {% if task.status != status.ERROR %}d-none{% endif %}">
-              <strong>Unexpected error during scan! </strong><br>Please contact your Pandora webmaster.
+              {{ task_status_messages['error'] | safe }}
             </div>
             <div class="alert alert-danger {% if task.status != status.ALERT %}d-none{% endif %}">
-              <strong>Malicious File! </strong> This file is know malicious, or
-              uses techniques seen in attacks, more details below. <br>
-              <strong>Recommendations: </strong><br>
-              If this file comes from an unknown source, we advise you to delete it.
-              If this file has been opened, please contact your system administrator.<br>
-              If this file comes from a known trusted source, please get in touch with
-              your system administrator before opening it to make sure it is expected.</br>
+              {{ task_status_messages['danger'] | safe }}
             </div>
             <div class="alert alert-warning {% if task.status != status.WARN %}d-none{% endif %}">
-              <strong>Suspicious File! </strong> See reasons below.
-              <strong>Recommendations: </strong><br>
-              We advise you not to open the file on your computer and get in touch
-              with your system administrator if you want more details.<br>
+              {{ task_status_messages['warning'] | safe }}
             </div>
             <div class="alert alert-success {% if task.status != status.CLEAN %}d-none{% endif %}">
-              <strong>Clean File! </strong><br>
-              No technical indicator for suspicious activity has been found in this file.</br>
-              It doesn't mean it is for sure safe to open but you can be relatively confident.</br>
-              If looking at the preview is enough for you, no need to open it on your computer!
+              {{ task_status_messages['success'] | safe }}
             </div>
             <div class="alert alert-info {% if task.workers_done %} d-none {% endif %}">
-              <strong>Pending task! </strong><br>
-              Please wait for the scan to finish.
+              {{ task_status_messages['info'] | safe }}
             </div>
           </div>
           <div class="col-md-1"></div>

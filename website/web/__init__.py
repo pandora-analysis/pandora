@@ -37,7 +37,7 @@ from werkzeug import Response as WerkzeugResponse
 
 from pandora.default import get_config, PandoraException, get_homedir
 from pandora.exceptions import Unsupported
-from pandora.helpers import workers, Status, get_disclaimers
+from pandora.helpers import workers, Status, get_disclaimers, get_task_status_messages
 from pandora.pandora import Pandora
 from pandora.role import Action
 from pandora.user import User
@@ -299,6 +299,7 @@ def api_analysis(task_id: str, seed: str | None=None) -> str:
                            zip_passwd=get_config('generic', 'sample_password'),
                            default_share_time=get_config('generic', 'default_share_time'),
                            show_project_page=get_config('generic', 'show_project_page'),
+                           task_status_messages=get_task_status_messages(),
                            admin_name=admin_name)
 
 

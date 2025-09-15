@@ -213,6 +213,19 @@ def get_disclaimers() -> dict[str, str]:
 
 
 @lru_cache(64)
+def get_task_status_messages() -> dict[str, str]:
+    status_names = ['overwrite', 'error', 'danger', 'warning', 'success', 'info']
+    to_return = {}
+    for status_name in status_names:
+        status_msg_path = get_homedir() / 'config' / f'task_status_message_{status_name}.tmpl'
+        if not status_msg_path.exists():
+            status_msg_path = get_homedir() / 'config' / f'task_status_message_{status_name}.tmpl.sample'
+        with status_msg_path.open() as f:
+            to_return[status_name] = f.read()
+    return to_return
+
+
+@lru_cache(64)
 def get_email_template() -> str:
     with (get_homedir() / 'config' / 'email.tmpl').open() as f:
         return f.read()
