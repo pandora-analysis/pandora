@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.11', '3.12', '3.13']
 
     steps:
     - uses: actions/checkout@v5
@@ -61,7 +61,7 @@ jobs:
     - name: codespell
       uses: codespell-project/actions-codespell@master
       with:
-        skip: ./cache/cache.conf,./poetry.lock,./storage/kvrocks.conf
+        skip: ./cache/cache.conf,./poetry.lock,./storage/kvrocks.conf,website/web/templates/submit_fr.html,website/web/templates/analysis_fr.html
         ignore_words_file: .codespellignore
       if: ${{ always() }}
 
