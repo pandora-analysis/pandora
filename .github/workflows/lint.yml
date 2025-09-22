@@ -61,7 +61,7 @@ jobs:
     - name: codespell
       uses: codespell-project/actions-codespell@master
       with:
-        skip: ./cache/cache.conf,./poetry.lock,./storage/kvrocks.conf,website/web/templates/submit_fr.html,website/web/templates/analysis_fr.html
+        skip: ./cache/cache.conf,./poetry.lock,./storage/kvrocks.conf,./website/web/templates/submit_fr.html,./website/web/templates/analysis_fr.html
         ignore_words_file: .codespellignore
       if: ${{ always() }}
 
