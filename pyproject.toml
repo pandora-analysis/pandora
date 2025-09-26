@@ -46,7 +46,7 @@ PyMuPDF = "^1.26.4"
 requests = "^2.32.5"
 PyExifTool = "^0.5.6"
 eml-parser = "^2.0.0"
-unoserver = "^3.3.2"
+unoserver = "^3.4"
 weasyprint = "^66.0"
 extract-msg = {version = "^0.55.0"}
 oletools = {version = "^0.60.2", extras = ["full"]}
