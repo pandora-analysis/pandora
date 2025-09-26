@@ -30,6 +30,7 @@ jobs:
     - name: Install System deps
       run: |
         sudo apt install libfuzzy-dev  # for pydeep, until the wheel is available for python 3.13
+        sudo apt install libcairo2-dev  # for svglib
 
     - name: Install poetry
       run: |
