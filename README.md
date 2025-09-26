@@ -125,7 +125,7 @@ sudo apt install exiftool  # for extracting exif information
 sudo apt install unrar  # for extracting rar files
 sudo apt install libxml2-dev libxslt1-dev antiword unrtf poppler-utils tesseract-ocr flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig  # for textract
 sudo apt install libssl-dev  # seems required for yara-python
-sudo apt install libcairo2-dev  # Required by reportlab
+sudo apt install libcairo2-dev  # Required by reportlab, svglib
 ```
 
 Note: on Ubuntu 20.04, libreoffice-nogui cannot be installed due to some dependencies issues.

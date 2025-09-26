@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from functools import cached_property
 from io import BytesIO
 from pathlib import Path
-from typing import cast, Any, Dict, Union, List
+from typing import cast, Any
 from uuid import uuid4
 from zipfile import ZipFile
 
@@ -26,7 +26,7 @@ from oletools.msodde import process_maybe_encrypted  # type: ignore[import-untyp
 from PIL import Image, ImageDraw, ImageFont
 from pymisp import MISPEvent
 from pymisp.tools import make_binary_objects, FileObject, PEObject, ELFObject, MachOObject, PESectionObject, ELFSectionObject, MachOSectionObject
-from svglib.svglib import svg2rlg  # type: ignore[import-untyped]
+from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPDF  # type: ignore[import-untyped]
 import textract  # type: ignore[import-untyped]
 from weasyprint import HTML, default_url_fetcher  # type: ignore[import-untyped]
@@ -431,7 +431,7 @@ class File:
 
     @property
     def to_web(self) -> dict[str, str | int | list[str]]:
-        to_return = cast(Dict[str, Union[str, int, List[str]]], self.to_dict)
+        to_return = cast(dict[str, str | int | list[str]], self.to_dict)
         to_return['previews'] = [str(path) for path in self.previews]
         return to_return
 
