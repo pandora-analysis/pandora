@@ -6,7 +6,7 @@ on:
       - main
       - devel-*
   pull_request:
-    branches: [ main ]
+    branches: [ "main", "develop" ]
 
 permissions:
   contents: read
