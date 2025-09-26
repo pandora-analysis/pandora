@@ -60,10 +60,10 @@
           </div>
           {% if current_user.role.can('share_analysis') %}
           <div class="col-sm-4">
-          <button type="button" class="btn btn-secondary" style="margin:5px"
+            <button type="button" class="btn btn-secondary" style="margin:5px"
                   data-bs-toggle="modal" data-bs-target="#shareModal">
               Share analysis
-          </button>
+            </button>
           </div>
           {% endif %}
 
@@ -247,8 +247,71 @@
 
       <!-- Tabs column -->
       <div class="col-md-6">
-        <div class="container-fluid">
+        <!-- Download button -->
+        {% if current_user.role.can([action.download_images, action.download_pdf, action.download_zip], 'or')
+              and not task.file.deleted %}
+        <div class="row">
+         <div class="col">
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" style="margin:5px;float:right;"
+                    id="dropdownMenu1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              Download ... <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+              {% if current_user.role.can(action.download_pdf) and task.file.is_pdf %}
+              <!-- TODO: also allow PDF export from office docs, not implemented yet -->
+              <li><a class="dropdown-item"
+                     href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='pdf') }}"
+                     title="Download pdf">
+                  PDF File
+                </a>
+              </li>
+              {% endif %}
 
+              {% if current_user.role.can(action.download_images) and task.file.previews %}
+              <li><a class="dropdown-item"
+                     href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img') }}"
+                     title="Download images">
+                  Images
+                </a>
+              </li>
+              {% endif %}
+              {% if current_user.role.can(action.download_text) and task.file.text %}
+              <li><a class="dropdown-item"
+                     href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt') }}"
+                     title="Download text">
+                  Text
+                </a>
+              </li>
+              {% endif %}
+
+              {% if current_user.role.can('download_zip') %}
+              <li role="separator" class="divider"></li>
+              <li><a class="dropdown-item"
+                   href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='zip') }}"
+                   title="Download protected zip file containing sample (password is {{ zip_pass }})">
+                 Original sample (password: "{{ zip_passwd }}")
+                </a>
+              </li>
+              {% endif %}
+
+              {% if current_user.role.can('download_misp') %}
+              <li role="separator" class="divider"></li>
+              <li><a class="dropdown-item"
+                   href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='misp') }}"
+                   title="Download the analysis in MISP format">
+                 Download the analysis in MISP format
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+         </div>
+        </div>
+        </br>
+        {% endif %}
+
+        <div class="row">
           <!-- Nav tabs -->
           <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="nav-item">
@@ -321,68 +384,6 @@
                 <div class="col-md-8">
                   <h3>Content Preview</h3>
                 </div>
-
-                <!-- Download button -->
-                {% if current_user.role.can([action.download_images, action.download_pdf, action.download_zip], 'or')
-                      and not task.file.deleted %}
-                <div class="col-md-4">
-                  <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button"
-                            id="dropdownMenu1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                      Download ... <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                      {% if current_user.role.can(action.download_pdf) and task.file.is_pdf %}
-                      <!-- TODO: also allow PDF export from office docs, not implemented yet -->
-                      <li><a class="dropdown-item"
-                             href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='pdf') }}"
-                             title="Download pdf">
-                          PDF File
-                        </a>
-                      </li>
-                      {% endif %}
-
-                      {% if current_user.role.can(action.download_images) and task.file.previews %}
-                      <li><a class="dropdown-item"
-                             href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img') }}"
-                             title="Download images">
-                          Images
-                        </a>
-                      </li>
-                      {% endif %}
-                      {% if current_user.role.can(action.download_text) and task.file.text %}
-                      <li><a class="dropdown-item"
-                             href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt') }}"
-                             title="Download text">
-                          Text
-                        </a>
-                      </li>
-                      {% endif %}
-
-                      {% if current_user.role.can('download_zip') %}
-                      <li role="separator" class="divider"></li>
-                      <li><a class="dropdown-item"
-                           href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='zip') }}"
-                           title="Download protected zip file containing sample (password is {{ zip_pass }})">
-                         Original sample (password: "{{ zip_passwd }}")
-                        </a>
-                      </li>
-                      {% endif %}
-
-                      {% if current_user.role.can('download_misp') %}
-                      <li role="separator" class="divider"></li>
-                      <li><a class="dropdown-item"
-                           href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='misp') }}"
-                           title="Download the analysis in MISP format">
-                         Download the analysis in MISP format
-                        </a>
-                      </li>
-                      {% endif %}
-                    </ul>
-                  </div>
-                </div>
-                {% endif %}
-              </div>
 
               <!-- Content preview -->
               <div class="row">
@@ -611,7 +612,7 @@
               </div>
             </div>
           </div>
-        </div>
+         </div>
       </div>
     </div>
   </div>
