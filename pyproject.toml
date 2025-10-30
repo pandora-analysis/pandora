@@ -42,11 +42,11 @@ PyYAML = "^6.0.3"
 Flask-WTF = "^1.2.2"
 validators = "^0.35.0"
 python-magic = "^0.4.27"
-PyMuPDF = "^1.26.4"
+PyMuPDF = "^1.26.5"
 requests = "^2.32.5"
 PyExifTool = "^0.5.6"
 eml-parser = "^2.0.0"
-unoserver = "^3.3.2"
+unoserver = "^3.4"
 weasyprint = "^66.0"
 extract-msg = {version = "^0.55.0"}
 oletools = {version = "^0.60.2", extras = ["full"]}
@@ -64,7 +64,7 @@ publicsuffix2 = "^2.20191221"
 pymispwarninglists = "^1.6.1"
 pikepdf = "^9.11.0"
 Pillow = "^11.3.0"
-pillow-heif = "^1.1.0"
+pillow-heif = "^1.1.1"
 imapclient = "^3.0.1"
 pyzipper = "^0.3.6"
 pymisp = {version = "^2.5.17.2", extras = ["fileobjects"]}
@@ -72,30 +72,30 @@ python-dateutil = "^2.9.0.post0"
 pycdlib = "^1.14.0"
 werkzeug = "^3.1.3"
 pyhashlookup = "^1.2.8"
-pylookyloo = "^1.33.0"
+pylookyloo = "^1.34.0"
 hachoir = "^3.3.0"
-aiohttp = "^3.12.15"
+aiohttp = "^3.13.2"
 opencv-python = "^4.12.0.88"
 typing-extensions = {version = "^4.15.0", python = "<3.11"}
 setuptools = "^80.9.0"
-beautifulsoup4 = {version= "^4.13.5", extras = ["lxml", "charset_normalizer"]}
-psutil = "^7.1.0"
+beautifulsoup4 = {version= "<4.14", extras = ["lxml", "charset_normalizer"]}
+psutil = "^7.1.2"
 textract-py3 = "^2.1.1"
 # The libyall libs
 dfvfs = "^20240505"
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^3.3.8"
+pylint = "^3.3.9"
 mypy = "^1.18.2"
 types-redis = {version = "^4.6.0.20241004"}
 types-PyYAML = "^6.0.12.20250915"
 types-requests = "^2.32.4.20250913"
-types-python-dateutil = "^2.9.0.20250822"
-types-psutil = "^7.0.0.20250822"
+types-python-dateutil = "^2.9.0.20251008"
+types-psutil = "^7.0.0.20251001"
 types-beautifulsoup4 = "^4.12.0.20250516"
 bandit = {extras = ["toml"], version = "^1.8.6"}
 flake8 = "^7.3.0"
-semgrep = "^1.138.0"
+semgrep = "^1.141.1"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
