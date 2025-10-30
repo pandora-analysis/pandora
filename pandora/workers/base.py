@@ -9,7 +9,8 @@ import time
 import traceback
 
 from logging import LoggerAdapter
-from typing import MutableMapping, Any, Iterator
+from typing import Any
+from collections.abc import MutableMapping, Iterator
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
@@ -63,7 +64,7 @@ class BaseWorker(multiprocessing.Process):
         else:
             try:
                 self.redis.xgroup_create(name='tasks_queue', groupname=self.module, mkstream=True)
-                self.logger.debug('Redis stream group created.')
+                self.logger.debug(f'Redis stream group {self.module} created.')
             except ResponseError:
                 self.logger.debug('Redis stream group already exists.')
             except RedisConnectionError:
@@ -223,3 +224,8 @@ class BaseWorker(multiprocessing.Process):
                 self.logger.critical(f'unable to reach redis socket, shutting down : {e}')
             except Exception as e:
                 self.logger.critical(f'unknown error with current task : {repr(e)}\n{traceback.format_exc()}')
+        try:
+            self.redis.xgroup_destroy(name='tasks_queue', groupname=self.module)
+            self.logger.debug(f'Redis stream group {self.module} destroyed.')
+        except Exception as e:
+            self.logger.info(f'Unable to destroy redis stream group {self.module}: {e}')
