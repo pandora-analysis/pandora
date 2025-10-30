@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import json
+import logging
 
+from collections.abc import MutableMapping
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
+from logging import LoggerAdapter
 from typing import overload, Any, Literal
 from uuid import uuid4
 
@@ -19,6 +22,16 @@ from .observable import Observable
 from .report import Report
 from .storage_client import Storage
 from .user import User
+
+
+class PandoraTaskLogAdapter(LoggerAdapter):  # type: ignore[type-arg]
+    """
+    Prepend log entry with the UUID
+    """
+    def process(self, msg: str, kwargs: MutableMapping[str, Any]) -> tuple[str, MutableMapping[str, Any]]:
+        if self.extra:
+            return '[{}] {}'.format(self.extra['uuid'], msg), kwargs
+        return msg, kwargs
 
 
 class Task:
@@ -80,6 +93,8 @@ class Task:
         :param save_date: task save date
         :param parent: parent task if file has been extracted
         """
+        logger = logging.getLogger(f'{self.__class__.__name__}')
+        logger.setLevel(get_config('generic', 'loglevel'))
         self.storage = Storage()
         # This redis is there just to make sure we only wait for workers that are currently enabled
         self.redis = Redis(unix_socket_path=get_socket_path('cache'), decode_responses=True)
@@ -90,6 +105,8 @@ class Task:
         else:
             # New task
             self.uuid = str(uuid4())
+            logger.info(f'[{self.uuid}] New task')
+        self.logger = PandoraTaskLogAdapter(logger, {'uuid': self.uuid})
 
         if submitted_file is None and file_id is None:
             raise Unsupported('submitted_file or file_id is required')

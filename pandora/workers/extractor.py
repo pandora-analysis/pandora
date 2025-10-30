@@ -14,7 +14,8 @@ from lzma import LZMAFile
 from io import BytesIO
 from pathlib import Path
 from tarfile import TarFile
-from typing import Sequence, overload, Literal, TYPE_CHECKING, Any
+from typing import overload, Literal, TYPE_CHECKING, Any
+from collections.abc import Sequence
 
 from extract_msg.msg_classes import MessageBase, AppointmentMeeting
 from extract_msg.attachments import AttachmentBase, SignedAttachment
@@ -631,7 +632,7 @@ class Extractor(BaseWorker):
             return
 
         if not task.user:
-            raise PandoraException('The task user is missing. Should not happen, but investigate if it does.')
+            raise PandoraException(f'[{task.uuid}] The task user is missing. Should not happen, but investigate if it does.')
 
         pandora = Pandora()
 
