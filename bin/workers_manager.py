@@ -6,7 +6,7 @@ import importlib
 import inspect
 import logging
 import logging.config
-from typing import Mapping
+from collections.abc import Mapping
 
 from redis import Redis
 
@@ -30,6 +30,11 @@ class WorkersManager(AbstractManager):
         self.redis.delete('enabled_workers')
 
         for module_name, w_config in workers().items():
+            try:
+                self.redis.xgroup_destroy(name='tasks_queue', groupname=module_name)  # type: ignore[no-untyped-call]
+            except Exception as e:
+                self.logger.debug(f'Cannot destroy queue for {module_name}: {e}')
+
             self._workers += self._init_worker(module_name, w_config)
 
         for worker in self._workers:
