@@ -456,6 +456,17 @@
                       {% endif %}
                       </td>
                     </tr>
+                    <tr>
+                        <th>Received SPF</th>
+                      <td id="received-spf">
+                        {% if task.file.msg_data and task.file.msg_data.header.get('Received-SPF') %}
+                          {{ task.file.msg_data.header['Received-SPF'] }}
+                        {% elif task.file.eml_data and task.file.eml_data.header.get('header')
+                                and task.file.eml_data.header['header'].get('received-spf') %}
+                          {{ task.file.eml_data.header['header']['received-spf'] }}
+                        {% endif %}
+                      </td>
+                    </tr>
                     {% if current_user.role.can(action.download_images) %}
                     <tr id="email-body">
                       <th>Body</th>
