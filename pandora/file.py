@@ -572,10 +572,10 @@ class File:
         try:
             if self.is_html or self.is_eml or self.is_txt:
                 if self.data:
-                    return self.data.getvalue().decode(errors='replace')
+                    return self.data.getvalue().strip().decode('utf-8', errors='replace')
                 return ''
             # Use of textract module for all file types
-            return textract.process(self.path, extension=self._extension_for_textract).decode(errors='replace')
+            return textract.process(self.path, extension=self._extension_for_textract).strip().decode('utf-8', errors='ignore').rstrip("\00")
 
         except textract.exceptions.ShellError:
             if self.is_doc:
