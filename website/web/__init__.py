@@ -17,7 +17,8 @@ import email.utils
 from importlib.metadata import version
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 from urllib.parse import quote_plus, unquote_plus
 
 import flask_moment  # type: ignore
@@ -353,7 +354,8 @@ def api_task_download(task_id: str, source: str, seed: str | None=None, idx: int
     if source == 'txt' and flask_login.current_user.role.can(Action.download_text):
         if not task.file.text:
             raise Unsupported('text content not available')
-        return send_file(BytesIO(task.file.text.encode()), download_name=f'{task.file.path.name}.txt', mimetype='plain/text')
+        return send_file(BytesIO(task.file.text.encode()), download_name=f'{task.file.path.name}.txt',
+                         as_attachment=True, mimetype='plain/text;charset=UTF-8')
 
     if source == 'txt_preview' and flask_login.current_user.role.can(Action.see_text_preview):
         return send_file(task.file.text_preview, download_name=f'{task.file.path.name}.png', mimetype='image/png')
