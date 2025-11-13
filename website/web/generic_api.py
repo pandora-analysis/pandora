@@ -10,7 +10,8 @@ import logging.config
 from collections import defaultdict
 from datetime import datetime, time, timedelta
 from io import BytesIO
-from typing import Any, Callable, Literal
+from typing import Any, Literal
+from collections.abc import Callable
 
 import flask_login  # type: ignore
 
@@ -167,6 +168,31 @@ class ApiSubmit(Resource):  # type: ignore[misc]
                     'lifetime': expire, 'link': link}
         link = url_for('api_analysis', task_id=task.uuid)
         return {'success': True, 'taskId': task.uuid, 'link': link}
+
+
+task_observables_parser = api.parser()
+task_observables_parser.add_argument('task_id', required=True,
+                                     location='args',
+                                     help="The id of the task you'd like to get the observable from")
+task_observables_parser.add_argument('seed', required=False,
+                                     location='args',
+                                     help="A seed allowing you so see the task (if not admin)")
+
+
+@api.route('/task_observables', methods=['GET'], strict_slashes=False)
+@api.expect(task_observables_parser)
+class ApiTaskObservables(Resource):  # type: ignore[misc]
+
+    @json_answer
+    def get(self) -> list[dict[str, Any]]:
+        args = status_parser.parse_args(request)
+        task_id = args['task_id']
+        seed = args['seed'] if args.get('seed') else None
+        task = pandora.get_task(task_id=task_id)
+        update_user_role(pandora, task, seed)
+        if not flask_login.current_user.role.can(Action.read_analysis):
+            raise Forbidden('Not allowed to read the report')
+        return [o.to_dict for o in task.observables]
 
 
 status_parser = api.parser()
@@ -384,8 +410,9 @@ def _intervals(freq: Literal[0, 1, 2, 3, 4, 5, 6], first: datetime, last: dateti
     else:
         raise Unsupported(f"unsupported frequency '{freq}'")
 
-    begin = dates[0]
-    for dt in dates[1:]:
+    d: list[datetime] = list(dates)
+    begin = d[0]
+    for dt in d[1:]:
         to_return.append((begin, dt))
         begin = dt
     to_return.append((begin, last))
