@@ -46,7 +46,7 @@ PyMuPDF = "^1.26.6"
 requests = "^2.32.5"
 PyExifTool = "^0.5.6"
 eml-parser = "^2.0.0"
-unoserver = "^3.4"
+unoserver = "^3.6"
 weasyprint = "^66.0"
 extract-msg = {version = "^0.55.0"}
 oletools = {version = "^0.60.2", extras = ["full"]}
@@ -85,17 +85,17 @@ textract-py3 = "^2.1.1"
 dfvfs = "^20240505"
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^4.0.2"
+pylint = "^4.0.3"
 mypy = "^1.18.2"
 types-redis = {version = "^4.6.0.20241004"}
 types-PyYAML = "^6.0.12.20250915"
 types-requests = "^2.32.4.20250913"
-types-python-dateutil = "^2.9.0.20251108"
-types-psutil = "^7.0.0.20251111"
+types-python-dateutil = "^2.9.0.20251115"
+types-psutil = "^7.1.1.20251122"
 types-beautifulsoup4 = "^4.12.0.20250516"
-bandit = {extras = ["toml"], version = "^1.8.6"}
+bandit = {extras = ["toml"], version = "^1.9.2"}
 flake8 = "^7.3.0"
-semgrep = "^1.143.0"
+semgrep = "^1.144.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
