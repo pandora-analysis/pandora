@@ -184,7 +184,7 @@ def update_user() -> None:
     else:
         # Note: session.sid comes from the redis session
         user = User(session_id=session.sid, last_ip=src_request_ip(request))  # type: ignore
-        if request.path.startswith('/analysis'):
+        if request.path.startswith('/analysis') or request.path.startswith('/submit'):
             user.store()
         flask_login.login_user(user)
 
