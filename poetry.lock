@@ -5193,32 +5193,32 @@ examples = ["pylacus (>=1.19.0)"]
 
 [[package]]
 name = "pymisp"
-version = "2.5.17.2"
+version = "2.5.17.3"
 description = "Python API for MISP."
 optional = false
 python-versions = "<4.0,>=3.9.2"
 groups = ["main"]
 files = [
-    {file = "pymisp-2.5.17.2-py3-none-any.whl", hash = "sha256:c6095c13a21ea89a1602b1ee53285a6f694d70cf90e19c203cff57442fee8c0e"},
-    {file = "pymisp-2.5.17.2.tar.gz", hash = "sha256:c09495ac46721d489fb3e2d6623a24249ad52b75fdeeb65e3df573f858f115fd"},
+    {file = "pymisp-2.5.17.3-py3-none-any.whl", hash = "sha256:f8b44762d066163cce8db6f0c72c3db25a32146af9094a17eafea05abdf5b95c"},
+    {file = "pymisp-2.5.17.3.tar.gz", hash = "sha256:e1d8595ab62d6fb9376674b3ee8990dff04cc3dec7f0361f41e7c991c0d9c258"},
 ]
 
 [package.dependencies]
-deprecated = ">=1.2.18"
-lief = {version = ">=0.17.0", optional = true, markers = "extra == \"fileobjects\""}
+deprecated = ">=1.3.1"
+lief = {version = ">=0.17.1", optional = true, markers = "extra == \"fileobjects\""}
+pure-magic-rs = {version = ">=0.2.0", optional = true, markers = "extra == \"fileobjects\""}
 pydeep2 = {version = ">=0.5.1", optional = true, markers = "extra == \"fileobjects\""}
 python-dateutil = ">=2.9.0.post0"
-python-magic = {version = ">=0.4.27", optional = true, markers = "extra == \"fileobjects\""}
 requests = ">=2.32.5"
 
 [package.extras]
 brotli = ["urllib3 (>=2.5.0)"]
-docs = ["docutils (<0.22) ; python_version >= \"3.11\"", "myst-parser (>=4.0.1) ; python_version >= \"3.11\"", "sphinx (>=8.2.3) ; python_version >= \"3.11\"", "sphinx-autodoc-typehints (>=3.2.0) ; python_version >= \"3.11\""]
+docs = ["docutils (<0.22) ; python_version >= \"3.11\"", "myst-parser (>=4.0.1) ; python_version >= \"3.11\"", "sphinx (>=8.2.3) ; python_version >= \"3.11\"", "sphinx-autodoc-typehints (>=3.5.2) ; python_version >= \"3.11\""]
 email = ["RTFDE (>=0.1.2.1) ; python_version <= \"3.9\"", "extract_msg (>=0.55.0)", "oletools (>=0.60.2)"]
-fileobjects = ["lief (>=0.17.0)", "pydeep2 (>=0.5.1)", "python-magic (>=0.4.27)"]
-openioc = ["beautifulsoup4 (>=4.13.5)"]
-pdfexport = ["reportlab (>=4.4.4)"]
-url = ["pyfaup (>=1.2)"]
+fileobjects = ["lief (>=0.17.1)", "pure-magic-rs (>=0.2.0)", "pydeep2 (>=0.5.1)"]
+openioc = ["beautifulsoup4 (>=4.13.5,<4.14)"]
+pdfexport = ["reportlab (>=4.4.5)"]
+url = ["pyfaup-rs (>=0.1.2,<0.2.0)"]
 virustotal = ["validators (>=0.35.0)"]
 
 [[package]]
@@ -5386,18 +5386,6 @@ files = [
 
 [package.extras]
 cli = ["click (>=5.0)"]
-
-[[package]]
-name = "python-magic"
-version = "0.4.27"
-description = "File type identification using libmagic"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-groups = ["main"]
-files = [
-    {file = "python-magic-0.4.27.tar.gz", hash = "sha256:c1ba14b08e4a5f5c31a302b7721239695b2f0f058d125bd5ce1ee36b9d9d3c3b"},
-    {file = "python_magic-0.4.27-py2.py3-none-any.whl", hash = "sha256:c212960ad306f700aa0d01e5d7a325d20548ff97eb9920dcd29513174f0294d3"},
-]
 
 [[package]]
 name = "python-multipart"
@@ -7459,4 +7447,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "dbce983dedc76ae8c5b280540519d677a46481a84287a3c36657c627e52d33c6"
+content-hash = "ce044a3e6c6a47b2ed5affc77a2f69e819259cfd495921518e6708470eaa2454"
