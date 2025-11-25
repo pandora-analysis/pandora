@@ -17,7 +17,7 @@ from zipfile import ZipFile
 
 import exiftool  # type: ignore[import-untyped]
 import fitz  # type: ignore[import-untyped]
-import magic
+from magic import MagicDb  # type: ignore[import-untyped]
 import pikepdf
 import pillow_heif  # type: ignore[import-untyped]
 
@@ -226,6 +226,7 @@ class File:
         self.error = ''
         self.error_trace = ''
         self._libreoffice_client: UnoClient | None = None
+        self.magic_bd = MagicDb()
 
         if isinstance(path, str):
             self.path: Path = Path(path)
@@ -483,10 +484,11 @@ class File:
     @property
     def mime_type(self) -> str:
         if not self._mime_type and self.data:
-            self._mime_type = magic.from_buffer(self.data.getvalue(), mime=True)
+            _m_result = self.magic_bd.best_magic_buffer(self.data.getvalue())
+            self._mime_type = _m_result.mime_type
             # Some files are recognized but don't have a mimetype
             if self._mime_type == 'application/octet-stream':
-                human_type = magic.from_buffer(self.data.getvalue())
+                human_type = _m_result.messsage
                 if human_type == 'PowerISO Direct-Access-Archive':
                     # # DAA - https://isc.sans.edu/diary/The+DAA+File+Format/25246 - #407
                     self._mime_type = "application/pandora-daa"
