@@ -17,13 +17,13 @@ from zipfile import ZipFile
 
 import exiftool  # type: ignore[import-untyped]
 import fitz  # type: ignore[import-untyped]
-from pure_magic_rs import MagicDb
 import pikepdf
 import pillow_heif  # type: ignore[import-untyped]
 
 from bs4 import BeautifulSoup
 from oletools.msodde import process_maybe_encrypted  # type: ignore[import-untyped]
 from PIL import Image, ImageDraw, ImageFont
+from pure_magic_rs import MagicDb
 from pymisp import MISPEvent
 from pymisp.tools import make_binary_objects, FileObject, PEObject, ELFObject, MachOObject, PESectionObject, ELFSectionObject, MachOSectionObject
 from svglib.svglib import svg2rlg

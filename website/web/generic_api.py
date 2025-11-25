@@ -8,10 +8,10 @@ import logging
 import logging.config
 
 from collections import defaultdict
+from collections.abc import Callable
 from datetime import datetime, time, timedelta
 from io import BytesIO
 from typing import Any, Literal
-from collections.abc import Callable
 
 import flask_login  # type: ignore
 

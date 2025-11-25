@@ -39,4 +39,6 @@ disable=
     C0209,
     R0401,
     R0917,
-    W0603
+    W0603,
+    # Handled by mypy.
+    E0611

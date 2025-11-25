@@ -12,13 +12,13 @@ import operator
 import os
 
 from collections import defaultdict
+from collections.abc import Callable
 from datetime import datetime, timedelta
 import email.utils
 from importlib.metadata import version
 from io import BytesIO
 from pathlib import Path
 from typing import Any
-from collections.abc import Callable
 from urllib.parse import quote_plus, unquote_plus
 
 import flask_moment  # type: ignore
