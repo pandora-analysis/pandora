@@ -419,7 +419,7 @@ class Extractor(BaseWorker):
     def check_dfvfs(self, submitted_file: File, check_only: Literal[False]) -> list[tuple[PathSpec, tsk_volume_system.TSKVolumeSystem]]:
         ...
 
-    @dfvfs_wrapper  # type: ignore[misc]
+    @dfvfs_wrapper  # type: ignore[untyped-decorator]
     def check_dfvfs(self, submitted_file: File, check_only: bool) -> bool | list[tuple[PathSpec, tsk_volume_system.TSKVolumeSystem]]:
         to_process = []
         # pylint: disable=C0415
@@ -469,7 +469,7 @@ class Extractor(BaseWorker):
             return False
         return to_return
 
-    @dfvfs_wrapper  # type: ignore[misc]
+    @dfvfs_wrapper  # type: ignore[untyped-decorator]
     def extract_with_dfvfs(self, archive_file: File, report: Report) -> list[tuple[str, BytesIO]]:
         extracted: list[tuple[str, BytesIO]] = []
         # pylint: disable=C0415

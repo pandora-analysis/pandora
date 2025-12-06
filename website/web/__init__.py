@@ -155,12 +155,12 @@ app.jinja_env.globals.update(get_sri=get_sri)
 app.jinja_env.globals.update(sizeof_fmt=sizeof_fmt)
 
 
-@login_manager.user_loader  # type: ignore[misc]
+@login_manager.user_loader  # type: ignore[untyped-decorator]
 def load_user(user_id: str) -> User | None:
     return pandora.get_user(user_id)
 
 
-@login_manager.request_loader  # type: ignore[misc]
+@login_manager.request_loader  # type: ignore[untyped-decorator]
 def _load_user_from_request(req: Request) -> User | None:
     user_name = load_user_from_request(req)
     if user_name:

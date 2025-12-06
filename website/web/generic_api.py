@@ -81,8 +81,8 @@ class AuthToken(Resource):  # type: ignore[misc]
 
     users_table = build_users_table()
 
-    @api.param('username', 'Your username')  # type: ignore[misc]
-    @api.param('password', 'Your password')  # type: ignore[misc]
+    @api.param('username', 'Your username')  # type: ignore[untyped-decorator]
+    @api.param('password', 'Your password')  # type: ignore[untyped-decorator]
     def get(self) -> dict[str, str] | tuple[dict[str, str], int]:
         username: str = request.args['username'] if request.args.get('username') else ''
         password: str = request.args['password'] if request.args.get('password') else ''
