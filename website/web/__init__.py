@@ -457,8 +457,10 @@ def api_tasks() -> str:
                 if [name for name in [task.file.original_filename, task.file.path.name] if search in name]:
                     filtered_tasks.append(task)
                     continue
-        tasks = filtered_tasks
-    return render_template('tasks.html', tasks=tasks, search=search or '',
+        tasks_to_show = filtered_tasks
+    else:
+        tasks_to_show = list(tasks)
+    return render_template('tasks.html', tasks=tasks_to_show, search=search or '',
                            show_project_page=get_config('generic', 'show_project_page'),
                            status=Status)
 

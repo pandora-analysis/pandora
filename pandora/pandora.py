@@ -6,6 +6,7 @@ import json
 import logging
 
 from datetime import datetime
+from collections.abc import Iterator
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
@@ -119,12 +120,11 @@ class Pandora():
     def add_extracted_reference(self, task: Task, extracted_task: Task) -> None:
         self.storage.add_extracted_reference(task.uuid, extracted_task.uuid)
 
-    def get_tasks(self, user: User, *, first_date: datetime | int | float | str=0, last_date: datetime | int | float | str='+Inf') -> list[Task]:
+    def get_tasks(self, user: User, *, first_date: datetime | int | float | str=0, last_date: datetime | int | float | str='+Inf') -> Iterator[Task]:
         if isinstance(first_date, datetime):
             first_date = first_date.timestamp()
         if isinstance(last_date, datetime):
             last_date = last_date.timestamp()
-        tasks = []
         for task in self.storage.get_tasks(first_date=first_date, last_date=last_date):
             # FIXME: get rid of that typing ignore
             try:
@@ -133,8 +133,7 @@ class Pandora():
                 self.logger.warning(f'Unable to load task {task}: {e}')
                 continue
             if user.is_admin or (_task.user and user.get_id() == _task.user.get_id()):
-                tasks.append(_task)
-        return tasks
+                yield _task
 
     # ##############
 
