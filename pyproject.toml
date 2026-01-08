@@ -99,7 +99,7 @@ semgrep = "^1.147.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
-requires = ["poetry-core>=2.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.bandit]
