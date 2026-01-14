@@ -693,7 +693,7 @@ def post_table(table_name: str) -> Response:
         total, tasks = get_tasks(offset=start, limit=length, search=search)
         if search and start is not None and length is not None:
             total_filtered = len(tasks)
-            tasks = tasks[start:start + length]
+        tasks = tasks[start:start + length]
         for t in tasks:
             if t.user and t.user.name:
                 owner = t.user.name
