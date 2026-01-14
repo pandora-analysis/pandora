@@ -11,3 +11,7 @@ settings:
   http_headers: {}
   cookies: {}
   proxy: null
+  username: null
+  password: null
+  categories:
+    - "source:pandora"

@@ -23,6 +23,9 @@ class LookylooWorker(BaseWorker):
     http_headers: dict[str, str]
     cookies: list[dict[str, Any]]
     proxy: str | None
+    categories: list[str] | None
+    username: str | None
+    password: str | None
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
                  loglevel: int | None=None,
@@ -33,6 +36,9 @@ class LookylooWorker(BaseWorker):
         if not self.client.is_up:
             self.disabled = True
             self.logger.warning(f'Unable to connect to the Lookyloo instance: {self.apiurl}.')
+
+        if self.username and self.password:
+            self.client.init_apikey(self.username, self.password)
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.data:
@@ -52,7 +58,8 @@ class LookylooWorker(BaseWorker):
                                              user_agent=self.user_agent,
                                              headers=self.http_headers,
                                              cookies=self.cookies,
-                                             proxy=self.proxy
+                                             proxy=self.proxy,
+                                             categories=self.categories
                                              )
         report.status = Status.UNKNOWN
         report.add_details('permaurl', lookyloo_report)

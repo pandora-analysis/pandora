@@ -5446,22 +5446,22 @@ testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "pylookyloo"
-version = "1.34.0"
+version = "1.36.1"
 description = "Python CLI and module for Lookyloo"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "pylookyloo-1.34.0-py3-none-any.whl", hash = "sha256:f777f1ea7f268ea6b7238aa7b22806f00961fac578050bad95d60fe79d76fb60"},
-    {file = "pylookyloo-1.34.0.tar.gz", hash = "sha256:5773cd586113e5a7a96dcdc008970182c405f9e9554ca7d2586afc1ec8fa251b"},
+    {file = "pylookyloo-1.36.1-py3-none-any.whl", hash = "sha256:71bdba91379525f2f13023999306deebe2506ac00ec771587a87a3753e8685f1"},
+    {file = "pylookyloo-1.36.1.tar.gz", hash = "sha256:c8777d5abf01d10a27cb88a3b159f580708e97891e8ad42a07081d1cc10ce434"},
 ]
 
 [package.dependencies]
 requests = ">=2.32.5"
 
 [package.extras]
-docs = ["Sphinx (>=8.2.3) ; python_version >= \"3.11\""]
-examples = ["pylacus (>=1.19.0)"]
+docs = ["Sphinx (>=9.1.0) ; python_version >= \"3.12\""]
+examples = ["pylacus (>=1.21.0)"]
 
 [[package]]
 name = "pymisp"
@@ -7606,4 +7606,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "f44f5fce47b716b486fa38eaa7c0609aea4609cb5ff29f436e09d2633ded14c5"
+content-hash = "4d8d6e1758fdefb36b9863cbae8d751df42b96eb9ba851b318549ec091f1c635"
