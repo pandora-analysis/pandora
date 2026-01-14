@@ -695,9 +695,15 @@ def post_table(table_name: str) -> Response:
             total_filtered = len(tasks)
             tasks = tasks[start:start + length]
         for t in tasks:
+            if t.user and t.user.name:
+                owner = t.user.name
+            elif hasattr(t, 'user_id') and t.user_id:
+                owner = t.user_id
+            else:
+                owner = 'Unknown'
             to_append = {
                 'id': t.uuid,
-                'owner': t.user.name if (t.user and t.user.name) else t.user_id,
+                'owner': owner,
                 'date': t.save_date,
                 'status': {'display': render_template(display_task_status_template,
                                                       task_status=t.status, status=Status),
