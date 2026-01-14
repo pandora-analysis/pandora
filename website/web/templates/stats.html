@@ -140,17 +140,11 @@ Pandora - statistics
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"
         integrity="{{get_sri('static/js', 'dashboard.js')}}"
         crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/lib/datatables.js') }}"
-        integrity="{{get_sri('static/js/lib', 'datatables.js')}}"
-        crossorigin="anonymous"></script>
 {% endblock %}
 
 {% block styles %}
   {{ super() }}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap-datepicker.min.css') }}"
         integrity="{{get_sri('static/css/lib', 'bootstrap-datepicker.min.css')}}"
-        crossorigin="anonymous">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/datatables.css') }}"
-        integrity="{{get_sri('static/css/lib', 'datatables.css')}}"
         crossorigin="anonymous">
 {% endblock %}

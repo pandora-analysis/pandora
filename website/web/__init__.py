@@ -27,7 +27,8 @@ import flask_wtf  # type: ignore
 import pyzipper  # type: ignore
 
 from flask import (Flask, request, session, abort, render_template,
-                   redirect, send_file, url_for, flash, Request, send_from_directory)
+                   redirect, send_file, url_for, flash, Request, send_from_directory,
+                   Response, jsonify)
 from flask_restx import Api  # type: ignore
 from flask_bootstrap import Bootstrap5  # type: ignore
 from pymisp import MISPEvent, PyMISP
@@ -154,6 +155,51 @@ app.jinja_env.globals.update(load_custom_js=load_custom_js)
 app.jinja_env.globals.update(get_sri=get_sri)
 app.jinja_env.globals.update(sizeof_fmt=sizeof_fmt)
 
+
+display_task_status_template = app.jinja_env.from_string(source='''
+{% from 'bootstrap5/utils.html' import render_icon %}
+<span class="img-thumbnail small-status-flag status-flag-{{ task_status.name.lower() }}">
+{% if task_status == status.OVERWRITE %}
+  {{ render_icon('question-octagon') }}
+{% elif task_status == status.ERROR %}
+  {{ render_icon('exclamation-octagon') }}
+{% elif task_status == status.ALERT %}
+  <img src="{{ url_for('static', filename='images/skull.svg') }}" width = "15" height = "15">
+{% elif task_status == status.WARN %}
+{{ render_icon('exclamation-triangle') }}
+{% elif task_status == status.CLEAN %}
+{{ render_icon('check-circle') }}
+{% else %}
+  {{ render_icon('question') }}
+{% endif %}
+</span>
+''')
+
+task_filename_template = app.jinja_env.from_string(source='''
+{% from 'bootstrap5/utils.html' import render_icon %}
+{{ render_icon(task_file.icon) }}<b>{{ task_file.original_filename }}</b>
+''')
+
+
+tasks_list_buttons_template = app.jinja_env.from_string(source='''
+<a href="{{ report_url }}">
+   <span class="btn btn-primary mt-1">See report</span>
+ </a>
+{% if current_user.is_admin %}
+ {% if task.file.deleted %}
+   <span class="btn btn-default mt-1">File deleted</span>
+ {% else %}
+   <span id="delete-{{ task.uuid }}" class="btn btn-danger mt-1"
+         onclick="javascript:deleteFile($(this).attr('data-url'), $(this).attr('data-uid'))"
+         data-url="{{ delete_url }}" data-uid="{{ task.file.uuid }}">
+       Delete file
+   </span>
+ {% endif %}
+{% endif %}
+''')
+
+
+# ------------------------------------
 
 @login_manager.user_loader  # type: ignore[untyped-decorator]
 def load_user(user_id: str) -> User | None:
@@ -432,35 +478,11 @@ def api_logout() -> WerkzeugResponse:
 @app.route('/tasks', methods=['GET'], strict_slashes=False)
 @html_answer
 def api_tasks() -> str:
-
     if not flask_login.current_user.role.can([Action.list_own_tasks, Action.list_all_tasks], 'or'):
         raise Forbidden('Not allowed to list tasks')
     search = request.args.get('query')
     search = search.strip() if search is not None else None
-    if not search:
-        # filter results by date, keep last 3 days,
-        # TODO: up to a max amount of tasks
-        first_date: datetime | int = datetime.now() - timedelta(days=get_config('generic', 'max_days_index'))
-    else:
-        # FIXME: This will be slow and the way to search must be improved.
-        first_date = 0
-    tasks = pandora.get_tasks(user=flask_login.current_user, first_date=first_date)
-    if search:
-        filtered_tasks = []
-        # filter results
-        for task in tasks:
-            if flask_login.current_user.role.can(Action.search_file_hash):
-                if search in [task.file.md5, task.file.sha1, task.file.sha256]:
-                    filtered_tasks.append(task)
-                    continue
-            if flask_login.current_user.role.can(Action.search_file_name):
-                if [name for name in [task.file.original_filename, task.file.path.name] if search in name]:
-                    filtered_tasks.append(task)
-                    continue
-        tasks_to_show = filtered_tasks
-    else:
-        tasks_to_show = list(tasks)
-    return render_template('tasks.html', tasks=tasks_to_show, search=search or '',
+    return render_template('tasks.html', search=search or '',
                            show_project_page=get_config('generic', 'show_project_page'),
                            status=Status)
 
@@ -635,6 +657,66 @@ def api_stats() -> str:
         raise Forbidden('Not allowed to show stats')
     return render_template('stats.html',
                            show_project_page=get_config('generic', 'show_project_page'))
+
+
+def get_tasks(offset: int | None=None, limit: int | None=None, search: str | None=None) -> tuple[int, list[Any]]:
+    first_date: datetime | int = datetime.now() - timedelta(days=get_config('generic', 'max_days_index'))
+    tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date))
+    total = len(tasks)
+
+    if search:
+        filtered_tasks = []
+        for task in tasks:
+            if flask_login.current_user.role.can(Action.search_file_hash):
+                if search in [task.file.md5, task.file.sha1, task.file.sha256]:
+                    filtered_tasks.append(task)
+                    continue
+            if flask_login.current_user.role.can(Action.search_file_name):
+                if [name for name in [task.file.original_filename, task.file.path.name] if search in name]:
+                    filtered_tasks.append(task)
+                    continue
+        tasks = filtered_tasks
+
+    return total, tasks
+
+
+@app.route('/tables/<string:table_name>/', methods=['POST'])
+def post_table(table_name: str) -> Response:
+    draw = request.form.get('draw', type=int)
+    start = request.form.get('start', type=int)
+    length = request.form.get('length', type=int)
+    search = request.form.get('search[value]', type=str)
+    if table_name == 'tasksTable':
+        if not flask_login.current_user.role.can([Action.list_own_tasks, Action.list_all_tasks], 'or'):
+            raise Forbidden('Not allowed to list tasks')
+        prepared_tasks = []
+        total, tasks = get_tasks(offset=start, limit=length, search=search)
+        if search and start is not None and length is not None:
+            total_filtered = len(tasks)
+            tasks = tasks[start:start + length]
+        for t in tasks:
+            to_append = {
+                'id': t.uuid,
+                'owner': t.user.name if (t.user and t.user.name) else t.user_id,
+                'date': t.save_date,
+                'status': {'display': render_template(display_task_status_template,
+                                                      task_status=t.status, status=Status),
+                           'filter': t.status},
+                'name': {'display': render_template(task_filename_template, task_file=t.file),
+                         'filter': t.file.original_filename},
+                'sha256': t.file.sha256,
+                'buttons': {'display': render_template(tasks_list_buttons_template,
+                                                       report_url=url_for('api_analysis', task_id=t.uuid),
+                                                       current_user=flask_login.current_user,
+                                                       task=t,
+                                                       delete_url=url_for('PandoraAPI_api_task_action', task_id=t.uuid, action='delete')),
+                            'filter': ''
+                            }
+            }
+            prepared_tasks.append(to_append)
+        return jsonify({'draw': draw, 'recordsTotal': total, 'recordsFiltered': total if not search else total_filtered, 'data': prepared_tasks})
+
+    return jsonify({})
 
 
 # NOTE: this one must be at the end, it adds a route to / that will break the default one.

@@ -18,6 +18,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ribbon.css') }}"
           integrity="{{get_sri('static/css', 'ribbon.css')}}"
           crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/datatables.css') }}"
+         {{get_sri('static/css/lib', 'datatables.css')}}
+          crossorigin="anonymous">
 
     {% set overrides_css = load_custom_css('overrides.css') %}
     {% if overrides_css %}
@@ -115,6 +118,12 @@
     {{ bootstrap.load_js() }}
     <script src="{{ url_for('static', filename='js/lib/jquery.min.js') }}"
             integrity="{{get_sri('static/js/lib', 'jquery.min.js')}}"
+            crossorigin="anonymous"></script>
+    <script src='{{ url_for('static', filename='js/lib/datatables.js') }}'
+           {{get_sri('static/js/lib', 'datatables.js')}}
+            crossorigin="anonymous"></script>
+    <script src='{{ url_for('static', filename='js/render_tables.js') }}'
+            {{get_sri('static/js', 'render_tables.js')}}
             crossorigin="anonymous"></script>
 
     {% set overrides_js = load_custom_js('overrides.js') %}
