@@ -57,12 +57,12 @@ if __name__ == '__main__':
         f.write(dropzone_css.content)
         print(f'Downloaded dropzone css v{dropzone_version}')
 
-    datatables_css = requests.get(f'https://cdn.datatables.net/v/bs5/dt-{datatables_version}/b-{datatables_buttons_version}/rg-{datatables_rowgroup_version}/sl-{datatables_select_version}/datatables.min.css')
+    datatables_css = requests.get(f'https://cdn.datatables.net/v/bs5/dt-{datatables_version}/b-{datatables_buttons_version}/rg-{datatables_rowgroup_version}/sl-{datatables_select_version}/datatables.min.css', timeout=5)
     with (dest_dir_css / 'datatables.css').open('wb') as f:
         f.write(datatables_css.content)
         print(f'Downloaded datatables css v{datatables_version}')
 
-    datatables_js = requests.get(f'https://cdn.datatables.net/v/bs5/dt-{datatables_version}/b-{datatables_buttons_version}/rg-{datatables_rowgroup_version}/sl-{datatables_select_version}/datatables.min.js')
+    datatables_js = requests.get(f'https://cdn.datatables.net/v/bs5/dt-{datatables_version}/b-{datatables_buttons_version}/rg-{datatables_rowgroup_version}/sl-{datatables_select_version}/datatables.min.js', timeout=5)
     with (dest_dir_js / 'datatables.js').open('wb') as f:
         f.write(datatables_js.content)
         print(f'Downloaded datatables js v{datatables_version}')
