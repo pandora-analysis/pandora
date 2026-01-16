@@ -691,16 +691,17 @@ def post_table(table_name: str) -> Response:
             raise Forbidden('Not allowed to list tasks')
         prepared_tasks = []
         total, tasks = get_tasks(offset=start, limit=length, search=search)
-        if search and start is not None and length is not None:
+        if search:
             total_filtered = len(tasks)
-        tasks = tasks[start:start + length]
+        if start is not None and length is not None:
+            tasks = tasks[start:start + length]
         for t in tasks:
             if t.user and t.user.name:
                 owner = t.user.name
             elif hasattr(t, 'user_id') and t.user_id:
                 owner = t.user_id
             else:
-                owner = 'Unknown'
+                owner = 'Unknown/Expired'
             to_append = {
                 'id': t.uuid,
                 'owner': owner,
