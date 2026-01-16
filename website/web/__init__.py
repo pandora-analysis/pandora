@@ -661,8 +661,17 @@ def api_stats() -> str:
 
 def get_tasks(offset: int | None=None, limit: int | None=None, search: str | None=None) -> tuple[int, list[Any]]:
     first_date: datetime | int = datetime.now() - timedelta(days=get_config('generic', 'max_days_index'))
-    tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date))
-    total = len(tasks)
+
+    # if we search OR aren't admin, we cannot just take an interval from the DB
+    if flask_login.current_user.is_admin and search is None:
+        # pass offset and limit
+        tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date,
+                                       offset=offset, limit=limit))
+    else:
+        # the interval will be selected later
+        tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date))
+
+    total = pandora.get_tasks_count(flask_login.current_user, first_date=first_date)
 
     if search:
         filtered_tasks = []
@@ -693,7 +702,12 @@ def post_table(table_name: str) -> Response:
         total, tasks = get_tasks(offset=start, limit=length, search=search)
         if search:
             total_filtered = len(tasks)
-        if start is not None and length is not None:
+        if flask_login.current_user.is_admin and search is None:
+            # we have the right interval already
+            pass
+        elif start is not None and length is not None:
+            # Take the appropriate interval for the user tasks
+            # if the uer is admin, we already took the right interval from the DB
             tasks = tasks[start:start + length]
         for t in tasks:
             if t.user and t.user.name:

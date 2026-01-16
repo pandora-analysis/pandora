@@ -120,20 +120,46 @@ class Pandora():
     def add_extracted_reference(self, task: Task, extracted_task: Task) -> None:
         self.storage.add_extracted_reference(task.uuid, extracted_task.uuid)
 
-    def get_tasks(self, user: User, *, first_date: datetime | int | float | str=0, last_date: datetime | int | float | str='+Inf') -> Iterator[Task]:
+    def get_tasks(self, user: User, *, first_date: datetime | int | float | str=0,
+                  last_date: datetime | int | float | str='+Inf',
+                  offset: int | None=None, limit: int | None=None) -> Iterator[Task]:
+        # NOTE: only use offset ant limit if we're admin, as we dont need to search which tasks we can display
+        if not user.is_admin:
+            offset = None
+            limit = None
         if isinstance(first_date, datetime):
             first_date = first_date.timestamp()
         if isinstance(last_date, datetime):
             last_date = last_date.timestamp()
-        for task in self.storage.get_tasks(first_date=first_date, last_date=last_date):
+        for task in self.storage.get_tasks(first_date=first_date, last_date=last_date,
+                                           offset=offset, limit=limit):
             # FIXME: get rid of that typing ignore
             try:
-                _task = Task(**task)  # type: ignore
+                if user.is_admin:
+                    yield Task(**task)  # type: ignore
+                else:
+                    # check userid
+                    if task.get('user_id') == user.get_id():
+                        yield Task(**task)  # type: ignore
+
             except PandoraException as e:
                 self.logger.warning(f'Unable to load task {task}: {e}')
                 continue
-            if user.is_admin or (_task.user and user.get_id() == _task.user.get_id()):
-                yield _task
+
+    def get_tasks_count(self, user: User, *, first_date: datetime | int | float | str=0, last_date: datetime | int | float | str='+Inf') -> int:
+        if isinstance(first_date, datetime):
+            first_date = first_date.timestamp()
+        if isinstance(last_date, datetime):
+            last_date = last_date.timestamp()
+        if user.is_admin:
+            return self.storage.count_tasks(first_date=first_date, last_date=last_date)
+        else:
+            total = 0
+            # TODO filter out the tasks of the user
+            for task in self.storage.get_tasks(first_date=first_date, last_date=last_date):
+                if task.get('user_id') == user.get_id():
+                    total += 1
+            return total
 
     # ##############
 

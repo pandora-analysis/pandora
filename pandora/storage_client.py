@@ -170,9 +170,10 @@ class Storage():
         self.storage.hmset(f'tasks:{task["uuid"]}', task)  # type: ignore[arg-type]
         self.storage.zadd('tasks', {task["uuid"]: timestamp})
 
-    def get_tasks(self, *, first_date: str | float=0, last_date: str | float='+Inf') -> list[dict[str, str]]:
+    def get_tasks(self, *, first_date: str | float=0, last_date: str | float='+Inf',
+                  offset: int | None=None, limit: int | None=None) -> list[dict[str, str]]:
         tasks = []
-        for uuid in self.storage.zrevrangebyscore('tasks', min=first_date, max=last_date):
+        for uuid in self.storage.zrevrangebyscore('tasks', min=first_date, max=last_date, start=offset, num=limit):
             tasks.append(self.get_task(uuid))
         tasks.sort(key=operator.itemgetter('save_date'), reverse=True)
         return tasks
