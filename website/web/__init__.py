@@ -663,7 +663,7 @@ def get_tasks(offset: int | None=None, limit: int | None=None, search: str | Non
     first_date: datetime | int = datetime.now() - timedelta(days=get_config('generic', 'max_days_index'))
 
     # if we search OR aren't admin, we cannot just take an interval from the DB
-    if flask_login.current_user.is_admin and search is None:
+    if flask_login.current_user.is_admin and not search:
         # pass offset and limit
         tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date,
                                        offset=offset, limit=limit))
@@ -702,7 +702,7 @@ def post_table(table_name: str) -> Response:
         total, tasks = get_tasks(offset=start, limit=length, search=search)
         if search:
             total_filtered = len(tasks)
-        if flask_login.current_user.is_admin and search is None:
+        if flask_login.current_user.is_admin and not search:
             # we have the right interval already
             pass
         elif start is not None and length is not None:
