@@ -151,15 +151,16 @@ class Pandora():
             first_date = first_date.timestamp()
         if isinstance(last_date, datetime):
             last_date = last_date.timestamp()
+
         if user.is_admin:
             return self.storage.count_tasks(first_date=first_date, last_date=last_date)
-        else:
-            total = 0
-            # TODO filter out the tasks of the user
-            for task in self.storage.get_tasks(first_date=first_date, last_date=last_date):
-                if task.get('user_id') == user.get_id():
-                    total += 1
-            return total
+
+        total = 0
+        # TODO filter out the tasks of the user
+        for task in self.storage.get_tasks(first_date=first_date, last_date=last_date):
+            if task.get('user_id') == user.get_id():
+                total += 1
+        return total
 
     # ##############
 

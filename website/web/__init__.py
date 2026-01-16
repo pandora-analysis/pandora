@@ -700,6 +700,7 @@ def post_table(table_name: str) -> Response:
             raise Forbidden('Not allowed to list tasks')
         prepared_tasks = []
         total, tasks = get_tasks(offset=start, limit=length, search=search)
+        total_filtered = 0
         if search:
             total_filtered = len(tasks)
         if flask_login.current_user.is_admin and not search:
