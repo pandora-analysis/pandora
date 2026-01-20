@@ -64,7 +64,7 @@ pymispwarninglists = "^1.7.0"
 pikepdf = "^10.2.0"
 Pillow = "^12.1.0"
 pillow-heif = "^1.1.1"
-imapclient = "^3.0.1"
+imapclient = "^3.1.0"
 pyzipper = "^0.3.6"
 pymisp = {version = "^2.5.32", extras = ["fileobjects"]}
 python-dateutil = "^2.9.0.post0"
