@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 
 from pathlib import Path
-from typing import Generator
+from collections.abc import Generator
 
 import cv2
 import numpy as np
@@ -20,7 +20,7 @@ from .base import BaseWorker
 
 class QrCodeDecoder(BaseWorker):
 
-    def _find_boxes(self, image: np.ndarray) -> Generator[tuple[int, int, int, int]]:  # type: ignore[type-arg]
+    def _find_boxes(self, image: np.ndarray) -> Generator[tuple[int, int, int, int]]:
         # code from: https://stackoverflow.com/questions/60359398/python-detect-a-qr-code-from-an-image-and-crop-using-opencv#60384780
         # Load imgae, grayscale, Gaussian blur, Otsu's threshold
         gray = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2GRAY)

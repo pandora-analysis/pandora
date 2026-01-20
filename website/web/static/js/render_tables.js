@@ -25,8 +25,7 @@ function renderTables() {
           serverSide: true,
           retrieve: true,
           ordering: false,
-          // Note: search is broken at this stage and requires a proper intexer to work again.
-          searching: false,
+          searching: true,
           order: [[ 2, "desc" ]],
           ajax: {
             url: `/tables/tasksTable/${window.location.search}`,

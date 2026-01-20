@@ -63,13 +63,27 @@ def shutdown_storage() -> None:
     print('Kvrocks storage database shutdown.')
 
 
+def launch_indexing(storage_directory: Path | None=None) -> None:
+    if not storage_directory:
+        storage_directory = get_homedir()
+    if not check_running('indexing'):
+        Popen(["./run_kvrocks.sh"], cwd=storage_directory / 'indexing')
+
+
+def shutdown_indexing() -> None:
+    r = Redis(unix_socket_path=get_socket_path('indexing'))
+    r.shutdown()
+    print('Kvrocks index database shutdown.')
+
+
 def launch_all() -> None:
     launch_cache()
     launch_storage()
+    launch_indexing()
 
 
 def check_all(stop: bool=False) -> None:
-    backends: dict[str, bool] = {'cache': False, 'storage': False}
+    backends: dict[str, bool] = {'cache': False, 'storage': False, 'indexing': False}
     while True:
         for db_name in backends:
             try:
@@ -93,6 +107,7 @@ def check_all(stop: bool=False) -> None:
 def stop_all() -> None:
     shutdown_cache()
     shutdown_storage()
+    shutdown_indexing()
 
 
 def main() -> None:

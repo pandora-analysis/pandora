@@ -120,6 +120,20 @@ class Pandora():
     def add_extracted_reference(self, task: Task, extracted_task: Task) -> None:
         self.storage.add_extracted_reference(task.uuid, extracted_task.uuid)
 
+    def get_tasks_by_id(self, user: User, tasks_uuids: list[str]) -> Iterator[Task]:
+        for uuid in tasks_uuids:
+            task = self.storage.get_task(uuid)
+            try:
+                if user.is_admin:
+                    yield Task(**task)  # type: ignore
+                else:
+                    if task.get('user_id') == user.get_id():
+                        yield Task(**task)  # type: ignore
+
+            except PandoraException as e:
+                self.logger.warning(f'Unable to load task {task}: {e}')
+                continue
+
     def get_tasks(self, user: User, *, first_date: datetime | int | float | str=0,
                   last_date: datetime | int | float | str='+Inf',
                   offset: int | None=None, limit: int | None=None) -> Iterator[Task]:

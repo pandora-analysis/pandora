@@ -96,7 +96,8 @@ def safe_create_dir(to_create: Path) -> None:
 def get_socket_path(name: str) -> str:
     mapping = {
         'cache': Path('cache', 'cache.sock'),
-        'storage': Path('storage', 'storage.sock')
+        'storage': Path('storage', 'storage.sock'),
+        'indexing': Path('indexing', 'kvrocks_index.sock')
     }
     return str(get_homedir() / mapping[name])
 

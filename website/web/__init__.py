@@ -40,6 +40,7 @@ from werkzeug import Response as WerkzeugResponse
 from pandora.default import get_config, PandoraException, get_homedir
 from pandora.exceptions import Unsupported
 from pandora.helpers import workers, Status, get_disclaimers, get_task_status_messages
+from pandora.indexing import Indexing
 from pandora.pandora import Pandora
 from pandora.role import Action
 from pandora.user import User
@@ -53,6 +54,7 @@ from .redisserverssession import Session
 
 logging.config.dictConfig(get_config('logging'))
 pandora: Pandora = Pandora()
+indexing: Indexing = Indexing()
 
 app: Flask = Flask(__name__)
 app.wsgi_app = ReverseProxied(app.wsgi_app)  # type: ignore
@@ -659,20 +661,33 @@ def api_stats() -> str:
                            show_project_page=get_config('generic', 'show_project_page'))
 
 
-def get_tasks(offset: int | None=None, limit: int | None=None, search: str | None=None) -> tuple[int, list[Any]]:
-    first_date: datetime | int = datetime.now() - timedelta(days=get_config('generic', 'max_days_index'))
+def get_tasks(offset: int | None=None, limit: int | None=None, search: str | None=None) -> tuple[int, int | None, list[Any]]:
+    first_date: datetime = datetime.now() - timedelta(days=get_config('generic', 'max_days_index'))
 
     # if we search OR aren't admin, we cannot just take an interval from the DB
-    if flask_login.current_user.is_admin and not search:
-        # pass offset and limit
-        tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date,
-                                       offset=offset, limit=limit))
+    filtered_total: int | None = None
+    if flask_login.current_user.is_admin:
+        if search:
+            # NOTE: at this stage, search can only be a sha256
+            total = pandora.get_tasks_count(flask_login.current_user, first_date=first_date)
+            filtered_total = indexing.get_tasks_sha256_count(search)
+            tasks_uuids = indexing.get_tasks_sha256(search, oldest_task=first_date, offset=offset, limit=limit)
+            tasks = list(pandora.get_tasks_by_id(user=flask_login.current_user, tasks_uuids=tasks_uuids))
+        else:
+            tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date,
+                                           offset=offset, limit=limit))
+            total = pandora.get_tasks_count(flask_login.current_user, first_date=first_date)
     else:
-        # the interval will be selected later
-        tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date))
-
-    total = pandora.get_tasks_count(flask_login.current_user, first_date=first_date)
-
+        if search:
+            tasks_uuids = indexing.get_tasks_sha256(search, oldest_task=first_date)
+            tasks = list(pandora.get_tasks_by_id(user=flask_login.current_user, tasks_uuids=tasks_uuids))
+            filtered_total = len(tasks)
+            total = pandora.get_tasks_count(flask_login.current_user, first_date=first_date)
+        else:
+            tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date,
+                                           offset=offset, limit=limit))
+            total = pandora.get_tasks_count(flask_login.current_user, first_date=first_date)
+    """
     if search:
         filtered_tasks = []
         for task in tasks:
@@ -685,8 +700,8 @@ def get_tasks(offset: int | None=None, limit: int | None=None, search: str | Non
                     filtered_tasks.append(task)
                     continue
         tasks = filtered_tasks
-
-    return total, tasks
+    """
+    return total, filtered_total, tasks
 
 
 @app.route('/tables/<string:table_name>/', methods=['POST'])
@@ -699,20 +714,16 @@ def post_table(table_name: str) -> Response:
         if not flask_login.current_user.role.can([Action.list_own_tasks, Action.list_all_tasks], 'or'):
             raise Forbidden('Not allowed to list tasks')
         prepared_tasks = []
-        total, tasks = get_tasks(offset=start, limit=length, search=search)
-        total_filtered = 0
-        if search:
-            total_filtered = len(tasks)
-        if flask_login.current_user.is_admin and not search:
-            # we have the right interval already
-            pass
-        elif start is not None and length is not None:
-            # Take the appropriate interval for the user tasks
-            # if the uer is admin, we already took the right interval from the DB
-            tasks = tasks[start:start + length]
+        total, total_filtered, tasks = get_tasks(offset=start, limit=length, search=search)
         for t in tasks:
-            if t.user and t.user.name:
-                owner = t.user.name
+            if t.user:
+                if t.user.name:
+                    owner = t.user.name
+                elif t.user.session_id:
+                    owner = t.user.session_id
+                else:
+                    owner = 'Unknown'
+
             elif hasattr(t, 'user_id') and t.user_id:
                 owner = t.user_id
             else:
