@@ -7,6 +7,7 @@ import logging
 
 from datetime import datetime
 from collections.abc import Iterator
+from collections.abc import Iterable
 
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
@@ -120,7 +121,7 @@ class Pandora():
     def add_extracted_reference(self, task: Task, extracted_task: Task) -> None:
         self.storage.add_extracted_reference(task.uuid, extracted_task.uuid)
 
-    def get_tasks_by_id(self, user: User, tasks_uuids: list[str]) -> Iterator[Task]:
+    def get_tasks_by_id(self, user: User, tasks_uuids: Iterable[str]) -> Iterator[Task]:
         for uuid in tasks_uuids:
             task = self.storage.get_task(uuid)
             try:

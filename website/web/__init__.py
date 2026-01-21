@@ -666,41 +666,25 @@ def get_tasks(offset: int | None=None, limit: int | None=None, search: str | Non
 
     # if we search OR aren't admin, we cannot just take an interval from the DB
     filtered_total: int | None = None
-    if flask_login.current_user.is_admin:
-        if search:
-            # NOTE: at this stage, search can only be a sha256
-            total = pandora.get_tasks_count(flask_login.current_user, first_date=first_date)
-            filtered_total = indexing.get_tasks_sha256_count(search)
-            tasks_uuids = indexing.get_tasks_sha256(search, oldest_task=first_date, offset=offset, limit=limit)
+    total = pandora.get_tasks_count(flask_login.current_user, first_date=first_date)
+    if search:
+        tasks_uuids: set[str] = set()
+        if flask_login.current_user.is_admin:
+            tasks_uuids = set(indexing.get_tasks_sha256(search, oldest_task=first_date, offset=offset, limit=limit))
+            tasks_uuids.update(set(indexing.get_tasks_filename(search, oldest_task=first_date, offset=offset, limit=limit)))
             tasks = list(pandora.get_tasks_by_id(user=flask_login.current_user, tasks_uuids=tasks_uuids))
+            filtered_total = len(tasks_uuids)
         else:
-            tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date,
-                                           offset=offset, limit=limit))
-            total = pandora.get_tasks_count(flask_login.current_user, first_date=first_date)
-    else:
-        if search:
-            tasks_uuids = indexing.get_tasks_sha256(search, oldest_task=first_date)
+            if flask_login.current_user.role.can(Action.search_file_hash):
+                tasks_uuids.update(indexing.get_tasks_sha256(search, oldest_task=first_date))
+            if flask_login.current_user.role.can(Action.search_file_name):
+                tasks_uuids.update(indexing.get_tasks_filename(search, oldest_task=first_date))
+
             tasks = list(pandora.get_tasks_by_id(user=flask_login.current_user, tasks_uuids=tasks_uuids))
             filtered_total = len(tasks)
-            total = pandora.get_tasks_count(flask_login.current_user, first_date=first_date)
-        else:
-            tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date,
-                                           offset=offset, limit=limit))
-            total = pandora.get_tasks_count(flask_login.current_user, first_date=first_date)
-    """
-    if search:
-        filtered_tasks = []
-        for task in tasks:
-            if flask_login.current_user.role.can(Action.search_file_hash):
-                if search in [task.file.md5, task.file.sha1, task.file.sha256]:
-                    filtered_tasks.append(task)
-                    continue
-            if flask_login.current_user.role.can(Action.search_file_name):
-                if [name for name in [task.file.original_filename, task.file.path.name] if search in name]:
-                    filtered_tasks.append(task)
-                    continue
-        tasks = filtered_tasks
-    """
+    else:
+        tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date,
+                                       offset=offset, limit=limit))
     return total, filtered_total, tasks
 
 

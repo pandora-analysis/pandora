@@ -59,11 +59,13 @@ class Indexing():
     def force_reindex(self, task_uuid: str) -> None:
         p = self.redis.pipeline()
         p.srem('indexed_sha256', task_uuid)
+        p.srem('indexed_filename', task_uuid)
         p.execute()
 
-    def task_indexed(self, task_uuid: str) -> tuple[bool]:
+    def task_indexed(self, task_uuid: str) -> tuple[bool, bool]:
         p = self.redis.pipeline()
         p.sismember('indexed_sha256', task_uuid)
+        p.sismember('indexed_filename', task_uuid)
         to_return: list[bool] = p.execute()
         return tuple(to_return)  # type: ignore[return-value]
 
@@ -83,6 +85,9 @@ class Indexing():
             if not indexed[0]:
                 self.logger.info(f'Indexing sha256 for {uuid_to_index}')
                 self.index_sha256_task(task)
+            if not indexed[1]:
+                self.logger.info(f'Indexing filename for {uuid_to_index}')
+                self.index_filename_task(task)
         except Exception as e:
             self.logger.error(f'Error during indexing for {uuid_to_index}: {e}')
         finally:
@@ -122,8 +127,47 @@ class Indexing():
         min_score: str | float = self.__limit_failsafe(oldest_task, limit)
         return self.redis.zrevrangebyscore(f'sha256|{sha256}|tasks', max_score, min_score, start=offset, num=limit)
 
-    def scan_tasks_sha256(self, sha512: str) -> Iterator[tuple[str, float]]:
-        yield from self.redis.zscan_iter(f'sha256|{sha512}|tasks')
+    def scan_tasks_sha256(self, sha256: str) -> Iterator[tuple[str, float]]:
+        yield from self.redis.zscan_iter(f'sha256|{sha256}|tasks')
 
     def get_tasks_sha256_count(self, sha256: str) -> int:
         return self.redis.zcard(f'sha256|{sha256}|tasks')
+
+    # ============= filename =============
+
+    @property
+    def filename(self) -> set[str]:
+        return self.redis.smembers('filename')
+
+    def index_filename_task(self, task: Task) -> None:
+        if self.redis.sismember('indexed_filename', task.uuid):
+            # do not reindex
+            return
+
+        self.redis.sadd('indexed_filename', task.uuid)
+        self.logger.debug(f'Indexing filename for {task.uuid} ... ')
+        pipeline = self.redis.pipeline()
+        internal_index = f'task_indexes|{task.uuid}'
+        pipeline.sadd(internal_index, 'filename')
+
+        pipeline.sadd(f'{internal_index}|filename', task.file.original_filename)
+        pipeline.sadd('filename', task.file.original_filename)
+        pipeline.zadd(f'filename|{task.file.original_filename}|tasks',
+                      mapping={task.uuid: task.save_date.timestamp()})
+        pipeline.sadd(f'{internal_index}|filename|{task.file.original_filename}', task.uuid)
+        pipeline.execute()
+        self.logger.debug(f'done with filename for {task.uuid}.')
+
+    def get_tasks_filename(self, filename: str, most_recent_task: datetime | None = None,
+                           oldest_task: datetime | None = None,
+                           offset: int | None = None, limit: int | None = None) -> list[str]:
+
+        max_score: str | float = most_recent_task.timestamp() if most_recent_task else '+Inf'
+        min_score: str | float = self.__limit_failsafe(oldest_task, limit)
+        return self.redis.zrevrangebyscore(f'filename|{filename}|tasks', max_score, min_score, start=offset, num=limit)
+
+    def scan_tasks_filename(self, filename: str) -> Iterator[tuple[str, float]]:
+        yield from self.redis.zscan_iter(f'filename|{filename}|tasks')
+
+    def get_tasks_filename_count(self, filename: str) -> int:
+        return self.redis.zcard(f'filename|{filename}|tasks')
