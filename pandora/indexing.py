@@ -92,7 +92,7 @@ class Indexing():
             self.logger.error(f'Error during indexing for {uuid_to_index}: {e}')
         finally:
             self.indexing_done(uuid_to_index)
-            return True
+        return True
 
     # ============= sha256 =============
 
