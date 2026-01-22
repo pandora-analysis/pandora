@@ -4306,14 +4306,14 @@ files = [
 
 [[package]]
 name = "packaging"
-version = "25.0"
+version = "26.0"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.8"
 groups = ["main", "dev"]
 files = [
-    {file = "packaging-25.0-py3-none-any.whl", hash = "sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484"},
-    {file = "packaging-25.0.tar.gz", hash = "sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f"},
+    {file = "packaging-26.0-py3-none-any.whl", hash = "sha256:b36f1fef9334a5588b4166f8bcd26a14e521f2b55e6b9de3aaa80d3ff7a37529"},
+    {file = "packaging-26.0.tar.gz", hash = "sha256:00243ae351a257117b6a241061796684b084ed1c516a08c48a3f7e147a9d80b4"},
 ]
 
 [[package]]
@@ -6336,18 +6336,18 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "semgrep"
-version = "1.148.0"
+version = "1.149.0"
 description = "Lightweight static analysis for many languages. Find bug variants with patterns that look like source code."
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "semgrep-1.148.0-cp310.cp311.cp312.cp313.cp314.py310.py311.py312.py313.py314-none-macosx_10_14_x86_64.whl", hash = "sha256:d86025c3266a186df208c4c2cdfdcd7ec1c4243360763722b9f0cedb3eab1019"},
-    {file = "semgrep-1.148.0-cp310.cp311.cp312.cp313.cp314.py310.py311.py312.py313.py314-none-macosx_11_0_arm64.whl", hash = "sha256:7328c08f1092e1976e54215bc78ddd2a18da2780b275328d364272ecbcaeeeda"},
-    {file = "semgrep-1.148.0-cp310.cp311.cp312.cp313.cp314.py310.py311.py312.py313.py314-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:44852c5e859eacafdaad39f8ead5dfa2473fe66049eb4499bd1ff93c44e60cc5"},
-    {file = "semgrep-1.148.0-cp310.cp311.cp312.cp313.cp314.py310.py311.py312.py313.py314-none-musllinux_1_0_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2591cedef984685f6d3e2b7185eefa73242c4540f1f5f0bf8bb576afe1e57468"},
-    {file = "semgrep-1.148.0-cp310.cp311.cp312.cp313.cp314.py310.py311.py312.py313.py314-none-win_amd64.whl", hash = "sha256:369505ddb91f438670b564f76093beca78a41e6b7dbf99655f5ffe4fafec64dd"},
-    {file = "semgrep-1.148.0.tar.gz", hash = "sha256:c690b9b922639d7ab50a45797716d1e40d57e104fe53c53cea38e61fccfe6d37"},
+    {file = "semgrep-1.149.0-cp310.cp311.cp312.cp313.cp314.py310.py311.py312.py313.py314-none-macosx_10_14_x86_64.whl", hash = "sha256:66fc310e030d703ab789dc5a1bfc5f0742523b3b23c0c49cb8b35c2dd561c1e0"},
+    {file = "semgrep-1.149.0-cp310.cp311.cp312.cp313.cp314.py310.py311.py312.py313.py314-none-macosx_11_0_arm64.whl", hash = "sha256:5b759f45392dadd3ae9f5eed6527945b58503f9b99d9811083b810f549a09841"},
+    {file = "semgrep-1.149.0-cp310.cp311.cp312.cp313.cp314.py310.py311.py312.py313.py314-none-musllinux_1_0_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2c3cd54ff43bf9db3bc6034e3d460a50ab549fb78a33f140b47e320d691c4b7e"},
+    {file = "semgrep-1.149.0-cp310.cp311.cp312.cp313.cp314.py310.py311.py312.py313.py314-none-musllinux_1_0_x86_64.manylinux2014_x86_64.whl", hash = "sha256:30cf9dc838085331fed9fa87af2bfd7fe4976ebbf9701b1513783babebbd59bb"},
+    {file = "semgrep-1.149.0-cp310.cp311.cp312.cp313.cp314.py310.py311.py312.py313.py314-none-win_amd64.whl", hash = "sha256:585c036248bf774888c8e4725ff721f46f300971b5c0a3042a503d95825378a9"},
+    {file = "semgrep-1.149.0.tar.gz", hash = "sha256:dcfbe41f6d57dd80a55db2b072e14a039a363fd115e3e18c9f194f5b2861adc3"},
 ]
 
 [package.dependencies]
@@ -6668,26 +6668,27 @@ dev = ["mypy (>=1.18.1)", "pre-commit (>=4.3.0)", "pytest (>=8.3.5)", "pytest-co
 
 [[package]]
 name = "textract-py3"
-version = "2.1.1"
+version = "3.0.0"
 description = "Minimally maintained fork of deanmalmgren/textract to replace '*' dependencies "
 optional = false
-python-versions = "<4.0,>=3.7"
+python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "textract_py3-2.1.1-py3-none-any.whl", hash = "sha256:f096916e5d9540adec5c76b775607b7d807f30b222dc8768e7e3bc1803b31fab"},
-    {file = "textract_py3-2.1.1.tar.gz", hash = "sha256:b5b99cca3d5f737e3243fe75c74e295d1ee8077b8e7437f8ff7460bf1857b9e3"},
+    {file = "textract_py3-3.0.0-py3-none-any.whl", hash = "sha256:6a2760b2d61a9a87ec911db58a4cf11c5cc309a15785494e54bcf18d0a5941f8"},
+    {file = "textract_py3-3.0.0.tar.gz", hash = "sha256:4277067ed297947fb64ac3af20d5698b704a045eb6fb13e6022a2e4cc9198082"},
 ]
 
 [package.dependencies]
-argcomplete = ">=1.10.0"
+argcomplete = ">=3.6.3"
 beautifulsoup4 = ">=4.8.0"
-chardet = ">=3"
+chardet = ">=5.2.0"
 docx2txt = ">=0.8"
-extract-msg = ">=0.30.11"
-"pdfminer.six" = ">=20221105"
+extract-msg = ">=0.40.0"
+pdfminer-six = ">=20221105"
+pillow = ">=9.0.0"
 python-pptx = ">=0.6.18"
-six = ">=1.16.0"
-SpeechRecognition = ">=3.8.1"
+six = ">=1.17.0"
+speechrecognition = ">=3.8.1"
 xlrd = ">=1.2.0,<2.0.0"
 
 [package.extras]
@@ -7690,4 +7691,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "26ce4ce8bc2d1071ccf0d21c3487e284eafb90df38632fb35a266f1854d92930"
+content-hash = "f7d36d2b3597f06f776398a18d4942613dee41231cdf6cd0c574fd0c1a3f0a73"

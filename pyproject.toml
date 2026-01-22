@@ -80,7 +80,7 @@ typing-extensions = {version = "^4.15.0", python = "<3.11"}
 setuptools = "^80.10.1"
 beautifulsoup4 = {version= "<4.14", extras = ["lxml", "charset_normalizer"]}
 psutil = "^7.2.1"
-textract-py3 = "^2.1.1"
+textract-py3 = "^3.0.0"
 pure-magic-rs = "^0.3.1"
 # The libyall libs
 dfvfs = "^20240505"
@@ -96,7 +96,7 @@ types-psutil = "^7.2.1.20260116"
 types-beautifulsoup4 = "^4.12.0.20250516"
 bandit = {extras = ["toml"], version = "^1.9.3"}
 flake8 = "^7.3.0"
-semgrep = "^1.148.0"
+semgrep = "^1.149.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
