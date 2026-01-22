@@ -1,6 +1,6 @@
 [project]
 name = "pandora"
-version = "1.11.2"
+version = "1.11.3"
 description = "Pandora analysis framework."
 authors = [{name="Raphaël Vinot", email="raphael.vinot@circl.lu"}]
 license = "AGPL-3.0-or-later"
