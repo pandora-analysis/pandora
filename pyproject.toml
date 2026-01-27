@@ -83,7 +83,7 @@ psutil = "^7.2.1"
 textract-py3 = "^3.0.0"
 pure-magic-rs = "^0.3.1"
 # The libyall libs
-dfvfs = "^20240505"
+dfvfs = "^20251019"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^4.0.4"
