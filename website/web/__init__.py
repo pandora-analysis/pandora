@@ -353,13 +353,15 @@ def api_analysis(task_id: str, seed: str | None=None) -> str:
             if task.file.msg_data.sender:
                 email_preview['sender'] = task.file.msg_data.sender
         except Exception:
+            if task.file.msg_data.headerDict.get('From'):
+                email_preview['sender'] = task.file.msg_data.headerDict['From']
             logging.exception('Unable to get sender')
         if task.file.msg_data.recipients:
             email_preview['recipients'] = [r.formatted for r in task.file.msg_data.recipients]
         if task.file.msg_data.subject:
             email_preview['subject'] = task.file.msg_data.subject
-        if task.file.msg_data.headerDict.get('received'):
-            email_preview['received'] = task.file.msg_data.headerDict['received']
+        if task.file.msg_data.headerDict.get('Received'):
+            email_preview['received'] = task.file.msg_data.headerDict['Received']
         if task.file.msg_data.headerDict.get('Received-SPF'):
             email_preview['received_spf'] = task.file.msg_data.headerDict['Received-SPF']
     elif (task.file.is_eml and task.file.eml_data):
