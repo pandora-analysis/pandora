@@ -389,8 +389,7 @@
               <div class="row">
                 <div class="col-md-12" style="margin-bottom:50px">
                   <!-- Emails -->
-                  {% if (task.file.is_msg and task.file.msg_data)
-                        or (task.file.is_eml and task.file.eml_data)%}
+                  {% if email_preview %}
                   <p class="lead">The information below are extracted from the email,
                       the fields shouldn't be trusted as they can have been
                       tempered with by the sender</p>
@@ -399,72 +398,41 @@
                     <tr>
                       <th style="width:20%">Date</th>
                       <td id="email-date">
-                      {% if task.file.msg_data and task.file.msg_data.date %}
-                        {{ task.file.msg_data.date }}
-                      {% elif task.file.eml_data and task.file.eml_data.header.date %}
-                        {{ moment(task.file.eml_data.header.date|to_datetime).format('L LT [UTC]Z') }}
-                      {% endif %}
+                          {{email_preview.date}}
                       </td>
                     </tr>
                     <tr>
                       <th>From</th>
                       <td id="email-from">
-                        {% if task.file.msg_data and task.file.msg_data.sender %}
-                          {{ task.file.msg_data.sender }}
-                        {% elif task.file.eml_data and task.file.eml_data.header.from %}
-                          {{ task.file.eml_data.header.from }}
-                        {% endif %}
+                          {{ email_preview.sender }}
                       </td>
                     </tr>
                     <tr>
                       <th>To</th>
                       <td id="email-to">
-                        {% if task.file.msg_data and task.file.msg_data.recipients %}
-                          {% for r in task.file.msg_data.recipients %}
-                            {{ r.formatted }}</br>
-                          {% endfor %}
-                        {% elif task.file.eml_data and task.file.eml_data.header.to %}
-                          {% for r in task.file.eml_data.header.to %}
-                            {{ r }}</br>
-                          {% endfor %}
-                        {% endif %}
+                        {% for r in email_preview.recipients %}
+                          {{r}}</br>
+                        {%endfor%}
                       </td>
                     </tr>
                     <tr>
                       <th>Subject</th>
                       <td id="email-subject">
-                        {% if task.file.msg_data and task.file.msg_data.subject %}
-                          {{ task.file.msg_data.subject }}
-                        {% elif task.file.eml_data and task.file.eml_data.header.subject %}
-                          {{ task.file.eml_data.header.subject }}
-                        {% endif %}
+                          {{email_preview.subject}}
                       </td>
                     </tr>
                     <tr>
                       <th>Hops</th>
                       <td id="email-hops">
-                      {% if task.file.msg_data and task.file.msg_data.header.received %}
-                        {{ task.file.msg_data.header.received }}
-                        {% for received in task.file.msg_data.header.received %}
-                        {% endfor %}
-                      {% elif task.file.eml_data and task.file.eml_data.header.received %}
-                        {% for received in task.file.eml_data.header.received %}
-                          {% if 'from' in received %}
-                            <span>{{ received.from[0] }}</span> <small class="text-muted">{{ received.from[1] }}</small><br/>
-                          {% endif %}
-                        {% endfor %}
-                      {% endif %}
+                      {% for received in email_preview.received %}
+                         {{ received }} </br>
+                      {% endfor %}
                       </td>
                     </tr>
                     <tr>
                         <th>Received SPF</th>
                       <td id="received-spf">
-                        {% if task.file.msg_data and task.file.msg_data.header.get('Received-SPF') %}
-                          {{ task.file.msg_data.header['Received-SPF'] }}
-                        {% elif task.file.eml_data and task.file.eml_data.header.get('header')
-                                and task.file.eml_data.header['header'].get('received-spf') %}
-                          {{ task.file.eml_data.header['header']['received-spf'] }}
-                        {% endif %}
+                          {{email_preview.received_spf}}
                       </td>
                     </tr>
                     {% if current_user.role.can(action.download_images) %}
