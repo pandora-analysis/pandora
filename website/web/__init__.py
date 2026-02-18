@@ -344,7 +344,42 @@ def api_analysis(task_id: str, seed: str | None=None) -> str:
     if not admin_name:
         admin_name = 'Administrator'
 
+    email_preview: dict[str, Any] = {}
+    if (task.file.is_msg and task.file.msg_data):
+        # prepare stuff for email preview
+        if task.file.msg_data.date:
+            email_preview['date'] = task.file.msg_data.date
+        try:
+            if task.file.msg_data.sender:
+                email_preview['sender'] = task.file.msg_data.sender
+        except Exception:
+            logging.exception('Unable to get sender')
+        if task.file.msg_data.recipients:
+            email_preview['recipients'] = [r.formatted for r in task.file.msg_data.recipients]
+        if task.file.msg_data.subject:
+            email_preview['subject'] = task.file.msg_data.subject
+        if task.file.msg_data.headerDict.get('received'):
+            email_preview['received'] = task.file.msg_data.headerDict['received']
+        if task.file.msg_data.headerDict.get('Received-SPF'):
+            email_preview['received_spf'] = task.file.msg_data.headerDict['Received-SPF']
+    elif (task.file.is_eml and task.file.eml_data):
+        # prepare stuff for email preview
+        if header := task.file.eml_data.get('header'):
+            if header.get('date'):
+                email_preview['date'] = header['date']
+            if header.get('from'):
+                email_preview['sender'] = header['from']
+            if header.get('to'):
+                email_preview['recipients'] = header['to']
+            if header.get('subject'):
+                email_preview['subject'] = header['subject']
+            if header.get('received'):
+                email_preview['received'] = [r['src'] for r in header['received'] if r.get('src')]
+            if header.get('received-spf'):
+                email_preview['received_spf'] = header['received-spf']
+
     return render_template('analysis.html', task=task, seed=seed,
+                           email_preview=email_preview,
                            zip_passwd=get_config('generic', 'sample_password'),
                            default_share_time=get_config('generic', 'default_share_time'),
                            show_project_page=get_config('generic', 'show_project_page'),
