@@ -169,7 +169,7 @@ class Ole(BaseWorker):
         if flash.value > 0:
             # Nothing good in that.
             report.status = Status.ALERT
-            malicious.append(encryption.description)
+            malicious.append(flash.description)
 
             # NOTE Taken from
             # https://github.com/decalage2/oletools/blob/master/oletools/pyxswf.py#L124
