@@ -29,8 +29,14 @@ class UnoserverLauncher(AbstractManager):
 
         # Initialize the server, doesn't start it.
         sys.path.append('/usr/lib/python3/dist-packages')
-        module = importlib.import_module('unoserver.server')
-        sys.path.pop()
+        try:
+            module = importlib.import_module('unoserver.server')
+        except ImportError:
+            self.logger.warning('Unoserver is not installed (missing uno library). Disabling.')
+            self.force_stop = True
+            return
+        finally:
+            sys.path.pop()
 
         self.unoserver = module.UnoServer()
         self.tmpuserdir = tempfile.mkdtemp()

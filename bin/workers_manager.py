@@ -6,7 +6,12 @@ import importlib
 import inspect
 import logging
 import logging.config
+import multiprocessing
+import sys
 from collections.abc import Mapping
+
+if sys.platform == 'darwin':
+    multiprocessing.set_start_method('fork', force=True)
 
 from redis import Redis
 
