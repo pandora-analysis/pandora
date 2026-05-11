@@ -111,7 +111,7 @@ class Extractor(BaseWorker):
         self._passwords = passwords
 
     def _extract_iso(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
-        iso = pycdlib.PyCdlib()  # type: ignore[attr-defined]
+        iso = pycdlib.PyCdlib()
         extracted_files: list[Path] = []
         try:
             if not archive_file.data:
