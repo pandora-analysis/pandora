@@ -45,7 +45,7 @@ validators = "^0.35.0"
 PyMuPDF = "^1.26.7"
 requests = "^2.32.5"
 PyExifTool = "^0.5.6"
-eml-parser = "^2.0.0"
+eml-parser = "^2.0.1"
 unoserver = "^3.6"
 weasyprint = "^68.0"
 extract-msg = {version = "^0.55.0"}
