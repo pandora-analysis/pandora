@@ -1,0 +1,13 @@
+meta:
+  name: AI Analysis
+  description: Static file analysis for exposed secrets, PII, and risky configuration.
+  replicas: 1
+
+settings:
+  disabled: false
+  run_by_default: true
+  required: false
+  cache: 1h
+  timeout: 1m
+  api_key: null
+  endpoint: null
