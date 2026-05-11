@@ -24,8 +24,8 @@ class ODF(BaseWorker):
             with zipfile.ZipFile(task.file.path, 'r') as lodoc:
                 for f in lodoc.infolist():
                     fname = f.filename.lower()
-                    if fname.startswith('script') or fname.startswith('basic') or \
-                            fname.startswith('object') or fname.endswith('.bin'):
+                    if (fname.startswith('script') or fname.startswith('basic') or fname.endswith('.bin')
+                        or (fname.startswith('object') and not fname.endswith('.xml'))):
                         report.status = Status.ALERT
                         report.add_details('warning', "The file contains an indicator that could be related to a macro")
         except Exception as e:
