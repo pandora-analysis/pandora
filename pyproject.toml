@@ -87,7 +87,7 @@ dfvfs = "^20251019"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^4.0.5"
-mypy = "^2.0.0"
+mypy = "^2.1.0"
 types-redis = {version = "^4.6.0.20241004"}
 types-PyYAML = "^6.0.12.20260510"
 types-requests = "^2.33.0.20260508"
