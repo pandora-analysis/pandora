@@ -11,6 +11,7 @@ from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
 
 from .default import get_config, get_socket_path
+from .exceptions import InvalidPandoraObject
 from .storage_client import Storage
 from .task import Task
 
@@ -88,6 +89,10 @@ class Indexing():
             if not indexed[1]:
                 self.logger.info(f'Indexing filename for {uuid_to_index}')
                 self.index_filename_task(task)
+        except InvalidPandoraObject as e:
+            # the task is completely broken and should be removed from the list.
+            self.logger.error(f'Task {uuid_to_index} cannot be indexed: {e}')
+            raise
         except Exception as e:
             self.logger.error(f'Error during indexing for {uuid_to_index}: {e}')
         finally:
