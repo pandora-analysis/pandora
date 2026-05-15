@@ -14,16 +14,22 @@ from .default import get_config
 
 class Storage():
 
-    _instance = None
+    # _instance = None
 
-    def __new__(cls) -> Storage:
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._redis_pool_storage: ConnectionPool = ConnectionPool(
-                host=get_config('generic', 'storage_db_hostname'),
-                port=get_config('generic', 'storage_db_port'),
-                decode_responses=True)
-        return cls._instance
+    # def __new__(cls) -> Storage:
+    #    if cls._instance is None:
+    #        cls._instance = super().__new__(cls)
+    #         cls._redis_pool_storage: ConnectionPool = ConnectionPool(
+    #            host=get_config('generic', 'storage_db_hostname'),
+    #            port=get_config('generic', 'storage_db_port'),
+    #            decode_responses=True)
+    #    return cls._instance
+
+    def __init__(self):
+        self._redis_pool_storage: ConnectionPool = ConnectionPool(
+            host=get_config('generic', 'storage_db_hostname'),
+            port=get_config('generic', 'storage_db_port'),
+            decode_responses=True)
 
     @property
     def storage(self) -> Redis:  # type: ignore[type-arg]
