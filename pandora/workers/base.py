@@ -12,6 +12,8 @@ from logging import LoggerAdapter
 from typing import Any
 from collections.abc import MutableMapping, Iterator
 
+import setproctitle
+
 from redis import ConnectionPool, Redis
 from redis.connection import UnixDomainSocketConnection
 from redis.exceptions import ResponseError, ConnectionError as RedisConnectionError
@@ -47,6 +49,7 @@ class BaseWorker(multiprocessing.Process):
         :param timeout: timeout for module
         """
         super().__init__(name=f'{module}-{worker_id}', daemon=True)
+
         self.loglevel: int = loglevel if loglevel is not None else get_config('generic', 'loglevel') or logging.INFO
         self.logger = logging.getLogger(module)
         self.logger.setLevel(self.loglevel)
@@ -167,6 +170,7 @@ class BaseWorker(multiprocessing.Process):
             return
 
         self.logger.info('Worker is running...')
+        setproctitle.setproctitle(f'Pandora Worker: {self.name}')
 
         while True:
             try:

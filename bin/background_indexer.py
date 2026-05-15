@@ -9,6 +9,7 @@ from redis import Redis
 
 from pandora import Indexing
 from pandora.default import AbstractManager, get_config, get_socket_path
+from pandora.exceptions import InvalidPandoraObject
 
 
 logging.config.dictConfig(get_config('logging'))
@@ -44,6 +45,10 @@ class BackgroundIndexer(AbstractManager):
             try:
                 if self.indexing.index_task(uuid):
                     __counter_shutdown += 1
+            except InvalidPandoraObject as e:
+                # this task is completely broken, removing it from the set
+                self.indexing.storage.storage.zrem('tasks', uuid)
+                self.logger.warning(f'Task {uuid} is completely broken, removing: {e}')
             except Exception as e:
                 self.logger.warning(f'Error while indexing {uuid}: {e}')
             if __counter_shutdown % 100 == 0 and self.shutdown_requested():

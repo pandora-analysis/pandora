@@ -16,7 +16,7 @@ from uuid import uuid4
 from zipfile import ZipFile
 
 import exiftool  # type: ignore[import-untyped]
-import fitz  # type: ignore[import-untyped]
+import pymupdf
 import pikepdf
 import pillow_heif  # type: ignore[import-untyped]
 
@@ -304,10 +304,14 @@ class File:
                         heif_file.mode,
                         heif_file.stride,
                     )
+                    im = image.convert('RGB')
+                    im.save(f'{self.path}.pdf')
                 else:
-                    image = Image.open(self.path)
-                im = image.convert('RGB')
-                im.save(f'{self.path}.pdf')
+                    with Image.open(self.path) as image:
+                        # we can do that because it returns a copy as an Image, which has a CM
+                        with image.convert('RGB') as im:
+                            im.save(f'{self.path}.pdf')
+
             except Exception as e:
                 self.logger.warning(f'Unable to generate a preview of the HTML body: {e}')
 
@@ -375,14 +379,14 @@ class File:
         to_convert = self.paths_to_preview()
 
         for i, p in enumerate(to_convert):
-            doc = fitz.open(p)
-            if doc.needs_pass:
-                raise Unsupported("The PDF is password protected, this feature isn't supported yet.")
-            digits = len(str(doc.page_count))
-            for page in doc:
-                pix = page.get_pixmap()
-                img_name = self.directory / f"preview-{i}-{page.number:0{digits}}.png"
-                pix.save(img_name)
+            with pymupdf.open(p) as doc:  # type: ignore[no-untyped-call]
+                if doc.needs_pass:
+                    raise Unsupported("The PDF is password protected, this feature isn't supported yet.")
+                digits = len(str(doc.page_count))
+                for page in doc:
+                    pix = page.get_pixmap()
+                    img_name = self.directory / f"preview-{i}-{page.number:0{digits}}.png"
+                    pix.save(img_name)
 
     @property
     def previews(self) -> list[Path]:
