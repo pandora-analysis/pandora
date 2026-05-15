@@ -8,7 +8,8 @@ import os
 
 from functools import lru_cache, wraps
 from pathlib import Path
-from typing import Callable, Any
+from typing import Any
+from collections.abc import Callable
 
 from flask import abort, Request
 import flask_login  # type: ignore
@@ -22,7 +23,9 @@ from pandora.task import Task
 
 # Method to make sizes in bytes human readable
 # Source: https://stackoverflow.com/questions/1094841/reusable-library-to-get-human-readable-version-of-file-size
-def sizeof_fmt(num: int | float, suffix: str='B') -> str:
+def sizeof_fmt(num: int | float | None, suffix: str='B') -> str:
+    if num is None:
+        return '0'
     for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
         if abs(num) < 1024.0:
             return f"{num:3.1f}{unit}{suffix}"

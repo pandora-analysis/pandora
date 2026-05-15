@@ -219,6 +219,9 @@ class BaseWorker(multiprocessing.Process):
                 finally:
                     self.storage.set_report(report.to_dict)
                     logger.debug('Done with task.')
+                    task_data = None
+                    task = None
+                    report = None
 
             except PandoraException as e:
                 self.logger.critical(f'Error with current task : {e}')

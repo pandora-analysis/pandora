@@ -16,25 +16,25 @@
       <th>SHA256</th>
       <th>Status</th>
     </tr>
-    {% for extracted_task in task.extracted %}
-    <tr id="extractedTaskRow-{{ extracted_task.uuid }}">
+    {% for extracted_task in extracted_tasks %}
+    <tr id="extractedTaskRow-{{ extracted_task['uuid'] }}">
       <td>
-				{{ extracted_task.save_date }}
+				{{ extracted_task['save_date'] }}
       </td>
       <td>
-        <a href="{{ url_for('api_analysis', task_id=extracted_task.uuid, seed=seed) }}">
-          {{ render_icon(task.file.icon) }}
-          <span>{{ extracted_task.file.original_filename }}</span>
+        <a href="{{ url_for('api_analysis', task_id=extracted_task['uuid'], seed=seed) }}">
+          {{ render_icon(extracted_task['file_icon']) }}
+          <span>{{ extracted_task['file_original_name'] }}</span>
         </a>
       </td>
       <td>
-        {{ sizeof_fmt(extracted_task.file.size) }}
+        {{ sizeof_fmt(extracted_task['file_size']) }}
       </td>
       <td style="word-wrap: break-all;">
-        {{ extracted_task.file.sha256 }}
+        {{ extracted_task['file_sha256'] }}
       </td>
       <td>
-        {{ display_task_status(extracted_task.status, status) }}
+        {{ display_task_status(extracted_task['status'], status) }}
       </td>
     </tr>
     {% endfor %}

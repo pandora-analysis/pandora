@@ -645,8 +645,20 @@ def html_extracted(task_id: str, seed: str | None=None) -> str:
     if not task:
         raise PandoraException('analysis not found')
     update_user_role(pandora, task, seed)
-    report = pandora.get_report(task_id, 'extractor')
-    return render_template('extracted.html', task=task, seed=seed, report=report)
+    # report = pandora.get_report(task_id, 'extractor')
+    extracted_to_show = []
+    for extracted_task in task.extracted:
+        to_show = {}
+        to_show['uuid'] = extracted_task.uuid
+        to_show['save_date'] = extracted_task.save_date
+        to_show['status'] = extracted_task.status
+        to_show['file_icon'] = extracted_task.file.icon
+        to_show['file_original_name'] = extracted_task.file.original_filename
+        to_show['file_size'] = extracted_task.file.size
+        to_show['file_sha256'] = extracted_task.file.sha256
+        extracted_to_show.append(to_show)
+
+    return render_template('extracted.html', extracted_tasks=extracted_to_show, seed=seed)  # , report=report)
 
 
 @app.route('/workers_results_html/<task_id>/<worker_name>', methods=['GET'], strict_slashes=False)
