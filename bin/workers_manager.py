@@ -6,7 +6,9 @@ import importlib
 import inspect
 import logging
 import logging.config
+
 from collections.abc import Mapping
+from multiprocessing import set_start_method
 
 from redis import Redis
 
@@ -120,6 +122,7 @@ class WorkersManager(AbstractManager):
 
 
 def main() -> None:
+    set_start_method('fork')
     wm = WorkersManager()
     wm.run(sleep_in_sec=60)
 
