@@ -648,7 +648,7 @@ def html_extracted(task_id: str, seed: str | None=None) -> str:
     # report = pandora.get_report(task_id, 'extractor')
     extracted_to_show = []
     for extracted_task in task.extracted:
-        to_show = {}
+        to_show: dict[str, Any] = {}
         to_show['uuid'] = extracted_task.uuid
         to_show['save_date'] = extracted_task.save_date
         to_show['status'] = extracted_task.status

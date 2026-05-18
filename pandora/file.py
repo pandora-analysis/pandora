@@ -678,7 +678,7 @@ class File:
                             # this call can trigger an exception
                             self.logger.warning(f'Unable to process a page: {e}')
                             continue
-                        for annots in page["/Annots"]:  # type: ignore
+                        for annots in page["/Annots"]:
                             if not annots.get("/A"):
                                 continue
                             uri = annots["/A"].get("/URI")

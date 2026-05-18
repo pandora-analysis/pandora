@@ -60,7 +60,6 @@ yara-python = "^4.5.4"
 svglib = "^1.6.0"
 clamd = "^1.0.2"
 rarfile = "^4.2"
-publicsuffix2 = "^2.20191221"
 pymispwarninglists = "^1.7.0"
 pikepdf = "^10.6.0"
 Pillow = "^12.2.0"
@@ -82,6 +81,7 @@ beautifulsoup4 = {version= "<4.14", extras = ["lxml", "charset_normalizer"]}
 psutil = "^7.2.2"
 textract-py3 = "^3.0.1"
 pure-magic-rs = "^0.3.4"
+pyfaup-rs = "^0.4.8"
 # The libyall libs
 dfvfs = "^20251019"
 

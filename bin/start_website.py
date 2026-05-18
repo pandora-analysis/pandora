@@ -18,7 +18,6 @@ class Website(AbstractManager):
         super().__init__(loglevel)
         self.script_name = 'website'
         self.process: Popen = self._launch_website()  # type: ignore[type-arg]
-        self.set_running()
 
     def _launch_website(self) -> Popen:  # type: ignore[type-arg]
         website_dir = get_homedir() / 'website'

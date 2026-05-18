@@ -4,7 +4,7 @@ import re
 
 from typing import Any
 
-from .helpers import get_public_suffix_list
+from pyfaup import Url, Host
 
 
 class TextParser:
@@ -28,7 +28,6 @@ class TextParser:
     ])
 
     def __init__(self, text: Any) -> None:
-        self.tlds = get_public_suffix_list().tlds
         self.text = str(text) or ''
         self.ips = self._find_ips()
         self.ibans = self._find_ibans()
@@ -66,7 +65,12 @@ class TextParser:
                     url = url[:-6]
                 if url.endswith('&gt;'):
                     url = url[:-4]
-                urls.add(url)
+                try:
+                    _u = Url(url)
+                    urls.add(_u.orig)
+                except ValueError:
+                    # not a valid URL
+                    continue
         return urls
 
     def _find_hostnames(self) -> set[str]:
@@ -74,9 +78,12 @@ class TextParser:
         text = self.text.replace("[.]", ".")
         for match in re.finditer(self.HOSTNAME_REGEX, text):
             hostname = match.group(1).lower()
-            tld = hostname.split('.')[-1]
-            if tld in self.tlds:
-                hostnames.add(hostname)
+            try:
+                _h = str(Host(hostname))
+                hostnames.add(str(_h))
+            except ValueError:
+                # not a valid hostname
+                continue
         return hostnames
 
     def _find_emails(self) -> set[str]:

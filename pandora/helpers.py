@@ -8,11 +8,10 @@ import secrets
 
 from datetime import timedelta
 from enum import IntEnum, Enum, unique, auto
-from functools import lru_cache
+from functools import cache
 from importlib.metadata import version
 from typing import Any
 
-from publicsuffix2 import PublicSuffixList, fetch  # type: ignore[import-untyped]
 from pymispwarninglists import WarningLists  # type: ignore[attr-defined]
 from redis import Redis
 import yaml
@@ -53,7 +52,7 @@ class TypeObservable(Enum):
     IBAN = auto()
 
 
-@lru_cache(64)
+@cache
 def email_blocklist() -> list[str]:
     _path = get_homedir() / 'config' / 'email_blocklist.yml'
     if _path.exists():
@@ -63,14 +62,14 @@ def email_blocklist() -> list[str]:
     return []
 
 
-@lru_cache(64)
+@cache
 def allowlist_default() -> list[str]:
     with (get_homedir() / 'config' / 'allowlist.yml').open() as config_file:
         config = yaml.safe_load(config_file.read())
     return config['allowlist']
 
 
-@lru_cache(64)
+@cache
 def roles_from_config() -> dict[str, Role]:
     with (get_homedir() / 'config' / 'roles.yml').open() as config_file:
         config = yaml.safe_load(config_file.read())
@@ -82,7 +81,7 @@ def roles_from_config() -> dict[str, Role]:
     return to_return
 
 
-@lru_cache(64)
+@cache
 def workers() -> dict[str, dict[str, Any]]:
     workers_dir = get_homedir() / 'pandora' / 'workers'
     # Sample config file
@@ -180,24 +179,12 @@ def expire_in_sec(time: str | int | None) -> int:
     return 0
 
 
-@lru_cache(64)
-def get_public_suffix_list() -> PublicSuffixList:
-    # Initialize Public Suffix List
-    try:
-        psl_file = fetch()
-        psl = PublicSuffixList(psl_file=psl_file)
-    except Exception as e:
-        logging.getLogger(__name__).warning(f'Unable to fetch the PublicSuffixList: {e}')
-        psl = PublicSuffixList()
-    return psl
-
-
-@lru_cache(64)
+# @cache
 def get_warninglists() -> WarningLists:
     return WarningLists(slow_search=False)
 
 
-@lru_cache(64)
+@cache
 def get_disclaimers() -> dict[str, str]:
     disclaimer_path = get_homedir() / 'config' / 'disclaimer.tmpl'
     if not disclaimer_path.exists():
@@ -212,7 +199,7 @@ def get_disclaimers() -> dict[str, str]:
     return to_return
 
 
-@lru_cache(64)
+@cache
 def get_task_status_messages() -> dict[str, str]:
     status_names = ['overwrite', 'error', 'danger', 'warning', 'success', 'info']
     to_return = {}
@@ -225,13 +212,13 @@ def get_task_status_messages() -> dict[str, str]:
     return to_return
 
 
-@lru_cache(64)
+@cache
 def get_email_template() -> str:
     with (get_homedir() / 'config' / 'email.tmpl').open() as f:
         return f.read()
 
 
-@lru_cache(64)
+@cache
 def get_useragent_for_requests() -> str:
     return f'Pandora / {version("pandora")}'
 
