@@ -8,7 +8,6 @@ import shutil
 import traceback
 
 from datetime import datetime, timezone
-from functools import cached_property
 from io import BytesIO
 from pathlib import Path
 from typing import cast, Any
@@ -408,7 +407,7 @@ class File:
     def directory(self) -> Path:
         return self.path.parent
 
-    @cached_property
+    @property
     def data(self) -> BytesIO | None:
         """
         Property to get file content in binary format.
@@ -528,7 +527,7 @@ class File:
     def size(self, value: int) -> None:
         self._size = value
 
-    @cached_property
+    @property
     def type(self) -> str:
         """
         Guess file type from mimeType or extension.
@@ -551,7 +550,7 @@ class File:
         # Default type to BIN (??)
         return 'BIN'
 
-    @cached_property
+    @property
     def _extension_for_textract(self) -> str | None:
         """
         Textract expects a specific list of extensions, sanitize the one we have.
@@ -569,7 +568,7 @@ class File:
         # Default extension to None
         return None
 
-    @cached_property
+    @property
     def text(self) -> str:
         """
         Property to get file text content.
@@ -596,7 +595,7 @@ class File:
             self.error_trace = f'{e}\n{traceback.format_exc()}'
         return ''
 
-    @cached_property
+    @property
     def text_preview(self) -> BytesIO:
         max_width: int = 2000
         max_height: int = 5000
@@ -716,14 +715,14 @@ class File:
             observables['email'].update(tp.emails)
         return observables
 
-    @cached_property
+    @property
     def eml_data(self) -> dict[str, Any] | None:
         if not self.is_eml or not self.data:
             return None
         ep = EmlParser(include_raw_body=True, include_attachment_data=True)
         return ep.decode_email_bytes(self.data.getvalue().decode(encoding='ascii', errors='ignore').encode())
 
-    @cached_property
+    @property
     def msg_data(self) -> MessageBase | AppointmentMeeting | None:
         # NOTE: the msg file can be other things than a message.
         # See https://github.com/TeamMsgExtractor/msg-extractor/blob/master/extract_msg/utils.py
@@ -734,7 +733,7 @@ class File:
             raise Unsupported(f'msg file must be a message, other formats are not supported yet. Type: {type(msg)}')
         return msg
 
-    @cached_property
+    @property
     def metadata(self) -> dict[str, str]:
         """
         Get file metadata.

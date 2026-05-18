@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import contextlib
 import json
+import linecache
 import logging
 import multiprocessing
 import signal
 import time
 import traceback
+import tracemalloc
 
 from logging import LoggerAdapter
 from typing import Any
@@ -35,6 +37,30 @@ class WorkerLogAdapter(LoggerAdapter):  # type: ignore[type-arg]
         return msg, kwargs
 
 
+def display_top(snapshot: tracemalloc.Snapshot, name: str, key_type: str='lineno', limit: int=10) -> None:
+    snapshot = snapshot.filter_traces((
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+        tracemalloc.Filter(False, "<unknown>"),
+    ))
+    top_stats = snapshot.statistics(key_type, cumulative=True)
+
+    print(f"Top {limit} lines - {name}")
+    for index, stat in enumerate(top_stats[:limit], 1):
+        frame = stat.traceback[0]
+        print("#%s: %s:%s: %.1f KiB"
+              % (index, frame.filename, frame.lineno, stat.size / 1024))
+        line = linecache.getline(frame.filename, frame.lineno).strip()
+        if line:
+            print('    %s' % line)
+
+    other = top_stats[limit:]
+    if other:
+        size = sum(stat.size for stat in other)
+        print(f"{len(other)} other: {size / 1024:.1f} KiB")
+    total = sum(stat.size for stat in top_stats)
+    print("Total allocated size: %.1f KiB" % (total / 1024))
+
+
 class BaseWorker(multiprocessing.Process):
 
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
@@ -49,6 +75,7 @@ class BaseWorker(multiprocessing.Process):
         :param timeout: timeout for module
         """
         super().__init__(name=f'{module}-{worker_id}', daemon=True)
+        # tracemalloc.start()
 
         self.loglevel: int = loglevel if loglevel is not None else get_config('generic', 'loglevel') or logging.INFO
         self.logger = logging.getLogger(module)
@@ -93,6 +120,8 @@ class BaseWorker(multiprocessing.Process):
 
         for key, value in options.items():
             setattr(self, key, value)
+        # snapshot = tracemalloc.take_snapshot()
+        # display_top(snapshot, self.name)
 
     @property
     def redis(self) -> Redis:  # type: ignore[type-arg]
@@ -217,11 +246,13 @@ class BaseWorker(multiprocessing.Process):
                         # Only change to success if the analysis didn't change it.
                         report.status = Status.CLEAN
                 finally:
+                    # snapshot = tracemalloc.take_snapshot()
+                    # display_top(snapshot, self.name)
                     self.storage.set_report(report.to_dict)
                     logger.debug('Done with task.')
-                    task_data = None
-                    task = None
-                    report = None
+                    # task_data = None
+                    # task = None
+                    # report = None
 
             except PandoraException as e:
                 self.logger.critical(f'Error with current task : {e}')
@@ -231,6 +262,7 @@ class BaseWorker(multiprocessing.Process):
                 self.logger.critical(f'unable to reach redis socket, shutting down : {e}')
             except Exception as e:
                 self.logger.critical(f'unknown error with current task : {repr(e)}\n{traceback.format_exc()}')
+
         try:
             self.redis.xgroup_destroy(name='tasks_queue', groupname=self.module)
             self.logger.debug(f'Redis stream group {self.module} destroyed.')
