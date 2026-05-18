@@ -83,7 +83,7 @@ textract-py3 = "^3.0.1"
 pure-magic-rs = "^0.3.4"
 pyfaup-rs = "^0.4.8"
 # The libyall libs
-dfvfs = "^20251019"
+dfvfs = "^20260411"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^4.0.5"
