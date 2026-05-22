@@ -183,6 +183,12 @@
                   </td>
                 </tr>
               {% endif %}
+              {% if task.password %}
+                <tr>
+                  <th>Password</th>
+                  <td>{{ task.password }}</td>
+                </tr>
+              {% endif %}
               {% if task.file.type is not none %}
                 <tr>
                   <th>Type</th>
