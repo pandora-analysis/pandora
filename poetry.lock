@@ -5935,21 +5935,21 @@ testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "pylookyloo"
-version = "1.39.1"
+version = "1.39.2"
 description = "Python CLI and module for Lookyloo"
 optional = false
 python-versions = "<3.15,>=3.10"
 groups = ["main"]
 files = [
-    {file = "pylookyloo-1.39.1-py3-none-any.whl", hash = "sha256:9141ac4e79624b7b4d447e71336eefaee60747e9d92ccf3117d128ba31a064f8"},
-    {file = "pylookyloo-1.39.1.tar.gz", hash = "sha256:e02019c5126f06ea73abd2da2f01f2266cf763941b44872c9c25bfe134ce9927"},
+    {file = "pylookyloo-1.39.2-py3-none-any.whl", hash = "sha256:eff57f74e2a34400da609566a2f9e35a8147fabe3a6bc365da99957b8ae50c2a"},
+    {file = "pylookyloo-1.39.2.tar.gz", hash = "sha256:7ba0fd8f16e5cad0796ec11f49ff041ab55fdccae4da1e20fbe1a17600f5b46f"},
 ]
 
 [package.dependencies]
 deprecated = {version = ">=1.3.1,<2.0.0", markers = "python_version < \"3.13\""}
 lookyloo-models = ">=0.2.7"
 pydantic = ">=2.12.5,<3.0.0"
-requests = ">=2.33.1"
+requests = ">=2.34.2"
 urllib3 = ">=2.6.3,<3.0.0"
 
 [package.extras]
@@ -8419,4 +8419,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "218183781c20c8cf758d8bbd1d3777159365a147cac71782d3f36af9bdc0877a"
+content-hash = "d790e30856bd89b886a3632e01ce60f4af6a1e7b55e4b80ef354fe7be2d75570"
