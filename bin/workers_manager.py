@@ -109,8 +109,8 @@ class WorkersManager(AbstractManager):
             self.logger.info(f'restart dead worker {worker.module}')
             self._workers.remove(worker)
             # Restart module worker
-            module_name, _ = worker.module.split('-')
-            new_worker = self._init_worker(module_name, worker_conf=workers()[module_name], restart=True)[0]
+            new_worker = self._init_worker(worker.module, worker_conf=workers()[worker.module],
+                                           restart=True)[0]
             self._workers.append(new_worker)
             new_worker.start()
 
