@@ -7917,14 +7917,14 @@ files = [
 
 [[package]]
 name = "unoserver"
-version = "3.6"
+version = "3.7"
 description = "A server for file conversions with Libre Office"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "unoserver-3.6-py3-none-any.whl", hash = "sha256:25c360fa194396a89cb79b4edd2735f8e4f0fd8531e59db3952114585bd7df05"},
-    {file = "unoserver-3.6.tar.gz", hash = "sha256:e446bcb3638c51880f002aaeecab1cf74dfa9df81035f027f7ff2e081b6d7015"},
+    {file = "unoserver-3.7-py3-none-any.whl", hash = "sha256:fc44e6808071c9d2957e705ecf1742cea8a582aa5d5cc23babf36bb332ec6e8e"},
+    {file = "unoserver-3.7.tar.gz", hash = "sha256:b05f9578506ac7374ae1b314c3a79528636c542ac78220a9ce99110584ca424b"},
 ]
 
 [package.extras]
@@ -8575,4 +8575,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "ddb2e2d4a8eafe9b9914cc1ca8d18f12fc4806275220f8bdd6eca2f0bebaae39"
+content-hash = "e838e973dd9653fa667a462bed3c803379864c53912f0a1988792d50eeb2c0e6"
