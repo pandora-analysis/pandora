@@ -56,6 +56,9 @@ class Report:
             'extras': json.dumps(self.extras) if self.extras else None,
         }.items() if v is not None}
 
+    def __str__(self) -> str:
+        return f'<status: {self.status.name} - worker: {self.worker_name} - task_uuid: {self.task_uuid}>'
+
     @property
     def status_indicators(self) -> dict[str, str]:
         return self._status_indicators

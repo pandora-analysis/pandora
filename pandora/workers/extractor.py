@@ -102,6 +102,14 @@ class Extractor(BaseWorker):
         # We might be getting integers from the config file
         self.zip_passwords = [str(pwd) for pwd in self.zip_passwords]
 
+        if self.max_recurse < 1:
+            raise PandoraException(f'[{module}] max_recurse must be at least 1 if the extractor worker is enabled.')
+
+        # NOTE: if the number of max recurse is <= replicas + 1, the worker might get stuck:
+        # https://github.com/pandora-analysis/pandora/issues/966#issuecomment-4670561558
+        if self.max_recurse > self.meta['replicas'] + 1:
+            raise PandoraException(f'[{module}] not enough replicas ({self.meta["replicas"]}) for the number of max recurse ({self.max_recurse}) should be at least ({self.max_recurse + 1}) .')
+
     @property
     def passwords(self) -> list[str]:
         return self._passwords
@@ -619,7 +627,7 @@ class Extractor(BaseWorker):
             _cur_recurse -= 1
             _cur_max_files_in_recurse -= len(_curtask.extracted)
 
-        if _cur_recurse < 0:
+        if _cur_recurse <= 0:
             self.logger.warning(f'File {task.file.path.name} is too deep in the recursion chain (>{self.max_recurse}).')
             report.status = Status.ERROR if self.max_is_error else Status.ALERT
             report.add_details('Warning', f'File {task.file.path.name} is too deep in the recursion chain (>{self.max_recurse}). If you want to scan it anyway, click on Actions > Rescan file.')

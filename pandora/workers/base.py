@@ -118,10 +118,16 @@ class BaseWorker(multiprocessing.Process):
         self.required = options.pop('required', False)
         self.run_by_default = options.pop('run_by_default', True)
 
+        self.meta = options.pop('meta')
         for key, value in options.items():
+            if hasattr(self, key):
+                raise PandoraException(f'Worker option "{key}" is not allowed (variable name already used in module).')
             setattr(self, key, value)
         # snapshot = tracemalloc.take_snapshot()
         # display_top(snapshot, self.name)
+
+    def __str__(self) -> str:
+        return f'WORKER <name: {self.name}>'
 
     @property
     def redis(self) -> Redis:  # type: ignore[type-arg]

@@ -310,7 +310,7 @@ class Task:
         return observables
 
     def __str__(self) -> str:
-        return f'<uuid: {self.uuid} - file: {self.file}>'
+        return f'<status: {self._status.name} - uuid: {self.uuid} - file: {self.file}>'
 
     @overload
     def misp_export(self, with_extracted_tasks: Literal[True]) -> list[MISPEvent]:

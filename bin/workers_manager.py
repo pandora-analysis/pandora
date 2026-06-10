@@ -7,7 +7,7 @@ import inspect
 import logging
 import logging.config
 
-from collections.abc import Mapping
+from collections.abc import MutableMapping
 from multiprocessing import set_start_method
 
 from redis import Redis
@@ -66,10 +66,11 @@ class WorkersManager(AbstractManager):
 
         # Import module
         module = importlib.import_module(f'pandora.workers.{module_name}')
-        options: Mapping[str, str | int | bool] = {
+        options: MutableMapping[str, str | int | bool | dict[str, str | int]] = {
             key: value for key, value in worker_conf['settings'].items()
             if key not in ('cache', 'timeout')
         }
+        options['meta'] = worker_conf['meta']
         status_in_report = {}
         if 'status_in_report' in worker_conf:
             status_in_report = worker_conf['status_in_report']

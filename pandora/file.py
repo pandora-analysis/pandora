@@ -312,7 +312,7 @@ class File:
                             im.save(f'{self.path}.pdf')
 
             except Exception as e:
-                self.logger.warning(f'Unable to generate a preview of the HTML body: {e}')
+                self.logger.warning(f'Unable to generate a preview of the image: {e}')
 
         if self.is_html:
             html_to_pdf(self.path, f'{self.path}.pdf')
@@ -327,7 +327,7 @@ class File:
                 if self.msg_data.htmlBody:
                     html_to_pdf(self.msg_data.htmlBody, f'{self.path}_body_html.pdf')
             except Exception as e:
-                self.logger.warning(f'Unable to generate a preview of the HTML body: {e}')
+                self.logger.warning(f'[MSG] Unable to generate a preview of the HTML body (probably missing): {e}')
 
         if self.eml_data:
             # get all content -> make it a PDF
