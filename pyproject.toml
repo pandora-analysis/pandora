@@ -45,8 +45,8 @@ validators = "^0.35.0"
 PyMuPDF = "^1.27.2.3"
 requests = "^2.34.2"
 PyExifTool = "^0.5.6"
-eml-parser = "^3.0.1"
-unoserver = "^3.6"
+eml-parser = "^3.0.2"
+unoserver = "^3.7"
 weasyprint = "^69.0"
 extract-msg = {version = "^0.55.0"}
 oletools = {version = "^0.60.2", extras = ["full"]}
@@ -63,7 +63,7 @@ rarfile = "^4.2"
 pymispwarninglists = "^1.7.0"
 pikepdf = "^10.8.0"
 Pillow = "^12.2.0"
-pillow-heif = "^1.3.0"
+pillow-heif = "^1.4.0"
 imapclient = "^3.1.0"
 pyzipper = "^0.4.0"
 pymisp = {version = "^2.5.34.1", extras = ["fileobjects"]}
@@ -81,12 +81,12 @@ beautifulsoup4 = {version= "<4.14", extras = ["lxml", "charset_normalizer"]}
 psutil = "^7.2.2"
 textract-py3 = "^3.0.1"
 pure-magic-rs = "^0.4.3"
-pyfaup-rs = "^0.4.10"
+pyfaup-rs = "^0.4.11"
 # The libyall libs
 dfvfs = "^20260411"
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^4.0.5"
+pylint = "^4.0.6"
 mypy = "^2.1.0"
 types-redis = {version = "^4.6.0.20241004"}
 types-PyYAML = "^6.0.12.20260518"
@@ -96,7 +96,7 @@ types-psutil = "^7.2.2.20260518"
 types-beautifulsoup4 = "^4.12.0.20250516"
 bandit = {extras = ["toml"], version = "^1.9.4"}
 flake8 = "^7.3.0"
-semgrep = "^1.165.0"
+semgrep = "^1.166.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
