@@ -185,7 +185,7 @@ class ApiTaskObservables(Resource):  # type: ignore[misc]
 
     @json_answer
     def get(self) -> list[dict[str, Any]]:
-        args = status_parser.parse_args(request)
+        args = task_observables_parser.parse_args(request)
         task_id = args['task_id']
         seed = args['seed'] if args.get('seed') else None
         task = pandora.get_task(task_id=task_id)
@@ -225,6 +225,31 @@ class ApiTaskStatus(Resource):  # type: ignore[misc]
         if details:
             to_return['workersStatus'] = task.workers_status
         return to_return
+
+
+task_metadata_parser = api.parser()
+task_metadata_parser.add_argument('task_id', required=True,
+                                  location='args',
+                                  help="The id of the task you'd like to get the file metadata from")
+task_metadata_parser.add_argument('seed', required=False,
+                                  location='args',
+                                  help="A seed allowing you so see the task (if not admin)")
+
+
+@api.route('/task_metadata', methods=['GET'], strict_slashes=False)
+@api.expect(task_metadata_parser)
+class ApiTaskMetadata(Resource):  # type: ignore[misc]
+
+    @json_answer
+    def get(self) -> dict[str, Any]:
+        args = task_metadata_parser.parse_args(request)
+        task_id = args['task_id']
+        seed = args['seed'] if args.get('seed') else None
+        task = pandora.get_task(task_id=task_id)
+        update_user_role(pandora, task, seed)
+        if not flask_login.current_user.role.can(Action.read_analysis):
+            raise Forbidden('Not allowed to read the report')
+        return {'success': True, 'taskId': task.uuid, 'metadata': task.file.metadata}
 
 
 worker_parser = api.parser()
