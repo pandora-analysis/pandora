@@ -185,7 +185,7 @@ class ApiTaskObservables(Resource):  # type: ignore[misc]
 
     @json_answer
     def get(self) -> list[dict[str, Any]]:
-        args = status_parser.parse_args(request)
+        args = task_observables_parser.parse_args(request)
         task_id = args['task_id']
         seed = args['seed'] if args.get('seed') else None
         task = pandora.get_task(task_id=task_id)
