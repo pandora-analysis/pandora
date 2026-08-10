@@ -5751,14 +5751,14 @@ test = ["coverage[toml] (>=5.2)", "hypothesis", "pytest (>=6.0)", "pytest-cov"]
 
 [[package]]
 name = "pycdlib"
-version = "1.16.0"
+version = "1.20.0"
 description = "Pure python ISO manipulation library"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "pycdlib-1.16.0-py2.py3-none-any.whl", hash = "sha256:17843829c6bf2fd365d3d2e49a94f06da82c999efc313b9f26b0ce59c0070785"},
-    {file = "pycdlib-1.16.0.tar.gz", hash = "sha256:da02ce3d3a7cc1f879cd84db7bb39427a082cee0dbf0730fec89604039344058"},
+    {file = "pycdlib-1.20.0-py2.py3-none-any.whl", hash = "sha256:cb675959dd6d61e94f02560ed7e9a5d368a3188b5f7f31813bc25a750cff0863"},
+    {file = "pycdlib-1.20.0.tar.gz", hash = "sha256:1d768eb491d761a3bace188270f152ef40f33fb0d3daf6cf39bc38a81272072c"},
 ]
 
 [[package]]
@@ -8917,4 +8917,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "6349c5c77fa10acad113c4745f31f85281095f7dc6b24e382ab1f59dd42a5559"
+content-hash = "44067c69a0d89a0f9b6760a1d646b4fe5fd6bfd902fecc17cbccad0f43038aa3"
