@@ -355,7 +355,7 @@ class Extractor(BaseWorker):
                     report.status = Status.ERROR if self.max_is_error else Status.ALERT
                     report.add_details('Warning', f'File {archive_file.path.name} too big ({tarinfo.size}).')
                     continue
-                tar.extract(tarinfo, dest_dir)
+                tar.extract(tarinfo, dest_dir, filter='data')
                 file_path = dest_dir / tarinfo.name
                 extracted_files.append(Path(file_path))
         return extracted_files
