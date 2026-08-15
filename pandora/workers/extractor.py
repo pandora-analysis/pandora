@@ -31,6 +31,7 @@ import rarfile  # type: ignore[import-untyped]
 from tzlocal import get_localzone_name
 
 from ..default import safe_create_dir, PandoraException
+from ..exceptions import ZipBomb
 from ..helpers import Status
 from ..pandora import Pandora
 from ..report import Report
@@ -59,6 +60,24 @@ def dfvfs_wrapper(func):  # type: ignore[no-untyped-def]
 
     return reset_local_tz
 
+
+# copied from https://github.com/RyanDFIR/unfurl/blob/main/unfurl/utils.py
+def safe_decompress(data: bytes, max_size: int = 500_000_000) -> bytes:
+    """Decompress zlib or gzip data with a size limit to prevent zip bomb attacks.
+
+    Uses wbits=47 (32 + MAX_WBITS) to auto-detect zlib or gzip format.
+
+    :param data: Compressed bytes to decompress
+    :param max_size: Maximum allowed decompressed size in bytes (defaults to 500M)
+    :return: Decompressed bytes
+    :raises ZipBomb: If decompressed data exceeds max_size
+    :raises zlib.error: If decompression fails
+    """
+    decompressor = zlib.decompressobj(wbits=32 + zlib.MAX_WBITS)
+    result = decompressor.decompress(data, max_size)
+    if decompressor.unconsumed_tail:
+        raise ZipBomb("File too big.")
+    return result
 
 # Notes:
 # 1. Never blindly extract a file:
@@ -586,7 +605,9 @@ class Extractor(BaseWorker):
             for chunksize in chunksizes:
                 packeddata = data[offset:offset + chunksize]
                 offset += chunksize
-                raw += zlib.decompress(packeddata, -zlib.MAX_WBITS)
+                raw += safe_decompress(packeddata, self.max_extracted_filesize)
+                if len(raw) > self.max_extracted_filesize:
+                    raise ZipBomb('File too big')
             return raw
 
         pseudo_file = archive_file.data
@@ -604,10 +625,16 @@ class Extractor(BaseWorker):
             self.logger.warning('Invalid CRC')
 
         chunklist = getting_chuncklist(header, pseudo_file.getvalue())
-        raw = unpackdata(header, chunklist, pseudo_file.getvalue())
-        if len(raw) != int.from_bytes(header['isosize'], byteorder='little', signed=False):
-            self.logger.warning('Potentially invalid ISO file length')
-        return [('internal_iso_in_daa.iso', BytesIO(raw))]
+        try:
+            raw = unpackdata(header, chunklist, pseudo_file.getvalue())
+            if len(raw) != int.from_bytes(header['isosize'], byteorder='little', signed=False):
+                self.logger.warning('Potentially invalid ISO file length')
+            return [('internal_iso_in_daa.iso', BytesIO(raw))]
+        except ZipBomb:
+            self.logger.warning(f'File {archive_file.path.name} too big.')
+            report.status = Status.ERROR if self.max_is_error else Status.ALERT
+            report.add_details('Warning', f'File {archive_file.path.name} too big.')
+            return [('internal_iso_in_daa.iso', BytesIO())]
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         # The files supported by dfvfs generally don't have proper mime types, so we just try it on everything.

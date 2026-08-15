@@ -25,3 +25,7 @@ class ConfigError(PandoraException):
 
 class InvalidPandoraObject(PandoraException):
     pass
+
+
+class ZipBomb(PandoraException):
+    pass
