@@ -434,7 +434,8 @@ def api_task_download(task_id: str, source: str, seed: str | None=None, idx: int
         # NOTE: need to also return a PDF of office doc.
         if not task.file.is_pdf:
             raise Unsupported('PDF not available')
-        return send_file(task.file.path)
+        return send_file(task.file.path, mimetype='application/pdf',
+                         as_attachment=True, download_name=f'{task.uuid}.pdf')
 
     if source == 'txt' and flask_login.current_user.role.can(Action.download_text):
         if not task.file.text:
