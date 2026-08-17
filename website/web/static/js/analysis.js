@@ -16,7 +16,8 @@ async function LookylooSubmit(lookyloo_url, url_to_submit) {
     return uuid;
 }
 
-async function lookyloo(lookyloo_url, sha256, url_to_submit) {
+async function lookyloo(lookyloo_url, sha256) {
+  let url_to_submit = document.getElementById(`lookyloo_submit-${sha256}`).dataset.url;
   let uuid = await LookylooSubmit(lookyloo_url, url_to_submit);
   document.getElementById(`lookyloo_submit-${sha256}`).style.display = 'none';
   document.getElementById(`lookyloo_link-${sha256}`).style.display = 'block';
@@ -83,7 +84,7 @@ Analysis.prototype.refreshTabs = function () {
         })
 
         if (this.workers_status.preview[1] == 'NOTAPPLICABLE') {
-            document.getElementById("previews_images").innerHTML = 'Cannot generate a preview for this file format.'
+            document.getElementById("previews_images").textContent = 'Cannot generate a preview for this file format.'
         }
         else {
             previews_url = `/previews/${this.task.uuid}`
@@ -105,7 +106,7 @@ Analysis.prototype.refreshTabs = function () {
     }
 
     if (this.number_observables && document.getElementById("number_observables").innerHTML != '') {
-       document.getElementById("number_observables").innerHTML = this.number_observables;
+       document.getElementById("number_observables").textContent = this.number_observables;
        $('#observables_tab').each(function(index, element) {
            $(this).removeClass("d-none");
        })
@@ -127,7 +128,7 @@ Analysis.prototype.refreshTabs = function () {
     }
 
     if (this.number_extracted) {
-        document.getElementById("number_extracted").innerHTML = this.number_extracted;
+        document.getElementById("number_extracted").textContent = this.number_extracted;
     }
     if (this.workers_status.extractor && this.workers_status.extractor[0]) {
         if (this.workers_status.extractor[1] != 'NOTAPPLICABLE') {
