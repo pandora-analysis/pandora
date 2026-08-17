@@ -62,7 +62,7 @@ def dfvfs_wrapper(func):  # type: ignore[no-untyped-def]
 
 
 # copied from https://github.com/RyanDFIR/unfurl/blob/main/unfurl/utils.py
-def safe_decompress(data: bytes, max_size: int = 500_000_000) -> bytes:
+def safe_decompress_daa(data: bytes, max_size: int = 500_000_000) -> bytes:
     """Decompress zlib or gzip data with a size limit to prevent zip bomb attacks.
 
     Uses wbits=47 (32 + MAX_WBITS) to auto-detect zlib or gzip format.
@@ -73,7 +73,7 @@ def safe_decompress(data: bytes, max_size: int = 500_000_000) -> bytes:
     :raises ZipBomb: If decompressed data exceeds max_size
     :raises zlib.error: If decompression fails
     """
-    decompressor = zlib.decompressobj(wbits=32 + zlib.MAX_WBITS)
+    decompressor = zlib.decompressobj(wbits=-zlib.MAX_WBITS)
     result = decompressor.decompress(data, max_size)
     if decompressor.unconsumed_tail:
         raise ZipBomb("File too big.")
@@ -605,7 +605,7 @@ class Extractor(BaseWorker):
             for chunksize in chunksizes:
                 packeddata = data[offset:offset + chunksize]
                 offset += chunksize
-                raw += safe_decompress(packeddata, self.max_extracted_filesize)
+                raw += safe_decompress_daa(packeddata, self.max_extracted_filesize)
                 if len(raw) > self.max_extracted_filesize:
                     raise ZipBomb('File too big')
             return raw
