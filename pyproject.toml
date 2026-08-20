@@ -81,7 +81,7 @@ beautifulsoup4 = {version= "^4.15.0", extras = ["lxml", "charset_normalizer"]}
 psutil = "^7.2.2"
 textract = "^2.0.0"
 pure-magic-rs = "^0.4.3"
-pyfaup-rs = "^0.4.16"
+pyfaup-rs = "^0.4.17"
 # The libyall libs
 dfvfs = "^20260717"
 
