@@ -1370,18 +1370,18 @@ files = [
 
 [[package]]
 name = "dfvfs"
-version = "20260717"
+version = "20260731"
 description = "Digital Forensics Virtual File System (dfVFS)"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "dfvfs-20260717-py3-none-any.whl", hash = "sha256:47e403af2e27dbbb8a89f7c06706ec95c7adc34830e1be6117e73b7e4eb52b05"},
-    {file = "dfvfs-20260717.tar.gz", hash = "sha256:e91927096f106bbd5dd706f8247270ca7fb33b445dbb872d46ef1aae50c55b79"},
+    {file = "dfvfs-20260731-py3-none-any.whl", hash = "sha256:8c22117b3361bb0fdf0f5931752eba33ad6c1d225fe3e1aabebe804faab3ec78"},
+    {file = "dfvfs-20260731.tar.gz", hash = "sha256:0d44a2a83b51443e9588ce16f8965adda674203d6bbb22fe9926be37f989242f"},
 ]
 
 [package.dependencies]
-dfdatetime = ">=20221112"
+dfdatetime = ">=20260730"
 dtfabric = ">=20230518"
 libbde-python = ">=20220121"
 libcaes-python = ">=20240114"
@@ -9108,4 +9108,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "32dff380e5f6ba38e4b3ea5e9af7f3fa6997244c5734f5d8e29450022e9a10fd"
+content-hash = "19119a7bce92820bcf965901d9fdce43f1ce51e224f7f9823b6bf5ffbe7fbc6f"
