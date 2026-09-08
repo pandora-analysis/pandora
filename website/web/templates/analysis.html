@@ -183,7 +183,7 @@
                   </td>
                 </tr>
               {% endif %}
-              {% if task.password %}
+              {% if current_user.is_admin and task.password %}
                 <tr>
                   <th>Password</th>
                   <td>{{ task.password }}</td>
