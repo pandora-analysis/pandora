@@ -20,10 +20,9 @@ from collections.abc import Sequence
 from extract_msg.msg_classes import MessageBase, AppointmentMeeting
 from extract_msg.attachments import AttachmentBase, SignedAttachment
 from extract_msg import MSGFile
-from hachoir.stream import StringInputStream  # type: ignore[import-untyped]
-from hachoir.parser.archive import CabFile  # type: ignore[import-untyped]
 import py7zr
 import py7zr.io
+from pycabfile import CabFile  # type: ignore[import-untyped]
 import pycdlib
 from pycdlib.facade import PyCdlibJoliet, PyCdlibUDF, PyCdlibRockRidge, PyCdlibISO9660
 import pyzipper  # type: ignore[import-untyped]
@@ -137,13 +136,14 @@ class Extractor(BaseWorker):
     def passwords(self, passwords: list[str]) -> None:
         self._passwords = passwords
 
-    def __safe_save(self, forced_parent: Path, dest_path: Path, data: bytes) -> None:
+    def __safe_save(self, forced_parent: Path, dest_path: Path, data: bytes) -> Path:
         resolved_path = dest_path.resolve()
         if not resolved_path.is_relative_to(forced_parent):
             # the dest path is outside of the parent
             raise PathTransversal(f'Path transversal attempt: {resolved_path}')
         with resolved_path.open('wb') as f:
             f.write(data)
+        return resolved_path
 
     def _extract_iso(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
         iso = pycdlib.PyCdlib()
@@ -183,7 +183,7 @@ class Extractor(BaseWorker):
                         filepath = tmp_dest_dir / filename.split(';')[0]
                     else:
                         filepath = tmp_dest_dir / filename
-                    self.__safe_save(dest_dir, filepath, extracted.getvalue())
+                    filepath = self.__safe_save(dest_dir, filepath, extracted.getvalue())
                     extracted_files.append(filepath)
             if len(extracted_files) > self.max_files_in_archive:
                 self.logger.warning(f'Too many files in the archive (more than {self.max_files_in_archive}).')
@@ -360,7 +360,7 @@ class Extractor(BaseWorker):
             new_file_path = dest_dir / archive_file.path.stem
         else:
             new_file_path = dest_dir / archive_file.path.name
-        self.__safe_save(dest_dir, new_file_path, data)
+        new_file_path = self.__safe_save(dest_dir, new_file_path, data)
         return [new_file_path]
 
     def _extract_tar(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
@@ -390,23 +390,23 @@ class Extractor(BaseWorker):
         # Code from https://github.com/vstinner/hachoir/issues/65#issuecomment-866965090
         if not archive_file.data:
             return extracted_files
-        cab = CabFile(StringInputStream(archive_file.data.getvalue()))
-        cab["folder_data[0]"].getSubIStream()
-        folder_data = BytesIO(cab["folder_data[0]"].uncompressed_data)
-        for file_number, file in enumerate(cab.array("file")):
-            if file_number >= self.max_files_in_archive:
-                self.logger.warning(f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive, stop extracting.')
-                report.status = Status.ERROR if self.max_is_error else Status.ALERT
-                report.add_details('Warning', f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive')
-                break
-            if file["filesize"].value >= self.max_extracted_filesize:
-                self.logger.warning(f'File {archive_file.path.name} too big ({file["filesize"].value}).')
-                report.status = Status.ERROR if self.max_is_error else Status.ALERT
-                report.add_details('Warning', f'File {archive_file.path.name} too big ({file["filesize"].value}).')
-                continue
-            file_path = dest_dir / file["filename"].value
-            self.__safe_save(dest_dir, file_path, folder_data.read(file["filesize"].value))
-            extracted_files.append(Path(file_path))
+        with CabFile(archive_file.path) as cab:
+            for file_number, filename in enumerate(cab.namelist()):
+                if file_number >= self.max_files_in_archive:
+                    self.logger.warning(f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive, stop extracting.')
+                    report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                    report.add_details('Warning', f'Too many files ({file_number}/{self.max_files_in_archive}) in the archive')
+                    break
+                info = cab.getinfo(filename)
+                if info.file_size >= self.max_extracted_filesize:
+                    self.logger.warning(f'File {archive_file.path.name} too big ({info.file_size}).')
+                    report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                    report.add_details('Warning', f'File {archive_file.path.name} too big ({info.file_size}).')
+                    continue
+                file = cab.read(filename)
+                file_path = dest_dir / filename
+                file_path = self.__safe_save(dest_dir, file_path, file)
+                extracted_files.append(Path(file_path))
         return extracted_files
 
     def _extract_gz(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
@@ -422,7 +422,7 @@ class Extractor(BaseWorker):
             new_file_path = dest_dir / archive_file.path.stem
         else:
             new_file_path = dest_dir / archive_file.path.name
-        self.__safe_save(dest_dir, new_file_path, data)
+        new_file_path = self.__safe_save(dest_dir, new_file_path, data)
         return [new_file_path]
 
     def _extract_lzma(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
@@ -438,7 +438,7 @@ class Extractor(BaseWorker):
             new_file_path = dest_dir / archive_file.path.stem
         else:
             new_file_path = dest_dir / archive_file.path.name
-        self.__safe_save(dest_dir, new_file_path, data)
+        new_file_path = self.__safe_save(dest_dir, new_file_path, data)
         return [new_file_path]
 
     @overload
