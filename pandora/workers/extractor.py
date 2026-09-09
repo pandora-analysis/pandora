@@ -31,7 +31,7 @@ import rarfile  # type: ignore[import-untyped]
 from tzlocal import get_localzone_name
 
 from ..default import safe_create_dir, PandoraException
-from ..exceptions import ZipBomb
+from ..exceptions import ZipBomb, PathTransversal
 from ..helpers import Status
 from ..pandora import Pandora
 from ..report import Report
@@ -137,6 +137,14 @@ class Extractor(BaseWorker):
     def passwords(self, passwords: list[str]) -> None:
         self._passwords = passwords
 
+    def __safe_save(self, forced_parent: Path, dest_path: Path, data: bytes) -> None:
+        resolved_path = dest_path.resolve()
+        if not resolved_path.is_relative_to(forced_parent):
+            # the dest path is outside of the parent
+            raise PathTransversal(f'Path transversal attempt: {resolved_path}')
+        with resolved_path.open('wb') as f:
+            f.write(data)
+
     def _extract_iso(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
         iso = pycdlib.PyCdlib()
         extracted_files: list[Path] = []
@@ -175,8 +183,7 @@ class Extractor(BaseWorker):
                         filepath = tmp_dest_dir / filename.split(';')[0]
                     else:
                         filepath = tmp_dest_dir / filename
-                    with filepath.open('wb') as f:
-                        f.write(extracted.getvalue())
+                    self.__safe_save(dest_dir, filepath, extracted.getvalue())
                     extracted_files.append(filepath)
             if len(extracted_files) > self.max_files_in_archive:
                 self.logger.warning(f'Too many files in the archive (more than {self.max_files_in_archive}).')
@@ -353,8 +360,7 @@ class Extractor(BaseWorker):
             new_file_path = dest_dir / archive_file.path.stem
         else:
             new_file_path = dest_dir / archive_file.path.name
-        with new_file_path.open('wb') as f:
-            f.write(data)  # write an uncompressed file
+        self.__safe_save(dest_dir, new_file_path, data)
         return [new_file_path]
 
     def _extract_tar(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
@@ -399,8 +405,7 @@ class Extractor(BaseWorker):
                 report.add_details('Warning', f'File {archive_file.path.name} too big ({file["filesize"].value}).')
                 continue
             file_path = dest_dir / file["filename"].value
-            with file_path.open('wb') as f:
-                f.write(folder_data.read(file["filesize"].value))
+            self.__safe_save(dest_dir, file_path, folder_data.read(file["filesize"].value))
             extracted_files.append(Path(file_path))
         return extracted_files
 
@@ -417,8 +422,7 @@ class Extractor(BaseWorker):
             new_file_path = dest_dir / archive_file.path.stem
         else:
             new_file_path = dest_dir / archive_file.path.name
-        with new_file_path.open('wb') as f:
-            f.write(data)  # write an uncompressed file
+        self.__safe_save(dest_dir, new_file_path, data)
         return [new_file_path]
 
     def _extract_lzma(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
@@ -434,8 +438,7 @@ class Extractor(BaseWorker):
             new_file_path = dest_dir / archive_file.path.stem
         else:
             new_file_path = dest_dir / archive_file.path.name
-        with new_file_path.open('wb') as f:
-            f.write(data)  # write an uncompressed file
+        self.__safe_save(dest_dir, new_file_path, data)
         return [new_file_path]
 
     @overload
@@ -711,6 +714,11 @@ class Extractor(BaseWorker):
                     extracted = self._extract_daa(task.file, report, extracted_dir)
                 else:
                     raise PandoraException(f'Unsupported mimetype: {task.file.mime_type}')
+            except PathTransversal as e:
+                self.logger.warning(f'Attempted to trigger a path transversal: {e}')
+                report.status = Status.ALERT
+                report.add_details('Warning', 'Archive attempted a path transversal.')
+                extracted = []
             except BaseException as e:
                 report.status = Status.WARN
                 report.add_details('Warning', f'Unable to extract {task.file.path.name}: {e}.')

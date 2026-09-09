@@ -29,3 +29,7 @@ class InvalidPandoraObject(PandoraException):
 
 class ZipBomb(PandoraException):
     pass
+
+
+class PathTransversal(PandoraException):
+    pass
