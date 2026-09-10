@@ -28,7 +28,8 @@ from pymisp.tools import make_binary_objects, FileObject, PEObject, ELFObject, M
 from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPDF  # type: ignore[import-untyped]
 import textract  # type: ignore[import-untyped]
-from weasyprint import HTML, default_url_fetcher  # type: ignore[import-untyped]
+from weasyprint import HTML  # type: ignore[import-untyped]
+from weasyprint.urls import URLFetcher, FatalURLFetchingError  # type: ignore[import-untyped]
 
 from eml_parser import EmlParser
 from extract_msg import openMsg
@@ -42,17 +43,19 @@ from .storage_client import Storage
 from .text_parser import TextParser
 
 
+class DisabledFetcher(URLFetcher):  # type: ignore[misc]
+    def fetch(self, url: str) -> None:
+        raise FatalURLFetchingError(f'Fetching is disabled, ignoring: {url}')
+
+
 def html_to_pdf(source: str | bytes | Path, dest: str) -> None:
 
-    def disable_fetch_weasyprint(url: str, timeout: int=10, ssl_context: Any | None=None) -> None:
-        raise ValueError(f'Fetching is disabled, ignoring: {url}')
-
     if isinstance(source, str):
-        html = HTML(string=source, url_fetcher=default_url_fetcher if get_config('generic', 'weasyprint_fetch_ressources') else disable_fetch_weasyprint)
+        html = HTML(string=source, url_fetcher=URLFetcher(timeout=5) if get_config('generic', 'weasyprint_fetch_ressources') else DisabledFetcher())
     elif isinstance(source, bytes):
-        html = HTML(file_obj=BytesIO(source), url_fetcher=default_url_fetcher if get_config('generic', 'weasyprint_fetch_ressources') else disable_fetch_weasyprint)
+        html = HTML(file_obj=BytesIO(source), url_fetcher=URLFetcher(timeout=5) if get_config('generic', 'weasyprint_fetch_ressources') else DisabledFetcher())
     elif isinstance(source, Path):
-        html = HTML(source, url_fetcher=default_url_fetcher if get_config('generic', 'weasyprint_fetch_ressources') else disable_fetch_weasyprint)
+        html = HTML(source, url_fetcher=URLFetcher(timeout=5) if get_config('generic', 'weasyprint_fetch_ressources') else DisabledFetcher())
     else:
         raise ValueError('Invalid type for the source document')
     html.write_pdf(dest)
