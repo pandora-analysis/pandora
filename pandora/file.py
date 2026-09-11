@@ -44,7 +44,7 @@ from .text_parser import TextParser
 
 
 class DisabledFetcher(URLFetcher):  # type: ignore[misc]
-    def fetch(self, url: str) -> None:
+    def fetch(self, url: str, headers: dict[str, Any] | None=None) -> None:
         raise FatalURLFetchingError(f'Fetching is disabled, ignoring: {url}')
 
 
