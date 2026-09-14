@@ -66,7 +66,7 @@ Pillow = "^12.3.0"
 pillow-heif = "^1.7.0"
 imapclient = "^3.1.0"
 pyzipper = "^0.4.0"
-pymisp = {version = "^2.5.34.2", extras = ["fileobjects"]}
+pymisp = {version = "^2.5.34.3", extras = ["fileobjects"]}
 python-dateutil = "^2.9.0.post0"
 pycdlib = "^1.20.0"
 werkzeug = "^3.1.8"
@@ -79,7 +79,7 @@ setuptools = "^84.0.0"
 beautifulsoup4 = {version= "^4.15.0", extras = ["lxml", "charset_normalizer"]}
 psutil = "^7.2.2"
 textract = "^2.1.0"
-pure-magic-rs = "^0.4.3"
+pure-magic-rs = "^0.5.0"
 pyfaup-rs = "^0.4.19"
 # The libyall libs
 dfvfs = "^20260717"
@@ -96,7 +96,7 @@ types-psutil = "^7.2.2.20260906"
 types-beautifulsoup4 = "^4.12.0.20250516"
 bandit = {extras = ["toml"], version = "^1.9.4"}
 flake8 = "^7.3.0"
-semgrep = "^1.176.1"
+semgrep = "^1.177.0"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
