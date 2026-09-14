@@ -75,15 +75,6 @@ class Pdf(BaseWorker):
                                 except Exception as e:
                                     self.logger.warning(f'Unable to read referenced stream: {e}')
 
-                # Check for JavaScript in object streams
-                stream = self._get_stream(doc, xref)
-
-                if stream:
-                    decoded_stream = stream.decode('latin-1', errors='replace')
-                    for key in js_indicators:
-                        if key in decoded_stream:
-                            js_scripts.append(decoded_stream)
-
         except Exception as e:
             self.logger.warning(f'Unable to extract JavaScript from PDF file: {e}')
 
