@@ -29,7 +29,7 @@ from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPDF  # type: ignore[import-untyped]
 import textract  # type: ignore[import-untyped]
 from weasyprint import HTML  # type: ignore[import-untyped]
-from weasyprint.urls import URLFetcher, FatalURLFetchingError  # type: ignore[import-untyped]
+from weasyprint.urls import URLFetcher, URLFetchingError  # type: ignore[import-untyped]
 
 from eml_parser import EmlParser
 from extract_msg import openMsg
@@ -45,7 +45,7 @@ from .text_parser import TextParser
 
 class DisabledFetcher(URLFetcher):  # type: ignore[misc]
     def fetch(self, url: str, headers: dict[str, Any] | None=None) -> None:
-        raise FatalURLFetchingError(f'Fetching is disabled, ignoring: {url}')
+        raise URLFetchingError(f'Fetching is disabled, ignoring: {url}')
 
 
 def html_to_pdf(source: str | bytes | Path, dest: str) -> None:
