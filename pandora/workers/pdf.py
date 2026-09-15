@@ -74,6 +74,8 @@ class Pdf(BaseWorker):
                                         js_scripts.append(stream.decode('utf-8', errors='replace'))
                                 except Exception as e:
                                     self.logger.warning(f'Unable to read referenced stream: {e}')
+                        else:
+                            js_scripts.append(f'{key} found in object {xref}: {obj_dict}')
 
         except Exception as e:
             self.logger.warning(f'Unable to extract JavaScript from PDF file: {e}')
