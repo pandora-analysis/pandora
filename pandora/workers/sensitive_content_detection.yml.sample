@@ -1,0 +1,62 @@
+meta:
+  name: Sensitive Content Detection
+  description: >
+    Scans file text content for sensitive data using configurable regex patterns.
+    Detects API keys, credentials, and PII categories as enabled by the admin.
+    All categories are opt-in and disabled by default.
+  replicas: 3
+
+settings:
+  timeout: 2m
+
+  # Maximum number of bytes to read from a file.
+  # Files larger than this will be scanned only up to this limit.
+  # Default: 5MB
+  max_scan_bytes: 5242880
+
+  # Detection categories. Enable each one independently.
+  # Each category can also override the default regex patterns
+  # by providing a `patterns` list.
+  #
+  # Example of overriding patterns for a category:
+  #   api_keys:
+  #     enabled: true
+  #     name: "API Keys & Tokens"
+  #     patterns:
+  #       - '(?i)my_custom_token_prefix[A-Za-z0-9]{32}'
+  #
+  categories:
+
+    # Detects API keys and tokens: AWS, OpenAI, GCP, GitHub PATs, Slack, etc.
+    api_keys:
+      enabled: false
+      name: "API Keys & Tokens"
+
+    # Detects plaintext credentials: password=, secret=, connection strings with
+    # embedded user:pass@host patterns.
+    credentials:
+      enabled: false
+      name: "Credentials & Secrets"
+
+    # Detects financial PII: IBANs, credit card numbers, US Social Security Numbers.
+    pii_financial:
+      enabled: false
+      name: "Financial PII"
+
+    # Detects contact PII: email addresses and international phone numbers.
+    pii_contact:
+      enabled: false
+      name: "Contact PII"
+
+# Map detection IDs to report severity levels.
+# Allowed values: ALERT, WARN
+# Admins can change the severity for each category here.
+status_in_report:
+  # API keys and tokens found in the file
+  api_keys_found: ALERT
+  # Plaintext credentials found in the file
+  credentials_found: ALERT
+  # Financial PII (IBAN, credit card, SSN) found in the file
+  pii_financial_found: WARN
+  # Contact PII (email, phone) found in the file
+  pii_contact_found: WARN
