@@ -17,7 +17,7 @@ from zipfile import ZipFile
 import exiftool  # type: ignore[import-untyped]
 import pymupdf
 import pikepdf
-from pillow_heif import register_heif_opener  # type: ignore[attr-defined]
+from pillow_heif import register_heif_opener
 
 from bs4 import BeautifulSoup
 from oletools.msodde import process_maybe_encrypted  # type: ignore[import-untyped]

@@ -129,28 +129,24 @@ Analysis.prototype.refreshTabs = function () {
 
     if (this.number_extracted) {
         document.getElementById("number_extracted").textContent = this.number_extracted;
-    }
-    if (this.workers_status.extractor && this.workers_status.extractor[0]) {
-        if (this.workers_status.extractor[1] != 'NOTAPPLICABLE') {
-            $('#extracted_tab').each(function(index, element) {
-                $(this).removeClass("d-none");
-            })
-            extracted_url = `/extracted/${this.task.uuid}`
-            if (this.seed) {
-                extracted_url = `${extracted_url}/seed-${this.seed}`
-            }
-
-            fetch(extracted_url, {
-              method: "GET",
-              headers: {
-                "X-CSRF-Token": this.CSRFToken
-              }
-            })
-            .then(response => response.text())
-            .then(text => {
-              document.getElementById("extracted_content").innerHTML=text;
-            })
+        $('#extracted_tab').each(function(index, element) {
+            $(this).removeClass("d-none");
+        })
+        extracted_url = `/extracted/${this.task.uuid}`
+        if (this.seed) {
+            extracted_url = `${extracted_url}/seed-${this.seed}`
         }
+
+        fetch(extracted_url, {
+          method: "GET",
+          headers: {
+            "X-CSRF-Token": this.CSRFToken
+          }
+        })
+        .then(response => response.text())
+        .then(text => {
+          document.getElementById("extracted_content").innerHTML=text;
+        })
     }
 
     for (const [worker_name, worker_done] of Object.entries(this.workers_status)){

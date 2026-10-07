@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 import re
+import time
+
+from io import BytesIO
+from typing import Any
 
 import pymupdf
 from pymupdf import Document
@@ -10,6 +14,7 @@ from pymupdf import Document
 from ..helpers import Status
 from ..task import Task
 from ..report import Report
+from ..pandora import Pandora
 
 from .base import BaseWorker
 
@@ -94,7 +99,7 @@ class Pdf(BaseWorker):
             suspicious_objects = []
             for xref in range(1, doc.xref_length()):  # type: ignore[no-untyped-call]
                 try:
-                    obj_dict = doc.xref_object(xref, compressed=True)  # type: ignore[no-untyped-call]
+                    obj_dict = doc.xref_object(xref, compressed=False)  # type: ignore[no-untyped-call]
                     if obj_dict is None:
                         continue
                 except (RuntimeError, ValueError, TypeError) as e:
@@ -119,12 +124,11 @@ class Pdf(BaseWorker):
 
         return suspicious_objects
 
-    def _detect_embedded_files(self, doc: Document) -> list[str]:
+    def _detect_embedded_files(self, doc: Document) -> list[tuple[dict[str, Any, bytes]]]:
         try:
             embedded_files = []
             for item in range(doc.embfile_count()):
-                embedded_files.append(str(doc.embfile_info(item)))
-
+                embedded_files.append((doc.embfile_info(item), doc.embfile_get(item)))
         except Exception as e:
             self.logger.warning(f'Unable to detect embedded files in PDF file: {e}')
 
@@ -136,6 +140,9 @@ class Pdf(BaseWorker):
             return
 
         self.logger.debug(f'Analysing PDF file {task.file.path}...')
+        tasks = []
+        extracted: list[tuple[str, BytesIO]] = []
+        pandora = Pandora()
         try:
             is_encrypted = False
             js_scripts = []
@@ -159,15 +166,49 @@ class Pdf(BaseWorker):
             if suspicious_objects:
                 report.add_details("Suspicious Objects Found", suspicious_objects)
             if embedded_files:
-                report.add_details("Embedded Files Found", embedded_files)
+                for info, content in embedded_files:
+                    report.add_details("Embedded Files Found", str(info))
+                    extracted.append((info['filename'], BytesIO(content)))
 
-            if js_scripts or is_encrypted or suspicious_objects or embedded_files:
+            if js_scripts or is_encrypted or suspicious_objects:
                 if is_encrypted:
                     report.status = Status.WARN
-                if js_scripts or suspicious_objects or embedded_files:
+                if js_scripts or suspicious_objects:
                     report.status = Status.ALERT
             else:
                 report.status = Status.CLEAN
 
+            # in case we had embeded files, we have subsequent tasks going
+            if extracted:
+                new_task = Task.new_task(user=task.user, sample=BytesIO(content),
+                                         filename=info['filename'],
+                                         disabled_workers=task.disabled_workers,
+                                         parent=task)
+                pandora.add_extracted_reference(task, new_task)
+                pandora.enqueue_task(new_task)
+                tasks.append(new_task)
+
+            if embedded_files and not tasks:
+                # Nothing was extracted
+                report.status = Status.WARN
+                report.add_details('Warning', 'Looks like the PDF has embeded files, but none were extracted. This is suspicious.')
+            elif report.status not in [Status.ERROR, Status.WARN, Status.ALERT, Status.OVERWRITE]:
+                # wait for all the workers to finish, or have one of them raising an ALERT
+                try:
+                    while not all(t.workers_done for t in tasks):
+                        for t in tasks:
+                            # If any of the task is marked as ALERT or OVERWRITE, we can quit.
+                            if t.workers_done and t.status >= Status.ALERT:
+                                report.add_details('Warning', 'There are suspicious files in this PDF, click on the "Extracted" tab for more.')
+                                break
+                        time.sleep(1)
+                except TimeoutError:
+                    # The extracted tasks can take a very long time, force the status in that case
+                    report.add_details('Warning', 'The extracted task(s) took too long, click on the "Extracted" tab for more.')
+                    report.status = Status.OVERWRITE
+                else:
+                    all_status = [t.status for t in tasks if t.workers_done]
+                    if all_status:
+                        report.status = max(all_status)
         except Exception as e:
             self.logger.warning(f'Unable to process PDF file: {e}')
