@@ -88,7 +88,7 @@ textract = "^2.1.0"
 pure-magic-rs = "^0.5.1"
 pyfaup-rs = "^0.4.23"
 # The libyall libs
-dfvfs = "^20260717"
+dfvfs = "^20260924"
 pycabfile = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
