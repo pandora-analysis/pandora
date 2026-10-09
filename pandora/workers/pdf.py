@@ -11,6 +11,7 @@ from typing import Any
 import pymupdf
 from pymupdf import Document
 
+from ..default import PandoraException
 from ..helpers import Status
 from ..task import Task
 from ..report import Report
@@ -124,7 +125,7 @@ class Pdf(BaseWorker):
 
         return suspicious_objects
 
-    def _detect_embedded_files(self, doc: Document) -> list[tuple[dict[str, Any, bytes]]]:
+    def _detect_embedded_files(self, doc: Document) -> list[tuple[dict[str, Any], bytes]]:
         try:
             embedded_files = []
             for item in range(doc.embfile_count()):
@@ -180,6 +181,8 @@ class Pdf(BaseWorker):
 
             # in case we had embeded files, we have subsequent tasks going
             if extracted:
+                if not task.user:
+                    raise PandoraException(f'[{task.uuid}] The task user is missing (PDF module).')
                 new_task = Task.new_task(user=task.user, sample=BytesIO(content),
                                          filename=info['filename'],
                                          disabled_workers=task.disabled_workers,
