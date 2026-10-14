@@ -20,6 +20,7 @@ from collections.abc import Sequence
 from extract_msg.msg_classes import MessageBase, AppointmentMeeting
 from extract_msg.attachments import AttachmentBase, SignedAttachment
 from extract_msg import MSGFile
+import msoffcrypto  # type: ignore[import-untyped]
 import py7zr
 import py7zr.io
 from pycabfile import CabFile  # type: ignore[import-untyped]
@@ -409,6 +410,33 @@ class Extractor(BaseWorker):
                 extracted_files.append(Path(file_path))
         return extracted_files
 
+    def _extract_encrypted_office(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
+        file = msoffcrypto.OfficeFile(archive_file.data)
+        to_return: list[Path] = []
+        if file.is_encrypted():
+            decrypted = BytesIO()
+            for pwd in self.passwords:
+                try:
+                    file.load_key(password=pwd)  # , verify_password=True)
+                    file.decrypt(decrypted)
+                    break
+                except Exception as e:
+                    # wrong password
+                    self.logger.info(f'Incorrect password for office doc ({pwd}): {e}.')
+                    continue
+            if decrypted.getbuffer().nbytes > 0:
+                d_path = dest_dir / f'decrypted_{archive_file.path.name}'
+                to_return.append(d_path)
+                with d_path.open('wb') as f:
+                    f.write(decrypted.getbuffer())
+            else:
+                report.status = Status.WARN
+                report.add_details('Warning', 'Unable to decrypt file.')
+                report.add_extra('no_password', True)
+        else:
+            report.status = Status.NOTAPPLICABLE
+        return to_return
+
     def _extract_gz(self, archive_file: File, report: Report, dest_dir: Path) -> list[Path]:
         # gz is just like bz2, a compressed archive with a TAR directory inside
         gz_file = GzipFile(archive_file.path)
@@ -642,7 +670,8 @@ class Extractor(BaseWorker):
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         # The files supported by dfvfs generally don't have proper mime types, so we just try it on everything.
         dfvfs_info = self.check_dfvfs(task.file, True)
-        if not (task.file.is_archive or task.file.is_eml or task.file.is_msg or dfvfs_info):
+        if not (task.file.is_archive or task.file.is_eml or task.file.is_msg or dfvfs_info
+                or task.file.type in ['DOC', 'PPT', 'XLS']):
             report.status = Status.NOTAPPLICABLE
             return
 
@@ -679,13 +708,14 @@ class Extractor(BaseWorker):
         safe_create_dir(extracted_dir)
         extracted: Sequence[Path | tuple[str, BytesIO]] = []
 
+        if task.password:
+            self.passwords = [task.password]
+        else:
+            self.passwords = self.zip_passwords
+
         # Try to extract files from archive
         # TODO: Support other archive formats
         if task.file.is_archive:
-            if task.password:
-                self.passwords = [task.password]
-            else:
-                self.passwords = self.zip_passwords
             try:
                 if task.file.mime_type == "application/x-7z-compressed":
                     extracted = self._extract_7z(task.file, report, extracted_dir)
@@ -753,6 +783,10 @@ class Extractor(BaseWorker):
                 self.logger.exception('dfVFS dislikes it.')
                 report.status = Status.WARN
                 report.add_details('Warning', f'Unable to process with dfVFS {task.file.path.name}: {e}.')
+
+        elif task.file.type in ['DOC', 'PPT', 'XLS']:
+            # check if the file is encrypted
+            extracted = self._extract_encrypted_office(task.file, report, extracted_dir)
 
         if not extracted and report.status != Status.NOTAPPLICABLE:
             report.status = Status.WARN
