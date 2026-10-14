@@ -69,7 +69,7 @@ pikepdf = [
     {version = "^10.14", python = ">=3.11"}
 ]
 Pillow = "^12.3.0"
-pillow-heif = "^1.8.0"
+pillow-heif = "^1.8.1"
 imapclient = "^4.1.0"
 pyzipper = "^0.4.0"
 pymisp = {version = "^2.5.34.4", extras = ["fileobjects"]}
