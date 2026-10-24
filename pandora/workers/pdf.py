@@ -179,7 +179,7 @@ class Pdf(BaseWorker):
             else:
                 report.status = Status.CLEAN
 
-            # in case we had embeded files, we have subsequent tasks going
+            # in case we had embedded files, we have subsequent tasks going
             if extracted:
                 if not task.user:
                     raise PandoraException(f'[{task.uuid}] The task user is missing (PDF module).')
@@ -194,7 +194,7 @@ class Pdf(BaseWorker):
             if embedded_files and not tasks:
                 # Nothing was extracted
                 report.status = Status.WARN
-                report.add_details('Warning', 'Looks like the PDF has embeded files, but none were extracted. This is suspicious.')
+                report.add_details('Warning', 'Looks like the PDF has embedded files, but none were extracted. This is suspicious.')
             elif report.status not in [Status.ERROR, Status.WARN, Status.ALERT, Status.OVERWRITE]:
                 # wait for all the workers to finish, or have one of them raising an ALERT
                 try:
