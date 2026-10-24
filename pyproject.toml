@@ -94,6 +94,7 @@ pyfaup-rs = "^0.4.26"
 dfvfs = "^20260717"
 pycabfile = "^1.0.0"
 msoffcrypto-tool = "^6.0.0"
+lark = "^1.3.1"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^4.1.3"
