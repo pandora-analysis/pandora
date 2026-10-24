@@ -1,6 +1,6 @@
 [project]
 name = "pandora"
-version = "1.13.1"
+version = "1.13.2"
 description = "Pandora analysis framework."
 authors = [{name="Raphaël Vinot", email="raphael.vinot@circl.lu"}]
 license = "AGPL-3.0-or-later"
@@ -56,11 +56,11 @@ oletools = {version = "^0.60.2", extras = ["full"]}
 py7zr = "^1.1.4"
 jbxapi = "^3.25.0"
 defusedxml = "^0.7.1"
-mwdblib = "^4.7.0"
+mwdblib = "^4.8.0"
 vt-py = "^0.22.0"
 malwarebazaar = {version="^0.2.9"}
 yara-python = "^4.5.4"
-svglib = "^2.3.0"
+svglib = "^2.3.2"
 clamd = "^1.0.2"
 rarfile = "^4.5"
 pymispwarninglists = "^1.7.0"
@@ -77,16 +77,19 @@ python-dateutil = "^2.9.0.post0"
 pycdlib = "^1.22.0"
 werkzeug = "^3.1.9"
 pyhashlookup = "^1.2.8"
-pylookyloo = "^1.42.0"
+pylookyloo = [
+    {version = "<1.43", python = "<3.11"},
+    {version = "^1.43", python = ">=3.11"}
+]
 aiohttp = "^3.14.5"
 opencv-python = "^5.0.0.93"
 typing-extensions = {version = "^4.16.0", python = "<3.11"}
-setuptools = "^84.0.0"
+setuptools = "^84.2.1"
 beautifulsoup4 = {version= "^4.15.0", extras = ["lxml", "charset_normalizer"]}
 psutil = "^7.2.2"
 textract = "^2.1.0"
 pure-magic-rs = "^0.5.1"
-pyfaup-rs = "^0.4.24"
+pyfaup-rs = "^0.4.26"
 # The libyall libs
 dfvfs = "^20260717"
 pycabfile = "^1.0.0"
@@ -98,12 +101,12 @@ mypy = "^2.4.0"
 types-redis = {version = "^4.6.0.20241004"}
 types-PyYAML = "^6.0.12.20260906"
 types-requests = "^2.33.0.20261006"
-types-python-dateutil = "^2.9.0.20260807"
+types-python-dateutil = "^2.9.0.20261021"
 types-psutil = "^7.2.2.20260906"
 types-beautifulsoup4 = "^4.12.0.20250516"
 bandit = {extras = ["toml"], version = "^1.9.4"}
 flake8 = "^7.4.1"
-semgrep = "^1.180.0"
+semgrep = "^1.182.1"
 types-tzlocal = "^5.1.0.1"
 
 [build-system]
