@@ -19,6 +19,9 @@ class Website(AbstractManager):
         self.script_name = 'website'
         self.process: Popen = self._launch_website()  # type: ignore[type-arg]
 
+    def _to_run_forever(self) -> None:
+        ...
+
     def _launch_website(self) -> Popen:  # type: ignore[type-arg]
         website_dir = get_homedir() / 'website'
         ip = get_config('generic', 'website_listen_ip')

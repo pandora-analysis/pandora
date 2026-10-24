@@ -37,6 +37,9 @@ class UnoserverLauncher(AbstractManager):
         self.unoserver.user_installation = Path(self.tmpuserdir).as_uri()
         self.process = self.unoserver.start()
 
+    def _to_run_forever(self) -> None:
+        ...
+
     def _wait_to_finish(self) -> None:
         self.unoserver.stop()
         shutil.rmtree(self.tmpuserdir, ignore_errors=True)
