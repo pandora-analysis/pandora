@@ -183,13 +183,14 @@ class Pdf(BaseWorker):
             if extracted:
                 if not task.user:
                     raise PandoraException(f'[{task.uuid}] The task user is missing (PDF module).')
-                new_task = Task.new_task(user=task.user, sample=BytesIO(content),
-                                         filename=info['filename'],
-                                         disabled_workers=task.disabled_workers,
-                                         parent=task)
-                pandora.add_extracted_reference(task, new_task)
-                pandora.enqueue_task(new_task)
-                tasks.append(new_task)
+                for fn, fb in extracted:
+                    new_task = Task.new_task(user=task.user, sample=fb,
+                                             filename=fn,
+                                             disabled_workers=task.disabled_workers,
+                                             parent=task)
+                    pandora.add_extracted_reference(task, new_task)
+                    pandora.enqueue_task(new_task)
+                    tasks.append(new_task)
 
             if embedded_files and not tasks:
                 # Nothing was extracted
