@@ -1734,14 +1734,14 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "extract-msg"
-version = "0.56.1"
+version = "0.57.0"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "extract_msg-0.56.1-py3-none-any.whl", hash = "sha256:3690ee28cbc5a8affa9c07d5e902464743949fcf2033f24b926d7c08485b42a9"},
-    {file = "extract_msg-0.56.1.tar.gz", hash = "sha256:de94121cf5503377d932d503280293837baf630cd51ce36de901936b3172c43a"},
+    {file = "extract_msg-0.57.0-py3-none-any.whl", hash = "sha256:bcbf918ac2e3c93180df3fbf0fc2e7ab344e37c1fd652802f185afd76578bc21"},
+    {file = "extract_msg-0.57.0.tar.gz", hash = "sha256:5768fdf8035b5f67f0f1d2959668eb0577a4239ea5f2044315ef74645cb39236"},
 ]
 
 [package.dependencies]
@@ -1759,6 +1759,7 @@ encoding = ["chardet (>=3.0.0,<6)"]
 image = ["Pillow (>=9.5.0,<10)"]
 mime = ["python-magic (>=0.4.27,<0.5)"]
 readthedocs = ["sphinx-rtd-theme"]
+test = ["pypdf (<7.0.0)"]
 
 [[package]]
 name = "face"
@@ -10498,4 +10499,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "09f4938e81dec0cde97c92dcbc62d44e32f9ff12736e82e5135a98523cfc20a7"
+content-hash = "8310412a0491858b91876fa174be6545b8336c40c0a2386335c67166e5c694fd"
