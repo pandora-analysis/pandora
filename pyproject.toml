@@ -81,7 +81,7 @@ textract = "^2.1.0"
 pure-magic-rs = "^0.5.1"
 pyfaup-rs = "^0.4.27"
 # The libyall libs
-dfvfs = "^20260717"
+dfvfs = "^20260924"
 pycabfile = "^1.0.0"
 msoffcrypto-tool = "^6.0.0"
 
