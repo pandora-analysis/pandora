@@ -1476,14 +1476,14 @@ wrapt = ">=1.16,<3"
 
 [[package]]
 name = "dfdatetime"
-version = "20261025"
+version = "20261027"
 description = "Digital Forensics date and time (dfDateTime)"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "dfdatetime-20261025-py3-none-any.whl", hash = "sha256:abcb6ab8cd6e67f6080971b717bcd837c694e78300d8312bb5e8c60a22b9c2d5"},
-    {file = "dfdatetime-20261025.tar.gz", hash = "sha256:dbec99e1aebd3a254e78fe94907e372ebadde0a6aed0b4f1e15f402fe2970142"},
+    {file = "dfdatetime-20261027-py3-none-any.whl", hash = "sha256:2015ab43a360bfdb8bd5cb178b487ddf42d1ec3dcdd123acab0ddc0672c578e2"},
+    {file = "dfdatetime-20261027.tar.gz", hash = "sha256:b7ccaeaf1c9a08939978aefd62e50e67cac09d670bef4b62b45f2cb4269e10dd"},
 ]
 
 [[package]]
@@ -1667,14 +1667,14 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "extract-msg"
-version = "0.56.1"
+version = "0.57.0"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "extract_msg-0.56.1-py3-none-any.whl", hash = "sha256:3690ee28cbc5a8affa9c07d5e902464743949fcf2033f24b926d7c08485b42a9"},
-    {file = "extract_msg-0.56.1.tar.gz", hash = "sha256:de94121cf5503377d932d503280293837baf630cd51ce36de901936b3172c43a"},
+    {file = "extract_msg-0.57.0-py3-none-any.whl", hash = "sha256:bcbf918ac2e3c93180df3fbf0fc2e7ab344e37c1fd652802f185afd76578bc21"},
+    {file = "extract_msg-0.57.0.tar.gz", hash = "sha256:5768fdf8035b5f67f0f1d2959668eb0577a4239ea5f2044315ef74645cb39236"},
 ]
 
 [package.dependencies]
@@ -1692,6 +1692,7 @@ encoding = ["chardet (>=3.0.0,<6)"]
 image = ["Pillow (>=9.5.0,<10)"]
 mime = ["python-magic (>=0.4.27,<0.5)"]
 readthedocs = ["sphinx-rtd-theme"]
+test = ["pypdf (<7.0.0)"]
 
 [[package]]
 name = "face"
@@ -6390,14 +6391,14 @@ tests-min = ["defusedxml", "packaging", "pytest"]
 
 [[package]]
 name = "platformdirs"
-version = "4.13.5"
+version = "4.13.6"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
 optional = false
 python-versions = ">=3.11"
 groups = ["dev"]
 files = [
-    {file = "platformdirs-4.13.5-py3-none-any.whl", hash = "sha256:53d3ec4280b815c1e0b02edad7f9ee8fda1ba9c0865dd9c2e6e63849ce82fc1e"},
-    {file = "platformdirs-4.13.5.tar.gz", hash = "sha256:05831adf87d392760f4b5c3a0a95579ab5a10b18b9b9bd43680dcb47544788a0"},
+    {file = "platformdirs-4.13.6-py3-none-any.whl", hash = "sha256:21fc198fb09f3e78cadcdfd8a6ae4fd65cadc64a3cba78b694321c2996114a3e"},
+    {file = "platformdirs-4.13.6.tar.gz", hash = "sha256:211d176e24674b5895dedf9021c262bcf9fad008a70610bfb147d4a8d6d8fe1b"},
 ]
 
 [[package]]
@@ -7656,18 +7657,19 @@ test = ["coverage[toml] (>=5.2)", "hypothesis", "pytest (>=6.0)", "pytest-benchm
 
 [[package]]
 name = "python-dateutil"
-version = "2.9.0.post0"
+version = "3.0.0"
 description = "Extensions to the standard Python datetime module"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 groups = ["main"]
 files = [
-    {file = "python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3"},
-    {file = "python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"},
+    {file = "python_dateutil-3.0.0-py2.py3-none-any.whl", hash = "sha256:3c79630202e4152c6add678446984236efe4f57e84d8e892aab0637bab82e9fd"},
+    {file = "python_dateutil-3.0.0.tar.gz", hash = "sha256:7ebcb3c29a92f3ceafe79a7a48a5c45677e9e004bbeec5742ac0bbb00560b7a2"},
 ]
 
 [package.dependencies]
-six = ">=1.5"
+six = ">=1.6"
+tzdata = "*"
 
 [[package]]
 name = "python-dotenv"
@@ -9212,7 +9214,6 @@ description = "Provider of IANA time zone data"
 optional = false
 python-versions = ">=2"
 groups = ["main"]
-markers = "platform_system == \"Windows\""
 files = [
     {file = "tzdata-2026.5-py2.py3-none-any.whl", hash = "sha256:b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac"},
     {file = "tzdata-2026.5.tar.gz", hash = "sha256:8cc73c0a0bfca7dbfa59235d60b2eff82231dee33f53d206db1acd9173cfc0a7"},
@@ -9963,4 +9964,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.16"
-content-hash = "1d03c1021524eb58d2785af2d7fd9b511bd56cd85329c73c6c94ca4648c62ae7"
+content-hash = "c0b674387efe1531b88885e906a2d4a9fd50dd618584f24e0975a769a04f1f46"
