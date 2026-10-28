@@ -1,4 +1,0 @@
-meta:
-  name: XLMMacroDeobfuscator
-  description: Decode obfuscated XLM macros (also known as Excel 4.0 macros)
-  replicas: 2
