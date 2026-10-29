@@ -2,7 +2,10 @@
 <div class="col-md-4">
   <div class="img-hover">
     <a href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}" target="_blank">
-      <img class="img-thumbnail blur-preview" width="70%" src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}">
+      <div class="position-relative d-inline-block">
+        <img class="img-thumbnail blur-preview" id="preview-{{ idx }}" width="70%" src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}">
+        <button class="btn btn-sm btn-dark position-absolute bottom-0 start-50 translate-middle-x mb-2" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById('preview-{{ idx }}').classList.toggle('blur-preview')">Toggle Blur</button>
+      </div>
     </a>
   </div>
 </div>
