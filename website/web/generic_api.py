@@ -162,6 +162,8 @@ class ApiSubmit(Resource):  # type: ignore[misc]
             return {'success': False, 'error': str(e)}, 400
         pandora.enqueue_task(task)
         if args.get('validity') is not None:
+            if not flask_login.current_user.is_admin:
+                return {'success': False, 'error': 'Only administrators can generate sharable links.'}, 403
             seed, expire = seed_manager.add(task.uuid, args['validity'])
             link = url_for('api_analysis', task_id=task.uuid, seed=seed)
             return {'success': True, 'taskId': task.uuid, 'seed': seed,
@@ -331,6 +333,8 @@ class ApiTaskAction(Resource):  # type: ignore[misc]
                     'file': task.file.to_web}
 
         if action == 'share' and flask_login.current_user.role.can(Action.share_analysis):
+            if not flask_login.current_user.is_admin:
+                return {'success': False, 'error': 'Only administrators can generate sharable links.'}, 403
             data: dict[str, Any] = request.get_json()
             if "validity" not in data:
                 data['validity'] = get_config('generic', 'default_share_time')
