@@ -1619,18 +1619,19 @@ files = [
 
 [[package]]
 name = "eml-parser"
-version = "4.4.0"
+version = "4.6.0"
 description = "Python EML parser library"
 optional = false
 python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "eml_parser-4.4.0-py3-none-any.whl", hash = "sha256:7f66e185c898bed55e3696afd015b68acb38f4e9c88fb5cc967f2f7030bd541e"},
-    {file = "eml_parser-4.4.0.tar.gz", hash = "sha256:622d41ad8a37392e2d9366ef836116c87f4d978d1beda65aeade69a550a6b717"},
+    {file = "eml_parser-4.6.0-py3-none-any.whl", hash = "sha256:1f1572a7459577dff3994e5e735723c0a186797b07a3c15cf4c64671f628ab98"},
+    {file = "eml_parser-4.6.0.tar.gz", hash = "sha256:1ca0a9fa659ec59aca1173d5b542c9e167c5909e8cf573fa4886c132b7b31daf"},
 ]
 
 [package.dependencies]
 charset-normalizer = "*"
+idna = ">=3.20"
 publicsuffixlist = "*"
 python-dateutil = "*"
 regex = ">=2026"
@@ -9961,4 +9962,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.15"
-content-hash = "58bbfdb003c9a890452dd87258a48f277054f723e6834aaceb1870c53dc1eb92"
+content-hash = "c4e7938cc6fda6196fe11ef01e652059610a22cdc95b51111c8b824a31d1aff1"
