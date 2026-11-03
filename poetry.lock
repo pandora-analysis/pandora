@@ -1668,14 +1668,14 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "extract-msg"
-version = "0.57.1"
+version = "0.58.2"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "extract_msg-0.57.1-py3-none-any.whl", hash = "sha256:b83a4559f6f5a89486667dad748e726537b37fcafaaa43cbd794315785622913"},
-    {file = "extract_msg-0.57.1.tar.gz", hash = "sha256:e5bca5f78fd3ce6004c63e2c142974f678f4e6d598f4e8afa4f7e8520eee0821"},
+    {file = "extract_msg-0.58.2-py3-none-any.whl", hash = "sha256:6211f7ebe146855a6d69aef60f14c197b583ffef00b9dc190e35644b2ea1ebd7"},
+    {file = "extract_msg-0.58.2.tar.gz", hash = "sha256:83bc225a0942d80fd97a445c0724e6472b3d821b59df1a5634421bbd19e265fa"},
 ]
 
 [package.dependencies]
@@ -10036,4 +10036,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.15"
-content-hash = "58bbfdb003c9a890452dd87258a48f277054f723e6834aaceb1870c53dc1eb92"
+content-hash = "de1e9a1ef56f3de557b85e93357ba5e9074bd2fcf265d2be12df5951d79efb4c"
