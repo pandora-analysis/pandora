@@ -9168,14 +9168,14 @@ files = [
 
 [[package]]
 name = "types-pyyaml"
-version = "6.0.12.20261030"
+version = "6.0.12.20261103"
 description = "Typing stubs for PyYAML"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "types_pyyaml-6.0.12.20261030-py3-none-any.whl", hash = "sha256:508cc80546918201026a955356222111224e1f4f7deab0b91f2a95933f764e67"},
-    {file = "types_pyyaml-6.0.12.20261030.tar.gz", hash = "sha256:9123d707aa31a3883eeb2cb290537c75246dfcb1c00abed7a70f5419d3bd31ae"},
+    {file = "types_pyyaml-6.0.12.20261103-py3-none-any.whl", hash = "sha256:444654c61f635dab82c092a511aa96a0ce31164810784b9a37314e3e56532ac8"},
+    {file = "types_pyyaml-6.0.12.20261103.tar.gz", hash = "sha256:7a1b5f837881dd35d5448b5f18275164f89f206185e31e8eae6e0b42607bc001"},
 ]
 
 [[package]]
@@ -10032,4 +10032,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.15"
-content-hash = "65351518433b57f763a56a9fb297987f666c7e20bfcd91336a41f10f8a12f34b"
+content-hash = "4bb31ca37f068159aaef0496412444cdc87c168698981c931b9c5dc5987873d1"
