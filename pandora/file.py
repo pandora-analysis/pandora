@@ -377,12 +377,14 @@ class File:
 
         for i, p in enumerate(to_convert):
             with pymupdf.open(p) as doc:  # type: ignore[no-untyped-call]
-                if doc.needs_pass and password:
+                locked = bool(doc.needs_pass)
+                if locked and password:
                     try:
-                        doc.authenticate(password)
+                        if doc.authenticate(password):
+                            locked = False
                     except Exception as e:
                         self.logger.warning(f'Unable to authenticate PDF preview with provided password: {e}')
-                if doc.needs_pass:
+                if locked:
                     raise Unsupported("The PDF is password protected, this feature isn't supported yet.")
                 digits = len(str(doc.page_count))
                 for page in doc:

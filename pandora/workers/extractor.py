@@ -958,12 +958,15 @@ class Extractor(BaseWorker):
         extracted: list[tuple[str, BytesIO]] = []
         try:
             with pymupdf.open(str(archive_file.path)) as doc:  # type: ignore[no-untyped-call]
-                if task is not None and task.password:
+                # needs_pass can stay true even after a successful authenticate(); trust the return value.
+                locked = bool(doc.needs_pass)
+                if locked and task is not None and task.password:
                     try:
-                        doc.authenticate(task.password)
+                        if doc.authenticate(task.password):
+                            locked = False
                     except Exception as e:
                         self.logger.warning(f'Unable to authenticate PDF with provided password: {e}')
-                if doc.needs_pass:
+                if locked:
                     report.add_details('Warning', 'PDF is password-protected; unable to extract embedded files.')
                     report.add_extra('no_password', True)
                     report.status = Status.NOTAPPLICABLE

@@ -147,15 +147,17 @@ class Pdf(BaseWorker):
             has_acroform = False
 
             with pymupdf.open(str(task.file.path)) as doc:  # type: ignore[no-untyped-call]
-                if task.password:
+                # needs_pass can stay true even after a successful authenticate(); trust the return value.
+                still_locked = bool(doc.needs_pass)
+                if still_locked and task.password:
                     try:
-                        doc.authenticate(task.password)
+                        if doc.authenticate(task.password):
+                            still_locked = False
                     except Exception as e:
                         self.logger.warning(f'Unable to authenticate PDF with provided password: {e}')
 
-                still_locked = bool(doc.needs_pass)
                 if self.check_encrypted:
-                    is_encrypted = self._is_encrypted(doc) or still_locked
+                    is_encrypted = self._is_encrypted(doc) or still_locked or bool(doc.needs_pass)
                 if self.check_javascript:
                     js_scripts = self._extract_javascript(doc)
                 if self.check_suspicious_object:
