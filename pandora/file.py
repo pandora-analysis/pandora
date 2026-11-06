@@ -109,6 +109,9 @@ class File:
         'image/heic': ['IMG', 'heic'],
         'image/heif': ['IMG', 'heif'],
         'application/vnd.ms-outlook': ['MSG', 'msg'],
+        'text/calendar': ['ICS', 'ics'],
+        'application/ics': ['ICS', 'ics'],
+        'text/x-vcalendar': ['ICS', 'ics'],
         'application/pdf': ['PDF', 'pdf'],
         'application/vnd.ms-powerpoint': ['PPT', 'ppt'],
         'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['PPT', 'pptx'],
@@ -135,6 +138,7 @@ class File:
         'EML': {'.eml'},
         'EXE': {'.exe', '.dll'},
         'HTM': {'.htm', '.html', '.xht', '.xhtml'},
+        'ICS': {'.ics'},
         'IMG': {'.png', '.gif', '.bmp', '.jpg', '.jpeg', '.ico', '.heic', '.heif'},
         'JSC': {'.js'},
         'MSG': {'.msg'},
@@ -154,6 +158,7 @@ class File:
         'EML': 'envelope',
         'EXE': 'filetype-exe',
         'HTM': 'filetype-html',
+        'ICS': 'calendar',
         'IMG': 'filetype-jpg',
         'JSC': 'filetype-js',
         'MSG': 'envelope',
@@ -173,6 +178,7 @@ class File:
         'EML': 'Message file',
         'EXE': 'Executable file',
         'HTM': 'HTML file',
+        'ICS': 'Calendar file',
         'IMG': 'Image file',
         'JSC': 'JavaScript file',
         'MSG': 'Microsoft Outlook message',
@@ -366,11 +372,16 @@ class File:
             raise NoPreview('Preview not supported for this file format')
         return to_convert
 
-    def make_previews(self) -> None:
+    def make_previews(self, password: str | None=None) -> None:
         to_convert = self.paths_to_preview()
 
         for i, p in enumerate(to_convert):
             with pymupdf.open(p) as doc:  # type: ignore[no-untyped-call]
+                if doc.needs_pass and password:
+                    try:
+                        doc.authenticate(password)
+                    except Exception as e:
+                        self.logger.warning(f'Unable to authenticate PDF preview with provided password: {e}')
                 if doc.needs_pass:
                     raise Unsupported("The PDF is password protected, this feature isn't supported yet.")
                 digits = len(str(doc.page_count))
@@ -816,6 +827,17 @@ class File:
         :return (bool): boolean
         """
         return self.type == 'EML'
+
+    @property
+    def is_ics(self) -> bool:
+        """
+        Whether this file is an ICS.
+        :return (bool): boolean
+        """
+        if self.type == 'ICS':
+            return True
+        # text/plain often wins for .ics files, so also check the suffix.
+        return self.path.suffix.lower() == '.ics'
 
     @property
     def is_msg(self) -> bool:
