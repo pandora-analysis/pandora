@@ -3,19 +3,13 @@
 from __future__ import annotations
 
 import re
-import time
-
-from io import BytesIO
-from typing import Any
 
 import pymupdf
 from pymupdf import Document
 
-from ..default import PandoraException
 from ..helpers import Status
 from ..task import Task
 from ..report import Report
-from ..pandora import Pandora
 
 from .base import BaseWorker
 
@@ -25,7 +19,6 @@ class Pdf(BaseWorker):
     check_encrypted: bool
     check_javascript: bool
     check_suspicious_object: bool
-    check_embedded_files: bool
 
     def _is_encrypted(self, doc: Document) -> bool:
         try:
@@ -98,6 +91,8 @@ class Pdf(BaseWorker):
     def _detect_suspicious_objects(self, doc: Document) -> list[str]:
         try:
             suspicious_objects = []
+            # /RichMedia and /XFA are commonly abused; /AA /OpenAction /Launch are classic auto-actions.
+            alert_keywords = ["/AA", "/OpenAction", "/Launch", "/RichMedia", "/XFA"]
             for xref in range(1, doc.xref_length()):  # type: ignore[no-untyped-call]
                 try:
                     obj_dict = doc.xref_object(xref, compressed=False)  # type: ignore[no-untyped-call]
@@ -107,8 +102,7 @@ class Pdf(BaseWorker):
                     self.logger.warning(f"Skipping xref {xref}: {e}")
                     continue
 
-                # Check for /AA, /OpenAction OR /Launch
-                for keyword in ["/AA", "/OpenAction", "/Launch"]:
+                for keyword in alert_keywords:
                     # Use regex to reduce FPs, especially with /AA
                     if len(re.findall(keyword + '(?![A-Za-z])', obj_dict)) > 0:
                         suspicious_objects.append(f'{keyword} found in object {xref}: {obj_dict}')
@@ -125,15 +119,19 @@ class Pdf(BaseWorker):
 
         return suspicious_objects
 
-    def _detect_embedded_files(self, doc: Document) -> list[tuple[dict[str, Any], bytes]]:
+    def _detect_acroform(self, doc: Document) -> bool:
+        """AcroForm alone is common; flag for awareness (WARN), not automatic ALERT."""
         try:
-            embedded_files = []
-            for item in range(doc.embfile_count()):
-                embedded_files.append((doc.embfile_info(item), doc.embfile_get(item)))
+            for xref in range(1, doc.xref_length()):  # type: ignore[no-untyped-call]
+                try:
+                    obj_dict = doc.xref_object(xref, compressed=True)  # type: ignore[no-untyped-call]
+                except (RuntimeError, ValueError, TypeError):
+                    continue
+                if obj_dict and re.search(r'/AcroForm(?![A-Za-z])', obj_dict):
+                    return True
         except Exception as e:
-            self.logger.warning(f'Unable to detect embedded files in PDF file: {e}')
-
-        return embedded_files
+            self.logger.warning(f'Unable to detect AcroForm in PDF file: {e}')
+        return False
 
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         if not task.file.is_pdf:
@@ -141,24 +139,28 @@ class Pdf(BaseWorker):
             return
 
         self.logger.debug(f'Analysing PDF file {task.file.path}...')
-        tasks = []
-        extracted: list[tuple[str, BytesIO]] = []
-        pandora = Pandora()
         try:
             is_encrypted = False
+            still_locked = False
             js_scripts = []
             suspicious_objects = []
-            embedded_files = []
+            has_acroform = False
 
             with pymupdf.open(str(task.file.path)) as doc:  # type: ignore[no-untyped-call]
+                if task.password:
+                    try:
+                        doc.authenticate(task.password)
+                    except Exception as e:
+                        self.logger.warning(f'Unable to authenticate PDF with provided password: {e}')
+
+                still_locked = bool(doc.needs_pass)
                 if self.check_encrypted:
-                    is_encrypted = self._is_encrypted(doc)
+                    is_encrypted = self._is_encrypted(doc) or still_locked
                 if self.check_javascript:
                     js_scripts = self._extract_javascript(doc)
                 if self.check_suspicious_object:
                     suspicious_objects = self._detect_suspicious_objects(doc)
-                if self.check_embedded_files:
-                    embedded_files = self._detect_embedded_files(doc)
+                    has_acroform = self._detect_acroform(doc)
 
             if is_encrypted:
                 report.add_details("Is Encrypted", "Yes")
@@ -166,53 +168,20 @@ class Pdf(BaseWorker):
                 report.add_details("Javascript Found", js_scripts)
             if suspicious_objects:
                 report.add_details("Suspicious Objects Found", suspicious_objects)
-            if embedded_files:
-                for info, content in embedded_files:
-                    report.add_details("Embedded Files Found", str(info))
-                    extracted.append((info['filename'], BytesIO(content)))
+            if has_acroform:
+                report.add_details("AcroForm", "PDF contains an AcroForm dictionary.")
 
-            if js_scripts or is_encrypted or suspicious_objects:
-                if is_encrypted:
-                    report.status = Status.WARN
-                if js_scripts or suspicious_objects:
-                    report.status = Status.ALERT
+            # Embedded files are handled by the extractor worker.
+            # Encryption alone must not be WARN/ALERT (#912): incomplete analysis -> ERROR.
+            if js_scripts or suspicious_objects:
+                report.status = Status.ALERT
+            elif still_locked:
+                report.status = Status.ERROR
+                report.add_details('Warning', 'Password-protected PDF; unable to fully analyse.')
+                report.add_extra('no_password', True)
+            elif has_acroform:
+                report.status = Status.WARN
             else:
                 report.status = Status.CLEAN
-
-            # in case we had embedded files, we have subsequent tasks going
-            if extracted:
-                if not task.user:
-                    raise PandoraException(f'[{task.uuid}] The task user is missing (PDF module).')
-                for fn, fb in extracted:
-                    new_task = Task.new_task(user=task.user, sample=fb,
-                                             filename=fn,
-                                             disabled_workers=task.disabled_workers,
-                                             parent=task)
-                    pandora.add_extracted_reference(task, new_task)
-                    pandora.enqueue_task(new_task)
-                    tasks.append(new_task)
-
-            if embedded_files and not tasks:
-                # Nothing was extracted
-                report.status = Status.WARN
-                report.add_details('Warning', 'Looks like the PDF has embedded files, but none were extracted. This is suspicious.')
-            elif report.status not in [Status.ERROR, Status.WARN, Status.ALERT, Status.OVERWRITE]:
-                # wait for all the workers to finish, or have one of them raising an ALERT
-                try:
-                    while not all(t.workers_done for t in tasks):
-                        for t in tasks:
-                            # If any of the task is marked as ALERT or OVERWRITE, we can quit.
-                            if t.workers_done and t.status >= Status.ALERT:
-                                report.add_details('Warning', 'There are suspicious files in this PDF, click on the "Extracted" tab for more.')
-                                break
-                        time.sleep(1)
-                except TimeoutError:
-                    # The extracted tasks can take a very long time, force the status in that case
-                    report.add_details('Warning', 'The extracted task(s) took too long, click on the "Extracted" tab for more.')
-                    report.status = Status.OVERWRITE
-                else:
-                    all_status = [t.status for t in tasks if t.workers_done]
-                    if all_status:
-                        report.status = max(all_status)
         except Exception as e:
             self.logger.warning(f'Unable to process PDF file: {e}')
