@@ -683,6 +683,47 @@ class Extractor(BaseWorker):
                 return name
         return f'embedded_{index}.bin'
 
+    def _payload_extension(self, payload: bytes, compobj: bytes | None=None) -> str:
+        """Infer a safe extension from magic bytes first, then optional CompObj hints."""
+        if payload.startswith(b'%PDF'):
+            return '.pdf'
+        if payload.startswith(b'\x89PNG\r\n\x1a\n'):
+            return '.png'
+        if payload.startswith(b'\xff\xd8\xff'):
+            return '.jpg'
+        if payload.startswith(b'GIF8'):
+            return '.gif'
+        if payload.startswith(b'BM'):
+            return '.bmp'
+        if payload.startswith(b'PK\x03\x04'):
+            return '.zip'
+        if payload.startswith(olefile.MAGIC):
+            return '.ole'
+        if payload.lstrip().startswith((b'<?xml', b'<html', b'<!DOCTYPE')):
+            return '.xml'
+        if compobj:
+            lowered = compobj.lower()
+            if b'acrobat' in lowered or b'pdf' in lowered:
+                return '.pdf'
+            if b'word.Document' in lowered or b'msworddoc' in lowered:
+                return '.doc'
+            if b'excel' in lowered or b'worksheet' in lowered:
+                return '.xls'
+            if b'powerpoint' in lowered:
+                return '.ppt'
+            if b'package' in lowered:
+                return '.bin'
+        return '.bin'
+
+    def _compobj_bytes(self, ole: Any, root: list[str] | None=None) -> bytes | None:
+        path = (root or []) + ['\x01CompObj']
+        try:
+            if ole.exists(path):
+                return ole.openstream(path).read()
+        except Exception as e:
+            self.logger.warning(f'Unable to read CompObj for {"/".join(path)}: {e}')
+        return None
+
     def _objectpool_extension(self, ole: Any, root: list[str]) -> str:
         """Guess a file extension from CompObj / well-known streams under an ObjectPool entry."""
         try:
@@ -694,22 +735,7 @@ class Extractor(BaseWorker):
                 return '.ppt'
         except Exception:  # nosec B110
             pass
-        try:
-            if not ole.exists(root + ['\x01CompObj']):
-                return '.bin'
-            comp = ole.openstream(root + ['\x01CompObj']).read()
-            lowered = comp.lower()
-            if b'word.Document' in lowered or b'msworddoc' in lowered:
-                return '.doc'
-            if b'excel' in lowered or b'worksheet' in lowered:
-                return '.xls'
-            if b'powerpoint' in lowered:
-                return '.ppt'
-            if b'package' in lowered:
-                return '.bin'
-        except Exception as e:
-            self.logger.warning(f'Unable to read CompObj for {"/".join(root)}: {e}')
-        return '.bin'
+        return self._payload_extension(b'', self._compobj_bytes(ole, root))
 
     def _extract_ole10native(self, ole: Any, report: Report, extracted: list[tuple[str, BytesIO]],
                              index: int) -> tuple[int, bool]:
@@ -748,6 +774,58 @@ class Extractor(BaseWorker):
                 if stream is not None:
                     stream.close()
         return index, found_native
+
+    def _extract_ole_contents(self, ole: Any, report: Report, extracted: list[tuple[str, BytesIO]],
+                              index: int) -> tuple[int, bool]:
+        """
+        Unwrap non-Package OLE embeds that store the raw payload in a CONTENTS stream
+        (e.g. Acrobat.Document objects inside OOXML xl/embeddings/*.bin).
+
+        Safety: only reads the known CONTENTS stream, enforces max size, sanitizes the
+        filename, and prefers magic-byte typing over trusting CompObj labels.
+        """
+        found_contents = False
+        # Exact stream name only — do not walk arbitrary OLE streams.
+        contents_paths = [
+            path_parts for path_parts in ole.listdir()
+            if path_parts[-1].upper() == 'CONTENTS'
+        ]
+        if not contents_paths:
+            return index, found_contents
+
+        compobj = self._compobj_bytes(ole)
+        for path_parts in contents_paths:
+            found_contents = True
+            if len(extracted) >= self.max_files_in_archive:
+                self.logger.warning(f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive, stop extracting.')
+                report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                report.add_details('Warning', f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive')
+                break
+            stream = None
+            try:
+                stream = ole.openstream(path_parts)
+                # Read one byte past the limit so oversized payloads are detected without loading unbounded data blindly.
+                payload = stream.read(self.max_extracted_filesize + 1)
+                if not payload:
+                    continue
+                if len(payload) > self.max_extracted_filesize:
+                    self.logger.warning(f'Skipping OLE CONTENTS stream, too big ({len(payload)}).')
+                    report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                    report.add_details('Warning', f'Skipping OLE CONTENTS stream, too big ({len(payload)}).')
+                    continue
+                ext = self._payload_extension(payload, compobj)
+                filename = self._embedded_filename(f'embedded_{index}{ext}', index=index)
+                if not filename.lower().endswith(ext):
+                    filename = f'{filename}{ext}'
+                report.add_details('Embedded Files Found', f'OLE CONTENTS ({ext.lstrip(".") or "bin"})')
+                extracted.append((filename, BytesIO(payload)))
+                index += 1
+            except Exception as e:
+                self.logger.warning(f'Unable to extract OLE CONTENTS stream: {e}')
+            finally:
+                if stream is not None:
+                    stream.close()
+        return index, found_contents
 
     def _extract_objectpool(self, ole: Any, report: Report, extracted: list[tuple[str, BytesIO]],
                             index: int) -> int:
@@ -826,6 +904,8 @@ class Extractor(BaseWorker):
                 try:
                     index, _ = self._extract_ole10native(ole, report, extracted, index)
                     if len(extracted) < self.max_files_in_archive:
+                        index, _ = self._extract_ole_contents(ole, report, extracted, index)
+                    if len(extracted) < self.max_files_in_archive:
                         index = self._extract_objectpool(ole, report, extracted, index)
                 finally:
                     try:
@@ -840,7 +920,7 @@ class Extractor(BaseWorker):
             report.add_details('Warning', f'Unable to extract {archive_file.path.name}: {e}.')
             return extracted
 
-        # Also pick Open XML embeddings that are not OLE packages (or OLE without Ole10Native).
+        # Also pick Open XML embeddings that are not OLE packages (or OLE without unwrapable streams).
         if zipfile.is_zipfile(archive_file.path) and len(extracted) < self.max_files_in_archive:
             try:
                 with zipfile.ZipFile(archive_file.path) as archive:
@@ -863,12 +943,14 @@ class Extractor(BaseWorker):
                             continue
                         if member.startswith(olefile.MAGIC):
                             ole = None
-                            found_native = False
+                            already_unwrapped = False
                             try:
                                 ole = olefile.OleFileIO(BytesIO(member))
                                 for path_parts in ole.listdir():
-                                    if path_parts[-1].lower() == '\x01ole10native':
-                                        found_native = True
+                                    leaf = path_parts[-1].lower()
+                                    # Ole10Native / CONTENTS are handled above via find_ole — skip raw .bin.
+                                    if leaf in {'\x01ole10native', 'contents'}:
+                                        already_unwrapped = True
                                         break
                             except Exception as e:
                                 self.logger.warning(f'Unable to parse embedded OLE {info.filename}: {e}')
@@ -878,10 +960,9 @@ class Extractor(BaseWorker):
                                         ole.close()
                                     except Exception:  # nosec B110
                                         pass
-                            if found_native:
-                                # Already unwrapped via find_ole; do not also queue the .bin.
+                            if already_unwrapped:
                                 continue
-                            # Embedded OLE without Ole10Native: queue the .bin itself.
+                            # Embedded OLE without known payload streams: queue the .bin itself.
                             filename = self._embedded_filename(Path(info.filename).name, index=index)
                             extracted.append((filename, BytesIO(member)))
                             index += 1
