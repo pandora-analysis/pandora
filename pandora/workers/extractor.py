@@ -28,6 +28,7 @@ import olefile  # type: ignore[import-untyped]
 from oletools.oleobj import OleNativeStream, find_ole, sanitize_filename  # type: ignore[import-untyped]
 from oletools.rtfobj import RtfObjParser  # type: ignore[import-untyped]
 import pymupdf
+from pure_magic_rs import MagicDb
 import py7zr
 import py7zr.io
 from pycabfile import CabFile  # type: ignore[import-untyped]
@@ -118,6 +119,15 @@ class Extractor(BaseWorker):
     max_is_error: bool
     zip_passwords: list[str]
 
+    _GENERIC_MAGIC_MIMES = frozenset({
+        'application/octet-stream',
+        'application/x-ole-storage',
+        'application/vnd.ms-office',
+        'application/cdfv2',
+        'application/x-cfb',
+        'inode/x-empty',
+    })
+
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
                  loglevel: int | None=None,
                  status_in_report: dict[str, str] | None=None,
@@ -135,6 +145,8 @@ class Extractor(BaseWorker):
         # https://github.com/pandora-analysis/pandora/issues/966#issuecomment-4670561558
         if self.max_recurse > self.meta['replicas'] + 1:
             raise PandoraException(f'[{module}] not enough replicas ({self.meta["replicas"]}) for the number of max recurse ({self.max_recurse}) should be at least ({self.max_recurse + 1}) .')
+
+        self.magic_db = MagicDb()
 
     @property
     def passwords(self) -> list[str]:
@@ -683,29 +695,48 @@ class Extractor(BaseWorker):
                 return name
         return f'embedded_{index}.bin'
 
+    @staticmethod
+    def _normalize_extension(raw: str) -> str | None:
+        token = raw.split('/')[0].strip().lower().lstrip('.')
+        if not token or len(token) > 10 or not token.isalnum() or token == 'bin':
+            return None
+        return f'.{token}'
+
+    def _extension_from_magic(self, payload: bytes) -> str | None:
+        if not payload:
+            return None
+        try:
+            result = self.magic_db.best_magic_buffer(payload)
+        except ValueError:
+            return None
+        mime = (result.mime_type or '').lower()
+        if mime in self._GENERIC_MAGIC_MIMES:
+            return None
+        known = File.MIME_TYPE_EQUAL.get(mime)
+        if known and known[1]:
+            normalized = self._normalize_extension(known[1])
+            if normalized:
+                return normalized
+        candidates = [self._normalize_extension(raw) for raw in (result.extensions or [])]
+        candidates = [ext for ext in candidates if ext]
+        if not candidates:
+            return None
+        routed = {ext for extensions in File.TYPE_EXTENSIONS.values() for ext in extensions}
+        for ext in candidates:
+            if ext in routed:
+                return ext
+        return candidates[0]
+
     def _payload_extension(self, payload: bytes, compobj: bytes | None=None) -> str:
-        """Infer a safe extension from magic bytes first, then optional CompObj hints."""
-        if payload.startswith(b'%PDF'):
-            return '.pdf'
-        if payload.startswith(b'\x89PNG\r\n\x1a\n'):
-            return '.png'
-        if payload.startswith(b'\xff\xd8\xff'):
-            return '.jpg'
-        if payload.startswith(b'GIF8'):
-            return '.gif'
-        if payload.startswith(b'BM'):
-            return '.bmp'
-        if payload.startswith(b'PK\x03\x04'):
-            return '.zip'
-        if payload.startswith(olefile.MAGIC):
-            return '.ole'
-        if payload.lstrip().startswith((b'<?xml', b'<html', b'<!DOCTYPE')):
-            return '.xml'
+        """Infer a safe extension from magic first, then optional CompObj hints."""
+        ext = self._extension_from_magic(payload)
+        if ext:
+            return ext
         if compobj:
             lowered = compobj.lower()
             if b'acrobat' in lowered or b'pdf' in lowered:
                 return '.pdf'
-            if b'word.Document' in lowered or b'msworddoc' in lowered:
+            if b'word.document' in lowered or b'msworddoc' in lowered:
                 return '.doc'
             if b'excel' in lowered or b'worksheet' in lowered:
                 return '.xls'
@@ -713,6 +744,8 @@ class Extractor(BaseWorker):
                 return '.ppt'
             if b'package' in lowered:
                 return '.bin'
+        if payload.startswith(olefile.MAGIC):
+            return '.ole'
         return '.bin'
 
     def _compobj_bytes(self, ole: Any, root: list[str] | None=None) -> bytes | None:
