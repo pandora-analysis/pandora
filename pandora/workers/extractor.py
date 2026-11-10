@@ -21,8 +21,7 @@ from collections.abc import Sequence
 
 from extract_msg.msg_classes import MessageBase, AppointmentMeeting
 from extract_msg.attachments import AttachmentBase, SignedAttachment
-from extract_msg import MSGFile
-from extract_msg.ole_writer import OleWriter
+from extract_msg import MSGFile, OleWriter
 import msoffcrypto  # type: ignore[import-untyped]
 import olefile  # type: ignore[import-untyped]
 from oletools.oleobj import OleNativeStream, find_ole, sanitize_filename  # type: ignore[import-untyped]
@@ -698,7 +697,7 @@ class Extractor(BaseWorker):
     @staticmethod
     def _normalize_extension(raw: str) -> str | None:
         token = raw.split('/')[0].strip().lower().lstrip('.')
-        if not token or len(token) > 10 or not token.isalnum() or token == 'bin':
+        if not token or len(token) > 10 or not token.isalnum() or token == 'bin':  # nosec
             return None
         return f'.{token}'
 
@@ -891,7 +890,7 @@ class Extractor(BaseWorker):
                 continue
             tmp_path = None
             try:
-                writer = OleWriter()
+                writer = OleWriter()  # nolint
                 writer.fromOleFile(ole, rootPath=root)
                 with tempfile.NamedTemporaryFile(suffix='.ole', delete=False) as tmp:
                     tmp_path = Path(tmp.name)

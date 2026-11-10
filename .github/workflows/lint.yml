@@ -74,7 +74,8 @@ jobs:
 
     - name: pylint
       run: |
-        poetry run pylint -ry bin pandora tools website
+        # Due to https://github.com/pylint-dev/pylint/issues/11807, skip pandora/workers/extractor.py
+        poetry run pylint -ry --ignore-paths=pandora/workers/extractor.py bin pandora tools website
       if: ${{ always() }}
 
     - name: semgrep
