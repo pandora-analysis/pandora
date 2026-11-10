@@ -1,10 +1,11 @@
 meta:
   name: Pdf
-  description: Pdf documents parser and object extractor
+  description: PDF parser for encryption, JavaScript, RichMedia/XFA/actions, and AcroForm (embedded files are handled by Extractor)
   replicas: 3
 
 settings:
+  # Encryption alone is reported as ERROR (unable to fully analyse), not WARN/ALERT. See #912.
+  # check_suspicious_object covers /AA /OpenAction /Launch /RichMedia /XFA (ALERT) and notes /AcroForm (WARN).
   check_encrypted: true
   check_javascript: true
   check_suspicious_object: true
-  check_embedded_files: true

@@ -1,6 +1,6 @@
 meta:
   name: Extractor
-  description: Extracts content from the uploaded object (email, archive)
+  description: Extracts content from the uploaded object (email, archive, office document, calendar, PDF embeds)
   replicas: 5
 
 settings:

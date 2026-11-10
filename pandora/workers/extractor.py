@@ -3,7 +3,9 @@ from __future__ import annotations
 import base64
 import functools
 import os
+import re
 import shutil
+import tempfile
 import time
 import zipfile
 import zlib
@@ -20,7 +22,13 @@ from collections.abc import Sequence
 from extract_msg.msg_classes import MessageBase, AppointmentMeeting
 from extract_msg.attachments import AttachmentBase, SignedAttachment
 from extract_msg import MSGFile
+from extract_msg.ole_writer import OleWriter
 import msoffcrypto  # type: ignore[import-untyped]
+import olefile  # type: ignore[import-untyped]
+from oletools.oleobj import OleNativeStream, find_ole, sanitize_filename  # type: ignore[import-untyped]
+from oletools.rtfobj import RtfObjParser  # type: ignore[import-untyped]
+import pymupdf
+from pure_magic_rs import MagicDb
 import py7zr
 import py7zr.io
 from pycabfile import CabFile  # type: ignore[import-untyped]
@@ -111,6 +119,15 @@ class Extractor(BaseWorker):
     max_is_error: bool
     zip_passwords: list[str]
 
+    _GENERIC_MAGIC_MIMES = frozenset({
+        'application/octet-stream',
+        'application/x-ole-storage',
+        'application/vnd.ms-office',
+        'application/cdfv2',
+        'application/x-cfb',
+        'inode/x-empty',
+    })
+
     def __init__(self, module: str, worker_id: int, cache: str, timeout: str,
                  loglevel: int | None=None,
                  status_in_report: dict[str, str] | None=None,
@@ -128,6 +145,8 @@ class Extractor(BaseWorker):
         # https://github.com/pandora-analysis/pandora/issues/966#issuecomment-4670561558
         if self.max_recurse > self.meta['replicas'] + 1:
             raise PandoraException(f'[{module}] not enough replicas ({self.meta["replicas"]}) for the number of max recurse ({self.max_recurse}) should be at least ({self.max_recurse + 1}) .')
+
+        self.magic_db = MagicDb()
 
     @property
     def passwords(self) -> list[str]:
@@ -667,10 +686,530 @@ class Extractor(BaseWorker):
             report.add_details('Warning', f'File {archive_file.path.name} too big.')
             return [('internal_iso_in_daa.iso', BytesIO())]
 
+    def _embedded_filename(self, *candidates: str | None, index: int) -> str:
+        for candidate in candidates:
+            if not candidate:
+                continue
+            name = sanitize_filename(candidate)
+            if name:
+                return name
+        return f'embedded_{index}.bin'
+
+    @staticmethod
+    def _normalize_extension(raw: str) -> str | None:
+        token = raw.split('/')[0].strip().lower().lstrip('.')
+        if not token or len(token) > 10 or not token.isalnum() or token == 'bin':
+            return None
+        return f'.{token}'
+
+    def _extension_from_magic(self, payload: bytes) -> str | None:
+        if not payload:
+            return None
+        try:
+            result = self.magic_db.best_magic_buffer(payload)
+        except ValueError:
+            return None
+        mime = (result.mime_type or '').lower()
+        if mime in self._GENERIC_MAGIC_MIMES:
+            return None
+        known = File.MIME_TYPE_EQUAL.get(mime)
+        if known and known[1]:
+            normalized = self._normalize_extension(known[1])
+            if normalized:
+                return normalized
+        candidates = [self._normalize_extension(raw) for raw in (result.extensions or [])]
+        candidates = [ext for ext in candidates if ext]
+        if not candidates:
+            return None
+        routed = {ext for extensions in File.TYPE_EXTENSIONS.values() for ext in extensions}
+        for ext in candidates:
+            if ext in routed:
+                return ext
+        return candidates[0]
+
+    def _payload_extension(self, payload: bytes, compobj: bytes | None=None) -> str:
+        """Infer a safe extension from magic first, then optional CompObj hints."""
+        ext = self._extension_from_magic(payload)
+        if ext:
+            return ext
+        if compobj:
+            lowered = compobj.lower()
+            if b'acrobat' in lowered or b'pdf' in lowered:
+                return '.pdf'
+            if b'word.document' in lowered or b'msworddoc' in lowered:
+                return '.doc'
+            if b'excel' in lowered or b'worksheet' in lowered:
+                return '.xls'
+            if b'powerpoint' in lowered:
+                return '.ppt'
+            if b'package' in lowered:
+                return '.bin'
+        if payload.startswith(olefile.MAGIC):
+            return '.ole'
+        return '.bin'
+
+    def _compobj_bytes(self, ole: Any, root: list[str] | None=None) -> bytes | None:
+        path = (root or []) + ['\x01CompObj']
+        try:
+            if ole.exists(path):
+                return ole.openstream(path).read()
+        except Exception as e:
+            self.logger.warning(f'Unable to read CompObj for {"/".join(path)}: {e}')
+        return None
+
+    def _objectpool_extension(self, ole: Any, root: list[str]) -> str:
+        """Guess a file extension from CompObj / well-known streams under an ObjectPool entry."""
+        try:
+            if ole.exists(root + ['WordDocument']):
+                return '.doc'
+            if ole.exists(root + ['Workbook']) or ole.exists(root + ['Book']):
+                return '.xls'
+            if ole.exists(root + ['PowerPoint Document']):
+                return '.ppt'
+        except Exception:  # nosec B110
+            pass
+        return self._payload_extension(b'', self._compobj_bytes(ole, root))
+
+    def _extract_ole10native(self, ole: Any, report: Report, extracted: list[tuple[str, BytesIO]],
+                             index: int) -> tuple[int, bool]:
+        found_native = False
+        for path_parts in ole.listdir():
+            if path_parts[-1].lower() != '\x01ole10native':
+                continue
+            found_native = True
+            if len(extracted) >= self.max_files_in_archive:
+                self.logger.warning(f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive, stop extracting.')
+                report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                report.add_details('Warning', f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive')
+                break
+            stream = None
+            try:
+                stream = ole.openstream(path_parts)
+                opkg = OleNativeStream(stream)
+                if opkg.is_link:
+                    continue
+                if opkg.actual_size is None:
+                    continue
+                if opkg.actual_size > self.max_extracted_filesize:
+                    self.logger.warning(f'Skipping file {opkg.filename}, too big ({opkg.actual_size}).')
+                    report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                    report.add_details('Warning', f'Skipping file {opkg.filename}, too big ({opkg.actual_size}).')
+                    continue
+                payload = stream.read(opkg.actual_size)
+                if not payload:
+                    continue
+                filename = self._embedded_filename(opkg.filename, opkg.src_path, opkg.temp_path, index=index)
+                extracted.append((filename, BytesIO(payload)))
+                index += 1
+            except Exception as e:
+                self.logger.warning(f'Unable to extract OLE native stream: {e}')
+            finally:
+                if stream is not None:
+                    stream.close()
+        return index, found_native
+
+    def _extract_ole_contents(self, ole: Any, report: Report, extracted: list[tuple[str, BytesIO]],
+                              index: int) -> tuple[int, bool]:
+        """
+        Unwrap non-Package OLE embeds that store the raw payload in a CONTENTS stream
+        (e.g. Acrobat.Document objects inside OOXML xl/embeddings/*.bin).
+
+        Safety: only reads the known CONTENTS stream, enforces max size, sanitizes the
+        filename, and prefers magic-byte typing over trusting CompObj labels.
+        """
+        found_contents = False
+        # Exact stream name only — do not walk arbitrary OLE streams.
+        contents_paths = [
+            path_parts for path_parts in ole.listdir()
+            if path_parts[-1].upper() == 'CONTENTS'
+        ]
+        if not contents_paths:
+            return index, found_contents
+
+        compobj = self._compobj_bytes(ole)
+        for path_parts in contents_paths:
+            found_contents = True
+            if len(extracted) >= self.max_files_in_archive:
+                self.logger.warning(f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive, stop extracting.')
+                report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                report.add_details('Warning', f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive')
+                break
+            stream = None
+            try:
+                stream = ole.openstream(path_parts)
+                # Read one byte past the limit so oversized payloads are detected without loading unbounded data blindly.
+                payload = stream.read(self.max_extracted_filesize + 1)
+                if not payload:
+                    continue
+                if len(payload) > self.max_extracted_filesize:
+                    self.logger.warning(f'Skipping OLE CONTENTS stream, too big ({len(payload)}).')
+                    report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                    report.add_details('Warning', f'Skipping OLE CONTENTS stream, too big ({len(payload)}).')
+                    continue
+                ext = self._payload_extension(payload, compobj)
+                filename = self._embedded_filename(f'embedded_{index}{ext}', index=index)
+                if not filename.lower().endswith(ext):
+                    filename = f'{filename}{ext}'
+                report.add_details('Embedded Files Found', f'OLE CONTENTS ({ext.lstrip(".") or "bin"})')
+                extracted.append((filename, BytesIO(payload)))
+                index += 1
+            except Exception as e:
+                self.logger.warning(f'Unable to extract OLE CONTENTS stream: {e}')
+            finally:
+                if stream is not None:
+                    stream.close()
+        return index, found_contents
+
+    def _extract_objectpool(self, ole: Any, report: Report, extracted: list[tuple[str, BytesIO]],
+                            index: int) -> int:
+        """Reconstruct nested OLE objects stored under ObjectPool (non-Package embeds)."""
+        children: set[str] = set()
+        try:
+            for path_parts in ole.listdir(streams=True, storages=True):
+                if len(path_parts) >= 2 and path_parts[0] == 'ObjectPool':
+                    children.add(path_parts[1])
+        except Exception as e:
+            self.logger.warning(f'Unable to list ObjectPool: {e}')
+            return index
+
+        for child in sorted(children):
+            if len(extracted) >= self.max_files_in_archive:
+                self.logger.warning(f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive, stop extracting.')
+                report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                report.add_details('Warning', f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive')
+                break
+            root = ['ObjectPool', child]
+            # Ole10Native under this entry is already handled by _extract_ole10native.
+            try:
+                has_native = any(
+                    list(path_parts[:2]) == root and path_parts[-1].lower() == '\x01ole10native'
+                    for path_parts in ole.listdir()
+                )
+            except Exception:
+                has_native = False
+            if has_native:
+                continue
+            tmp_path = None
+            try:
+                writer = OleWriter()
+                writer.fromOleFile(ole, rootPath=root)
+                with tempfile.NamedTemporaryFile(suffix='.ole', delete=False) as tmp:
+                    tmp_path = Path(tmp.name)
+                writer.write(str(tmp_path))
+                payload = tmp_path.read_bytes()
+                if not payload or not olefile.isOleFile(BytesIO(payload)):
+                    continue
+                if len(payload) > self.max_extracted_filesize:
+                    filename = f'embedded_{index}{self._objectpool_extension(ole, root)}'
+                    self.logger.warning(f'Skipping file {filename}, too big ({len(payload)}).')
+                    report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                    report.add_details('Warning', f'Skipping file {filename}, too big ({len(payload)}).')
+                    continue
+                ext = self._objectpool_extension(ole, root)
+                filename = self._embedded_filename(f'objectpool_{child}{ext}', index=index)
+                if not filename.lower().endswith(ext):
+                    filename = f'{filename}{ext}'
+                report.add_details('Embedded Files Found', f'ObjectPool/{child}')
+                extracted.append((filename, BytesIO(payload)))
+                index += 1
+            except Exception as e:
+                self.logger.warning(f'Unable to extract ObjectPool/{child}: {e}')
+            finally:
+                if tmp_path is not None:
+                    try:
+                        tmp_path.unlink(missing_ok=True)
+                    except Exception:  # nosec B110
+                        pass
+        return index
+
+    def _extract_office_embedded(self, archive_file: File, report: Report, dest_dir: Path) -> list[tuple[str, BytesIO]]:
+        extracted: list[tuple[str, BytesIO]] = []
+        if not archive_file.data:
+            report.status = Status.NOTAPPLICABLE
+            return extracted
+
+        data = archive_file.data.getvalue()
+        index = 1
+        try:
+            for ole in find_ole(str(archive_file.path), data):
+                if ole is None:
+                    continue
+                try:
+                    index, _ = self._extract_ole10native(ole, report, extracted, index)
+                    if len(extracted) < self.max_files_in_archive:
+                        index, _ = self._extract_ole_contents(ole, report, extracted, index)
+                    if len(extracted) < self.max_files_in_archive:
+                        index = self._extract_objectpool(ole, report, extracted, index)
+                finally:
+                    try:
+                        ole.close()
+                    except Exception:  # nosec B110
+                        pass
+                if len(extracted) >= self.max_files_in_archive:
+                    break
+        except Exception as e:
+            self.logger.exception(e)
+            report.status = Status.WARN
+            report.add_details('Warning', f'Unable to extract {archive_file.path.name}: {e}.')
+            return extracted
+
+        # Also pick Open XML embeddings that are not OLE packages (or OLE without unwrapable streams).
+        if zipfile.is_zipfile(archive_file.path) and len(extracted) < self.max_files_in_archive:
+            try:
+                with zipfile.ZipFile(archive_file.path) as archive:
+                    for info in archive.infolist():
+                        if len(extracted) >= self.max_files_in_archive:
+                            self.logger.warning(f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive, stop extracting.')
+                            report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                            report.add_details('Warning', f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive')
+                            break
+                        name_lower = info.filename.lower()
+                        if info.is_dir() or '/embeddings/' not in f'/{name_lower}':
+                            continue
+                        if info.file_size > self.max_extracted_filesize:
+                            self.logger.warning(f'Skipping file {info.filename}, too big ({info.file_size}).')
+                            report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                            report.add_details('Warning', f'Skipping file {info.filename}, too big ({info.file_size}).')
+                            continue
+                        member = archive.read(info)
+                        if not member:
+                            continue
+                        if member.startswith(olefile.MAGIC):
+                            ole = None
+                            already_unwrapped = False
+                            try:
+                                ole = olefile.OleFileIO(BytesIO(member))
+                                for path_parts in ole.listdir():
+                                    leaf = path_parts[-1].lower()
+                                    # Ole10Native / CONTENTS are handled above via find_ole — skip raw .bin.
+                                    if leaf in {'\x01ole10native', 'contents'}:
+                                        already_unwrapped = True
+                                        break
+                            except Exception as e:
+                                self.logger.warning(f'Unable to parse embedded OLE {info.filename}: {e}')
+                            finally:
+                                if ole is not None:
+                                    try:
+                                        ole.close()
+                                    except Exception:  # nosec B110
+                                        pass
+                            if already_unwrapped:
+                                continue
+                            # Embedded OLE without known payload streams: queue the .bin itself.
+                            filename = self._embedded_filename(Path(info.filename).name, index=index)
+                            extracted.append((filename, BytesIO(member)))
+                            index += 1
+                        else:
+                            filename = self._embedded_filename(Path(info.filename).name, index=index)
+                            extracted.append((filename, BytesIO(member)))
+                            index += 1
+            except Exception as e:
+                self.logger.exception(e)
+                report.status = Status.WARN
+                report.add_details('Warning', f'Unable to extract {archive_file.path.name}: {e}.')
+
+        if not extracted:
+            report.status = Status.NOTAPPLICABLE
+        return extracted
+
+    def _extract_rtf(self, archive_file: File, report: Report, dest_dir: Path) -> list[tuple[str, BytesIO]]:
+        extracted: list[tuple[str, BytesIO]] = []
+        if not archive_file.data:
+            report.status = Status.NOTAPPLICABLE
+            return extracted
+
+        try:
+            rtf = RtfObjParser(archive_file.data.getvalue())
+            rtf.parse()
+        except Exception as e:
+            self.logger.exception(e)
+            report.status = Status.WARN
+            report.add_details('Warning', f'Unable to extract {archive_file.path.name}: {e}.')
+            return extracted
+
+        index = 1
+        for obj in rtf.objects:
+            if not getattr(obj, 'is_package', False) or not getattr(obj, 'olepkgdata', None):
+                continue
+            if len(extracted) >= self.max_files_in_archive:
+                self.logger.warning(f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive, stop extracting.')
+                report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                report.add_details('Warning', f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive')
+                break
+            payload = obj.olepkgdata
+            if len(payload) > self.max_extracted_filesize:
+                self.logger.warning(f'Skipping file {obj.filename}, too big ({len(payload)}).')
+                report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                report.add_details('Warning', f'Skipping file {obj.filename}, too big ({len(payload)}).')
+                continue
+            filename = self._embedded_filename(obj.filename, getattr(obj, 'src_path', None),
+                                               getattr(obj, 'temp_path', None), index=index)
+            extracted.append((filename, BytesIO(payload)))
+            index += 1
+
+        if not extracted:
+            report.status = Status.NOTAPPLICABLE
+        return extracted
+
+    def _is_ics(self, archive_file: File) -> bool:
+        # Prefer File.is_ics when present; keep a fallback for older images without that property.
+        is_ics_prop = getattr(type(archive_file), 'is_ics', None)
+        if isinstance(is_ics_prop, property):
+            try:
+                return bool(archive_file.is_ics)
+            except Exception:  # nosec B110
+                pass
+        if archive_file.path.suffix.lower() in {'.ics', '.ical', '.ifb', '.vcs'}:
+            return True
+        return archive_file.mime_type in {
+            'text/calendar',
+            'application/ics',
+            'text/x-vcalendar',
+        }
+
+    def _extract_pdf_embedded(self, archive_file: File, report: Report,
+                              task: Task | None=None) -> list[tuple[str, BytesIO]]:
+        extracted: list[tuple[str, BytesIO]] = []
+        try:
+            with pymupdf.open(str(archive_file.path)) as doc:  # type: ignore[no-untyped-call]
+                # needs_pass can stay true even after a successful authenticate(); trust the return value.
+                locked = bool(doc.needs_pass)
+                if locked and task is not None and task.password:
+                    try:
+                        if doc.authenticate(task.password):
+                            locked = False
+                    except Exception as e:
+                        self.logger.warning(f'Unable to authenticate PDF with provided password: {e}')
+                if locked:
+                    report.add_details('Warning', 'PDF is password-protected; unable to extract embedded files.')
+                    report.add_extra('no_password', True)
+                    report.status = Status.NOTAPPLICABLE
+                    return extracted
+
+                for item in range(doc.embfile_count()):
+                    if len(extracted) >= self.max_files_in_archive:
+                        self.logger.warning(f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive, stop extracting.')
+                        report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                        report.add_details('Warning', f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive')
+                        break
+                    try:
+                        info = doc.embfile_info(item)
+                        content = doc.embfile_get(item)
+                    except Exception as e:
+                        self.logger.warning(f'Unable to read embedded PDF file #{item}: {e}')
+                        continue
+                    if not content:
+                        continue
+                    if len(content) > self.max_extracted_filesize:
+                        filename = self._embedded_filename(info.get('filename') if isinstance(info, dict) else None,
+                                                           index=len(extracted) + 1)
+                        self.logger.warning(f'Skipping file {filename}, too big ({len(content)}).')
+                        report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                        report.add_details('Warning', f'Skipping file {filename}, too big ({len(content)}).')
+                        continue
+                    filename = self._embedded_filename(
+                        info.get('filename') if isinstance(info, dict) else None,
+                        index=len(extracted) + 1,
+                    )
+                    report.add_details('Embedded Files Found', str(info))
+                    extracted.append((filename, BytesIO(content)))
+        except Exception as e:
+            self.logger.exception(e)
+            report.status = Status.WARN
+            report.add_details('Warning', f'Unable to extract {archive_file.path.name}: {e}.')
+            return extracted
+
+        if not extracted:
+            report.status = Status.NOTAPPLICABLE
+        return extracted
+
+    def _unfold_ics(self, content: str) -> str:
+        return re.sub(r'\r?\n[ \t]', '', content)
+
+    def _ics_attach_filename(self, params: dict[str, str], index: int) -> str:
+        for key in ('X-FILENAME', 'FILENAME', 'X-APPLE-FILENAME'):
+            if key in params and params[key]:
+                name = sanitize_filename(params[key])
+                if name:
+                    return name
+        fmttype = params.get('FMTTYPE', '')
+        if '/' in fmttype:
+            subtype = fmttype.split('/', 1)[1].split(';', 1)[0].strip()
+            if subtype:
+                return f'embedded_{index}.{sanitize_filename(subtype) or "bin"}'
+        return f'embedded_{index}.bin'
+
+    def _extract_ics(self, archive_file: File, report: Report, dest_dir: Path,
+                     task: Task | None=None) -> list[tuple[str, BytesIO]]:
+        extracted: list[tuple[str, BytesIO]] = []
+        if not archive_file.data:
+            report.status = Status.NOTAPPLICABLE
+            return extracted
+
+        try:
+            content = archive_file.data.getvalue().decode('utf-8', errors='replace')
+            unfolded = self._unfold_ics(content)
+        except Exception as e:
+            self.logger.exception(e)
+            report.status = Status.WARN
+            report.add_details('Warning', f'Unable to extract {archive_file.path.name}: {e}.')
+            return extracted
+
+        index = 1
+        for line in unfolded.splitlines():
+            if not line.upper().startswith('ATTACH'):
+                continue
+            try:
+                # ATTACH;PARAM=value:payload  OR  ATTACH:payload
+                if ':' not in line:
+                    continue
+                left, value = line.split(':', 1)
+                params: dict[str, str] = {}
+                for part in left.split(';')[1:]:
+                    if '=' not in part:
+                        continue
+                    key, val = part.split('=', 1)
+                    params[key.upper()] = val.strip().strip('"')
+                value = value.strip()
+                encoding = params.get('ENCODING', '').upper()
+                value_type = params.get('VALUE', '').upper()
+
+                if encoding == 'BASE64' or value_type == 'BINARY':
+                    if len(extracted) >= self.max_files_in_archive:
+                        self.logger.warning(f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive, stop extracting.')
+                        report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                        report.add_details('Warning', f'Too many files ({len(extracted)}/{self.max_files_in_archive}) in the archive')
+                        break
+                    # VALUE=BINARY without ENCODING is still typically base64 in practice for ATTACH.
+                    payload = base64.b64decode(value, validate=False)
+                    if len(payload) > self.max_extracted_filesize:
+                        filename = self._ics_attach_filename(params, index)
+                        self.logger.warning(f'Skipping file {filename}, too big ({len(payload)}).')
+                        report.status = Status.ERROR if self.max_is_error else Status.ALERT
+                        report.add_details('Warning', f'Skipping file {filename}, too big ({len(payload)}).')
+                        continue
+                    if not payload:
+                        continue
+                    filename = self._ics_attach_filename(params, index)
+                    extracted.append((filename, BytesIO(payload)))
+                    index += 1
+                elif value_type == 'URI' or value.lower().startswith(('http://', 'https://', 'file://')):
+                    if task is not None:
+                        task.add_observable(value, 'url')
+                    report.add_details('Warning', f'URI attachment (not downloaded): {value}')
+            except Exception as e:
+                self.logger.warning(f'Unable to parse ICS ATTACH line: {e}')
+
+        if not extracted:
+            # URI attachments are recorded as observables above; nothing to unpack either way.
+            report.status = Status.NOTAPPLICABLE
+        return extracted
+
     def analyse(self, task: Task, report: Report, manual_trigger: bool=False) -> None:
         # The files supported by dfvfs generally don't have proper mime types, so we just try it on everything.
         dfvfs_info = self.check_dfvfs(task.file, True)
         if not (task.file.is_archive or task.file.is_eml or task.file.is_msg or dfvfs_info
+                or self._is_ics(task.file) or task.file.is_rtf or task.file.is_pdf
                 or task.file.type in ['DOC', 'PPT', 'XLS']):
             report.status = Status.NOTAPPLICABLE
             return
@@ -786,7 +1325,50 @@ class Extractor(BaseWorker):
 
         elif task.file.type in ['DOC', 'PPT', 'XLS']:
             # check if the file is encrypted
-            extracted = self._extract_encrypted_office(task.file, report, extracted_dir)
+            try:
+                extracted = self._extract_encrypted_office(task.file, report, extracted_dir)
+            except Exception as e:
+                # Minimal / unusual Office containers can make msoffcrypto raise; still try embeddings.
+                self.logger.warning(f'Unable to check office encryption for {task.file.path.name}: {e}')
+                report.status = Status.NOTAPPLICABLE
+                extracted = []
+            if report.status == Status.NOTAPPLICABLE:
+                # Not encrypted: look for embedded objects instead.
+                report.reset_status()
+                try:
+                    extracted = self._extract_office_embedded(task.file, report, extracted_dir)
+                except Exception as e:
+                    self.logger.exception(e)
+                    report.status = Status.WARN
+                    report.add_details('Warning', f'Unable to extract {task.file.path.name}: {e}.')
+                    extracted = []
+
+        elif task.file.is_rtf:
+            try:
+                extracted = self._extract_rtf(task.file, report, extracted_dir)
+            except Exception as e:
+                self.logger.exception(e)
+                report.status = Status.WARN
+                report.add_details('Warning', f'Unable to extract {task.file.path.name}: {e}.')
+                extracted = []
+
+        elif self._is_ics(task.file):
+            try:
+                extracted = self._extract_ics(task.file, report, extracted_dir, task)
+            except Exception as e:
+                self.logger.exception(e)
+                report.status = Status.WARN
+                report.add_details('Warning', f'Unable to extract {task.file.path.name}: {e}.')
+                extracted = []
+
+        elif task.file.is_pdf:
+            try:
+                extracted = self._extract_pdf_embedded(task.file, report, task)
+            except Exception as e:
+                self.logger.exception(e)
+                report.status = Status.WARN
+                report.add_details('Warning', f'Unable to extract {task.file.path.name}: {e}.')
+                extracted = []
 
         if not extracted and report.status != Status.NOTAPPLICABLE:
             report.status = Status.WARN
@@ -802,7 +1384,8 @@ class Extractor(BaseWorker):
             new_task = Task.new_task(user=task.user, sample=sample,
                                      filename=filename,
                                      disabled_workers=task.disabled_workers,
-                                     parent=task)
+                                     parent=task,
+                                     password=task.password or None)
             pandora.add_extracted_reference(task, new_task)
             pandora.enqueue_task(new_task)
             tasks.append(new_task)
