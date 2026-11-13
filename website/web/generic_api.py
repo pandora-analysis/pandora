@@ -331,6 +331,10 @@ class ApiTaskAction(Resource):  # type: ignore[misc]
                     'file': task.file.to_web}
 
         if action == 'share' and flask_login.current_user.role.can(Action.share_analysis):
+            # If the request contains a seed, it means they are accessing a shared report. Only admins can re-share.
+            req_seed = request.args.get('seed') or request.form.get('seed') or (request.json and request.json.get('seed'))
+            if req_seed and not flask_login.current_user.is_admin:
+                return {'success': False, 'error': 'Only administrators can generate sharable links from a shared report.'}, 403
             data: dict[str, Any] = request.get_json()
             if "validity" not in data:
                 data['validity'] = get_config('generic', 'default_share_time')

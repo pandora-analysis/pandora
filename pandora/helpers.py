@@ -233,11 +233,11 @@ class Seed():
 
     def add(self, task_uuid: str, time: str | int | None=None, seed: str | None=None) -> tuple[str, int]:
         expire = expire_in_sec(time)
+        MAX_EXPIRE = 86400  # Force max 1 day
+        if not expire or expire > MAX_EXPIRE:
+            expire = MAX_EXPIRE
         if not seed:
             seed = secrets.token_urlsafe()
-        if expire:
-            self.redis.setex(name=f'seed:{seed}', time=expire, value=task_uuid)
-        else:
-            # When seed is False (0, None)
-            self.redis.set(name=f'seed:{seed}', value=task_uuid)
+        
+        self.redis.setex(name=f'seed:{seed}', time=expire, value=task_uuid)
         return seed, expire

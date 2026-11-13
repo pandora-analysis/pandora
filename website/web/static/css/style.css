@@ -99,3 +99,13 @@ a:not([class*="btn"]) {
 a:not([class*="btn"]):hover {
     text-decoration: underline;
 }
+
+/* Blur sensitive previews by default */
+.blur-preview {
+    filter: blur(15px);
+    transition: filter 0.3s ease;
+    cursor: pointer;
+}
+.blur-preview:hover {
+    filter: blur(0);
+}
