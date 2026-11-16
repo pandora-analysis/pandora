@@ -13,7 +13,7 @@ import os
 
 from collections import defaultdict
 from collections.abc import Callable
-from datetime import datetime, timedelta
+from datetime import datetime
 import email.utils
 from importlib.metadata import version
 from io import BytesIO
@@ -712,29 +712,26 @@ def api_stats() -> str:
 
 
 def get_tasks(offset: int | None=None, limit: int | None=None, search: str | None=None) -> tuple[int, int | None, list[Any]]:
-    first_date: datetime = datetime.now() - timedelta(days=get_config('generic', 'max_days_index'))
-
     # if we search OR aren't admin, we cannot just take an interval from the DB
     filtered_total: int | None = None
-    total = pandora.get_tasks_count(flask_login.current_user, first_date=first_date)
+    total = pandora.get_tasks_count(flask_login.current_user)
     if search:
         tasks_uuids: set[str] = set()
         if flask_login.current_user.is_admin:
-            tasks_uuids = set(indexing.get_tasks_sha256(search, oldest_task=first_date, offset=offset, limit=limit))
-            tasks_uuids.update(set(indexing.get_tasks_filename(search, oldest_task=first_date, offset=offset, limit=limit)))
+            tasks_uuids = set(indexing.get_tasks_sha256(search, offset=offset, limit=limit))
+            tasks_uuids.update(set(indexing.get_tasks_filename(search, offset=offset, limit=limit)))
             tasks = list(pandora.get_tasks_by_id(user=flask_login.current_user, tasks_uuids=tasks_uuids))
             filtered_total = len(tasks_uuids)
         else:
             if flask_login.current_user.role.can(Action.search_file_hash):
-                tasks_uuids.update(indexing.get_tasks_sha256(search, oldest_task=first_date))
+                tasks_uuids.update(indexing.get_tasks_sha256(search))
             if flask_login.current_user.role.can(Action.search_file_name):
-                tasks_uuids.update(indexing.get_tasks_filename(search, oldest_task=first_date))
+                tasks_uuids.update(indexing.get_tasks_filename(search))
 
             tasks = list(pandora.get_tasks_by_id(user=flask_login.current_user, tasks_uuids=tasks_uuids))
             filtered_total = len(tasks)
     else:
-        tasks = list(pandora.get_tasks(user=flask_login.current_user, first_date=first_date,
-                                       offset=offset, limit=limit))
+        tasks = list(pandora.get_tasks(user=flask_login.current_user, offset=offset, limit=limit))
     return total, filtered_total, tasks
 
 
