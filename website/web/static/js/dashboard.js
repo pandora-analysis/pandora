@@ -87,9 +87,9 @@ function initChart(data) {
                 data: data.values,
                 lineTension: 0.1,
                 backgroundColor: 'transparent',
-                borderColor: '#009697',
+                borderColor: '#315e73',  // CIRCL primary (theme.css --pdr-primary)
                 borderWidth: 4,
-                pointBackgroundColor: '#009697'
+                pointBackgroundColor: '#de2d38'  // CIRCL red
             }]
         }
     })
@@ -123,12 +123,12 @@ function updateSubmitInfos(infos){
     $("#submit-infos .table tbody tr").remove();
     Object.keys(infos).forEach(key => {
         if(key != "total") {
-            const newRowContent = `<tr><td>${key}</td><td>${infos[key]}</td></tr>`
+            const newRowContent = `<tr><td>${pdrEscape(key)}</td><td class="text-end">${pdrEscape(infos[key])}</td></tr>`
             tbody.append(newRowContent);
         }
     })
     if(infos.total != undefined){
-        tbody.append(`<tr><td><B>Total</B></td><td><b>${infos.total}</b></td></tr>`);
+        tbody.append(`<tr class="pdr-total"><td>Total</td><td class="text-end">${pdrEscape(infos.total)}</td></tr>`);
     }
 }
 
@@ -139,21 +139,21 @@ function updateFilesInfos(infos){
         return infos[a] - infos[b]
     }).reverse().forEach(key => {
         if(key != "total") {
-            const newRowContent = `<tr><td>${key}</td><td>${infos[key]}</td></tr>`
+            const newRowContent = `<tr><td>${pdrEscape(key)}</td><td class="text-end">${pdrEscape(infos[key])}</td></tr>`
             tbody.append(newRowContent);
         }
     })
     if(infos.total  != undefined){
-        tbody.append(`<tr><td><B>Total</B></td><td><b>${infos.total}</b></td></tr>`);
+        tbody.append(`<tr class="pdr-total"><td>Total</td><td class="text-end">${pdrEscape(infos.total)}</td></tr>`);
     }
 }
 
 function updateSizeInfos(infos){
     const tr = $('#files-size-info .table tbody tr')
     $("#files-size-info .table tbody tr td").remove();
-    tr.append(`<td>${infos.min}</td>`);
-    tr.append(`<td>${infos.max}</td>`);
-    tr.append(`<td>${infos.avg}</td>`);
+    tr.append(`<td>${pdrEscape(infos.min)}</td>`);
+    tr.append(`<td>${pdrEscape(infos.max)}</td>`);
+    tr.append(`<td>${pdrEscape(infos.avg)}</td>`);
 }
 
 function updateInterval(start, end){

@@ -44,10 +44,9 @@ Analysis.prototype.refreshStatus = function () {
     }
 
     // Refresh status icon and message
-    $("#taskStatusIcon").each(function( index, element ){
-      $(this).addClass("d-none");
-    })
-    $(`.status-flag-${this.task.status.toLowerCase()}`).removeClass("d-none");
+    // Hide every big status flag, then show the current one (scoped to #taskStatus so small flags elsewhere are untouched).
+    $("#taskStatus .overall-status-flag").addClass("d-none");
+    $(`#taskStatus .status-flag-${this.task.status.toLowerCase()}`).removeClass("d-none");
     $("#taskStatusMessage").find(".alert").addClass("d-none");
     if (this.task.status === "OVERWRITE") {
         $("#taskStatusMessage").find(".alert-overwrite").removeClass("d-none");
@@ -62,6 +61,28 @@ Analysis.prototype.refreshStatus = function () {
     } else {
         $("#taskStatusMessage").find(".alert-info").removeClass("d-none");
     }
+};
+
+// Progress panel (#analysisProgress): "running, X of N modules finished" or "finished", from workers_status
+// ({module: [done, status]}) sent by the refresh API. Texts come from data-text-* (page language).
+Analysis.prototype.refreshProgress = function () {
+    const box = document.getElementById("analysisProgress");
+    if (!box || !this.workers_status) { return; }
+    const entries = Object.entries(this.workers_status);
+    const total = entries.length;
+    const done = entries.filter(([, st]) => st[0]).length;
+    const pending = entries.filter(([, st]) => !st[0]).map(([name]) => name);
+    const finished = !!this.workers_done;
+    box.classList.toggle("is-done", finished);
+    const text = (finished ? box.dataset.textDone : box.dataset.textRunning) || "";
+    document.getElementById("progressTitle").textContent = text.replace("{done}", done).replace("{total}", total);
+    document.getElementById("progressCount").textContent = `${done} / ${total}`;
+    document.getElementById("progressBar").style.width = `${(finished || !total) ? 100 : Math.round(done * 100 / total)}%`;
+    document.getElementById("progressBarOuter").setAttribute("aria-valuenow", done);
+    document.getElementById("progressPendingList").textContent = pending.join(", ");
+    const nothingPending = finished || pending.length === 0;
+    document.getElementById("progressPendingRunning").classList.toggle("d-none", nothingPending);
+    document.getElementById("progressPendingDone").classList.toggle("d-none", !nothingPending);
 };
 
 Analysis.prototype.refreshReports = function () {
@@ -185,7 +206,14 @@ Analysis.prototype.refreshHTML = function () {
     if (this.workers_done && (!this.task.extracted_tasks || this.task.extracted_tasks.every(function(task) { return task.done }))) {
         clearInterval(this.refresher);
     }
+    // Module results placeholder: once every module is done, replace it with a plain message
+    // (CSS already hides both as soon as one result is visible).
+    if (this.workers_done) {
+        $(".pdr-results-empty").addClass("d-none");
+        $(".pdr-results-none").removeClass("d-none");
+    }
     this.refreshStatus();
+    this.refreshProgress();
     this.refreshReports();
     this.refreshTabs();
 };
@@ -210,6 +238,11 @@ Analysis.prototype.refresh = function (url) {
     analysis.number_observables = data.number_observables;
     analysis.number_extracted = data.number_extracted;
     analysis.refreshHTML();
+    if (!analysis.firstRefreshDone) {
+      // First state drawn: let the page loader reveal the page (static/js/ui.js)
+      analysis.firstRefreshDone = true;
+      document.dispatchEvent(new Event("pdr:content-ready"));
+    }
   })
   .catch((error) => {
      clearInterval(analysis.refresher);
@@ -285,7 +318,9 @@ Analysis.prototype.share = function (url) {
       if (data.success === false) {
           throw new Error(data.error);
       }
-      $("#shareLink").attr("href", new URL(data.link, location.href));
+      const shareURL = new URL(data.link, location.href).href;
+      $("#shareLink").attr("href", shareURL).text(shareURL);
+      document.getElementById("shareCopy").dataset.copy = shareURL;
       if (data.lifetime > 0) {
           $("#sharePeriod").text(`for ${parseInt(data.lifetime / (3600*24))} day(s)`);
       } else {
@@ -306,8 +341,9 @@ Analysis.prototype.share = function (url) {
     return false;
 };
 
-Analysis.prototype.deleteFile = function (url) {
-    if (! confirm("Are you sure you want to delete this file ? That action is irreversible !")) {
+Analysis.prototype.deleteFile = async function (url) {
+    if (!(await pdrConfirm("The file and its previews will be removed from Pandora. The analysis results stay. This cannot be undone.",
+                           {title: "Delete this file?", confirmLabel: "Delete the file", danger: true}))) {
         return false;
     }
     fetch(url, {
@@ -324,7 +360,7 @@ Analysis.prototype.deleteFile = function (url) {
       window.location.reload();
     })
     .catch((error) => {
-      alert("An error has occurred while removing file : " + error);
+      pdrAlert("The file could not be deleted: " + error, {title: "Delete failed"});
     })
     return false;
 };

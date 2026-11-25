@@ -1,96 +1,91 @@
 {% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_icon %}
+{% from "macros.html" import full_id, empty_state, page_header %}
 
-{% block title %}
-    Pandora - Observables Lists
-{% endblock %}
+{% block title %}Observables lists — Pandora{% endblock %}
+
+{% macro list_table(entries, list_type) %}
+{% if entries %}
+<div class="table-responsive">
+<table class="table table-hover align-middle pdr-table">
+  <thead><tr><th>Value</th><th>Type</th><th><span class="visually-hidden">Remove</span></th></tr></thead>
+  <tbody>
+  {% for observable, type in entries.items() %}
+  <tr>
+    <td>{{ full_id(observable) }}</td>
+    <td><span class="pdr-type">{{ type[0] }}</span></td>
+    <td class="text-end">
+      <form action="{{ url_for('observables_lists_delete', list_type=list_type, observable=type[1]) }}"
+            data-pdr-confirm="{{ observable }} will no longer be treated specially when it is found in a file." data-pdr-confirm-title="Remove this value from the list?" data-pdr-confirm-label="Remove" data-pdr-danger>
+        <button type="submit" class="btn btn-sm btn-secondary">{{ render_icon('trash') }} Remove</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+{{ empty_state('This list is empty.') }}
+{% endif %}
+{% endmacro %}
 
 {% block content %}
-<form class="row g-3" action="{{ url_for('observables_lists_insert') }}" method="POST">
-  <div class="col-auto">
-    <label for="observable" class="form-label">Observable</label>
-    <input type="text" class="form-text" name="observable" id="observable" required>
-  </div>
-  <div class="col-auto">
-    <select class="form-select" name="type" id="type" aria-label="Observable type" required>
-      <option selected disabled value="">Select a type</option>
-      {% for type in types %}
-      <option value="{{type}}">{{type}}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="col-auto">
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="list_type" id="suspicious" value=1>
-      <label class="form-check-label" for="suspicious">
-      Suspicious
-      </label>
+<div class="container-xl">
+  {{ page_header('Observables lists', 'list-ul', 'Values found in files (URLs, domains, IPs, hashes…) that Pandora must always treat as suspicious, or always as legitimate.',
+                 [('Administration', url_for('api_admin_page')), ('Observables lists', None)], section='Administration') }}
+
+  <section class="pdr-card">
+    <header class="pdr-card-header"><h2 class="pdr-card-title">{{ render_icon('plus-circle') }} Add a value</h2></header>
+    <div class="pdr-card-body">
+      <form class="pdr-add-form" action="{{ url_for('observables_lists_insert') }}" method="POST">
+        <div class="pdr-add-value">
+          <label for="observable" class="form-label">Value</label>
+          <input type="text" class="form-control pdr-mono" name="observable" id="observable" placeholder="e.g. evil.example.com" required>
+        </div>
+        <div>
+          <label for="type" class="form-label">Type</label>
+          <select class="form-select" name="type" id="type" required>
+            <option selected disabled value="">Choose a type</option>
+            {% for type in types %}<option value="{{ type }}">{{ type }}</option>{% endfor %}
+          </select>
+        </div>
+        <fieldset>
+          <legend class="form-label">List</legend>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="list_type" id="suspicious" value=1>
+            <label class="form-check-label" for="suspicious">Suspicious</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="list_type" id="legitimate" value=0 checked>
+            <label class="form-check-label" for="legitimate">Legitimate</label>
+          </div>
+        </fieldset>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn btn-primary" id="insertSubmit">{{ render_icon('plus-lg') }} Add</button>
+      </form>
     </div>
-  </div>
-  <div class="col-auto">
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="list_type" id="legitimate" value=0 checked>
-      <label class="form-check-label" for="legitimate">
-        Legitimate
-      </label>
+  </section>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <section class="pdr-card h-100">
+        <header class="pdr-card-header pdr-list-head pdr-status--alert">
+          <h2 class="pdr-card-title">{{ render_icon('x-octagon-fill') }} Suspicious <span class="pdr-count">{{ suspicious | length }}</span></h2>
+          <p class="pdr-card-subtitle">A file containing one of these values gets a warning.</p>
+        </header>
+        <div class="pdr-card-body">{{ list_table(suspicious, 1) }}</div>
+      </section>
     </div>
-  </div>
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-  <div class="col-auto">
-    <button type="submit" class="btn btn-primary" id="insertSubmit">Add observable</button>
-  </div>
-</form>
-
-</br>
-
-<div class="row">
-  <div class="col-md-6">
-    <h3>Suspicious observables</h3>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Observable</th>
-          <th scope="col">Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for observable, type in suspicious.items() %}
-        <tr>
-          <td>{{ observable }}</td>
-          <td>{{ type[0] }}</td>
-          <td>
-            <form action="{{ url_for('observables_lists_delete', list_type=1, observable=type[1]) }}">
-              <button type="submit" class="btn btn-secondary" id="insertSubmit">delete</button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  <div class="col-md-6">
-    <h3>Legitimate observables</h3>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Observable</th>
-          <th scope="col">Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for observable, type in legitimate.items() %}
-        <tr>
-          <td>{{ observable }}</td>
-          <td>{{ type[0] }}</td>
-          <td>
-            <form action="{{ url_for('observables_lists_delete', list_type=0, observable=type[1]) }}">
-              <button type="submit" class="btn btn-secondary" id="insertSubmit">delete</button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="col-lg-6">
+      <section class="pdr-card h-100">
+        <header class="pdr-card-header pdr-list-head pdr-status--clean">
+          <h2 class="pdr-card-title">{{ render_icon('check-circle-fill') }} Legitimate <span class="pdr-count">{{ legitimate | length }}</span></h2>
+          <p class="pdr-card-subtitle">These values never make a file suspicious.</p>
+        </header>
+        <div class="pdr-card-body">{{ list_table(legitimate, 0) }}</div>
+      </section>
+    </div>
   </div>
 </div>
 {% endblock %}

@@ -1,47 +1,47 @@
 {% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_icon %}
+{% from "macros.html" import full_id, copy_inline, empty_state, page_header %}
 
-{% block title %}
-    Pandora - users
-{% endblock %}
+{% block title %}Users — Pandora{% endblock %}
 
 {% block content %}
-  <form action="{{ url_for('api_clear_users') }}">
-    <button type="submit" class="btn btn-secondary">Clear all sessions</button>
-  </form>
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th scope="col">Id</th>
-        <th scope="col">Name</th>
-        <th scope="col">Admin</th>
-        <th scope="col">First seen</th>
-        <th scope="col">Last seen</th>
-        <th scope="col">Last Used IP</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for user in users %}
-      <tr id="row-{{ user.session_id }}">
-        <td>{{ user.session_id }}</td>
-        <td>{{ user.name }}</td>
-        <td>
-        {% if user.is_admin %}
-          <span class="badge bg-success">TRUE</span>
-        {% else %}
-          <span class="badge bg-danger">FALSE</span>
-        {% endif %}
-        </td>
-        <td>{{ moment(user.first_seen).format('lll') }}</td>
-        <td>{{ moment(user.last_seen).format('lll') }}</td>
-        <td>
-        {% if user.last_ip is none %}
-          <span class="badge bg-light text-dark">NULL</span>
-        {% else %}
-          {{ user.last_ip }}
-        {% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
+<div class="container-xl">
+  {% call page_header('Users', 'people', 'Every browser session Pandora knows, anonymous or logged in. ' ~ users|length ~ ' in total.',
+                      [('Administration', url_for('api_admin_page')), ('Users', None)], section='Administration') %}
+    <form action="{{ url_for('api_clear_users') }}" data-pdr-confirm="Every session will be logged out, including yours. You will need to log in again." data-pdr-confirm-title="Clear all sessions?" data-pdr-confirm-label="Clear all sessions" data-pdr-danger>
+      <button type="submit" class="btn btn-secondary">{{ render_icon('x-circle') }} Clear all sessions</button>
+    </form>
+  {% endcall %}
+
+  <section class="pdr-card">
+    <div class="pdr-card-body">
+    {% if users %}
+      <div class="table-responsive">
+      <table class="table table-hover align-middle pdr-table pdr-stack">
+        <thead>
+          <tr><th>Name</th><th>Admin</th><th>Session id</th><th>First seen</th><th>Last seen</th><th>Last IP</th></tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+          <tr id="row-{{ user.session_id }}">
+            <td data-label="Name">{% if user.name %}{{ user.name }}{% else %}<span class="pdr-visitor">Anonymous visitor</span>{% endif %}</td>
+            <td data-label="Admin">
+              {% if user.is_admin %}<span class="pdr-badge pdr-status--running">{{ render_icon('shield-check', size='0.95em') }}<span>Admin</span></span>
+              {% else %}<span class="pdr-badge pdr-status--neutral"><span>No</span></span>{% endif %}
+            </td>
+            <td data-label="Session id">{{ full_id(user.session_id) }}</td>
+            <td data-label="First seen" class="text-nowrap">{{ moment(user.first_seen).format('lll') }}</td>
+            <td data-label="Last seen" class="text-nowrap">{{ moment(user.last_seen).format('lll') }}</td>
+            <td data-label="Last IP">{% if user.last_ip is none %}<span class="pdr-empty-value">—</span>{% else %}{{ copy_inline(user.last_ip) }}{% endif %}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+    {% else %}
+      {{ empty_state('No session yet.') }}
+    {% endif %}
+    </div>
+  </section>
+</div>
 {% endblock %}

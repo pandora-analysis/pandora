@@ -1,25 +1,49 @@
 <!DOCTYPE html>
-<html  lang="en">
+{% from 'bootstrap5/utils.html' import render_icon %}
+<html lang="{{ ui_lang | default('en') }}">
   <head>
     {% block head %}
     <meta charset="utf-8">
-    <link rel="icon" href="{{ url_for('static', filename='images/logo.svg') }}" type="image/svg+xml"
-          integrity="{{get_sri('static/images', 'logo.svg')}}"
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {# Page loader: hide the content until it is ready (static/js/ui.js reveals it). Safety: always reveal after 4 s,
+       even if a script fails to load. Without JavaScript nothing is hidden. #}
+    <script>
+      // Theme: "light" (default), "system" (follow the browser / OS) or "dark", saved per browser (localStorage).
+      // Applied here, before anything is drawn ("system" is read once, at load). static/js/ui.js handles the switcher.
+      (function () {
+        var choice = 'light';
+        try { choice = localStorage.getItem('pdr-theme') || 'light'; } catch (e) { /* storage blocked: default */ }
+        var dark = choice === 'dark' || (choice === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme-choice', choice);
+      })();
+      document.documentElement.classList.add('pdr-loading');
+      window.setTimeout(function () { document.documentElement.classList.remove('pdr-loading'); }, 4000);
+    </script>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/bricolage-grotesque-latin.woff2') }}" as="font" type="font/woff2"
+          integrity="{{get_sri('static/fonts', 'bricolage-grotesque-latin.woff2')}}" crossorigin="anonymous">
+    <link rel="icon" href="{{ url_for('static', filename='images/pandora-icon.svg') }}" type="image/svg+xml"
+          integrity="{{get_sri('static/images', 'pandora-icon.svg')}}"
           crossorigin="anonymous">
 
     {{ moment.include_moment(local_js='/static/js/lib/moment-with-locales.min.js',
                              sri=get_sri('static/js/lib', 'moment-with-locales.min.js')) }}
+    {% if ui_lang | default('en') != 'en' %}
+    {# Dates ("2 days ago", formats) in the page language: moment-with-locales includes it #}
+    <script>moment.locale("{{ ui_lang }}");</script>
+    {% endif %}
     {% block styles %}
     <!-- Included stylesheets -->
     {{ bootstrap.load_css() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}"
+          integrity="{{get_sri('static/css', 'theme.css')}}"
+          crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"
           integrity="{{get_sri('static/css', 'style.css')}}"
           crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/ribbon.css') }}"
-          integrity="{{get_sri('static/css', 'ribbon.css')}}"
-          crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/datatables.css') }}"
-         {{get_sri('static/css/lib', 'datatables.css')}}
+         integrity="{{get_sri('static/css/lib', 'datatables.css')}}"
           crossorigin="anonymous">
 
     {% set overrides_css = load_custom_css('overrides.css') %}
@@ -34,84 +58,99 @@
     {% endblock %}
   </head>
 
-  <body>
-    {% include "custom_header.html" ignore missing %}
-    <nav class="navbar navbar-expand-md navbar-light bg-light">
-      <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <a class="navbar-brand" href="{{ url_for('api_root') }}">
-          <img src="{{ url_for('static', filename='images/logo-h.svg') }}" style="width:250px;" alt="PANDORA"
-               integrity="{{get_sri('static/images', 'logo-h.svg')}}"
-               crossorigin="anonymous">
-        </a>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav mx-5">
-                {% if current_user.role.can([action.list_all_tasks, action.list_own_tasks], 'or') %}
-                    <li id="tasks-nav" class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('api_tasks') }}">Recent</a>
-                    </li>
-                {% endif %}
-
-                {% if current_user.role.can('submit_file') %}
-                    <li id="submit-nav" class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('api_submit_page') }}">Submit</a>
-                    </li>
-                {% endif %}
-                {% if current_user.role.can('list_users') %}
-                    <li class="nav-item" id="roles-nav">
-                        <a class="nav-link active" href="{{ url_for('api_roles') }}">Roles</a>
-                    </li>
-                {% endif %}
-                {% if current_user.role.can('list_users') %}
-                    <li class="nav-item" id="users-nav">
-                        <a class="nav-link active" href="{{ url_for('api_users') }}">Users</a>
-                    </li>
-                {% endif %}
-                {% if current_user.role.can('manage_observables_lists') %}
-                    <li class="nav-item" id="stats-nav">
-                        <a class="nav-link active" href="{{ url_for('observables_lists') }}">Observables lists</a>
-                    </li>
-                {% endif %}
-                {% if current_user.role.can('list_stats') %}
-                    <li class="nav-item" id="stats-nav">
-                        <a class="nav-link active" href="{{ url_for('api_stats') }}">Statistics</a>
-                    </li>
-                {% endif %}
-                {% if current_user.is_admin %}
-                    <li class="nav-item" id="admin-nav">
-                        <a class="nav-link active" href="{{ url_for('api_admin_page') }}">Admin</a>
-                    </li>
-                {% endif %}
-            </ul>
-            <ul class="navbar-nav mx-5">
-              <li class="nav-item">
-                <div onclick="toggle_detailed_view()">
-                  <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" value=""
-                           id="detailedView" {% if current_user.detailed_view %}checked{% endif %}>
-                    <label class="form-check-label" for="detailedView">
-                      Detailed view
-                    </label>
-                  </div>
-                </div>
-              </li>
-            </ul>
-        </div>
-      </div>
-      {% if show_project_page %}
-      <div class="corner-ribbon top-right sticky bg-light shadow">
-        <a href="https://github.com/pandora-analysis">Project page</a>
-      </div>
-      {% endif %}
-    </nav>
-
-    <div class="container-fluid">
-      {% block content %}{% endblock %}
+  <body {% block body_attrs %}{% endblock %}>
+    <div class="pdr-loader" role="status" aria-live="polite">
+      {% set class = 'pdr-loader-box' %}{% set box_id = 'loaderbox' %}{% set box_mode = 'loop' %}{% include "_pandora_box.html" %}
+      <span>Loading…</span>
     </div>
+    {% include "custom_header.html" ignore missing %}
+    {# Navigation entries: (endpoint, label, id, permission test). The current page is highlighted. #}
+    {% set nav_items = [] %}
+    {% if current_user.role.can([action.list_all_tasks, action.list_own_tasks], 'or') %}{% set _ = nav_items.append(('api_tasks', 'Recent', 'tasks-nav')) %}{% endif %}
+    {% if current_user.role.can('submit_file') %}{% set _ = nav_items.append(('api_submit_page', 'Submit', 'submit-nav')) %}{% endif %}
+    {% if current_user.role.can('list_users') %}{% set _ = nav_items.append(('api_roles', 'Roles', 'roles-nav')) %}{% endif %}
+    {% if current_user.role.can('list_users') %}{% set _ = nav_items.append(('api_users', 'Users', 'users-nav')) %}{% endif %}
+    {% if current_user.role.can('manage_observables_lists') %}{% set _ = nav_items.append(('observables_lists', 'Observables lists', 'observables-nav')) %}{% endif %}
+    {% if current_user.role.can('list_stats') %}{% set _ = nav_items.append(('api_stats', 'Statistics', 'stats-nav')) %}{% endif %}
+    {% if current_user.is_admin %}{% set _ = nav_items.append(('api_admin_page', 'Admin', 'admin-nav')) %}{% endif %}
+
+    <header class="pdr-header">
+      <nav class="navbar navbar-expand-lg" aria-label="Main navigation">
+        <div class="container">
+          <a class="navbar-brand pdr-brand" href="{{ url_for('api_root') }}">
+            <img class="pdr-logo-light" src="{{ url_for('static', filename='images/pandora-logo-new.svg') }}" alt="Pandora — analysis framework"
+                 height="56" integrity="{{get_sri('static/images', 'pandora-logo-new.svg')}}"
+                 crossorigin="anonymous">
+            {# Same logo with light text, for the dark theme #}
+            <img class="pdr-logo-dark" src="{{ url_for('static', filename='images/pandora-logo-new-dark.svg') }}" alt="Pandora — analysis framework"
+                 height="56" integrity="{{get_sri('static/images', 'pandora-logo-new-dark.svg')}}"
+                 crossorigin="anonymous">
+          </a>
+
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#pdr-nav"
+                  aria-controls="pdr-nav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="pdr-nav">
+            <ul class="navbar-nav ms-lg-4 me-auto">
+              {% for endpoint, label, item_id in nav_items %}
+                {% set is_current = request.endpoint == endpoint %}
+                <li id="{{ item_id }}" class="nav-item">
+                  <a class="nav-link{% if is_current %} active{% endif %}" href="{{ url_for(endpoint) }}"
+                     {% if is_current %}aria-current="page"{% endif %}>{{ label }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+            <div class="dropdown pdr-theme-switch">
+              <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                      aria-label="Colour theme" title="Colour theme">
+                <span class="pdr-theme-icon pdr-theme-icon-light">{{ render_icon('sun', size='1em') }}</span>
+                <span class="pdr-theme-icon pdr-theme-icon-system">{{ render_icon('circle-half', size='1em') }}</span>
+                <span class="pdr-theme-icon pdr-theme-icon-dark">{{ render_icon('moon-stars', size='1em') }}</span>
+                <span class="pdr-theme-label">Theme</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><button type="button" class="dropdown-item" data-pdr-theme-set="light">{{ render_icon('sun') }} Light</button></li>
+                <li><button type="button" class="dropdown-item" data-pdr-theme-set="system">{{ render_icon('circle-half') }} Match browser</button></li>
+                <li><button type="button" class="dropdown-item" data-pdr-theme-set="dark">{{ render_icon('moon-stars') }} Dark</button></li>
+              </ul>
+            </div>
+            <div class="form-check form-switch pdr-detailed-switch mb-0">
+              <input class="form-check-input" type="checkbox" role="switch" id="detailedView"
+                     onchange="toggle_detailed_view()" {% if current_user.detailed_view %}checked{% endif %}>
+              <label class="form-check-label" for="detailedView">Detailed view</label>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-fluid pdr-main">
+      {% block content %}{% endblock %}
+    </main>
 
     {% include "custom_footer.html" ignore missing %}
+
+    <footer class="pdr-footer">
+      <div class="container">
+        <a class="pdr-footer-brand" href="https://www.circl.lu/" aria-label="CIRCL — Computer Incident Response Center Luxembourg">
+          <img src="{{ url_for('static', filename='images/circl-logo-h.png') }}" alt="CIRCL" height="40"
+               integrity="{{get_sri('static/images', 'circl-logo-h.png')}}" crossorigin="anonymous">
+        </a>
+        <p class="mb-0">Pandora is an open-source analysis framework developed by
+          <a href="https://www.circl.lu/">CIRCL</a>.</p>
+        <ul class="pdr-footer-links">
+          {% if show_project_page %}
+          <li><a href="https://github.com/pandora-analysis">Project page</a></li>
+          {% endif %}
+          {# Interactive API documentation (Swagger UI from flask-restx, endpoint "doc" = /doc/) #}
+          <li><a href="{{ url_for('doc') }}">API documentation</a></li>
+          <li><a href="https://github.com/pandora-analysis/pandora">Source code</a></li>
+          <li><a href="https://github.com/pandora-analysis/pandora/issues">Report an issue</a></li>
+        </ul>
+      </div>
+    </footer>
 
     {% block scripts %}
     <!-- Included scripts -->
@@ -120,10 +159,13 @@
             integrity="{{get_sri('static/js/lib', 'jquery.min.js')}}"
             crossorigin="anonymous"></script>
     <script src='{{ url_for('static', filename='js/lib/datatables.js') }}'
-           {{get_sri('static/js/lib', 'datatables.js')}}
+           integrity="{{get_sri('static/js/lib', 'datatables.js')}}"
+            crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/ui.js') }}"
+            integrity="{{get_sri('static/js', 'ui.js')}}"
             crossorigin="anonymous"></script>
     <script src='{{ url_for('static', filename='js/render_tables.js') }}'
-            {{get_sri('static/js', 'render_tables.js')}}
+            integrity="{{get_sri('static/js', 'render_tables.js')}}"
             crossorigin="anonymous"></script>
 
     {% set overrides_js = load_custom_js('overrides.js') %}

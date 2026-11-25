@@ -1,53 +1,91 @@
 {% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_icon %}
+{% from "macros.html" import notice, page_header %}
 
-{% block title %}
-    Pandora - Admin
-{% endblock %}
+{% block title %}Administration — Pandora{% endblock %}
 
 {% block content %}
-    {% if current_user.is_admin %}
-    <div class="card text-center mx-auto" style="width:350px">
-        <div class="card-header">
-            Hello {{ current_user.name }} !
-        </div>
-        <div class="list-group">
-          {% if current_user.role.can(action.list_tasks) %}
-            <a href="{{ url_for('api_tasks') }}" class="list-group-item list-group-item-action">See tasks</a>
-          {% endif %}
-          {% if current_user.role.can(action.list_users) %}
-            <a href="{{ url_for('api_users') }}" class="list-group-item list-group-item-action">See users</a>
-          {% endif %}
-          {% if current_user.role.can(action.list_roles) %}
-            <a href="{{ url_for('api_roles') }}" class="list-group-item list-group-item-action">See roles</a>
-          {% endif %}
-          {% if current_user.role.can(action.list_stats) %}
-            <a href="{{ url_for('api_stats') }}" class="list-group-item list-group-item-action">See statistics</a>
-          {% endif %}
-          <a href="{{ url_for('api_logout') }}" class="list-group-item list-group-item-action">Logout</a>
-        </div>
-    </div>
-    {% else %}
-    <div class="mx-auto" style="width:350px">
-        <h3 class="text-center">Pandora Administration</h3>
-        <form id="loginForm" method="POST" action="{{ url_for('api_admin_submit') }}">
-          {% if error is not none %}
-            <div class="form-group alert alert-danger">{{ error }}</div>
-          {% endif %}
-          <div class="mb-3">
-              <label for="loginUsername" class="form-label">Username</label>
-              <input type="text" class="form-control" id="loginUsername" name="username" placeholder="Enter username" size="50" autofocus>
-          </div>
-          <div class="mb-3">
-              <label for="loginPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Enter Password" size="50">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          </div>
-          <div class="mb-3 form-check">
-              <label class="form-check-label" for="loginRemeber">Remember me</label>
-              <input type="checkbox" class="form-check-input" id="loginRemeber">
-          </div>
-          <button type="submit" form="loginForm" class="btn btn-primary">Login</button>
-        </form>
-    </div>
+<div class="container-xl">
+{% if current_user.is_admin %}
+  {% call page_header('Administration', 'speedometer2', 'Logged in as ' ~ current_user.name ~ '. Choose what to manage on this Pandora instance.',
+                      [('Administration', None)], centered=True) %}
+    <a class="btn btn-secondary" href="{{ url_for('api_logout') }}">{{ render_icon('box-arrow-right') }} Log out</a>
+  {% endcall %}
+
+  <div class="pdr-tiles is-centered">
+    {% if current_user.role.can([action.list_all_tasks, action.list_own_tasks], 'or') %}
+    <a class="pdr-tile" href="{{ url_for('api_tasks') }}">
+      <span class="pdr-tile-icon">{{ render_icon('clock-history', size='1.5rem') }}</span>
+      <strong>Analyses</strong><span>Every file submitted, with its status and report.</span>
+      <span class="pdr-tile-go">Open {{ render_icon('arrow-right') }}</span>
+    </a>
     {% endif %}
+    {% if current_user.role.can(action.list_users) %}
+    <a class="pdr-tile" href="{{ url_for('api_users') }}">
+      <span class="pdr-tile-icon">{{ render_icon('people', size='1.5rem') }}</span>
+      <strong>Users</strong><span>Sessions, admins, last seen and IP address.</span>
+      <span class="pdr-tile-go">Open {{ render_icon('arrow-right') }}</span>
+    </a>
+    {% endif %}
+    {% if current_user.role.can(action.list_roles) %}
+    <a class="pdr-tile" href="{{ url_for('api_roles') }}">
+      <span class="pdr-tile-icon">{{ render_icon('shield-lock', size='1.5rem') }}</span>
+      <strong>Roles</strong><span>What each kind of user is allowed to do.</span>
+      <span class="pdr-tile-go">Open {{ render_icon('arrow-right') }}</span>
+    </a>
+    {% endif %}
+    {% if current_user.role.can('manage_observables_lists') %}
+    <a class="pdr-tile" href="{{ url_for('observables_lists') }}">
+      <span class="pdr-tile-icon">{{ render_icon('list-ul', size='1.5rem') }}</span>
+      <strong>Observables lists</strong><span>Values always flagged as suspicious or as legitimate.</span>
+      <span class="pdr-tile-go">Open {{ render_icon('arrow-right') }}</span>
+    </a>
+    {% endif %}
+    {% if current_user.role.can(action.list_stats) %}
+    <a class="pdr-tile" href="{{ url_for('api_stats') }}">
+      <span class="pdr-tile-icon">{{ render_icon('bar-chart', size='1.5rem') }}</span>
+      <strong>Statistics</strong><span>Submissions and results over time.</span>
+      <span class="pdr-tile-go">Open {{ render_icon('arrow-right') }}</span>
+    </a>
+    {% endif %}
+  </div>
+
+{% else %}
+  <section class="pdr-login">
+    <img class="pdr-login-icon" src="{{ url_for('static', filename='images/pandora-icon.svg') }}" alt=""
+         integrity="{{get_sri('static/images', 'pandora-icon.svg')}}" crossorigin="anonymous">
+    <h1 class="pdr-login-title">Pandora administration</h1>
+
+    {% if error is not none and request.view_args.get('error') is not none %}
+      {% call notice('error', 'Login failed') %}{{ error }}{% endcall %}
+    {% endif %}
+
+    <form id="loginForm" method="POST" action="{{ url_for('api_admin_submit') }}" class="pdr-card pdr-card-body">
+      <div class="mb-3">
+        <label for="loginUsername" class="form-label">Username</label>
+        <input type="text" class="form-control" id="loginUsername" name="username" autocomplete="username" required autofocus>
+      </div>
+      <div class="mb-3">
+        <label for="loginPassword" class="form-label">Password</label>
+        <input type="password" class="form-control" id="loginPassword" name="password" autocomplete="current-password" required>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      </div>
+      {# Same as on main: this checkbox has no `name`, so it is not sent and the server ignores it
+         (flask_login.login_user is called without remember). Making it work needs a backend change. #}
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="loginRemeber">
+        <label class="form-check-label" for="loginRemeber">Remember me</label>
+      </div>
+      <button type="submit" form="loginForm" class="btn btn-primary w-100">{{ render_icon('box-arrow-in-right') }} Log in</button>
+    </form>
+
+    {# Help for administrators, folded by default #}
+    <details class="pdr-disclaimer pdr-login-help">
+      <summary>{{ render_icon('info-circle') }} Where do the accounts come from?</summary>
+      <div>Admin accounts are set in <code>config/generic.json</code>, key <code>users</code>
+        (<code>{"username": "password"}</code>). Restart Pandora after changing them.</div>
+    </details>
+  </section>
+{% endif %}
+</div>
 {% endblock %}

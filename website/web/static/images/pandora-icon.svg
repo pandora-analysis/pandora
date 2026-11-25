@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 49 236 236" width="236" height="236">
+  <defs>
+
+
+
+    <linearGradient id="layerTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A8D3FA" />
+      <stop offset="100%" stop-color="#7BB5EE" />
+    </linearGradient>
+
+    <linearGradient id="layerMid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#589FE4" />
+      <stop offset="100%" stop-color="#357AC6" />
+    </linearGradient>
+
+    <linearGradient id="layerLow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#347BC6" />
+      <stop offset="100%" stop-color="#1E569B" />
+    </linearGradient>
+  </defs>
+
+
+  <g transform="translate(36, 18)">
+
+
+
+    <polygon points="118,108 46,150 46,162 118,120" fill="#132B4E" />
+
+    <polygon points="118,108 190,150 190,162 118,120" fill="#1D447A" />
+
+    <polygon points="118,120 46,162 118,204 190,162" fill="#0F223E" />
+
+
+
+    <polygon points="46,150 118,108 92,92 20,134" fill="#2A68B8" />
+    <polygon points="46,150 20,134 20,144 46,160" fill="#1B4885" />
+
+    <polygon points="190,150 118,108 144,92 216,134" fill="#1F5396" />
+    <polygon points="190,150 216,134 216,144 190,160" fill="#153A6C" />
+
+
+
+    <g>
+      <polygon points="118,118 176,151 118,184 60,151" fill="url(#layerLow)" fill-opacity="0.88" />
+      <polygon points="60,151 118,184 118,190 60,157" fill="#1A4B8A" fill-opacity="0.92" />
+      <polygon points="118,184 176,151 176,157 118,190" fill="#123666" fill-opacity="0.92" />
+    </g>
+
+
+    <g>
+      <polygon points="118,90 176,123 118,156 60,123" fill="url(#layerMid)" fill-opacity="0.82" />
+      <polygon points="60,123 118,156 118,161 60,128" fill="#2B6CB8" fill-opacity="0.85" />
+      <polygon points="118,156 176,123 176,128 118,161" fill="#1D4E8C" fill-opacity="0.85" />
+    </g>
+
+
+    <g>
+      <polygon points="118,62 176,95 118,128 60,95" fill="#5CA4E8" fill-opacity="0.78" />
+      <polygon points="60,95 118,128 118,132 60,99" fill="#3F86CE" fill-opacity="0.82" />
+      <polygon points="118,128 176,95 176,99 118,132" fill="#2B67A8" fill-opacity="0.82" />
+    </g>
+
+
+    <g>
+      <polygon points="118,34 176,67 118,100 60,67" fill="url(#layerTop)" fill-opacity="0.84" />
+      <polygon points="60,67 118,100 118,104 60,71" fill="#6AA8E6" fill-opacity="0.85" />
+      <polygon points="118,100 176,67 176,71 118,104" fill="#4D89C9" fill-opacity="0.85" />
+
+      <polyline points="60,67 118,34 176,67" fill="none" stroke="#D6EAFF" stroke-width="1.5" stroke-opacity="0.7" />
+    </g>
+
+
+
+    <polygon points="46,162 118,204 118,264 46,222" fill="#2973C7" />
+
+    <polygon points="118,204 190,162 190,222 118,264" fill="#183A6B" />
+
+
+
+    <polygon points="46,162 118,204 92,220 20,178" fill="#5EA6F0" />
+    <polygon points="20,178 92,220 92,228 20,186" fill="#3A7EC9" />
+
+    <polygon points="190,162 118,204 144,220 216,178" fill="#225BA6" />
+    <polygon points="118,204 144,220 144,228 118,212" fill="#163E75" />
+  </g>
+
+
+  </svg>

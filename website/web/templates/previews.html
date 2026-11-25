@@ -1,9 +1,11 @@
+{# Preview images of the file (one per page). Loaded inline and refreshed by analysis.js into #previews_images. #}
 {% for idx in range(task.file.previews|length) %}
-<div class="col-md-4">
-  <div class="img-hover">
-    <a href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}" target="_blank">
-      <img class="img-thumbnail" width="70%" src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}">
-    </a>
-  </div>
+<div class="col-6 col-md-4 pdr-preview">
+  <a href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}" target="_blank"
+     title="Open page {{ idx + 1 }} in full size">
+    <img class="pdr-preview-img" alt="Preview of page {{ idx + 1 }}"
+         src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}">
+    <span class="pdr-preview-label">Page {{ idx + 1 }}</span>
+  </a>
 </div>
 {% endfor %}

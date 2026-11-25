@@ -1,50 +1,36 @@
 {% from 'bootstrap5/utils.html' import render_icon %}
-{% from "macros.html" import display_status_badge %}
-
-<div class="row" style="margin-bottom:30px">
-  <div class="col-md-8">
-    <h3>Observables</h3>
-  </div>
+{% from "macros.html" import display_status_badge, empty_state, full_id %}
+{# Loaded into the "Observables" tab by analysis.js. Lookyloo buttons: ids lookyloo_submit-<sha256> / lookyloo_link-<sha256>. #}
+{% if task.observables %}
+<p class="pdr-hint">URLs, domains, IPs, emails and hashes found in the file. "Warning lists" are known-good or known-noisy lists the value appears in.</p>
+<div class="table-responsive">
+<table class="table table-hover align-middle pdr-table" id="observablesTaskRows">
+  <thead><tr><th>Status</th><th>Type</th><th>Value</th><th>Warning lists</th></tr></thead>
+  <tbody>
+  {% for observable in task.observables %}
+  <tr id="observableRow-{{ observable.sha256 }}">
+    <td>{{ display_status_badge(observable.status, status) }}</td>
+    <td><span class="pdr-type">{{ observable.observable_type }}</span></td>
+    <td>
+      {{ full_id(observable.value) }}
+      {% if lookyloo_url and observable.observable_type == "url" %}
+      <button type="button" class="btn btn-sm btn-secondary mt-1" id="lookyloo_submit-{{observable.sha256}}"
+              onclick="lookyloo('{{lookyloo_url}}', '{{observable.sha256}}')" data-url="{{observable.value}}">
+        {{ render_icon('camera') }} Capture with Lookyloo</button>
+      <a style="display:none" id="lookyloo_link-{{observable.sha256}}" class="btn btn-sm btn-secondary mt-1"
+         target="_blank" rel="noopener noreferrer" href="">{{ render_icon('box-arrow-up-right') }} See the capture</a>
+      {% endif %}
+    </td>
+    <td>
+      {% if observable.warninglists %}
+      <ul class="pdr-list">{% for wl in observable.warninglists %}<li>{{ wl.name }}</li>{% endfor %}</ul>
+      {% else %}<span class="pdr-empty-value">—</span>{% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
 </div>
-
-<div class="row">
-  <table class="table table-hover table-bordered" id="observablesTaskRows">
-    <tr>
-      <th>Status</th>
-      <th>Type</th>
-      <th>Observable</th>
-      <th>Warninglists</th>
-    </tr>
-    {% for observable in task.observables %}
-    <tr id="observableRow-{{ observable.sha256 }}">
-      <td style="width:115px">
-        {{ display_status_badge(observable.status, status) }}
-      </td>
-      <td style="width: 110px">
-				{{ observable.observable_type }}
-      </td>
-      <td style="max-width: 400px">
-        <div style="word-wrap: break-word">{{observable.value}}</div>
-        {% if lookyloo_url and observable.observable_type == "url" %}
-        <div style="float:right" id="lookyloo_submit-{{observable.sha256}}" class="btn alert-link"
-             onclick="lookyloo('{{lookyloo_url}}', '{{observable.sha256}}')"
-             data-url="{{observable.value}}">
-          Submit to Lookyloo
-        </div>
-        <a style="float:right;display:none" id='lookyloo_link-{{observable.sha256}}'
-           class="btn alert-link" target="_blank" href=''>
-          See capture on lookyloo
-        </a>
-        {% endif %}
-      </td>
-      <td style="max-width: 300px">
-        <ul>
-        {% for wl in observable.warninglists%}
-          <li>{{wl.name}}</li>
-        {% endfor %}
-        </ul>
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
-</div>
+{% else %}
+{{ empty_state('No observables were found in this file.') }}
+{% endif %}
