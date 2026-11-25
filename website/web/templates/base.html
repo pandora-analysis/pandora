@@ -167,6 +167,23 @@
                      onchange="toggle_detailed_view()" {% if current_user.detailed_view %}checked{% endif %}>
               <label class="form-check-label" for="detailedView">Detailed view</label>
             </div>
+            <div class="dropdown pdr-help">
+              <button type="button" class="pdr-help-button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"
+                      aria-label="What is the detailed view?">{{ render_icon('question-circle') }}</button>
+              <div class="dropdown-menu dropdown-menu-end pdr-help-panel">
+                <p class="pdr-help-title">Detailed view
+                  <span class="pdr-help-state {% if current_user.detailed_view %}is-on{% endif %}">{{ 'On now' if current_user.detailed_view else 'Off now' }}</span></p>
+                <p>It only changes what you <strong>see</strong>. Turning it on or off never changes a report or its result.</p>
+                <p class="pdr-help-case {% if not current_user.detailed_view %}is-current{% endif %}"><strong>{{ render_icon('toggle-off') }} Off</strong> (simple, recommended to read a file):
+                  the content of the file, its links, the files inside it, and the overall result (clean, warning, alert).</p>
+                <p class="pdr-help-case {% if current_user.detailed_view %}is-current{% endif %}"><strong>{{ render_icon('toggle-on') }} On</strong> (for security people): the same, plus</p>
+                <ul>
+                  <li>in a report: what each module found (antivirus, YARA rules, …) and why;</li>
+                  <li>on the Submit page: the choice of the modules that will run on your next file.</li>
+                </ul>
+                <p class="mb-0">The page reloads when you switch it. It is remembered for your session only: other people keep their own choice.</p>
+              </div>
+            </div>
           </div>
         </div>
       </nav>

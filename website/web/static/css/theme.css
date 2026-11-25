@@ -1307,3 +1307,19 @@ html[data-theme="dark"] .pdr-locked-wrong { color: #ff9a9f; }
   #observablesTaskRows td:nth-child(-n+2) { display: inline-block; width: auto; }
   #observablesTaskRows td:has(> .pdr-empty-value) { display: none; }
 }
+
+/* "?" next to Detailed view */
+.pdr-help-button { display: inline-flex; padding: .25rem; border: 0; background: none; color: var(--pdr-primary); font-size: 1.05rem; line-height: 1; }
+.pdr-help-panel { width: min(400px, calc(100vw - 32px)); padding: 1rem; white-space: normal; color: var(--pdr-text); }
+.pdr-help-panel p, .pdr-help-panel ul { margin-bottom: .6rem; }
+.pdr-help-panel ul { padding-left: 1.25rem; }
+.pdr-help-title { display: flex; align-items: center; justify-content: space-between; font-weight: 700; }
+.pdr-help-state { padding: .1rem .5rem; border: 1px solid var(--pdr-border); border-radius: 5px; font-size: .85em; font-weight: 600; color: var(--pdr-text-muted); }
+.pdr-help-state.is-on { background: var(--pdr-primary-solid); border-color: var(--pdr-primary-solid); color: #fff; }
+.pdr-help-case { padding-left: .6rem; border-left: 4px solid transparent; }
+.pdr-help-case.is-current { border-left-color: var(--pdr-primary); }
+/* In the phone menu: "?" on the line of the switch, its text in the flow of a menu that can scroll */
+@media (max-width: 991.98px) {
+  .pdr-header .navbar-collapse { max-height: calc(100vh - 80px); overflow-y: auto; }
+  .pdr-help .dropdown-menu { position: static !important; transform: none !important; width: 100%; }
+}

@@ -37,8 +37,13 @@ function lookylooFillAll(box) {
         const value = b.dataset.url.trim();
         try {
             const url = new URL(value);
-            if (/^https?:$/.test(url.protocol) && url.hostname.includes(".") && !/\s/.test(value)) { links.set(url.href, value); }
+            if (/^https?:$/.test(url.protocol) && /^[\w.-]+\.[\w-]+$/.test(url.hostname) && !/\s/.test(value)) { links.set(url.href, value); }
         } catch (e) { /* not a valid link */ }
+    });
+    // Emails cut long lines with "=": drop the start of a link that is also there in full ("https://www.exa=")
+    const all = [...links.values()];
+    links.forEach((value, key) => {
+        if (value.endsWith("=") && all.some((other) => other !== value && other.startsWith(value.slice(0, -1)))) { links.delete(key); }
     });
     document.querySelectorAll("form[data-lookyloo-all]").forEach((form) => {
         form.classList.toggle("d-none", links.size < 2);
@@ -48,6 +53,7 @@ function lookylooFillAll(box) {
         const label = form.querySelector("[data-text]");
         label.textContent = label.dataset.text.replace("{n}", links.size);
     });
+    return links.size;
 }
 
 document.addEventListener("click", (event) => {
@@ -232,8 +238,7 @@ Analysis.prototype.refreshTabs = function () {
          box.innerHTML = text;
          box.dataset.pdrHtml = text;
          Object.keys(lookylooCaptures).forEach(lookylooShow);
-         lookylooFillAll(box);
-         const hint = document.getElementById("lookylooLinks"), links = box.querySelectorAll("button[data-lookyloo]").length;
+         const hint = document.getElementById("lookylooLinks"), links = lookylooFillAll(box);
          if (hint) {
              const label = hint.querySelector("[data-text]");
              label.textContent = label.dataset.text.replace("{n}", links);

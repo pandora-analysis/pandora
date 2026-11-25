@@ -1,10 +1,11 @@
 {% from "macros.html" import module_result, lookyloo_logo %}
 {% call module_result(worker_name, worker_meta, report, status) %}
   {% if report.status == status.MANUAL %}
-    <p>This module sends the sample to a third-party service, so it only runs when you ask.</p>
+    <p>As it is sending the sample to a 3rd party service, the module needs to be triggered manually. If you wish to do so, click here:</p>
     <p class="mb-0"><a class="btn btn-sm btn-secondary pdr-lookyloo" href="{{ url_for('manual_trigger_worker', task_id=task.uuid, seed=seed, worker_name=worker_name) }}">
-      {{ lookyloo_logo() }} Run it now</a></p>
+      {{ lookyloo_logo() }} Run Lookyloo now</a></p>
   {% elif report.details and report.details.get('permaurl') %}
+    <p>This file was submitted to a Lookyloo instance.</p>
     <p class="mb-0"><a class="btn btn-sm btn-secondary pdr-lookyloo" href="{{ report.details['permaurl'] }}" target="_blank" rel="noopener noreferrer">
       {{ lookyloo_logo() }} See the capture on Lookyloo</a></p>
   {% endif %}
