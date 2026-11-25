@@ -1,11 +1,41 @@
-{# Preview images of the file (one per page). Loaded inline and refreshed by analysis.js into #previews_images. #}
-{% for idx in range(task.file.previews|length) %}
-<div class="col-6 col-md-4 pdr-preview">
-  <a href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}" target="_blank"
-     title="Open page {{ idx + 1 }} in full size">
-    <img class="pdr-preview-img" alt="Preview of page {{ idx + 1 }}"
-         src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}">
-    <span class="pdr-preview-label">Page {{ idx + 1 }}</span>
-  </a>
+{# Pages of the file as pictures made by Pandora, at reading size. Several pages: one at a time, with arrows on the
+   sides, "Page n / N" and thumbnails (static/js/ui.js "Page viewer"), instead of a long scroll.
+   Loaded inline and refreshed by analysis.js into #previews_images. #}
+{% set n_pages = task.file.previews | length %}
+{% if n_pages %}
+<div class="col-12 pdr-pager" data-pdr-pager data-pages="{{ n_pages }}" tabindex="-1" aria-roledescription="page viewer">
+  <div class="pdr-pager-stage">
+    {% if n_pages > 1 %}
+    <button type="button" class="pdr-pager-arrow pdr-pager-prev" data-pdr-pager-go="-1" aria-label="Previous page" disabled>
+      <svg class="bi" width="28" height="28" fill="currentColor" aria-hidden="true"><use href="{{ url_for('bootstrap.static', filename='icons/bootstrap-icons.svg') }}#chevron-left"/></svg>
+    </button>
+    {% endif %}
+    {% for idx in range(n_pages) %}
+    <figure class="pdr-preview pdr-page{% if idx == 0 %} is-current{% endif %}" data-page="{{ idx }}">
+      <a href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}" target="_blank"
+         title="Open page {{ idx + 1 }} in a new tab">
+        <img class="pdr-preview-img" alt="Page {{ idx + 1 }} of the file" loading="lazy"
+             src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}">
+      </a>
+    </figure>
+    {% endfor %}
+    {% if n_pages > 1 %}
+    <button type="button" class="pdr-pager-arrow pdr-pager-next" data-pdr-pager-go="1" aria-label="Next page">
+      <svg class="bi" width="28" height="28" fill="currentColor" aria-hidden="true"><use href="{{ url_for('bootstrap.static', filename='icons/bootstrap-icons.svg') }}#chevron-right"/></svg>
+    </button>
+    {% endif %}
+  </div>
+  <p class="pdr-pager-count" aria-live="polite">Page <span data-pdr-pager-current>1</span> / {{ n_pages }}</p>
+  {% if n_pages > 1 %}
+  <div class="pdr-pager-thumbs" role="tablist" aria-label="Pages">
+    {% for idx in range(n_pages) %}
+    <button type="button" class="pdr-pager-thumb{% if idx == 0 %} is-current{% endif %}" data-pdr-pager-to="{{ idx }}"
+            aria-label="Page {{ idx + 1 }}" {% if idx == 0 %}aria-current="true"{% endif %}>
+      <img alt="" loading="lazy" src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img', idx=idx) }}">
+      <span>{{ idx + 1 }}</span>
+    </button>
+    {% endfor %}
+  </div>
+  {% endif %}
 </div>
-{% endfor %}
+{% endif %}

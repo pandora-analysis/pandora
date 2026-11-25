@@ -1,5 +1,7 @@
 # CIRCL visual style — reference for the Pandora web UI rework
 
+> Who the interface is for, and what it must let them do: see [USER_GOALS.md](USER_GOALS.md). Read it first.
+
 Taken from https://www.circl.lu/ on 2026-11-23 (`root.min.css`, `custom.min.css`, home page HTML).
 Goal: Pandora should look like a sibling of circl.lu. Values below are the ones the site uses.
 

@@ -63,6 +63,52 @@
       {% set class = 'pdr-loader-box' %}{% set box_id = 'loaderbox' %}{% set box_mode = 'loop' %}{% include "_pandora_box.html" %}
       <span>Loading…</span>
     </div>
+    <script>
+      // Drives the loader's box with one clock. The browser's own SVG animations would start only once the page has
+      // loaded, in the middle of this loop, and make the box jump: read their keyframes, then remove them.
+      (function () {
+        var root = document.documentElement, dur = 2400, delay = 250;   // delay: start once the loader has faded in
+        var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var flaps = [].slice.call(document.querySelectorAll('.pdr-loader-box animate')).map(function (a) {
+          var flap = {
+            el: a.parentNode,
+            kt: a.getAttribute('keyTimes').split(';').map(Number),
+            v: a.getAttribute('values').split(';').map(function (pts) { return pts.trim().split(/[\s,]+/).map(Number); })
+          };
+          a.parentNode.removeChild(a);
+          return flap;
+        });
+        var layers = [].slice.call(document.querySelectorAll('.pdr-loader-box .pdr-box-layer'));
+        if (still) { return; }
+        function ease(x) { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); }
+        var t0 = performance.now();
+        function draw(now) {
+          var t = (Math.max(0, now - t0 - delay) % dur) / dur;
+          flaps.forEach(function (a) {
+            var k = 0;
+            while (k < a.kt.length - 2 && t > a.kt[k + 1]) { k++; }
+            var f = Math.min(1, Math.max(0, (t - a.kt[k]) / ((a.kt[k + 1] - a.kt[k]) || 1)));
+            var p = a.v[k], q = a.v[k + 1], out = [];
+            for (var i = 0; i < p.length; i += 2) {
+              out.push((p[i] + (q[i] - p[i]) * f).toFixed(1) + ',' + (p[i + 1] + (q[i + 1] - p[i + 1]) * f).toFixed(1));
+            }
+            a.el.setAttribute('points', out.join(' '));
+          });
+          layers.forEach(function (g, n) {   // bottom layer first; all out together, back in before the flaps close
+            var up = ease((t - 0.32 - 0.03 * n) / 0.1) * (1 - ease((t - 0.62 - 0.01 * n) / 0.08));
+            g.style.opacity = up.toFixed(2);
+            g.style.transform = 'translateY(' + ((1 - up) * 60).toFixed(1) + 'px)';
+          });
+        }
+        function frame(now) {
+          if (!root.classList.contains('pdr-loading')) { return; }
+          draw(now);
+          window.requestAnimationFrame(frame);
+        }
+        draw(t0);   // closed box before the first paint
+        window.requestAnimationFrame(frame);
+      })();
+    </script>
     {% include "custom_header.html" ignore missing %}
     {# Navigation entries: (endpoint, label, id, permission test). The current page is highlighted. #}
     {% set nav_items = [] %}

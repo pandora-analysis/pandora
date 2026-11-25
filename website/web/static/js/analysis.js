@@ -121,7 +121,13 @@ Analysis.prototype.refreshTabs = function () {
             })
             .then(response => response.text())
             .then(text => {
-              document.getElementById("previews_images").innerHTML=text;
+              // Only replace when the pages changed (it runs every second while modules work), and keep the page shown.
+              const box = document.getElementById("previews_images");
+              if (box.dataset.pdrHtml !== text) {
+                box.innerHTML = text;
+                box.dataset.pdrHtml = text;
+                if (typeof pdrPagerRestore === "function") { pdrPagerRestore(box); }
+              }
             })
         }
     }

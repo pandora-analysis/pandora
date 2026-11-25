@@ -10,13 +10,27 @@ back to the logo's isometric axes. The frames become SMIL <animate attributeName
 browser only interpolates between close, real positions.
 
 Two modes, chosen in the template with `box_mode`:
-  - "once": the closed box opens once when ui.js calls beginElement() (front flaps first, like a real box,
-            then the back ones); CSS then raises the layers.
+  - "once": the closed box is shown still, then opens once when ui.js calls beginElement() (top pair of
+            opposite flaps first, like a real box, then the pair underneath); CSS then raises the layers.
   - "loop": loader; opens, stays open while the layers rise, closes again.
 """
+from __future__ import annotations
+
 import math
 import re
 from pathlib import Path
+from typing import TypedDict
+
+Point = tuple[float, float]
+Vertex = tuple[int, bool, float]  # hinge corner index, is it an outer corner, thickness offset
+
+
+class Flap(TypedDict):
+    hinge: list[Point]
+    out: Point
+    first: bool
+    lift: float
+
 
 ROOT = Path(__file__).resolve().parents[2]
 ICON = ROOT / 'website/web/static/images/pandora-icon.svg'
@@ -31,17 +45,19 @@ OPEN_DEPTH = 26 / 72      # flap depth as drawn (open), in box edges
 CLOSED_DEPTH = 0.5        # closed, two opposite flaps meet in the middle of the top
 
 
-def add(a, b, k=1.0):
+def add(a: Point, b: Point, k: float=1.0) -> Point:
     return (a[0] + k * b[0], a[1] + k * b[1])
 
 
+# 'first' = top pair (two opposite flaps, opened first); the other two are folded underneath.
+# 'lift' = the back rim is drawn 12 px higher than the front one: closed flaps meet half-way.
 # Each flap: hinge corners (as drawn), outward axis (unit), and its polygons as drawn (open).
 # 'out' = direction away from the box centre along the top plane. Closed = rotated 180° around the hinge.
-FLAPS = {
-    'back-left':   {'hinge': [(46, 150), (118, 108)], 'out': (-X[0], -X[1]), 'first': False},
-    'back-right':  {'hinge': [(190, 150), (118, 108)], 'out': (-Y[0], -Y[1]), 'first': False},
-    'front-left':  {'hinge': [(46, 162), (118, 204)], 'out': Y, 'first': True},
-    'front-right': {'hinge': [(190, 162), (118, 204)], 'out': X, 'first': True},
+FLAPS: dict[str, Flap] = {
+    'back-left': {'hinge': [(46, 150), (118, 108)], 'out': (-X[0], -X[1]), 'first': True, 'lift': 6},
+    'back-right': {'hinge': [(190, 150), (118, 108)], 'out': (-Y[0], -Y[1]), 'first': False, 'lift': 6},
+    'front-left': {'hinge': [(46, 162), (118, 204)], 'out': Y, 'first': False, 'lift': -6},
+    'front-right': {'hinge': [(190, 162), (118, 204)], 'out': X, 'first': True, 'lift': -6},
 }
 POLYS = {  # polygon points as drawn → flap name
     '46,150 118,108 92,92 20,134': 'back-left',
@@ -55,18 +71,20 @@ POLYS = {  # polygon points as drawn → flap name
 }
 
 
-def classify(points, flap):
+def classify(points: list[Point], flap: Flap) -> list[Vertex]:
     """Describe each vertex as (hinge corner index, is_outer, thickness_dy) so it can be re-projected."""
     hinge, out = flap['hinge'], flap['out']
-    desc = []
+    desc: list[Vertex] = []
     for (x, y) in points:
         for i, h in enumerate(hinge):
             for outer in (False, True):
                 base = add(h, out, OPEN_DEPTH) if outer else h
                 if abs(base[0] - x) < 1.5 and abs(base[1] - y) < 3:      # same point (drawing is rounded)
-                    desc.append((i, outer, 0.0)); break
+                    desc.append((i, outer, 0.0))
+                    break
                 if abs(base[0] - x) < 1.5 and 0 < y - base[1] <= 12:     # thickness edge below it
-                    desc.append((i, outer, y - base[1])); break
+                    desc.append((i, outer, y - base[1]))
+                    break
             else:
                 continue
             break
@@ -75,63 +93,89 @@ def classify(points, flap):
     return desc
 
 
-def frame(desc, flap, theta):
-    """Points of a flap polygon at angle theta (0 = open as drawn, pi = closed over the top)."""
+def frame(desc: list[Vertex], flap: Flap, theta: float, part: str='all') -> str:
+    """Points of a flap polygon at angle theta (0 = open as drawn, pi = closed over the top).
+
+    part: 'inner' is only drawn while the flap leans inward, 'outer' once it is past upright; 'all' always.
+    A part that is not drawn is collapsed on its hinge, so the front flaps can be painted inside the box, then in front.
+    """
     hinge, out = flap['hinge'], flap['out']
     depth = OPEN_DEPTH + (CLOSED_DEPTH - OPEN_DEPTH) * (theta / math.pi)   # flaps are a bit longer than drawn
-    vec = add((math.cos(theta) * out[0], math.cos(theta) * out[1]), Z, math.sin(theta))  # rotation in 3D, projected
+    vec = add((math.cos(theta) * out[0], math.cos(theta) * out[1]), Z, math.sin(theta))  # 3D rotation, projected
+    lift = flap['lift'] * max(-math.cos(theta), 0)
     pts = []
     for i, outer, dy in desc:
-        p = add(hinge[i], vec, depth) if outer else hinge[i]
-        pts.append((p[0], p[1] + dy * max(math.cos(theta), 0)))  # slab edge only seen while open-ish
+        p = hinge[i] if part == 'hidden' or not outer else add(add(hinge[i], vec, depth), (0, lift))
+        pts.append((p[0], p[1] + (0 if part == 'hidden' else dy * max(math.cos(theta), 0))))
     return ' '.join(f'{x:.1f},{y:.1f}' for x, y in pts)
 
 
-def ease(t):  # ease-in-out
+def ease(t: float) -> float:  # ease-in-out
     return t * t * (3 - 2 * t)
 
 
-def keyframes(desc, flap, mode):
-    steps = 14
+STEPS = 14  # even: the middle step is exactly upright
+
+
+def motion(flap: Flap, mode: str) -> list[tuple[float, float]]:
+    """List of (time, theta) for one flap."""
+    def swing(start: float, end: float, opening: bool) -> list[tuple[float, float]]:
+        return [(start + (end - start) * k / STEPS, math.pi * ((1 - ease(k / STEPS)) if opening else ease(k / STEPS)))
+                for k in range(STEPS + 1)]
     if mode == 'once':
-        # front flaps (on top) open during 0–0.55, back flaps during 0.35–0.9 of 0.9 s
-        start, end = (0.0, 0.55) if flap['first'] else (0.35, 0.9)
-        times = [0.0] + [start + (end - start) * k / steps for k in range(steps + 1)] + [1.0]
-        thetas = [math.pi] + [math.pi * (1 - ease(k / steps)) for k in range(steps + 1)] + [0.0]
-    else:
-        # loop 2.4 s: open (front then back), stay open, close (back then front), stay closed
-        o0, o1 = (0.05, 0.25) if flap['first'] else (0.15, 0.35)
-        c0, c1 = (0.80, 0.95) if flap['first'] else (0.70, 0.85)
-        times, thetas = [0.0], [math.pi]
-        for k in range(steps + 1):
-            times.append(o0 + (o1 - o0) * k / steps); thetas.append(math.pi * (1 - ease(k / steps)))
-        for k in range(steps + 1):
-            times.append(c0 + (c1 - c0) * k / steps); thetas.append(math.pi * ease(k / steps))
-        times.append(1.0); thetas.append(math.pi)
-    # SMIL needs strictly increasing keyTimes
-    clean_t, clean_v = [], []
-    for t, th in zip(times, thetas):
-        t = round(t, 4)
-        if clean_t and t <= clean_t[-1]:
-            clean_v[-1] = frame(desc, flap, th); continue
-        clean_t.append(t); clean_v.append(frame(desc, flap, th))
-    return ';'.join(f'{t:g}' for t in clean_t), ';'.join(clean_v)
+        # 1.6 s: closed and still for 0.4 s, top pair opens 0.4-1.0 s, under pair 0.9-1.5 s; CSS then raises the layers
+        o = (0.25, 0.625) if flap['first'] else (0.5625, 0.9375)
+        return [(0.0, math.pi)] + swing(*o, True) + [(1.0, 0.0)]
+    # loop, 2.4 s: top pair then under pair open, stay open, under pair then top pair close
+    o, c = ((0.04, 0.19), (0.84, 0.98)) if flap['first'] else ((0.17, 0.32), (0.74, 0.87))
+    return [(0.0, math.pi)] + swing(*o, True) + swing(*c, False) + [(1.0, math.pi)]
 
 
-def animate(points_attr, flap_name):
+def keyframes(desc: list[Vertex], flap: Flap, mode: str, part: str) -> tuple[str, str]:
+    def shown(theta: float, entering: bool) -> str:
+        if part == 'all':
+            return 'all'
+        upright = abs(theta - math.pi / 2) < 1e-6
+        inner = entering if upright else theta > math.pi / 2
+        return 'all' if inner == (part == 'inner') else 'hidden'
+    out: list[tuple[float, str]] = []
+    path = motion(flap, mode)
+    for n, (t, th) in enumerate(path):
+        if part != 'all' and abs(th - math.pi / 2) < 1e-6:   # hand over between the inner and the outer drawing
+            from_inner = path[n - 1][1] > th
+            out.append((t, frame(desc, flap, th, shown(th, from_inner))))
+            out.append((t + 0.0002, frame(desc, flap, th, shown(th, not from_inner))))
+        else:
+            out.append((t, frame(desc, flap, th, shown(th, True))))
+    return ';'.join(f'{round(t, 4):g}' for t, _ in out), ';'.join(v for _, v in out)
+
+
+def parse(points_attr: str) -> list[Point]:
+    pairs = (p.split(',') for p in points_attr.split())
+    return [(float(x), float(y)) for x, y in pairs]
+
+
+def animate(points_attr: str, flap_name: str, part: str='all') -> str:
     flap = FLAPS[flap_name]
-    pts = [tuple(map(float, p.split(','))) for p in points_attr.split()]
-    desc = classify(pts, flap)
-    kt_o, v_o = keyframes(desc, flap, 'once')
-    kt_l, v_l = keyframes(desc, flap, 'loop')
-    once = (f'<animate class="pdr-box-anim" attributeName="points" begin="indefinite" dur="0.9s" fill="freeze" '
+    desc = classify(parse(points_attr), flap)
+    kt_o, v_o = keyframes(desc, flap, 'once', part)
+    kt_l, v_l = keyframes(desc, flap, 'loop', part)
+    once = (f'<animate class="pdr-box-anim" attributeName="points" begin="indefinite" dur="1.6s" fill="freeze" '
             f'keyTimes="{kt_o}" values="{v_o}"/>')
     loop = (f'<animate attributeName="points" begin="0s" dur="2.4s" repeatCount="indefinite" '
             f'keyTimes="{kt_l}" values="{v_l}"/>')
     return '{% if box_mode == "loop" %}' + loop + '{% else %}' + once + '{% endif %}'
 
 
-def main():
+def inner_copy(points_attr: str, name: str, fill: str) -> str:
+    """The front flap while it leans over the box: painted with the back flaps, nothing to see once open."""
+    flap = FLAPS[name]
+    desc = classify(parse(points_attr), flap)
+    return (f'    <polygon class="pdr-box-flap-inner" points="{frame(desc, flap, 0, "hidden")}" fill="{fill}">'
+            f'{animate(points_attr, name, "inner")}</polygon>\n')
+
+
+def main() -> None:
     svg = ICON.read_text()
     # gradients: unique id prefix per copy on a page
     for name in ('layerTop', 'layerMid', 'layerLow'):
@@ -150,7 +194,7 @@ def main():
         pat = re.compile(r'<polygon points="' + re.escape(points_attr) + r'"([^>]*?)\s*/>')
         m = pat.search(svg)
         assert m, points_attr
-        svg = svg[:m.start()] + f'<polygon points="{points_attr}"{m.group(1)}>{animate(points_attr, name)}</polygon>' + svg[m.end():]
+        svg = svg[:m.start()] + f'<polygon points="{points_attr}"{m.group(1)}>{animate(points_attr, name, 'outer' if name.startswith('front') else 'all')}</polygon>' + svg[m.end():]
     for name, first_poly in (('back-left', '46,150 118,108 92,92 20,134'), ('back-right', '190,150 118,108 144,92 216,134'),
                              ('front-left', '46,162 118,204 92,220 20,178'), ('front-right', '190,162 118,204 144,220 216,178')):
         polys = [p for p, n in POLYS.items() if n == name]
@@ -160,11 +204,22 @@ def main():
         line_start = svg.rindex('\n', 0, start) + 1
         svg = (svg[:line_start] + f'    <g class="pdr-box-flap pdr-box-flap-{name}">\n' + svg[line_start:end]
                + '\n    </g>' + svg[end:])
+    # painting order inside the box: under pair (front-left, back-right), then top pair (back-left, front-right)
+
+    def group(name: str) -> tuple[int, int]:
+        a = svg.index(f'    <g class="pdr-box-flap pdr-box-flap-{name}">')
+        b = svg.index('    </g>', a) + len('    </g>')
+        return a, b
+    a, b = group('back-left')
+    left = svg[a:b]
+    svg = svg[:a] + inner_copy('46,162 118,204 92,220 20,178', 'front-left', '#5EA6F0') + svg[b:]
+    a, b = group('back-right')
+    svg = (svg[:b] + '\n' + left + '\n' + inner_copy('190,162 118,204 144,220 216,178', 'front-right', '#225BA6') + svg[b:])
     header = ('{#- GENERATED by doc/web-ui/generate_pandora_box.py from static/images/pandora-icon.svg: do not edit by hand.\n'
               '    Pandora box, inline so it can be animated. Set before the include: `class`, `box_id` (gradient id prefix,\n'
               '    unique per copy on a page) and `box_mode` ("once": opens when ui.js starts it; "loop": loader).\n'
               '    The 4 flaps rotate in 3D around their hinge (closed over the top → open), projected in the logo\'s view. -#}\n')
-    OUT.write_text(header + svg)
+    OUT.write_text('\n'.join(line.rstrip() for line in (header + svg).splitlines()) + '\n')
     print(f'written {OUT.relative_to(ROOT)}')
 
 

@@ -69,24 +69,9 @@
       </ol>
     </nav>
 
-    <!-- ===================== Verdict ===================== -->
-    <section class="pdr-verdict" aria-labelledby="verdict-title">
-      <div class="pdr-verdict-flags" id="taskStatus">
-        {% for s in status %}
-          {% set info = STATUS_INFO.get(s.name, ('neutral', 'question-circle', s.name|capitalize, '')) %}
-          <div class="overall-status-flag status-flag-{{ s.name|lower }} {% if s != task.status %}d-none{% endif %}">
-            {% if s != status.ALERT %}
-              {{ render_icon(status_icons[s], size='3.5rem') }}
-            {% else %}
-              <img src="{{ url_for('static', filename='images/skull.svg') }}" width="56" height="56" alt="">
-            {% endif %}
-            <span class="pdr-verdict-word">{{ t.status.get(s.name, info[2]) }}</span>
-          </div>
-        {% endfor %}
-      </div>
-
-      <div class="pdr-verdict-main">
-        <p class="pdr-verdict-kicker">{{ t.analysis_result }}</p>
+    <!-- ===================== File header: what this page is about (the verdict comes further down) ===================== -->
+    <section class="pdr-file-header" aria-labelledby="verdict-title">
+      <div class="pdr-file-header-main">
         <h1 class="pdr-verdict-file" id="verdict-title">
           {{ render_icon(task.file.icon) }}{{ copy_inline(task.file.original_filename) }}
         </h1>
@@ -96,28 +81,7 @@
           {% if task.file.size is not none %} · {{ sizeof_fmt(task.file.size) }}{% endif %}
           {% if task.file.type is not none %} · {{ task.file.info }}{% endif %}
         </p>
-        <div id="taskStatusMessage" class="pdr-verdict-message">
-          <div class="alert alert-overwrite {% if task.status != status.OVERWRITE %}d-none{% endif %}">
-            {{ task_status_messages['overwrite'] | safe }}
-          </div>
-          <div class="alert alert-error {% if task.status != status.ERROR %}d-none{% endif %}">
-            {{ task_status_messages['error'] | safe }}
-          </div>
-          <div class="alert alert-danger {% if task.status != status.ALERT %}d-none{% endif %}">
-            {{ task_status_messages['danger'] | safe }}
-          </div>
-          <div class="alert alert-warning {% if task.status != status.WARN %}d-none{% endif %}">
-            {{ task_status_messages['warning'] | safe }}
-          </div>
-          <div class="alert alert-success {% if task.status != status.CLEAN %}d-none{% endif %}">
-            {{ task_status_messages['success'] | safe }}
-          </div>
-          <div class="alert alert-info {% if task.workers_done %}d-none{% endif %}">
-            {{ task_status_messages['info'] | safe }}
-          </div>
-        </div>
       </div>
-
       <div class="pdr-verdict-actions">
         {% if current_user.role.can('share_analysis') %}
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
@@ -220,38 +184,230 @@
       </div>
     </section>
 
-    <div class="row g-4">
-      <!-- ===================== Left: file + module results ===================== -->
-      <div class="col-lg-5">
+    <!-- ===================== Preview: the important part, full width ===================== -->
+    <section class="pdr-card pdr-tabs-card">
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="nav-item">
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#content-preview" type="button" role="tab"
+                  aria-controls="content-preview" aria-selected="true">{{ render_icon('eye') }} {{ t.tab_preview }}</button>
+        </li>
+        {% if current_user.role.can(action.see_text_preview) %}
+        <li role="presentation" class="nav-item {% if not task.file.text %}d-none{% endif %}">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#text-preview-content" type="button" role="tab"
+                  aria-controls="text-preview-content" aria-selected="false">{{ render_icon('file-earmark-richtext') }} {{ t.tab_text_preview }}</button>
+        </li>
+        {% endif %}
+        {% if current_user.role.can(action.download_text) %}
+        <li role="presentation" class="nav-item {% if not task.file.text %}d-none{% endif %}">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#text-content" type="button" role="tab"
+                  aria-controls="text-content" aria-selected="false">{{ render_icon('file-earmark-text') }} {{ t.tab_text }}</button>
+        </li>
+        {% endif %}
+        <li role="presentation" class="nav-item {% if not task.file.metadata %}d-none{% endif %}">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#metadata" type="button" role="tab"
+                  aria-controls="metadata" aria-selected="false">{{ render_icon('tags') }} {{ t.tab_metadata }}</button>
+        </li>
+        <li role="presentation" class="nav-item {% if not task.observables %}d-none{% endif %}" id="observables_tab">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#observables_list" type="button" role="tab"
+                  aria-controls="observables_list" aria-selected="false">
+            {{ render_icon('link-45deg') }} {{ t.tab_observables }} <span class="pdr-count" id="number_observables">{{ task.observables|length }}</span>
+          </button>
+        </li>
+        <li role="presentation" class="nav-item {% if not task.extracted %}d-none{% endif %}" id="extracted_tab">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#extracted" type="button" role="tab"
+                  aria-controls="extracted" aria-selected="false">
+            {{ render_icon('box-arrow-up') }} {{ t.tab_extracted }} <span class="pdr-count" id="number_extracted">{{ task.extracted|length }}</span>
+          </button>
+        </li>
+        <li role="presentation" class="nav-item {% if not task.linked_tasks %}d-none{% endif %}">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab"
+                  aria-controls="history" aria-selected="false">
+            {{ render_icon('clock-history') }} {{ t.tab_history }} <span class="pdr-count">{{ task.linked_tasks|length }}</span>
+          </button>
+        </li>
+      </ul>
 
-        <section class="pdr-card">
-          <header class="pdr-card-header"><h2 class="pdr-card-title">{{ render_icon('file-earmark') }} {{ t.file }}</h2></header>
-          <div class="pdr-card-body">
-            <dl class="pdr-kv">
-              <dt>{{ t.name }}</dt><dd>{{ copy_inline(task.file.original_filename) }}</dd>
-              <dt>{{ t.submitted }}</dt><dd>{{ moment(task.save_date).format('lll') }}</dd>
-              {% if task.file.size is not none %}<dt>{{ t.size }}</dt><dd>{{ sizeof_fmt(task.file.size) }}</dd>{% endif %}
-              {% if task.file.type is not none %}<dt>{{ t.type }}</dt><dd>{{ task.file.info }}</dd>{% endif %}
-              {% if task.file.mime_type is not none %}<dt>{{ t.mime_type }}</dt><dd class="pdr-mono">{{ task.file.mime_type }}</dd>{% endif %}
-              {% if task.file.encoding %}<dt>{{ t.encoding }}</dt><dd class="pdr-mono">{{ task.file.encoding }}</dd>{% endif %}
-              {% if task.parent %}
-              <dt>{{ t.extracted_from }}</dt>
-              <dd>{{ render_icon(task.parent.file.icon) }} {{ task.parent.file.original_filename }} —
-                <a href="{{ url_for('api_analysis', task_id=task.parent.uuid, seed=seed) }}">{{ t.see_its_report }}</a></dd>
+      <div class="tab-content pdr-card-body">
+
+        <!-- Preview -->
+        <div role="tabpanel" class="tab-pane show active" id="content-preview">
+          {# The point of this page: get the content without opening the file #}
+          {% if not task.file.deleted %}
+          <div class="pdr-read-here">
+            <div class="pdr-read-here-text">
+              <strong>{{ render_icon('eye') }} {{ t.read_here_title }}</strong>
+              <span>{{ t.read_here_text }}</span>
+            </div>
+            <div class="pdr-read-here-actions">
+              {% if current_user.role.can(action.download_images) and task.file.previews %}
+              <a class="btn btn-sm btn-secondary" href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img') }}">
+                {{ render_icon('images') }} {{ t.dl_pages }}</a>
               {% endif %}
-              {% if current_user.is_admin and task.password %}<dt>{{ t.password }}</dt><dd>{{ copy_inline(task.password) }}</dd>{% endif %}
-            </dl>
-            {% if task.file.md5 is not none or task.file.sha1 is not none or task.file.sha256 is not none %}
-            <h3 class="pdr-subtitle">{{ t.hashes }}</h3>
-            <dl class="pdr-kv pdr-hashes">
-              {% if task.file.md5 is not none %}<dt>MD5</dt><dd>{{ full_id(task.file.md5) }}</dd>{% endif %}
-              {% if task.file.sha1 is not none %}<dt>SHA-1</dt><dd>{{ full_id(task.file.sha1) }}</dd>{% endif %}
-              {% if task.file.sha256 is not none %}<dt>SHA-256</dt><dd>{{ full_id(task.file.sha256) }}</dd>{% endif %}
-            </dl>
-            {% endif %}
+              {% if current_user.role.can(action.download_text) and task.file.text %}
+              <a class="btn btn-sm btn-secondary" href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt') }}">
+                {{ render_icon('file-earmark-text') }} {{ t.dl_text_only }}</a>
+              {% endif %}
+            </div>
           </div>
-        </section>
+          {% endif %}
+          {% if email_preview %}
+            {% call notice('warn', t.email_forged_title) %}
+              {{ t.email_forged_text }}
+            {% endcall %}
+            <dl class="pdr-kv" id="emailContent">
+              <dt>{{ t.email_date }}</dt><dd id="email-date">{{ email_preview.date }}</dd>
+              <dt>{{ t.email_from }}</dt><dd id="email-from">{% if email_preview.sender %}{{ copy_inline(email_preview.sender) }}{% else %}<span class="pdr-empty-value">—</span>{% endif %}</dd>
+              <dt>{{ t.email_to }}</dt>
+              <dd id="email-to" class="pdr-mono">
+                {% for r in email_preview.recipients %}<div>{{ copy_inline(r) }}</div>{% else %}<span class="pdr-empty-value">—</span>{% endfor %}
+              </dd>
+              <dt>{{ t.email_subject }}</dt><dd id="email-subject">{% if email_preview.subject %}{{ copy_inline(email_preview.subject, mono=False) }}{% else %}<span class="pdr-empty-value">—</span>{% endif %}</dd>
+              <dt>{{ t.email_hops }}</dt>
+              <dd id="email-hops" class="pdr-mono">
+                {% for received in email_preview.received %}{{ received }}<br>{% else %}<span class="pdr-empty-value">—</span>{% endfor %}
+              </dd>
+              <dt>{{ t.email_spf }}</dt>
+              <dd id="received-spf" class="pdr-mono">{% if email_preview.received_spf %}{{ email_preview.received_spf }}{% else %}<span class="pdr-empty-value">—</span>{% endif %}</dd>
+            </dl>
+            {% if current_user.role.can(action.download_images) %}
+            <h3 class="pdr-subtitle" id="email-body">{{ t.email_body }}</h3>
+            <div class="row preview-done {% if not task.file.previews|length %}d-none{% endif %}" id="previews_images">
+              {% include 'previews.html' %}
+            </div>
+            <div class="preview-wait {% if task.file.previews|length %}d-none{% endif %}">
+              {{ skeleton('previews', 3, t.generating_preview) }}
+            </div>
+            {% endif %}
 
+          {% elif current_user.role.can(action.download_images) %}
+            <div class="row preview-done {% if not task.file.previews|length %}d-none{% endif %}" id="previews_images">
+              {% include 'previews.html' %}
+            </div>
+            <div class="preview-wait {% if task.file.previews|length %}d-none{% endif %}">
+              {{ skeleton('previews', 3, t.generating_preview) }}
+            </div>
+          {% endif %}
+
+          {% if task.file.is_html %}
+            <div class="mt-3">
+            {% if 'lookyloo' in task.reports and 'permaurl' in task.reports['lookyloo'].details %}
+              <a class="btn btn-secondary" href="{{task.reports['lookyloo'].details['permaurl']}}" target="_blank" rel="noopener noreferrer">
+                {{ render_icon('box-arrow-up-right') }} {{ t.lookyloo_see }}</a>
+            {% elif 'lookyloo' in task.reports and task.reports['lookyloo'].status == status.MANUAL %}
+              {% call notice('info', t.lookyloo_title) %}
+                {{ t.lookyloo_text }}
+                <a href="{{url_for('manual_trigger_worker', task_id=task.uuid, seed=seed, worker_name='lookyloo')}}">{{ t.lookyloo_run }}</a>.
+              {% endcall %}
+            {% endif %}
+            </div>
+          {% endif %}
+        </div>
+
+        {% if current_user.role.can(action.see_text_preview) and task.file.text %}
+        <!-- Text preview (image of the text) -->
+        <div role="tabpanel" class="tab-pane" id="text-preview-content">
+          <div class="preview-done {% if not task.file.previews|length %}d-none{% endif %}">
+            <p class="pdr-hint">{{ t.text_too_long }}</p>
+            <a class="pdr-text-preview d-block" href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt_preview') }}" target="_blank">
+              <img class="pdr-preview-img" alt="{{ t.text_image_alt }}"
+                   src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt_preview') }}">
+            </a>
+          </div>
+          <div class="preview-wait {% if task.file.previews|length %}d-none{% endif %}">
+            {{ skeleton('previews', 1, t.generating_text_preview) }}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if current_user.role.can('download_text') and task.file.text %}
+        <!-- Text content -->
+        <div role="tabpanel" class="tab-pane" id="text-content">
+          <pre class="pdr-text">{{ task.file.text }}</pre>
+        </div>
+        {% endif %}
+
+        {% if task.file.metadata %}
+        <!-- Metadata -->
+        <div role="tabpanel" class="tab-pane" id="metadata">
+          <dl class="pdr-kv">
+          {% for key, value in task.file.metadata.items() %}
+            <dt>{{ key }}</dt><dd class="pdr-mono">{{ value }}</dd>
+          {% endfor %}
+          </dl>
+        </div>
+        {% endif %}
+
+        <!-- Observables (filled by analysis.js, placeholder until then) -->
+        <div role="tabpanel" class="tab-pane" id="observables_list">
+          <div id="observables_content">{{ skeleton('rows', 6, t.loading_observables) }}</div>
+        </div>
+
+        <!-- Extracted files (filled by analysis.js) -->
+        <div role="tabpanel" class="tab-pane" id="extracted">
+          <div id="extracted_content">{{ skeleton('rows', 4, t.loading_extracted) }}</div>
+        </div>
+
+        <!-- History -->
+        <div role="tabpanel" class="tab-pane {% if not task.linked_tasks %}d-none{% endif %}" id="history">
+          <table class="table table-hover">
+            <thead><tr><th>{{ t.col_date }}</th><th>{{ t.col_name }}</th><th>{{ t.col_status }}</th></tr></thead>
+            <tbody>
+            {% for linked_task in task.linked_tasks %}
+            <tr class="{% if linked_task.uuid == task.uuid %}table-active{% endif %}" id="linkedTaskRow-{{ linked_task.uuid }}">
+              <td>{{ moment(linked_task.save_date).format('L LT [UTC]Z') }}</td>
+              <td><a href="{{ url_for('api_analysis', task_id=linked_task.uuid) }}">
+                {{ render_icon(linked_task.file.icon) }} {{ linked_task.file.client_name }}</a></td>
+              <td>{{ display_task_status(linked_task.status, status) }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Analysis result: verdict, modules, file details ===================== -->
+    <h2 class="pdr-section-title" id="analysis-result-title">{{ render_icon('shield-check') }} {{ t.analysis_result }}</h2>
+    <section class="pdr-verdict" aria-labelledby="analysis-result-title">
+      <div class="pdr-verdict-flags" id="taskStatus">
+        {% for s in status %}
+          {% set info = STATUS_INFO.get(s.name, ('neutral', 'question-circle', s.name|capitalize, '')) %}
+          <div class="overall-status-flag status-flag-{{ s.name|lower }} {% if s != task.status %}d-none{% endif %}">
+            {% if s != status.ALERT %}
+              {{ render_icon(status_icons[s], size='3.5rem') }}
+            {% else %}
+              <img src="{{ url_for('static', filename='images/skull.svg') }}" width="56" height="56" alt="">
+            {% endif %}
+            <span class="pdr-verdict-word">{{ t.status.get(s.name, info[2]) }}</span>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="pdr-verdict-main">
+        <div id="taskStatusMessage" class="pdr-verdict-message">
+          <div class="alert alert-overwrite {% if task.status != status.OVERWRITE %}d-none{% endif %}">
+            {{ task_status_messages['overwrite'] | safe }}
+          </div>
+          <div class="alert alert-error {% if task.status != status.ERROR %}d-none{% endif %}">
+            {{ task_status_messages['error'] | safe }}
+          </div>
+          <div class="alert alert-danger {% if task.status != status.ALERT %}d-none{% endif %}">
+            {{ task_status_messages['danger'] | safe }}
+          </div>
+          <div class="alert alert-warning {% if task.status != status.WARN %}d-none{% endif %}">
+            {{ task_status_messages['warning'] | safe }}
+          </div>
+          <div class="alert alert-success {% if task.status != status.CLEAN %}d-none{% endif %}">
+            {{ task_status_messages['success'] | safe }}
+          </div>
+          <div class="alert alert-info {% if task.workers_done %}d-none{% endif %}">
+            {{ task_status_messages['info'] | safe }}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="row g-4">
+      <div class="col-lg-7">
         <section class="pdr-card pdr-results" aria-labelledby="results-title">
           <header class="pdr-card-header">
             <h2 class="pdr-card-title" id="results-title">{{ render_icon('list-check') }} {{ t.module_results }}</h2>
@@ -283,168 +439,32 @@
           </div>
         </section>
       </div>
-
-      <!-- ===================== Right: content tabs ===================== -->
-      <div class="col-lg-7">
-        <section class="pdr-card pdr-tabs-card">
-          <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="nav-item">
-              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#content-preview" type="button" role="tab"
-                      aria-controls="content-preview" aria-selected="true">{{ render_icon('eye') }} {{ t.tab_preview }}</button>
-            </li>
-            {% if current_user.role.can(action.see_text_preview) %}
-            <li role="presentation" class="nav-item {% if not task.file.text %}d-none{% endif %}">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#text-preview-content" type="button" role="tab"
-                      aria-controls="text-preview-content" aria-selected="false">{{ render_icon('file-earmark-richtext') }} {{ t.tab_text_preview }}</button>
-            </li>
-            {% endif %}
-            {% if current_user.role.can(action.download_text) %}
-            <li role="presentation" class="nav-item {% if not task.file.text %}d-none{% endif %}">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#text-content" type="button" role="tab"
-                      aria-controls="text-content" aria-selected="false">{{ render_icon('file-earmark-text') }} {{ t.tab_text }}</button>
-            </li>
-            {% endif %}
-            <li role="presentation" class="nav-item {% if not task.file.metadata %}d-none{% endif %}">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#metadata" type="button" role="tab"
-                      aria-controls="metadata" aria-selected="false">{{ render_icon('tags') }} {{ t.tab_metadata }}</button>
-            </li>
-            <li role="presentation" class="nav-item {% if not task.observables %}d-none{% endif %}" id="observables_tab">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#observables_list" type="button" role="tab"
-                      aria-controls="observables_list" aria-selected="false">
-                {{ render_icon('link-45deg') }} {{ t.tab_observables }} <span class="pdr-count" id="number_observables">{{ task.observables|length }}</span>
-              </button>
-            </li>
-            <li role="presentation" class="nav-item {% if not task.extracted %}d-none{% endif %}" id="extracted_tab">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#extracted" type="button" role="tab"
-                      aria-controls="extracted" aria-selected="false">
-                {{ render_icon('box-arrow-up') }} {{ t.tab_extracted }} <span class="pdr-count" id="number_extracted">{{ task.extracted|length }}</span>
-              </button>
-            </li>
-            <li role="presentation" class="nav-item {% if not task.linked_tasks %}d-none{% endif %}">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab"
-                      aria-controls="history" aria-selected="false">
-                {{ render_icon('clock-history') }} {{ t.tab_history }} <span class="pdr-count">{{ task.linked_tasks|length }}</span>
-              </button>
-            </li>
-          </ul>
-
-          <div class="tab-content pdr-card-body">
-
-            <!-- Preview -->
-            <div role="tabpanel" class="tab-pane show active" id="content-preview">
-              {% if email_preview %}
-                {% call notice('warn', t.email_forged_title) %}
-                  {{ t.email_forged_text }}
-                {% endcall %}
-                <dl class="pdr-kv" id="emailContent">
-                  <dt>{{ t.email_date }}</dt><dd id="email-date">{{ email_preview.date }}</dd>
-                  <dt>{{ t.email_from }}</dt><dd id="email-from">{% if email_preview.sender %}{{ copy_inline(email_preview.sender) }}{% else %}<span class="pdr-empty-value">—</span>{% endif %}</dd>
-                  <dt>{{ t.email_to }}</dt>
-                  <dd id="email-to" class="pdr-mono">
-                    {% for r in email_preview.recipients %}<div>{{ copy_inline(r) }}</div>{% else %}<span class="pdr-empty-value">—</span>{% endfor %}
-                  </dd>
-                  <dt>{{ t.email_subject }}</dt><dd id="email-subject">{% if email_preview.subject %}{{ copy_inline(email_preview.subject, mono=False) }}{% else %}<span class="pdr-empty-value">—</span>{% endif %}</dd>
-                  <dt>{{ t.email_hops }}</dt>
-                  <dd id="email-hops" class="pdr-mono">
-                    {% for received in email_preview.received %}{{ received }}<br>{% else %}<span class="pdr-empty-value">—</span>{% endfor %}
-                  </dd>
-                  <dt>{{ t.email_spf }}</dt>
-                  <dd id="received-spf" class="pdr-mono">{% if email_preview.received_spf %}{{ email_preview.received_spf }}{% else %}<span class="pdr-empty-value">—</span>{% endif %}</dd>
-                </dl>
-                {% if current_user.role.can(action.download_images) %}
-                <h3 class="pdr-subtitle" id="email-body">{{ t.email_body }}</h3>
-                <div class="row preview-done {% if not task.file.previews|length %}d-none{% endif %}" id="previews_images">
-                  {% include 'previews.html' %}
-                </div>
-                <div class="preview-wait {% if task.file.previews|length %}d-none{% endif %}">
-                  {{ skeleton('previews', 3, t.generating_preview) }}
-                </div>
-                {% endif %}
-
-              {% elif current_user.role.can(action.download_images) %}
-                <div class="row preview-done {% if not task.file.previews|length %}d-none{% endif %}" id="previews_images">
-                  {% include 'previews.html' %}
-                </div>
-                <div class="preview-wait {% if task.file.previews|length %}d-none{% endif %}">
-                  {{ skeleton('previews', 3, t.generating_preview) }}
-                </div>
+      <div class="col-lg-5">
+        <section class="pdr-card">
+          <header class="pdr-card-header"><h2 class="pdr-card-title">{{ render_icon('file-earmark') }} {{ t.file }}</h2></header>
+          <div class="pdr-card-body">
+            <dl class="pdr-kv">
+              <dt>{{ t.name }}</dt><dd>{{ copy_inline(task.file.original_filename) }}</dd>
+              <dt>{{ t.submitted }}</dt><dd>{{ moment(task.save_date).format('lll') }}</dd>
+              {% if task.file.size is not none %}<dt>{{ t.size }}</dt><dd>{{ sizeof_fmt(task.file.size) }}</dd>{% endif %}
+              {% if task.file.type is not none %}<dt>{{ t.type }}</dt><dd>{{ task.file.info }}</dd>{% endif %}
+              {% if task.file.mime_type is not none %}<dt>{{ t.mime_type }}</dt><dd class="pdr-mono">{{ task.file.mime_type }}</dd>{% endif %}
+              {% if task.file.encoding %}<dt>{{ t.encoding }}</dt><dd class="pdr-mono">{{ task.file.encoding }}</dd>{% endif %}
+              {% if task.parent %}
+              <dt>{{ t.extracted_from }}</dt>
+              <dd>{{ render_icon(task.parent.file.icon) }} {{ task.parent.file.original_filename }} —
+                <a href="{{ url_for('api_analysis', task_id=task.parent.uuid, seed=seed) }}">{{ t.see_its_report }}</a></dd>
               {% endif %}
-
-              {% if task.file.is_html %}
-                <div class="mt-3">
-                {% if 'lookyloo' in task.reports and 'permaurl' in task.reports['lookyloo'].details %}
-                  <a class="btn btn-secondary" href="{{task.reports['lookyloo'].details['permaurl']}}" target="_blank" rel="noopener noreferrer">
-                    {{ render_icon('box-arrow-up-right') }} {{ t.lookyloo_see }}</a>
-                {% elif 'lookyloo' in task.reports and task.reports['lookyloo'].status == status.MANUAL %}
-                  {% call notice('info', t.lookyloo_title) %}
-                    {{ t.lookyloo_text }}
-                    <a href="{{url_for('manual_trigger_worker', task_id=task.uuid, seed=seed, worker_name='lookyloo')}}">{{ t.lookyloo_run }}</a>.
-                  {% endcall %}
-                {% endif %}
-                </div>
-              {% endif %}
-            </div>
-
-            {% if current_user.role.can(action.see_text_preview) and task.file.text %}
-            <!-- Text preview (image of the text) -->
-            <div role="tabpanel" class="tab-pane" id="text-preview-content">
-              <div class="preview-done {% if not task.file.previews|length %}d-none{% endif %}">
-                <p class="pdr-hint">{{ t.text_too_long }}</p>
-                <a class="pdr-text-preview d-block" href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt_preview') }}" target="_blank">
-                  <img class="pdr-preview-img" alt="{{ t.text_image_alt }}"
-                       src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt_preview') }}">
-                </a>
-              </div>
-              <div class="preview-wait {% if task.file.previews|length %}d-none{% endif %}">
-                {{ skeleton('previews', 1, t.generating_text_preview) }}
-              </div>
-            </div>
+              {% if current_user.is_admin and task.password %}<dt>{{ t.password }}</dt><dd>{{ copy_inline(task.password) }}</dd>{% endif %}
+            </dl>
+            {% if task.file.md5 is not none or task.file.sha1 is not none or task.file.sha256 is not none %}
+            <h3 class="pdr-subtitle">{{ t.hashes }}</h3>
+            <dl class="pdr-kv pdr-hashes">
+              {% if task.file.md5 is not none %}<dt>MD5</dt><dd>{{ full_id(task.file.md5) }}</dd>{% endif %}
+              {% if task.file.sha1 is not none %}<dt>SHA-1</dt><dd>{{ full_id(task.file.sha1) }}</dd>{% endif %}
+              {% if task.file.sha256 is not none %}<dt>SHA-256</dt><dd>{{ full_id(task.file.sha256) }}</dd>{% endif %}
+            </dl>
             {% endif %}
-
-            {% if current_user.role.can('download_text') and task.file.text %}
-            <!-- Text content -->
-            <div role="tabpanel" class="tab-pane" id="text-content">
-              <pre class="pdr-text">{{ task.file.text }}</pre>
-            </div>
-            {% endif %}
-
-            {% if task.file.metadata %}
-            <!-- Metadata -->
-            <div role="tabpanel" class="tab-pane" id="metadata">
-              <dl class="pdr-kv">
-              {% for key, value in task.file.metadata.items() %}
-                <dt>{{ key }}</dt><dd class="pdr-mono">{{ value }}</dd>
-              {% endfor %}
-              </dl>
-            </div>
-            {% endif %}
-
-            <!-- Observables (filled by analysis.js, placeholder until then) -->
-            <div role="tabpanel" class="tab-pane" id="observables_list">
-              <div id="observables_content">{{ skeleton('rows', 6, t.loading_observables) }}</div>
-            </div>
-
-            <!-- Extracted files (filled by analysis.js) -->
-            <div role="tabpanel" class="tab-pane" id="extracted">
-              <div id="extracted_content">{{ skeleton('rows', 4, t.loading_extracted) }}</div>
-            </div>
-
-            <!-- History -->
-            <div role="tabpanel" class="tab-pane {% if not task.linked_tasks %}d-none{% endif %}" id="history">
-              <table class="table table-hover">
-                <thead><tr><th>{{ t.col_date }}</th><th>{{ t.col_name }}</th><th>{{ t.col_status }}</th></tr></thead>
-                <tbody>
-                {% for linked_task in task.linked_tasks %}
-                <tr class="{% if linked_task.uuid == task.uuid %}table-active{% endif %}" id="linkedTaskRow-{{ linked_task.uuid }}">
-                  <td>{{ moment(linked_task.save_date).format('L LT [UTC]Z') }}</td>
-                  <td><a href="{{ url_for('api_analysis', task_id=linked_task.uuid) }}">
-                    {{ render_icon(linked_task.file.icon) }} {{ linked_task.file.client_name }}</a></td>
-                  <td>{{ display_task_status(linked_task.status, status) }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-              </table>
-            </div>
           </div>
         </section>
       </div>

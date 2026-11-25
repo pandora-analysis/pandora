@@ -141,3 +141,83 @@ document.addEventListener("submit", async (event) => {
     // No live watching: "Match browser" reads the browser's preference when the page loads or when the mode is chosen.
     apply(root.getAttribute("data-theme-choice") || "light");
 })();
+
+// Page viewer (templates/previews.html): one page at a time, arrows on the sides, thumbnails, ← / → keys.
+// The current page is remembered on the container, so a refresh of the HTML (analysis.js) keeps it.
+function pdrPagerShow(pager, index) {
+    const pages = pager.querySelectorAll(".pdr-page");
+    if (!pages.length) { return; }
+    const i = Math.max(0, Math.min(pages.length - 1, index));
+    const target = pages[i];
+    const img = target.querySelector("img");
+    const token = String(Date.now() + Math.random());
+    pager.dataset.pdrToken = token;
+    // Update the controls at once (counter, arrows, thumbnails), the page itself only when its image is ready
+    pager.querySelectorAll(".pdr-pager-thumb").forEach((t, k) => {
+        t.classList.toggle("is-current", k === i);
+        if (k === i) { t.setAttribute("aria-current", "true"); t.scrollIntoView({block: "nearest", inline: "nearest", behavior: "instant"}); }
+        else { t.removeAttribute("aria-current"); }
+    });
+    const prev = pager.querySelector(".pdr-pager-prev"), next = pager.querySelector(".pdr-pager-next");
+    if (prev) { prev.disabled = i === 0; }
+    if (next) { next.disabled = i === pages.length - 1; }
+    const cur = pager.querySelector("[data-pdr-pager-current]");
+    if (cur) { cur.textContent = i + 1; }
+    pager.dataset.current = i;
+    if (pager.parentElement) { pager.parentElement.dataset.pdrPage = i; }   // survives an innerHTML refresh of the parent
+    // Main preview: write the page in the address (#page=3) so a shared link opens on it. replaceState: no history spam.
+    if (pager.closest("#previews_images") && !pager.dataset.pdrRestoring) {
+        const hash = i > 0 ? `#page=${i + 1}` : " ";
+        if (location.hash !== hash.trim()) { history.replaceState(null, "", hash === " " ? location.pathname + location.search : hash); }
+    }
+
+    const swap = () => {
+        if (pager.dataset.pdrToken !== token) { return; }   // another page was asked meanwhile
+        pages.forEach((p, k) => p.classList.toggle("is-current", k === i));
+        pager.classList.remove("is-loading");
+        const stage = pager.querySelector(".pdr-pager-stage");
+        if (stage) { stage.style.minHeight = ""; }
+        // preload the neighbours so the next arrow click is instant
+        [i - 1, i + 1].forEach((k) => { const n = pages[k] && pages[k].querySelector("img"); if (n) { n.loading = "eager"; } });
+    };
+    if (!img || (img.complete && img.naturalWidth > 0)) { swap(); return; }
+    // Not loaded yet: keep the current page on screen (held height + loading veil) until the new one has arrived
+    const stage = pager.querySelector(".pdr-pager-stage");
+    if (stage) { stage.style.minHeight = stage.offsetHeight + "px"; }
+    pager.classList.add("is-loading");
+    img.loading = "eager";
+    img.addEventListener("load", swap, {once: true});
+    img.addEventListener("error", swap, {once: true});
+}
+function pdrPagerRestore(container) {
+    const pager = container && container.querySelector("[data-pdr-pager]");
+    if (pager && container.dataset.pdrPage) { pdrPagerShow(pager, parseInt(container.dataset.pdrPage, 10)); }
+}
+document.addEventListener("click", (event) => {
+    const go = event.target.closest("[data-pdr-pager-go], [data-pdr-pager-to]");
+    if (!go) { return; }
+    const pager = go.closest("[data-pdr-pager]");
+    const current = parseInt(pager.dataset.current || "0", 10);
+    pdrPagerShow(pager, go.dataset.pdrPagerTo !== undefined ? parseInt(go.dataset.pdrPagerTo, 10) : current + parseInt(go.dataset.pdrPagerGo, 10));
+});
+document.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") { return; }
+    const target = event.target instanceof Element ? event.target : null;   // can be the document itself
+    if (target && target.closest("input, textarea, select, [contenteditable], .modal")) { return; }
+    // the visible pager (the tab that is shown)
+    const pager = [...document.querySelectorAll("[data-pdr-pager]")].find((p) => p.offsetParent !== null);
+    if (!pager) { return; }
+    event.preventDefault();
+    pdrPagerShow(pager, parseInt(pager.dataset.current || "0", 10) + (event.key === "ArrowRight" ? 1 : -1));
+});
+
+// Open on the page given in the address (#page=3), now or once the previews arrive (analysis.js calls pdrPagerRestore).
+document.addEventListener("DOMContentLoaded", () => {
+    const m = /^#page=(\d+)$/.exec(location.hash);
+    if (!m) { return; }
+    document.querySelectorAll("#previews_images").forEach((box) => {
+        box.dataset.pdrPage = Math.max(0, parseInt(m[1], 10) - 1);
+        const pager = box.querySelector("[data-pdr-pager]");
+        if (pager) { pager.dataset.pdrRestoring = "1"; pdrPagerShow(pager, parseInt(box.dataset.pdrPage, 10)); delete pager.dataset.pdrRestoring; }
+    });
+});

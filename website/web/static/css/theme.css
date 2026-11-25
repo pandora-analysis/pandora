@@ -1060,3 +1060,136 @@ html[data-theme-choice="dark"] .pdr-theme-icon-dark { display: inline-flex; }
 .pdr-theme-switch .dropdown-item { display: flex; align-items: center; gap: .5rem; }
 .pdr-theme-switch .dropdown-item.active { background: var(--pdr-hover); color: var(--pdr-text); font-weight: 600; }
 @media (max-width: 991.98px) { .pdr-theme-switch { margin: .25rem 0 .5rem; } }
+
+/* ---------- Analysis page order: file header → preview (full width) → analysis result ---------- */
+.pdr-file-header {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1.5rem;
+  padding: 1rem 1.25rem; margin-bottom: 1rem;
+  background: var(--pdr-surface); border: 1px solid var(--pdr-border);
+  border-top: 4px solid var(--pdr-primary); border-radius: 0 0 var(--pdr-radius) var(--pdr-radius);   /* straight top line */
+}
+.pdr-file-header-main { min-width: 0; flex: 1 1 28rem; }
+.pdr-file-header .pdr-verdict-file { margin: 0 0 .2rem; }
+.pdr-file-header .pdr-verdict-meta { margin: 0; }
+.pdr-progress { margin: 0 0 1rem; }
+.pdr-tabs-card { margin-bottom: 2rem; }
+.pdr-tabs-card .tab-content { min-height: 320px; }
+
+.pdr-section-title {
+  display: flex; align-items: center; gap: .5rem;
+  margin: .5rem 0 1rem; font-size: 1.35rem; font-weight: 700;
+}
+.pdr-section-title svg { color: var(--pdr-primary); }
+.pdr-verdict { grid-template-columns: auto 1fr; border-top-width: 4px; }
+.pdr-verdict .pdr-verdict-main { align-self: center; }
+
+/* Full-width previews are large: a smaller zoom keeps them on screen */
+@media (hover: hover) and (pointer: fine) {
+  .pdr-preview a:hover .pdr-preview-img, .pdr-preview a:focus-visible .pdr-preview-img { transform: scale(1.8); }
+}
+@media (max-width: 575.98px) { .pdr-verdict { grid-template-columns: 1fr; } }
+
+/* ---------- "Read the file here": pages at reading size, guidance + quick downloads ----------
+   Goal: the person gets the content from Pandora and does not need to open the original file. */
+.pdr-read-here {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1.5rem;
+  padding: .8rem 1rem; margin-bottom: 1rem;
+  background: var(--pdr-surface-alt); border: 1px solid var(--pdr-border);
+  border-left: 4px solid var(--pdr-primary); border-radius: 0 var(--pdr-radius-sm) var(--pdr-radius-sm) 0;   /* straight accent */
+}
+.pdr-read-here-text { flex: 1 1 30rem; display: flex; flex-direction: column; gap: .15rem; }
+.pdr-read-here-text strong { display: inline-flex; align-items: center; gap: .4rem; }
+.pdr-read-here-text span { color: var(--pdr-text-muted); font-size: .92rem; }
+.pdr-read-here-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+#previews_images.row { --bs-gutter-x: 0; }
+.pdr-page { margin: 0 auto 1.5rem; max-width: 900px; }
+.pdr-page .pdr-preview-img { width: 100%; box-shadow: 0 4px 18px rgba(35, 49, 58, .12); }
+.pdr-page .pdr-preview-label { margin-top: .4rem; }
+/* Pages are already at reading size: no hover zoom on them */
+@media (hover: hover) and (pointer: fine) {
+  .pdr-page a:hover .pdr-preview-img, .pdr-page a:focus-visible .pdr-preview-img { transform: none; box-shadow: 0 6px 24px rgba(35, 49, 58, .2); }
+  .pdr-page .pdr-preview-img { cursor: pointer; }
+  .pdr-page a:hover .pdr-preview-label { visibility: visible; }
+}
+
+/* Progress panel: at the top while the analysis runs, at the bottom of the page once it is finished.
+   The page content is a flex column so the finished panel can be moved with `order` (no HTML moved, JS untouched). */
+.pdr-analysis { display: flex; flex-direction: column; }
+.pdr-analysis > * { width: 100%; }
+.pdr-analysis > .row { width: auto; }
+.pdr-analysis > .pdr-progress.is-done { order: 1; margin: 1.5rem 0 0; }
+
+/* ---------- Page viewer (templates/previews.html + ui.js): one page at a time, arrows on the sides ---------- */
+.pdr-pager { margin: 0 auto; max-width: 1040px; }
+.pdr-pager-stage { position: relative; display: flex; align-items: center; justify-content: center; padding: 0 64px; }
+.pdr-pager .pdr-page { display: none; margin: 0; width: 100%; max-width: 900px; }
+.pdr-pager .pdr-page.is-current { display: block; }
+.pdr-pager-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 3rem; height: 3rem; border-radius: 50%;
+  border: 1px solid var(--pdr-border-strong); background: var(--pdr-surface); color: var(--pdr-primary);
+  box-shadow: 0 4px 14px rgba(35, 49, 58, .15); cursor: pointer;
+}
+.pdr-pager-arrow:hover:not(:disabled) { background: var(--pdr-hover); border-color: var(--pdr-primary); }
+.pdr-pager-arrow:disabled { opacity: .35; cursor: default; box-shadow: none; }
+.pdr-pager-prev { left: 0; }
+.pdr-pager-next { right: 0; }
+.pdr-pager-count { margin: .6rem 0 .4rem; text-align: center; color: var(--pdr-text-muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+.pdr-pager-thumbs { display: flex; gap: .5rem; overflow-x: auto; padding: .25rem .25rem .5rem; justify-content: safe center; }
+.pdr-pager-thumb {
+  flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: .2rem;
+  padding: 3px; border: 2px solid transparent; border-radius: var(--pdr-radius-sm); background: none; cursor: pointer;
+  color: var(--pdr-text-muted); font-size: .75rem; font-weight: 600;
+}
+.pdr-pager-thumb img { display: block; width: 56px; height: 72px; object-fit: cover; object-position: top; border: 1px solid var(--pdr-border); border-radius: 3px; background: #fff; }
+.pdr-pager-thumb:hover { border-color: var(--pdr-border-strong); }
+.pdr-pager-thumb.is-current { border-color: var(--pdr-primary); color: var(--pdr-text); }
+@media (max-width: 575.98px) {
+  .pdr-pager-stage { padding: 0; }
+  .pdr-pager-arrow { width: 2.5rem; height: 2.5rem; opacity: .9; }
+  .pdr-pager-prev { left: -.25rem; } .pdr-pager-next { right: -.25rem; }
+}
+/* The whole page fits in the window (no scrolling to reach the arrows); click the page for full size */
+.pdr-pager .pdr-page.is-current { display: flex; justify-content: center; }
+.pdr-pager .pdr-page .pdr-preview-img { width: auto; max-width: 100%; max-height: calc(100vh - 260px); min-height: 320px; object-fit: contain; }
+@media (max-width: 575.98px) { .pdr-pager .pdr-page .pdr-preview-img { max-height: none; min-height: 0; width: 100%; } }
+/* Arrows right next to the page (not at the far edges of the area) */
+.pdr-pager-stage { gap: 1.25rem; padding: 0; }
+.pdr-pager-stage .pdr-pager-arrow { position: static; transform: none; flex: 0 0 auto; }
+.pdr-pager .pdr-page.is-current { width: auto; }
+.pdr-pager .pdr-page .pdr-preview-img { max-height: calc(100vh - 290px); }
+@media (max-width: 575.98px) {
+  .pdr-pager-stage { position: relative; }
+  .pdr-pager-stage .pdr-pager-arrow { position: absolute; top: 50%; transform: translateY(-50%); }
+  .pdr-pager .pdr-page.is-current { width: 100%; }
+}
+.pdr-pager .pdr-page .pdr-preview-img { max-height: calc(100vh - 350px); }
+/* Page change: the current page stays visible under a light veil until the next page's image has loaded */
+.pdr-pager.is-loading .pdr-page.is-current { position: relative; }
+.pdr-pager.is-loading .pdr-page.is-current::after {
+  content: ""; position: absolute; inset: 0; background: rgba(247, 249, 250, .55);
+  background-image: radial-gradient(circle, var(--pdr-primary) 0 5px, transparent 6px);
+  background-size: 22px 22px; background-repeat: no-repeat; background-position: center;
+}
+html[data-theme="dark"] .pdr-pager.is-loading .pdr-page.is-current::after { background-color: rgba(17, 24, 29, .45); }
+
+/* Text preview tab: no zoom, the picture of the text at reading size in a scrollable area */
+a.pdr-text-preview {
+  display: block; max-height: calc(100vh - 300px); min-height: 240px; overflow: auto;
+  border: 1px solid var(--pdr-border); border-radius: var(--pdr-radius-sm); background: #fff; cursor: auto;
+}
+a.pdr-text-preview .pdr-preview-img { width: 100%; max-width: 900px; margin: 0 auto; border: 0; border-radius: 0; cursor: auto; }
+@media (hover: hover) and (pointer: fine) {
+  a.pdr-text-preview:hover .pdr-preview-img, a.pdr-text-preview:focus-visible .pdr-preview-img { transform: none !important; box-shadow: none !important; }
+}
+
+/* Box animation timing (home): closed 0–0.4 s, flaps open until 1.5 s, then the layers rise */
+html.pdr-ready .pdr-box-animated .pdr-box-layer-1 { animation-delay: 1.5s; }
+html.pdr-ready .pdr-box-animated .pdr-box-layer-2 { animation-delay: 1.65s; }
+html.pdr-ready .pdr-box-animated .pdr-box-layer-3 { animation-delay: 1.8s; }
+html.pdr-ready .pdr-box-animated .pdr-box-layer-4 { animation-delay: 1.95s; }
+/* Loader: flaps and layers are driven together by the script in base.html; the 40px table box only shows its flaps */
+html.pdr-loading .pdr-loader .pdr-loader-box .pdr-box-layer { animation: none !important; }
+.pdr-mini-box .pdr-box-layer { display: none; }
