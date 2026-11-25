@@ -4,6 +4,25 @@
 {% set n_pages = task.file.previews | length %}
 {% if n_pages %}
 <div class="col-12 pdr-pager" data-pdr-pager data-pages="{{ n_pages }}" tabindex="-1" aria-roledescription="page viewer">
+  {# Full screen only: the viewer's tools (static/js/ui.js "Viewer") #}
+  {% macro tool(action, icon, label) %}
+    <button type="button" class="pdr-tool" data-pdr-view="{{ action }}" title="{{ label }}" aria-label="{{ label }}">
+      <svg class="bi" width="18" height="18" fill="currentColor" aria-hidden="true"><use href="{{ url_for('bootstrap.static', filename='icons/bootstrap-icons.svg') }}#{{ icon }}"/></svg>
+    </button>
+  {% endmacro %}
+  <div class="pdr-pager-tools" role="toolbar" aria-label="Viewer">
+    {{ tool('out', 'zoom-out', 'Zoom out (-)') }}
+    <output class="pdr-tool-zoom" data-pdr-view-zoom aria-live="polite"></output>
+    {{ tool('in', 'zoom-in', 'Zoom in (+)') }}
+    <span class="pdr-tool-sep"></span>
+    {{ tool('page', 'fullscreen-exit', 'Whole page (0)') }}
+    {{ tool('width', 'arrows', 'Full width (W)') }}
+    {{ tool('rotate', 'arrow-clockwise', 'Rotate (R)') }}
+    <span class="pdr-tool-sep"></span>
+    <button type="button" class="pdr-tool" data-pdr-fullscreen-exit title="Exit full screen (Esc)" aria-label="Exit full screen">
+      <svg class="bi" width="18" height="18" fill="currentColor" aria-hidden="true"><use href="{{ url_for('bootstrap.static', filename='icons/bootstrap-icons.svg') }}#x-lg"/></svg>
+    </button>
+  </div>
   <div class="pdr-pager-stage">
     {% if n_pages > 1 %}
     <button type="button" class="pdr-pager-arrow pdr-pager-prev" data-pdr-pager-go="-1" aria-label="Previous page" disabled>

@@ -1,11 +1,11 @@
-{% from 'bootstrap5/utils.html' import render_icon %}
-{% from "macros.html" import module_result, notice %}
+{% from "macros.html" import module_result, lookyloo_logo %}
 {% call module_result(worker_name, worker_meta, report, status) %}
   {% if report.status == status.MANUAL %}
-    <p class="mb-0">This module sends the sample to a third-party service, so it only runs when you ask.
-      <a href="{{ url_for('manual_trigger_worker', task_id=task.uuid, seed=seed, worker_name=worker_name) }}">Run it now</a>.</p>
+    <p>This module sends the sample to a third-party service, so it only runs when you ask.</p>
+    <p class="mb-0"><a class="btn btn-sm btn-secondary pdr-lookyloo" href="{{ url_for('manual_trigger_worker', task_id=task.uuid, seed=seed, worker_name=worker_name) }}">
+      {{ lookyloo_logo() }} Run it now</a></p>
   {% elif report.details and report.details.get('permaurl') %}
-    <p class="mb-0"><a class="btn btn-sm btn-secondary" href="{{ report.details['permaurl'] }}" target="_blank" rel="noopener noreferrer">
-      {{ render_icon('box-arrow-up-right') }} See the capture on Lookyloo</a></p>
+    <p class="mb-0"><a class="btn btn-sm btn-secondary pdr-lookyloo" href="{{ report.details['permaurl'] }}" target="_blank" rel="noopener noreferrer">
+      {{ lookyloo_logo() }} See the capture on Lookyloo</a></p>
   {% endif %}
 {% endcall %}

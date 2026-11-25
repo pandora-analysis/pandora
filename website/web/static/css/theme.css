@@ -548,7 +548,8 @@ div.dt-container div.dt-processing { border: 1px solid var(--pdr-border); border
 #TasksTable .btn-danger:hover { background: var(--pdr-accent); color: #fff; }
 #TasksTable td.dt-empty { padding: 1rem .7rem; }
 div.dt-container div.dt-processing > div:last-child > div { background: var(--pdr-primary); }
-#TasksTable td.pdr-name-cell { min-width: 14rem; overflow-wrap: break-word; }
+/* Long file names wrap instead of stretching the table */
+#TasksTable td.pdr-name-cell { min-width: 14rem; max-width: 24rem; overflow-wrap: anywhere; }
 /* First load: the placeholder rows are enough, hide the "Loading…" box on top of them */
 div.dt-container:has(td.dt-empty .pdr-skeleton) div.dt-processing { display: none !important; }
 
@@ -585,7 +586,7 @@ div.dt-container:has(td.dt-empty .pdr-skeleton) div.dt-processing { display: non
   #TasksTable tbody td[data-label]:not([data-label=""])::before {
     content: attr(data-label); display: block; color: var(--pdr-text-muted); font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em;
   }
-  #TasksTable td .pdr-id-wrap, #TasksTable td.pdr-name-cell { min-width: 0; }
+  #TasksTable td .pdr-id-wrap, #TasksTable td.pdr-name-cell { min-width: 0; max-width: none; }
   #TasksTable td:last-child a, #TasksTable td:last-child .btn { display: inline-block; width: auto; }
   #TasksTable td:last-child a + .btn { margin-top: 0; margin-left: .35rem; }
   #TasksTable_wrapper .dt-layout-row { flex-direction: column; align-items: stretch; gap: .5rem; }
@@ -855,7 +856,7 @@ html.pdr-loading .pdr-loader img { animation: none; }
 .pdr-tabs-card { overflow: visible; }
 .pdr-tabs-card .nav-tabs { border-radius: 0 var(--pdr-radius) 0 0; }
 @media (hover: hover) and (pointer: fine) {
-  .pdr-preview, .pdr-text-preview { position: relative; }
+  .pdr-preview { position: relative; }
   .pdr-preview-img {
     position: relative; z-index: 1;
     transform-origin: top left;
@@ -864,21 +865,14 @@ html.pdr-loading .pdr-loader img { animation: none; }
   }
   .pdr-preview:nth-child(3n) .pdr-preview-img { transform-origin: top right; }
   .pdr-preview:nth-child(3n+2) .pdr-preview-img { transform-origin: top center; }
-  .pdr-preview a:hover .pdr-preview-img, .pdr-preview a:focus-visible .pdr-preview-img,
-  .pdr-text-preview a:hover .pdr-preview-img, .pdr-text-preview a:focus-visible .pdr-preview-img {
+  .pdr-preview a:hover .pdr-preview-img, .pdr-preview a:focus-visible .pdr-preview-img {
     transform: scale(2.6);
     z-index: 30;
     box-shadow: 0 12px 40px rgba(35, 49, 58, .35);
   }
-  .pdr-text-preview a:hover .pdr-preview-img, .pdr-text-preview a:focus-visible .pdr-preview-img { transform: scale(1.6); }
   .pdr-preview a:hover .pdr-preview-label { visibility: hidden; }
 }
 @media (prefers-reduced-motion: reduce) { .pdr-preview-img { transition: none; } }
-@media (hover: hover) and (pointer: fine) {
-  a.pdr-text-preview:hover .pdr-preview-img, a.pdr-text-preview:focus-visible .pdr-preview-img {
-    transform: scale(1.6); z-index: 30; box-shadow: 0 12px 40px rgba(35, 49, 58, .35);
-  }
-}
 
 /* Loader sits under the menu bar (header z-index 1020 is above it), so the menu stays visible and usable */
 html.pdr-loading .pdr-loader { z-index: 1010; padding-top: 80px; }
@@ -1175,15 +1169,75 @@ html[data-theme-choice="dark"] .pdr-theme-icon-dark { display: inline-flex; }
 }
 html[data-theme="dark"] .pdr-pager.is-loading .pdr-page.is-current::after { background-color: rgba(17, 24, 29, .45); }
 
-/* Text preview tab: no zoom, the picture of the text at reading size in a scrollable area */
-a.pdr-text-preview {
-  display: block; max-height: calc(100vh - 300px); min-height: 240px; overflow: auto;
-  border: 1px solid var(--pdr-border); border-radius: var(--pdr-radius-sm); background: #fff; cursor: auto;
+/* Text preview tab: no zoom, the picture of the text at reading size in a scrollable area, with an end marker */
+.pdr-text-preview {
+  max-height: calc(100vh - 300px); min-height: 240px; overflow: auto;
+  border: 1px solid var(--pdr-border); border-radius: var(--pdr-radius-sm); background: #fff;
 }
-a.pdr-text-preview .pdr-preview-img { width: 100%; max-width: 900px; margin: 0 auto; border: 0; border-radius: 0; cursor: auto; }
-@media (hover: hover) and (pointer: fine) {
-  a.pdr-text-preview:hover .pdr-preview-img, a.pdr-text-preview:focus-visible .pdr-preview-img { transform: none !important; box-shadow: none !important; }
+.pdr-text-preview .pdr-preview-img { width: 100%; max-width: 900px; margin: 0 auto; border: 0; border-radius: 0; cursor: pointer; }
+.pdr-text-end {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .5rem 1rem;
+  padding: 1rem; border-top: 1px solid var(--pdr-border); background: var(--pdr-surface-alt); color: var(--pdr-text);
 }
+.pdr-text-end-cut { display: none; font-weight: 600; }
+.pdr-text-preview.is-cut .pdr-text-end { border-top: 4px solid var(--pdr-status-warn); }
+.pdr-text-preview.is-cut .pdr-text-end-cut { display: inline; }
+.pdr-text-preview.is-cut .pdr-text-end-full { display: none; }
+
+/* Text tab: "copy everything" floats over the top right corner of the text, and stays there while the text scrolls */
+.pdr-text-box { position: relative; }
+.pdr-text-box .pdr-copy-all { position: absolute; top: .6rem; right: 1.4rem; z-index: 2; box-shadow: 0 2px 10px rgba(35, 49, 58, .18); }
+@media (max-width: 575.98px) {   /* icon only, so the first line stays readable */
+  .pdr-text-box .pdr-copy-all { top: .25rem; right: .35rem; padding: .15rem .35rem; }
+  .pdr-copy-all-word { display: none; }
+}
+.pdr-copy-all.is-copied::after, .pdr-copy-all.is-failed::after {
+  content: "Copied"; position: absolute; right: calc(100% + 6px); top: 50%; transform: translateY(-50%);
+  padding: .15rem .5rem; border-radius: 4px; background: var(--pdr-status-clean); color: #fff; font-size: .75rem; font-weight: 600; white-space: nowrap;
+}
+.pdr-copy-all.is-failed::after { content: "Copy failed"; background: #b8242e; }
+
+/* Full screen preview: the page, then one bar below with the arrows and all the pages */
+.pdr-fullscreen-open { display: none; }
+#content-preview:has([data-pdr-pager]) .pdr-fullscreen-open { display: inline-block; }
+html.pdr-has-fullscreen, html.pdr-has-fullscreen body { overflow: hidden; }
+#previews_images.pdr-fullscreen {
+  position: fixed; inset: 0; z-index: 1060; width: 100%; height: 100%; margin: 0; padding: 0; background: var(--pdr-surface);
+}
+.pdr-fullscreen .pdr-pager {
+  display: grid; width: 100%; max-width: none; height: 100%; margin: 0; padding: 0;
+  grid-template: "tools tools tools" auto "page page page" minmax(0, 1fr) "count count count" auto "prev thumbs next" auto / auto minmax(0, 1fr) auto;
+}
+.pdr-fullscreen .pdr-pager-stage { display: contents; }
+.pdr-fullscreen .pdr-pager .pdr-page.is-current {
+  grid-area: page; display: block; position: relative; width: 100%; max-width: none; min-height: 0; overflow: hidden; touch-action: none; user-select: none;
+}
+.pdr-fullscreen .pdr-page.can-move { cursor: grab; }
+.pdr-fullscreen .pdr-page.is-moving { cursor: grabbing; }
+.pdr-fullscreen .pdr-page a { display: contents; }
+.pdr-fullscreen .pdr-pager .pdr-page .pdr-preview-img {
+  position: absolute; top: 50%; left: 50%; width: auto; height: auto; max-width: none; max-height: none; min-height: 0;
+  transform-origin: center; transition: none; cursor: inherit; border-radius: 0;
+}
+.pdr-fullscreen .pdr-pager-count { grid-area: count; margin: 0; padding: .4rem 0 .1rem; border-top: 1px solid var(--pdr-border); background: var(--pdr-surface); }
+.pdr-fullscreen .pdr-pager-thumbs { grid-area: thumbs; background: var(--pdr-surface); padding: .25rem .5rem .6rem; }
+.pdr-fullscreen .pdr-pager-stage .pdr-pager-arrow { position: static; transform: none; align-self: center; margin: 0 1rem .4rem; }
+.pdr-fullscreen .pdr-pager-prev { grid-area: prev; }
+.pdr-fullscreen .pdr-pager-next { grid-area: next; }
+.pdr-pager-tools { display: none; }
+.pdr-fullscreen .pdr-pager-tools {
+  grid-area: tools; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .25rem;
+  padding: .4rem .5rem; background: var(--pdr-surface); border-bottom: 1px solid var(--pdr-border);
+}
+.pdr-fullscreen .pdr-page { background: var(--pdr-bg); }
+.pdr-tool {
+  display: inline-flex; align-items: center; justify-content: center; width: 2.4rem; height: 2.4rem;
+  border: 1px solid transparent; border-radius: var(--pdr-radius-sm); background: none; color: var(--pdr-primary); cursor: pointer;
+}
+.pdr-tool:hover { background: var(--pdr-hover); border-color: var(--pdr-border-strong); }
+.pdr-tool[aria-pressed="true"] { background: var(--pdr-hover); border-color: var(--pdr-primary); }
+.pdr-tool-zoom { min-width: 3.4rem; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+.pdr-tool-sep { width: 1px; height: 1.5rem; margin: 0 .35rem; background: var(--pdr-border-strong); }
 
 /* Box animation timing (home): closed 0–0.4 s, flaps open until 1.5 s, then the layers rise */
 html.pdr-ready .pdr-box-animated .pdr-box-layer-1 { animation-delay: 1.5s; }
@@ -1193,3 +1247,63 @@ html.pdr-ready .pdr-box-animated .pdr-box-layer-4 { animation-delay: 1.95s; }
 /* Loader: flaps and layers are driven together by the script in base.html; the 40px table box only shows its flaps */
 html.pdr-loading .pdr-loader .pdr-loader-box .pdr-box-layer { animation: none !important; }
 .pdr-mini-box .pdr-box-layer { display: none; }
+
+/* Second block of tabs (text, metadata): as high as its content */
+.pdr-tabs-more .tab-content { min-height: 0; }
+.pdr-tabs-more .pdr-text { max-height: 60vh; margin-bottom: 0; }
+/* Text to scroll: the scrollbar is always visible, and a button tells how many lines are left (ui.js) */
+.pdr-text-box .pdr-text { line-height: 1.35rem; scrollbar-color: var(--pdr-text-muted) var(--pdr-hover); }
+.pdr-text-box.has-more .pdr-text { border-bottom: 3px solid var(--pdr-primary); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.pdr-text-next {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 2;
+  display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .9rem; border: 0; white-space: nowrap;
+  border-radius: var(--pdr-radius-sm) var(--pdr-radius-sm) 0 0;
+  background: var(--pdr-primary-solid); color: #fff; font-size: .85rem; font-weight: 600; cursor: pointer;
+}
+.pdr-text-next[hidden] { display: none; }
+.pdr-text-next:hover { background: #254f63; }
+
+/* "Read the file here" only makes sense when there is something to read */
+#content-preview:not(:has([data-pdr-pager])) .pdr-read-here { display: none; }
+.pdr-file-name { max-width: 24rem; overflow-wrap: anywhere; }
+
+tr[data-pdr-row] { cursor: pointer; }
+tr[data-pdr-row] .pdr-full-id { cursor: text; }
+
+/* Breadcrumb: one line, long file names are cut with "…" (the full name is in the header below and in the tooltip) */
+.pdr-breadcrumb ol { flex-wrap: nowrap; }
+.pdr-breadcrumb li { display: block; flex: 0 0 auto; white-space: nowrap; }
+.pdr-breadcrumb li a { display: inline; }
+.pdr-breadcrumb li[title] { flex: 0 1 auto; min-width: 4rem; max-width: 26rem; overflow: hidden; text-overflow: ellipsis; }
+.pdr-breadcrumb li[aria-current] { flex-shrink: 1; min-width: 4rem; overflow: hidden; text-overflow: ellipsis; overflow-wrap: normal; }
+
+/* Lookyloo: logo on its buttons, and the note above the pages when the file contains links */
+.pdr-lookyloo { display: inline-flex; align-items: center; gap: .5rem; }
+.pdr-lookyloo[hidden] { display: none; }
+.pdr-lookyloo-logo { width: 54px; height: 24px; object-fit: contain; }
+.btn-primary .pdr-lookyloo-logo, html[data-theme="dark"] .pdr-lookyloo-logo { filter: invert(1); }
+.pdr-lookyloo-hint {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; padding: .7rem 1rem; margin-bottom: 1rem;
+  border: 1px solid var(--pdr-border); border-left: 4px solid var(--pdr-primary); border-radius: 0 var(--pdr-radius-sm) var(--pdr-radius-sm) 0;
+  background: var(--pdr-surface-alt);
+}
+.pdr-lookyloo-hint span { flex: 1 1 20rem; }
+
+/* File locked with a password: the field is at the top of the report */
+.pdr-locked-form { display: flex; flex-wrap: wrap; gap: .5rem; }
+.pdr-locked-form input { flex: 1 1 14rem; max-width: 24rem; }
+.pdr-locked-wrong { color: #b8242e; font-weight: 600; margin-bottom: .5rem; }
+html[data-theme="dark"] .pdr-locked-wrong { color: #ff9a9f; }
+/* No pages: no empty frame under the message */
+.pdr-tabs-card .tab-content:has(#content-preview.active):has(#passwordNeeded:not(.d-none), #hasExtracted:not(.d-none), #noPreview:not(.d-none)):not(:has([data-pdr-pager])) { min-height: 0; }
+
+.pdr-lookyloo-search { display: inline-block; margin: 0; }
+/* Links table on phones: one block per value */
+@media (max-width: 575.98px) {
+  #observablesTaskRows thead { display: none; }
+  #observablesTaskRows, #observablesTaskRows tbody, #observablesTaskRows tr, #observablesTaskRows td { display: block; width: 100%; }
+  #observablesTaskRows tr { padding: .5rem 0; border-bottom: 1px solid var(--pdr-border); }
+  #observablesTaskRows td { border: 0; padding: .15rem .25rem; }
+  #observablesTaskRows td:nth-child(-n+2) { display: inline-block; width: auto; }
+  #observablesTaskRows td:has(> .pdr-empty-value) { display: none; }
+}

@@ -1,28 +1,59 @@
-async function LookylooSubmit(lookyloo_url, url_to_submit) {
-    uuid = await fetch(`${lookyloo_url}/submit`, {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-        body: JSON.stringify({url: url_to_submit, listing: false})
-    })
-    .then(response => response.json())
-    .then(data => {
-        return data;
-    })
-    .catch((error) => {
-        throw new Error(error);
-    });
-    return uuid;
+// Send a link to Lookyloo, only when someone clicks. The captures are remembered, because the list of links is reloaded
+// while the analysis runs.
+const lookylooCaptures = {};
+
+function lookylooShow(sha256) {
+    const button = document.getElementById(`lookyloo_submit-${sha256}`), link = document.getElementById(`lookyloo_link-${sha256}`);
+    if (!button || !link || !lookylooCaptures[sha256]) { return; }
+    button.hidden = true;
+    link.href = lookylooCaptures[sha256];
+    link.hidden = false;
 }
 
-async function lookyloo(lookyloo_url, sha256) {
-  let url_to_submit = document.getElementById(`lookyloo_submit-${sha256}`).dataset.url;
-  let uuid = await LookylooSubmit(lookyloo_url, url_to_submit);
-  document.getElementById(`lookyloo_submit-${sha256}`).style.display = 'none';
-  document.getElementById(`lookyloo_link-${sha256}`).style.display = 'block';
-  document.getElementById(`lookyloo_link-${sha256}`).href = `${lookyloo_url}/tree/${uuid}`;
+async function lookylooSubmit(button) {
+    const base = button.dataset.lookyloo.replace(/\/+$/, ""), sha256 = button.dataset.sha256;
+    button.disabled = true;
+    try {
+        const response = await fetch(`${base}/submit`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({url: button.dataset.url, listing: false})
+        });
+        if (!response.ok) { throw new Error(`Lookyloo answered ${response.status}`); }
+        const uuid = await response.json();
+        if (typeof uuid !== "string") { throw new Error(uuid && uuid.error ? uuid.error : "unexpected answer"); }
+        lookylooCaptures[sha256] = `${base}/tree/${uuid}`;
+        lookylooShow(sha256);
+    } catch (error) {
+        button.disabled = false;
+        pdrAlert(`The link could not be sent to Lookyloo: ${error.message}`, {title: "Lookyloo"});
+    }
 }
+
+// "Open the N links in Lookyloo": the links once each, without the ones Lookyloo refuses (one bad link refuses them all).
+function lookylooFillAll(box) {
+    const buttons = [...box.querySelectorAll("button[data-lookyloo]")], links = new Map();
+    buttons.forEach((b) => {
+        const value = b.dataset.url.trim();
+        try {
+            const url = new URL(value);
+            if (/^https?:$/.test(url.protocol) && url.hostname.includes(".") && !/\s/.test(value)) { links.set(url.href, value); }
+        } catch (e) { /* not a valid link */ }
+    });
+    document.querySelectorAll("form[data-lookyloo-all]").forEach((form) => {
+        form.classList.toggle("d-none", links.size < 2);
+        if (!buttons.length) { return; }
+        form.action = buttons[0].dataset.lookyloo.replace(/\/+$/, "") + "/capture";
+        form.elements.urls.value = [...links.values()].join("\n");
+        const label = form.querySelector("[data-text]");
+        label.textContent = label.dataset.text.replace("{n}", links.size);
+    });
+}
+
+document.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-lookyloo]");
+    if (button) { lookylooSubmit(button); }
+});
 
 function Analysis(CSRFToken) {
     this.CSRFToken = CSRFToken;
@@ -95,7 +126,50 @@ Analysis.prototype.refreshReports = function () {
     });
 };
 
+// The message shown instead of the pages. One at a time, the most useful first:
+// locked with a password > files were extracted > no preview.
+Analysis.prototype.refreshNoPreview = function () {
+    const box = document.getElementById("previews_images");
+    const show = (id, yes) => { const e = document.getElementById(id); if (e) { e.classList.toggle("d-none", !yes); } };
+    // The Extractor says if a password is missing: wait for it, so that the message does not change under the reader.
+    const waiting = this.workers_status && this.workers_status.extractor && !this.extractorChecked;
+    const noPages = this.previewChecked && !waiting && !(box && box.querySelector("[data-pdr-pager]"));
+    const locked = !!this.needsPassword;
+    const extracted = noPages && !locked && this.number_extracted > 0;
+    if (extracted) {
+        const title = document.querySelector("#hasExtracted .pdr-notice-title");
+        if (title) {
+            title.dataset.text = title.dataset.text || title.textContent;
+            title.textContent = title.dataset.text.replace("{n}", this.number_extracted);
+        }
+    }
+    show("passwordNeeded", locked);
+    show("passwordWrong", locked && passwordTried(this.task.uuid));
+    show("hasExtracted", extracted);
+    show("noPreview", noPages && !locked && !extracted);
+};
+
+// Rescanning creates a new report: remember its id (never the password), to say there that the password did not work.
+function passwordTried(uuid, remember) {
+    try {
+        if (remember) { sessionStorage.setItem("pdr-password-tried", uuid); }
+        return sessionStorage.getItem("pdr-password-tried") === uuid;
+    } catch (e) { return false; }
+}
+
+document.addEventListener("submit", (event) => {
+    if (event.target.id !== "passwordForm") { return; }
+    event.preventDefault();
+    analysis.rescan(event.target.dataset.url, document.getElementById("topPassword").value, event.target.querySelector("button"));
+});
+
 Analysis.prototype.refreshTabs = function () {
+    // The preview module did not run at all (disabled for this file)
+    if (this.workers_done && !this.workers_status.preview) {
+        $(".preview-wait").addClass("d-none");
+        this.previewChecked = true;
+        this.refreshNoPreview();
+    }
     if (this.workers_status.preview && this.workers_status.preview[0]) {
         $('.preview-wait').each(function(index, element) {
           $(this).addClass("d-none");
@@ -105,9 +179,10 @@ Analysis.prototype.refreshTabs = function () {
         })
 
         if (this.workers_status.preview[1] == 'NOTAPPLICABLE') {
-            document.getElementById("previews_images").textContent = 'Cannot generate a preview for this file format.'
+            this.previewChecked = true;
+            this.refreshNoPreview();
         }
-        else {
+        else if (document.getElementById("previews_images")) {
             previews_url = `/previews/${this.task.uuid}`
             if (this.seed) {
                 previews_url = `${previews_url}/seed-${this.seed}`
@@ -128,6 +203,8 @@ Analysis.prototype.refreshTabs = function () {
                 box.dataset.pdrHtml = text;
                 if (typeof pdrPagerRestore === "function") { pdrPagerRestore(box); }
               }
+              this.previewChecked = true;
+              this.refreshNoPreview();
             })
         }
     }
@@ -150,7 +227,18 @@ Analysis.prototype.refreshTabs = function () {
        })
        .then(response => response.text())
        .then(text => {
-         document.getElementById("observables_content").innerHTML=text;
+         const box = document.getElementById("observables_content");
+         if (box.dataset.pdrHtml === text) { return; }   // unchanged: keep what the person is doing
+         box.innerHTML = text;
+         box.dataset.pdrHtml = text;
+         Object.keys(lookylooCaptures).forEach(lookylooShow);
+         lookylooFillAll(box);
+         const hint = document.getElementById("lookylooLinks"), links = box.querySelectorAll("button[data-lookyloo]").length;
+         if (hint) {
+             const label = hint.querySelector("[data-text]");
+             label.textContent = label.dataset.text.replace("{n}", links);
+             hint.classList.toggle("d-none", !links);
+         }
        })
     }
 
@@ -197,6 +285,11 @@ Analysis.prototype.refreshTabs = function () {
         })
         .then(response => response.text())
         .then(text => {
+            if (worker_name === "extractor") {
+                this.needsPassword = text.includes("data-pdr-needs-password");
+                this.extractorChecked = true;
+                this.refreshNoPreview();
+            }
             const workers_results = document.getElementById(`workers_results_${worker_done[1].toLowerCase()}`);
             if (workers_results) {
                 workers_results.insertAdjacentHTML('beforeend', text);
@@ -257,23 +350,28 @@ Analysis.prototype.refresh = function (url) {
   })
 };
 
-Analysis.prototype.rescan = function (url) {
+// password / button: given by the form at the top; otherwise the field of the Extractor result is used.
+Analysis.prototype.rescan = function (url, password, button) {
+    const value = password === undefined ? $("#password").val() : password;
+    if (button) { button.disabled = true; }
     fetch(url, {
       method: "POST",
       headers: {
         "X-CSRF-Token": this.CSRFToken,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({password: $("#password").val()})
+      body: JSON.stringify({password: value})
     })
     .then(response => response.json())
     .then(data => {
       if (data.success === false) {
         throw new Error(data.error);
       }
+      if (value) { passwordTried(data.taskId || new URL(data.link, location.href).pathname.split("/")[2], true); }
       window.location = new URL(data.link, location.href);
     })
     .catch((error) => {
+      if (button) { button.disabled = false; }
       $("#errorJSInner").text("An error has occurred while trying to rescan file : " + error);
       $("#errorJS").removeClass("d-none");
     })

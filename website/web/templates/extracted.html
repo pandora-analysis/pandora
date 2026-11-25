@@ -8,7 +8,7 @@
   <thead><tr><th>Status</th><th>Name</th><th>Size</th><th>SHA-256</th><th>Date</th></tr></thead>
   <tbody>
   {% for extracted_task in extracted_tasks %}
-  <tr id="extractedTaskRow-{{ extracted_task['uuid'] }}">
+  <tr id="extractedTaskRow-{{ extracted_task['uuid'] }}" data-pdr-row>
     <td>{{ display_task_status(extracted_task['status'], status) }}</td>
     <td><a href="{{ url_for('api_analysis', task_id=extracted_task['uuid'], seed=seed) }}">
       {{ render_icon(extracted_task['file_icon']) }} <span class="pdr-file-name">{{ extracted_task['file_original_name'] }}</span></a></td>

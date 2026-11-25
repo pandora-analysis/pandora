@@ -186,3 +186,31 @@
   {% if caller is defined %}<div class="pdr-page-header-actions">{{ caller() }}</div>{% endif %}
 </header>
 {% endmacro %}
+
+{#- The Lookyloo logo (black drawing: inverted on dark backgrounds by theme.css). -#}
+{% macro lookyloo_logo() %}<img class="pdr-lookyloo-logo" src="{{ url_for('static', filename='images/lookyloo.png') }}" alt="Lookyloo" width="54" height="24"
+  integrity="{{ get_sri('static/images', 'lookyloo.png') }}" crossorigin="anonymous">{% endmacro %}
+
+{#- All the links of the file in Lookyloo's "multiple captures" page (new tab, on click only). analysis.js fills the links
+    and shows the button. Same settings as a single capture: not listed, JavaScript on, Lookyloo's default browser. -#}
+{% macro lookyloo_all(label) %}
+<form class="d-none" data-lookyloo-all method="post" target="_blank" rel="noopener noreferrer">
+  <input type="hidden" name="urls" value="">
+  <input type="hidden" name="multipleCaptures" value="1">
+  <input type="hidden" name="visibility" value="unlisted">
+  <input type="hidden" name="java_script_enabled" value="1">
+  <input type="hidden" name="user_agent" value=""><input type="hidden" name="os" value=""><input type="hidden" name="browser" value="">
+  <button type="submit" class="btn btn-sm btn-primary pdr-lookyloo">{{ lookyloo_logo() }} <span data-text="{{ label }}"></span></button>
+</form>
+{% endmacro %}
+
+{#- Search a value in the captures Lookyloo already has (its search form, new tab). Nothing is captured. -#}
+{% macro lookyloo_search(lookyloo_url, observable) %}
+{% set fields = {'url': 'url', 'uri': 'url', 'link': 'url', 'hostname': 'url', 'domain': 'url', 'ip-dst': 'ip', 'ip-src': 'ip', 'ip': 'ip', 'sha512': 'ressource'} %}
+{% if lookyloo_url and observable.observable_type in fields %}
+<form class="pdr-lookyloo-search" method="post" action="{{ lookyloo_url.rstrip('/') }}/search" target="_blank" rel="noopener noreferrer">
+  <input type="hidden" name="{{ fields[observable.observable_type] }}" value="{{ observable.value }}">
+  <button type="submit" class="btn btn-sm btn-secondary mt-1 pdr-lookyloo">{{ lookyloo_logo() }} Search in Lookyloo</button>
+</form>
+{% endif %}
+{% endmacro %}

@@ -3,7 +3,7 @@
 {% call module_result(worker_name, worker_meta, report, status) %}
   {{ report_details(report.details) }}
   {% if report.extras and report.extras.get('no_password') %}
-  <div class="pdr-rescan">
+  <div class="pdr-rescan" data-pdr-needs-password>
     <p class="mb-2">{{ render_icon('key') }} The sample is encrypted and the password is unknown. Try again with another one:</p>
     {# #password is read by analysis.rescan() #}
     <div class="d-flex flex-wrap gap-2">

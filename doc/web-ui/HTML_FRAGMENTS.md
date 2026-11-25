@@ -16,5 +16,3 @@ Also worth knowing:
 
 - `POST /task-action/<task_id>/refresh` (JSON) drives the live updates; the page then calls 1–4 above to get the HTML.
   If 1–4 became JSON, `refresh` could return everything in one call.
-- When there is no preview, `analysis.js` writes a fixed English sentence ("Cannot generate a preview for this file
-  format.") into `#previews_images`.

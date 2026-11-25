@@ -42,9 +42,12 @@ For an email, what matters is:
 | Preview first, verdict lower | Done: file header → pages → analysis result |
 | Read the content without opening the file | Done: pages at reading size, "Read the file here" guidance |
 | Download the image / the text | Done: "Download the pages (images, ZIP)", "Download the text" |
-| Copy text from the preview | Partly: the "Text (copy-paste)" tab; the page images themselves are not selectable |
-| No preview → clear "do not open, talk to someone" message | To do |
+| Copy text from the preview | Partly: "Text preview" block with "Copy all the text"; the page images themselves are not selectable |
+| No preview → clear "do not open, talk to someone" message | Done |
 | Email: body readable | Done |
-| Email: links, send to Lookyloo on demand | Partly: "Links & indicators" tab has "Capture with Lookyloo"; not shown next to the body |
+| Email: links, send to Lookyloo on demand | Done: note above the body with the number of links, "Open it safely in Lookyloo" on each link, for everyone who can read the report |
+| Email: all links at once, search a hostname / IP / URL in Lookyloo | Done: "Open the N links in Lookyloo" and "Search in Lookyloo", new tab, on click only |
+| HTML file → Lookyloo on demand | Done: button above the pages |
+| HTML body of an email → Lookyloo | To do (backend): the Lookyloo module only accepts HTML files |
 | Email: sender information | Partly: From / To / Subject / Hops / SPF with a "headers can be forged" warning; no clearer summary |
-| Email: attachments next to the body | To do: only in the "Attachments & embedded files" tab |
+| Email: attachments next to the body | To do: only in the "Extracted" tab |
