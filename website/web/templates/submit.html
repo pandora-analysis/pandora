@@ -39,22 +39,6 @@
     {% call notice('warn', t.be_careful) %}{{ special_disclaimer }}{% endcall %}
   {% endif %}
 
-  {# ---------- How it works ---------- #}
-  <ol class="pdr-steps" aria-label="{{ t.how_it_works }}">
-    <li>
-      <span class="pdr-step-icon">{{ render_icon('cloud-arrow-up', size='1.6rem') }}</span>
-      <div><strong>{{ t.step1_title }}</strong><span>{{ t.step1_text }}</span></div>
-    </li>
-    <li>
-      <span class="pdr-step-icon">{{ render_icon('box-seam', size='1.6rem') }}</span>
-      <div><strong>{{ t.step2_title }}</strong><span>{{ t.step2_text | replace('{n}', active_workers | length) }}</span></div>
-    </li>
-    <li>
-      <span class="pdr-step-icon">{{ render_icon('shield-check', size='1.6rem') }}</span>
-      <div><strong>{{ t.step3_title }}</strong><span>{{ t.step3_text }}</span></div>
-    </li>
-  </ol>
-
   {# ---------- Upload ---------- #}
   <section class="pdr-card" aria-labelledby="upload-title">
     <header class="pdr-card-header">
@@ -131,6 +115,22 @@
     {# Keep the selector used by submit.js: no module list means nothing is disabled. #}
     <div id="workers-selection" class="d-none"></div>
   {% endif %}
+
+  {# ---------- How it works ---------- #}
+  <ol class="pdr-steps" aria-label="{{ t.how_it_works }}">
+    <li>
+      <span class="pdr-step-icon">{{ render_icon('cloud-arrow-up', size='1.6rem') }}</span>
+      <div><strong>{{ t.step1_title }}</strong><span>{{ t.step1_text }}</span></div>
+    </li>
+    <li>
+      <span class="pdr-step-icon">{{ render_icon('box-seam', size='1.6rem') }}</span>
+      <div><strong>{{ t.step2_title }}</strong><span>{{ t.step2_text | replace('{n}', active_workers | length) }}</span></div>
+    </li>
+    <li>
+      <span class="pdr-step-icon">{{ render_icon('shield-check', size='1.6rem') }}</span>
+      <div><strong>{{ t.step3_title }}</strong><span>{{ t.step3_text }}</span></div>
+    </li>
+  </ol>
 
   {# ---------- Disclaimer ---------- #}
   <details class="pdr-disclaimer">
