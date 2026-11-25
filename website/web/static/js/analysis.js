@@ -100,6 +100,26 @@ Analysis.prototype.refreshStatus = function () {
     }
 };
 
+// Short result at the top of the page. A locked file is never shown as "nothing dangerous": Pandora did not see its content.
+Analysis.prototype.refreshResultLink = function () {
+    const box = document.getElementById("resultLinks");
+    if (!box || !this.task) { return; }
+    const hidden = this.needsPassword && !["WARN", "ALERT", "OVERWRITE"].includes(this.task.status);
+    const shown = hidden ? "LOCKED" : this.task.status;
+    box.querySelectorAll("[data-status]").forEach((b) => { b.classList.toggle("d-none", b.dataset.status !== shown); });
+};
+
+document.addEventListener("click", (event) => {
+    if (!event.target.closest(".pdr-result-link")) { return; }
+    const title = document.getElementById("analysis-result-title"), verdict = document.querySelector(".pdr-verdict");
+    title.focus({preventScroll: true});
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    title.scrollIntoView({behavior: calm ? "auto" : "smooth", block: "start"});
+    verdict.classList.remove("is-pointed");
+    void verdict.offsetWidth;                                           // restart the flash
+    verdict.classList.add("is-pointed");
+});
+
 // Progress panel (#analysisProgress): "running, X of N modules finished" or "finished", from workers_status
 // ({module: [done, status]}) sent by the refresh API. Texts come from data-text-* (page language).
 Analysis.prototype.refreshProgress = function () {
@@ -149,6 +169,7 @@ Analysis.prototype.refreshNoPreview = function () {
             title.textContent = title.dataset.text.replace("{n}", this.number_extracted);
         }
     }
+    this.refreshResultLink();
     show("passwordNeeded", locked);
     show("passwordWrong", locked && passwordTried(this.task.uuid));
     show("hasExtracted", extracted);
@@ -317,6 +338,7 @@ Analysis.prototype.refreshHTML = function () {
         $(".pdr-results-none").removeClass("d-none");
     }
     this.refreshStatus();
+    this.refreshResultLink();
     this.refreshProgress();
     this.refreshReports();
     this.refreshTabs();

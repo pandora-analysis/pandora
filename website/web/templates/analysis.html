@@ -71,6 +71,22 @@
 
     <!-- ===================== File header: what this page is about (the verdict comes further down) ===================== -->
     <section class="pdr-file-header" aria-labelledby="verdict-title">
+        {# Short result: an icon, a click scrolls to the full result. One per status, switched by analysis.js. #}
+        <div class="pdr-result-links" id="resultLinks">
+          {% macro result_link(name, color, label, hidden) %}
+          <button type="button" class="pdr-result-link pdr-status--{{ color }} {% if hidden %}d-none{% endif %}" data-status="{{ name }}" aria-label="{{ label }}. {{ t.result_details }}">
+            {{ caller() }}
+            <span class="pdr-result-tip" aria-hidden="true"><strong>{{ label }}</strong>{{ t.result_details }} {{ render_icon('arrow-down') }}</span>
+          </button>
+          {% endmacro %}
+          {% for s in status %}
+          {% set info = STATUS_INFO.get(s.name, ('neutral', 'question-circle', s.name|capitalize, '')) %}
+          {% call result_link(s.name, info[0], t.result_short.get(s.name, info[2]), s != task.status) %}
+            {%- if s == status.ALERT %}<img src="{{ url_for('static', filename='images/skull.svg') }}" width="26" height="26" alt="">{% else %}{{ render_icon(info[1], size='1.5rem') }}{% endif -%}
+          {% endcall %}
+          {% endfor %}
+          {% call result_link('LOCKED', 'warn', t.result_locked, True) %}{{ render_icon('lock-fill', size='1.5rem') }}{% endcall %}
+        </div>
       <div class="pdr-file-header-main">
         <h1 class="pdr-verdict-file" id="verdict-title">
           {{ render_icon(task.file.icon) }}{{ copy_inline(task.file.original_filename) }}
@@ -440,7 +456,7 @@
     {% endif %}
 
     <!-- ===================== Analysis result: verdict, modules, file details ===================== -->
-    <h2 class="pdr-section-title" id="analysis-result-title">{{ render_icon('shield-check') }} {{ t.analysis_result }}</h2>
+    <h2 class="pdr-section-title" id="analysis-result-title" tabindex="-1">{{ render_icon('shield-check') }} {{ t.analysis_result }}</h2>
     <section class="pdr-verdict" aria-labelledby="analysis-result-title">
       <div class="pdr-verdict-flags" id="taskStatus">
         {% for s in status %}

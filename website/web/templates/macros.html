@@ -187,8 +187,8 @@
 </header>
 {% endmacro %}
 
-{#- The Lookyloo logo (black drawing: inverted on dark backgrounds by theme.css). -#}
-{% macro lookyloo_logo() %}<img class="pdr-lookyloo-logo" src="{{ url_for('static', filename='images/lookyloo.png') }}" alt="Lookyloo" width="54" height="24"
+{#- The eyes of the Lookyloo logo (black drawing: inverted on dark backgrounds by theme.css). -#}
+{% macro lookyloo_logo() %}<img class="pdr-lookyloo-logo" src="{{ url_for('static', filename='images/lookyloo.png') }}" alt="" width="30" height="15"
   integrity="{{ get_sri('static/images', 'lookyloo.png') }}" crossorigin="anonymous">{% endmacro %}
 
 {#- All the links of the file in Lookyloo's "multiple captures" page (new tab, on click only). analysis.js fills the links

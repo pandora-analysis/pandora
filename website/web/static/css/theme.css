@@ -1280,7 +1280,7 @@ tr[data-pdr-row] .pdr-full-id { cursor: text; }
 /* Lookyloo: logo on its buttons, and the note above the pages when the file contains links */
 .pdr-lookyloo { display: inline-flex; align-items: center; gap: .5rem; }
 .pdr-lookyloo[hidden] { display: none; }
-.pdr-lookyloo-logo { width: 54px; height: 24px; object-fit: contain; }
+.pdr-lookyloo-logo { width: 30px; height: 15px; object-fit: contain; }
 .btn-primary .pdr-lookyloo-logo, html[data-theme="dark"] .pdr-lookyloo-logo { filter: invert(1); }
 .pdr-lookyloo-hint {
   display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; padding: .7rem 1rem; margin-bottom: 1rem;
@@ -1323,3 +1323,22 @@ html[data-theme="dark"] .pdr-locked-wrong { color: #ff9a9f; }
   .pdr-header .navbar-collapse { max-height: calc(100vh - 80px); overflow-y: auto; }
   .pdr-help .dropdown-menu { position: static !important; transform: none !important; width: 100%; }
 }
+
+/* Short result in the file header: an icon, a click scrolls to the analysis result */
+.pdr-result-link {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; padding: 0;
+  border: 0; border-radius: var(--pdr-radius-sm); background: var(--pdr-s-bg); color: var(--pdr-s-fg); cursor: pointer;
+}
+.pdr-result-link:hover { filter: brightness(1.08); }
+.pdr-result-tip {
+  position: absolute; top: calc(100% + 8px); left: 0; z-index: 20; padding: .4rem .7rem; white-space: nowrap;
+  border-radius: 5px; background: #23313a; color: #fff; font-size: .85rem; visibility: hidden; opacity: 0; transition: opacity .15s; pointer-events: none;
+}
+.pdr-result-tip strong { display: block; }
+.pdr-result-link:hover .pdr-result-tip, .pdr-result-link:focus-visible .pdr-result-tip { visibility: visible; opacity: 1; }
+.pdr-result-links { flex: 0 0 auto; }
+.pdr-file-header:has(.pdr-result-links) .pdr-file-header-main { flex-basis: 0; }
+@media (max-width: 767.98px) { .pdr-file-header:has(.pdr-result-links) .pdr-file-header-main { flex-basis: calc(100% - 80px); } }
+#analysis-result-title { scroll-margin-top: 90px; outline: none; }
+.pdr-verdict.is-pointed { animation: pdr-verdict-flash 1.6s ease-out .5s; }
+@keyframes pdr-verdict-flash { 0%, 60% { box-shadow: 0 0 0 4px var(--pdr-focus, #e4a526); } 100% { box-shadow: 0 0 0 4px transparent; } }
