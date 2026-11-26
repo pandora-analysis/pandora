@@ -36,31 +36,32 @@ a, *[onclick], *[title] {
 }
 
 .status-flag-overwrite {
-  background-color:#808080 !important;
+  background-color:var(--pdr-status-overwrite, #808080) !important;
 }
 
 .status-flag-error {
-  background-color:#000000 !important;
+  background-color:var(--pdr-status-error, #000000) !important;
 }
 
 .status-flag-alert {
-  background-color:#c9302c !important;
+  background-color:var(--pdr-status-alert, #c9302c) !important;
 }
 
 .status-flag-warn {
-  background-color:#ec971f !important;
+  background-color:var(--pdr-status-warn, #ec971f) !important;
+  color:var(--pdr-status-warn-text, white) !important;
 }
 
 .status-flag-clean {
-  background-color:#449d44 !important;
+  background-color:var(--pdr-status-clean, #449d44) !important;
 }
 
 .status-flag-running {
-  background-color:#5bc0de !important;
+  background-color:var(--pdr-status-running, #5bc0de) !important;
 }
 
 .status-flag-waiting {
-  background-color:#5bc0de !important;
+  background-color:var(--pdr-status-running, #5bc0de) !important;
 }
 
 .alert-error {
@@ -82,14 +83,15 @@ a, *[onclick], *[title] {
 }
 
 #dropzone{
-    background-color:#eee;
+    background-color:var(--pdr-surface, #eee);
+    color:var(--pdr-text-muted, inherit);
     height:300px;
     margin-bottom: 20px;
     align-items: center;
     display: flex;
     justify-content: center;
-    border-radius: 5px;
-    border: 2px dashed;
+    border-radius: var(--pdr-radius, 5px);
+    border: 2px dashed var(--pdr-border-strong, currentColor);
 }
 
 /* Bootstrap 5 tweak: do not underline links unless hovered over */
@@ -98,4 +100,10 @@ a:not([class*="btn"]) {
 }
 a:not([class*="btn"]):hover {
     text-decoration: underline;
+}
+
+/* Centered titles (drop zone, headings in centered blocks) don't take the red section bar */
+#dropzone h2, .text-center h2 {
+    border-left: 0;
+    padding-left: 0;
 }

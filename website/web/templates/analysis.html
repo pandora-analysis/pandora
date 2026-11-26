@@ -1,11 +1,21 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_icon %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% from "macros.html" import display_task_status %}
+{% from "macros.html" import display_task_status, notice, skeleton, full_id, copy_inline, lookyloo_logo, lookyloo_all, STATUS_INFO %}
+{% from "_i18n.html" import I18N %}
+{# Text: English from _i18n.html, overlaid by `ui_text` when a translated wrapper (analysis_fr.html) extends this page. #}
+{% set t = I18N['en'].copy() %}{% if ui_text is defined %}{% set _ = t.update(ui_text) %}{% endif %}
 
-{% block title %}
-    Pandora - Analysis of {{ task.file.original_filename }}
-{% endblock %}
+{#
+  Analysis page. Updated live by static/js/analysis.js every second: keep these ids / classes.
+  - #errorJS / #errorJSInner, #taskStatusAlert .alert (#alertDeleted, #alertPending, #alertFailed)
+  - #taskStatus .overall-status-flag.status-flag-<status>, #taskStatusMessage .alert-<kind>
+  - #workers_results_<status> : each module's result (worker template) is appended in the box of its status
+  - .preview-wait / .preview-done, #previews_images, #observables_tab / #number_observables / #observables_content,
+    #extracted_tab / #number_extracted / #extracted_content, modal form ids (#email, #message, #shareDays, ...)
+#}
+
+{% block title %}{{ t.analysis_page_title | replace('{name}', task.file.original_filename) }}{% endblock %}
 
 {% block scripts %}
   {{ super() }}
@@ -16,629 +26,573 @@
     var analysis = new Analysis("{{ csrf_token() }}");
 
     $(document).ready(function () {
-      analysis.refresher = setInterval(function() {
-        analysis.refresh("{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='refresh') }}");
-      }, 1000);
+      const refreshURL = "{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='refresh') }}";
+      analysis.refresh(refreshURL);   // once right away, so the page can be shown without waiting a full second
+      analysis.refresher = setInterval(function() { analysis.refresh(refreshURL); }, 1000);
     });
   </script>
 {% endblock %}
 
+{% block body_attrs %}data-pdr-wait="content"{% endblock %}
+
 {% block content %}
   {{ render_messages(container=True, dismissible=True) }}
-  <div class="container-fluid">
-    <!-- Eventual JS Error -->
-    <div class="row d-none" id="errorJS">
-      <div class="col-md-12">
-        <div class="alert alert-danger">
-          <span id="errorJSInner"></span>
-        </div>
+  <div class="container-xl pdr-analysis">
+
+    <!-- Error from the live refresh (filled by analysis.js) -->
+    <div class="d-none" id="errorJS">
+      <div class="alert alert-danger pdr-alert" role="alert">
+        {{ render_icon('bug-fill') }} <span id="errorJSInner"></span>
       </div>
     </div>
 
-    <!-- Status Alert -->
-    <div class="row" id="taskStatusAlert">
-      <div class="col-md-12">
-        <div class="alert alert-warning {% if not task.file.deleted %} d-none {% endif %}" id="alertDeleted" role="alert">
-          <strong>Deleted File! </strong> File and previews are no longer available. Only the stats are displayed.
-        </div>
-        <div class="alert alert-info {% if task.workers_done %} d-none {% endif %}" id="alertPending" role="alert">
-          <strong>Pending Task! </strong> Data will be available soon...
-        </div>
-        <div class="alert alert-error {% if task.status != 'ERROR' %} d-none {% endif %}" id="alertFailed" role="alert">
-          <strong>Failed Task! </strong> Oops, something really bad happened...
-        </div>
+    <!-- Task state (shown / hidden by analysis.js) -->
+    <div id="taskStatusAlert">
+      <div class="alert alert-warning pdr-alert {% if not task.file.deleted %}d-none{% endif %}" id="alertDeleted" role="alert">
+        {{ render_icon('trash') }} <strong>{{ t.deleted_title }}</strong> {{ t.deleted_text }}
+      </div>
+      <div class="alert alert-error pdr-alert {% if task.status != status.ERROR %}d-none{% endif %}" id="alertFailed" role="alert">
+        {{ render_icon('x-octagon-fill') }} <strong>{{ t.failed_title }}</strong> {{ t.failed_text }}
       </div>
     </div>
 
-    <div class="row">
-      <!-- Overall column -->
-      <div class="col-md-6">
-        <!-- Overall header -->
-        <div class="row">
-          <div class="col-sm-6">
-            <div id="overall-label"><h1>Overall Result<br/></h1></div>
-          </div>
-          {% if current_user.role.can('share_analysis') %}
-          <div class="col-sm-4">
-            <button type="button" class="btn btn-secondary" style="margin:5px"
-                  data-bs-toggle="modal" data-bs-target="#shareModal">
-              Share analysis
-            </button>
-          </div>
-          {% endif %}
+    <nav class="pdr-breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="{{ url_for('api_root') }}">{{ render_icon('house-door', size='0.95em') }} {{ t.home }}</a></li>
+        {% if current_user.role.can([action.list_all_tasks, action.list_own_tasks], 'or') %}
+        <li><a href="{{ url_for('api_tasks') }}">{{ t.recent }}</a></li>
+        {% endif %}
+        {% if task.parent %}
+        <li title="{{ task.parent.file.original_filename }}"><a href="{{ url_for('api_analysis', task_id=task.parent.uuid, seed=seed) }}">{{ task.parent.file.original_filename }}</a></li>
+        {% endif %}
+        <li aria-current="page" title="{{ task.file.original_filename }}">{{ task.file.original_filename }}</li>
+      </ol>
+    </nav>
 
-          {% if current_user.role.can(['rescan_file', 'notify_cert', 'delete_file'], 'or') %}
-          <div class="col-sm-2">
-            <div class="dropdown" style="margin:5px">
-              <button class="btn btn-secondary dropdown-toggle" type="button"
-                      id="dropdownMenuActions" data-bs-toggle="dropdown"
-                      aria-haspopup="true" aria-expanded="true">
-                Actions ... <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="dropdownMenuActions">
-              {% if current_user.role.can('rescan_file') and not task.file.deleted %}
-                <li>
-                  <a class="dropdown-item" href="#" onclick="javascript:analysis.rescan($(this).attr('data-url'))"
-                     data-url="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='rescan') }}">
-                    Rescan file
-                  </a>
-                </li>
-              {% endif %}
-              {% if current_user.role.can('notify_cert') %}
-                <li>
-                  <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#notifyModal">
-                      Alert {{admin_name}}
-                  </a>
-                </li>
-              {% endif %}
-              {% if current_user.role.can('delete_file') and not task.file.deleted %}
-                  <li id="deleteButton">
-                    <a class="dropdown-item" href="#" onclick="javascript:analysis.deleteFile($(this).attr('data-url'))"
-                       data-url="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='delete') }}">
-                      Delete file
-                    </a>
-                  </li>
-              {% endif %}
-              {% if current_user.role.can('submit_to_misp') and not task.file.deleted %}
-                  <li id="submitMISPButton">
-                    <a class="dropdown-item"
-                       href="{{ url_for('task_misp_submit', task_id=task.uuid, seed=seed) }}"
-                       title="Submit to MISP">
-                      Submit to MISP
-                    </a>
-                  </li>
-              {% endif %}
-              </ul>
-            </div>
-          </div>
-          {% endif %}
-        </div>
-
-        <!-- Overall status -->
-        <div class="row" id="taskStatus">
-          <div class="col-md-1"></div>
+    <!-- ===================== File header: what this page is about (the verdict comes further down) ===================== -->
+    <section class="pdr-file-header" aria-labelledby="verdict-title">
+        {# Short result: an icon, a click scrolls to the full result. One per status, switched by analysis.js. #}
+        <div class="pdr-result-links" id="resultLinks">
+          {% macro result_link(name, color, label, hidden) %}
+          <button type="button" class="pdr-result-link pdr-status--{{ color }} {% if hidden %}d-none{% endif %}" data-status="{{ name }}" aria-label="{{ label }}. {{ t.result_details }}">
+            {{ caller() }}
+            <span class="pdr-result-tip" aria-hidden="true"><strong>{{ label }}</strong>{{ t.result_details }} {{ render_icon('arrow-down') }}</span>
+          </button>
+          {% endmacro %}
           {% for s in status %}
-          <div class="col-md-4 img-thumbnail overall-status-flag status-flag-{{ s.name|lower }}
-               {% if s != task.status %} d-none {% endif %}" id="taskStatusIcon">
-            {% if s != status.ALERT %}
-              {{ render_icon(status_icons[s]) }}
-            {% else %}
-              <img src="{{ url_for('static', filename='images/skull.svg') }}" width = "160" height = "160">
-            {% endif %}
-          </div>
+          {% set info = STATUS_INFO.get(s.name, ('neutral', 'question-circle', s.name|capitalize, '')) %}
+          {% call result_link(s.name, info[0], t.result_short.get(s.name, info[2]), s != task.status) %}
+            {%- if s == status.ALERT %}<img src="{{ url_for('static', filename='images/skull.svg') }}" width="26" height="26" alt="">{% else %}{{ render_icon(info[1], size='1.5rem') }}{% endif -%}
+          {% endcall %}
           {% endfor %}
-
-          <div class="col-md-6" id="taskStatusMessage">
-              <div class="alert alert-overwrite {% if task.status != status.OVERWRITE %}d-none{% endif %}">
-                {{ task_status_messages['overwrite'] | safe }}
-            </div>
-            <div class="alert alert-error {% if task.status != status.ERROR %}d-none{% endif %}">
-              {{ task_status_messages['error'] | safe }}
-            </div>
-            <div class="alert alert-danger {% if task.status != status.ALERT %}d-none{% endif %}">
-              {{ task_status_messages['danger'] | safe }}
-            </div>
-            <div class="alert alert-warning {% if task.status != status.WARN %}d-none{% endif %}">
-              {{ task_status_messages['warning'] | safe }}
-            </div>
-            <div class="alert alert-success {% if task.status != status.CLEAN %}d-none{% endif %}">
-              {{ task_status_messages['success'] | safe }}
-            </div>
-            <div class="alert alert-info {% if task.workers_done %} d-none {% endif %}">
-              {{ task_status_messages['info'] | safe }}
-            </div>
-          </div>
-          <div class="col-md-1"></div>
+          {% call result_link('LOCKED', 'warn', t.result_locked, True) %}{{ render_icon('lock-fill', size='1.5rem') }}{% endcall %}
         </div>
-
-        <!-- File details -->
-        <div class="row">
-          <div class="col-md-12">
-            <div>
-              <h3>File details</h3>
-            </div>
-
-            <table class="table table-hover table-bordered">
-              <tr>
-                <th style="width:30%">Name</th>
-                <td>{{ render_icon(task.file.icon) }}{{task.file.original_filename}}</td>
-              </tr>
-              <tr>
-                <th>Submission Date</th>
-                <td>{{ moment(task.save_date).format('lll') }}</td>
-              </tr>
-              {% if task.file.size is not none %}
-                <tr>
-                  <th>Size</th>
-                  <td>{{ sizeof_fmt(task.file.size) }}</td>
-                </tr>
-              {% endif %}
-              {% if task.parent %}
-                <tr>
-                  <th>Extracted from</th>
-                  <td>{{ render_icon(task.file.icon) }}{{ task.parent.file.original_filename }}
-                    <a href="{{ url_for('api_analysis', task_id=task.parent.uuid, seed=seed) }}">
-                        <span class="alert-link">See report</span>
-                    </a>
-                  </td>
-                </tr>
-              {% endif %}
-              {% if current_user.is_admin and task.password %}
-                <tr>
-                  <th>Password</th>
-                  <td>{{ task.password }}</td>
-                </tr>
-              {% endif %}
-              {% if task.file.type is not none %}
-                <tr>
-                  <th>Type</th>
-                  <td>{{ task.file.info }}</td>
-                </tr>
-              {% endif %}
-              {% if task.file.mime_type is not none %}
-                <tr>
-                  <th>MimeType</th>
-                  <td>{{ task.file.mime_type }}</td>
-                </tr>
-              {% endif %}
-              {% if task.file.encoding %}
-                <tr>
-                  <th>Encoding</th>
-                  <td>{{ task.file.encoding }}</td>
-                </tr>
-              {% endif %}
-              {% if task.file.md5 is not none %}
-                <tr>
-                  <th>MD5</th>
-                  <td>{{ task.file.md5 }}</td>
-                </tr>
-              {% endif %}
-              {% if task.file.sha1 is not none %}
-                <tr>
-                  <th>SHA-1</th>
-                  <td>{{ task.file.sha1 }}</td>
-                </tr>
-              {% endif %}
-              {% if task.file.sha256 is not none %}
-                <tr>
-                  <th>SHA-256</th>
-                  <td style="font-size:smaller">{{ task.file.sha256 }}</td>
-                </tr>
-              {% endif %}
-            </table>
-          </div>
-          {% if current_user.detailed_view %}
-          <div id="workers_results_overwrite"></div>
-          <div id="workers_results_alert"></div>
-          <div id="workers_results_warn"></div>
-          <div id="workers_results_clean"></div>
-          <div id="workers_results_unknown"></div>
-          <div id="workers_results_manual"></div>
-          <div id="workers_results_error"></div>
-          <div hidden id="workers_results_notapplicable"></div>
-          <div hidden id="workers_results_disabled"></div>
-          {%else%}
-          <div class="md-3" onclick="toggle_detailed_view()">
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" value=""
-                     id="detailedView" {% if current_user.detailed_view %}checked{% endif %}>
-              <label class="form-check-label" for="detailedView">
-                Show details
-              </label>
-            </div>
-          </div>
-          {% endif %}
-        </div>
+      <div class="pdr-file-header-main">
+        <h1 class="pdr-verdict-file" id="verdict-title">
+          {{ render_icon(task.file.icon) }}{{ copy_inline(task.file.original_filename) }}
+        </h1>
+        <p class="pdr-verdict-meta">
+          <span class="pdr-task-id">{{ t.task }} {{ copy_inline(task.uuid) }}</span> ·
+          {{ t.submitted_ago }} {{ moment(task.save_date).fromNow() }}
+          {% if task.file.size is not none %} · {{ sizeof_fmt(task.file.size) }}{% endif %}
+          {% if task.file.type is not none %} · {{ task.file.info }}{% endif %}
+        </p>
       </div>
-
-      <!-- Tabs column -->
-      <div class="col-md-6">
-        <!-- Download button -->
-        {% if current_user.role.can([action.download_images, action.download_pdf, action.download_zip], 'or')
-              and not task.file.deleted %}
-        <div class="row">
-         <div class="col">
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" style="margin:5px;float:right;"
-                    id="dropdownMenu1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-              Download ... <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-              {% if current_user.role.can(action.download_pdf) and task.file.is_pdf %}
-              <!-- TODO: also allow PDF export from office docs, not implemented yet -->
-              <li><a class="dropdown-item"
-                     href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='pdf') }}"
-                     title="Download pdf">
-                  PDF File
-                </a>
-              </li>
-              {% endif %}
-
-              {% if current_user.role.can(action.download_images) and task.file.previews %}
-              <li><a class="dropdown-item"
-                     href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img') }}"
-                     title="Download images">
-                  Images
-                </a>
-              </li>
-              {% endif %}
-              {% if current_user.role.can(action.download_text) and task.file.text %}
-              <li><a class="dropdown-item"
-                     href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt') }}"
-                     title="Download text">
-                  Text
-                </a>
-              </li>
-              {% endif %}
-
-              {% if current_user.role.can('download_zip') %}
-              <li role="separator" class="divider"></li>
-              <li><a class="dropdown-item"
-                   href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='zip') }}"
-                   title="Download protected zip file containing sample (password is {{ zip_pass }})">
-                 Original sample (password: "{{ zip_passwd }}")
-                </a>
-              </li>
-              {% endif %}
-
-              {% if current_user.role.can('download_misp') %}
-              <li role="separator" class="divider"></li>
-              <li><a class="dropdown-item"
-                   href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='misp') }}"
-                   title="Download the analysis in MISP format">
-                 Download the analysis in MISP format
-                </a>
-              </li>
-              {% endif %}
-            </ul>
-          </div>
-         </div>
-        </div>
-        </br>
+      <div class="pdr-verdict-actions">
+        {% if current_user.role.can('share_analysis') %}
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
+          {{ render_icon('share') }} {{ t.share }}
+        </button>
         {% endif %}
 
-        <div class="row">
-          <!-- Nav tabs -->
-          <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="nav-item">
-              <button class="nav-link active link-dark"
-                      data-bs-toggle="tab"
-                      data-bs-target="#content-preview"
-                      type="button" role="tab"
-                      aria-controls="content-preview" aria-selected="true">Content preview</button>
-            </li>
-            {% if current_user.role.can(action.see_text_preview) %}
-            <li role="presentation" class="nav-item {% if not task.file.text %} d-none {% endif %}">
-              <button class="nav-link link-dark"
-                      data-bs-toggle="tab"
-                      data-bs-target="#text-preview-content"
-                      type="button" role="tab"
-                      aria-controls="text-preview-content" aria-selected=false">Text Preview</button>
-            </li>
+        {% if current_user.role.can([action.download_images, action.download_pdf, action.download_zip], 'or')
+              and not task.file.deleted %}
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu1"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+            {{ render_icon('download') }} {{ t.download }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu1">
+            {% if current_user.role.can(action.download_pdf) and task.file.is_pdf %}
+            <!-- TODO: also allow PDF export from office docs, not implemented yet -->
+            <li><a class="dropdown-item" href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='pdf') }}">
+              {{ render_icon('file-earmark-pdf') }} {{ t.dl_pdf }}</a></li>
             {% endif %}
-            {% if current_user.role.can(action.download_text) %}
-            <li role="presentation" class="nav-item {% if not task.file.text %} d-none {% endif %}">
-              <button class="nav-link link-dark"
-                      data-bs-toggle="tab"
-                      data-bs-target="#text-content"
-                      type="button" role="tab"
-                      aria-controls="text-content" aria-selected=false">Text content</button>
-            </li>
+            {% if current_user.role.can(action.download_images) and task.file.previews %}
+            <li><a class="dropdown-item" href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img') }}">
+              {{ render_icon('images') }} {{ t.dl_images }}</a></li>
             {% endif %}
-            <li role="presentation" class="nav-item {% if not task.file.metadata%} d-none {% endif %}">
-              <button class="nav-link link-dark"
-                      data-bs-toggle="tab"
-                      data-bs-target="#metadata"
-                      type="button" role="tab"
-                      aria-controls="metadata" aria-selected=false">Metadata</button>
-            </li>
-            <li role="presentation" class="nav-item {% if not task.observables %} d-none {% endif %}" id="observables_tab">
-              <button class="nav-link link-dark"
-                      data-bs-toggle="tab"
-                      data-bs-target="#observables_list"
-                      type="button" role="tab"
-                      aria-controls="observables" aria-selected=false">
-                  Observables&nbsp;&nbsp;<span class="badge bg-secondary" id="number_observables">{{ task.observables|length }}</span>
-              </button>
-            </li>
-            <li role="presentation" class="nav-item {% if not task.extracted %} d-none {% endif %}" id="extracted_tab">
-              <button class="nav-link link-dark"
-                      data-bs-toggle="tab"
-                      data-bs-target="#extracted"
-                      type="button" role="tab"
-                      aria-controls="extracted" aria-selected=false">
-                  Extracted&nbsp;&nbsp;<span class="badge bg-secondary" id="number_extracted">{{ task.extracted|length }}</span>
-              </button>
-            </li>
-            <li role="presentation" class="nav-item {% if not task.linked_tasks %} d-none {% endif %}">
-              <button class="nav-link link-dark"
-                      data-bs-toggle="tab"
-                      data-bs-target="#history"
-                      type="button" role="tab"
-                      aria-controls="history" aria-selected=false">
-                History&nbsp;&nbsp;<span class="badge">{{ task.linked_tasks|length }}</span>
-              </button>
-            </li>
+            {% if current_user.role.can(action.download_text) and task.file.text %}
+            <li><a class="dropdown-item" href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt') }}">
+              {{ render_icon('file-earmark-text') }} {{ t.dl_text }}</a></li>
+            {% endif %}
+            {% if current_user.role.can('download_zip') %}
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='zip') }}"
+                   title="{{ t.dl_zip_title }}">
+              {{ render_icon('file-earmark-zip') }} {{ t.dl_zip | replace('{pw}', '<code>' ~ (zip_passwd | e) ~ '</code>') | safe }}</a></li>
+            {% endif %}
+            {% if current_user.role.can('download_misp') %}
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='misp') }}">
+              {{ render_icon('box-arrow-up-right') }} {{ t.dl_misp }}</a></li>
+            {% endif %}
           </ul>
+        </div>
+        {% endif %}
 
-          <!-- Tab panels -->
-          <div class="row" style="margin-bottom:30px">
-           <div class="tab-content">
+        {% if current_user.role.can(['rescan_file', 'notify_cert', 'delete_file', 'submit_to_misp'], 'or') %}
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuActions"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+            {{ render_icon('three-dots') }} {{ t.actions }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuActions">
+            {% if current_user.role.can('rescan_file') and not task.file.deleted %}
+            <li><a class="dropdown-item" href="#" onclick="javascript:analysis.rescan($(this).attr('data-url'))"
+                   data-url="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='rescan') }}">
+              {{ render_icon('arrow-repeat') }} {{ t.rescan }}</a></li>
+            {% endif %}
+            {% if current_user.role.can('notify_cert') %}
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#notifyModal">
+              {{ render_icon('envelope-exclamation') }} {{ t.alert_admin | replace('{name}', admin_name) }}</a></li>
+            {% endif %}
+            {% if current_user.role.can('submit_to_misp') and not task.file.deleted %}
+            <li id="submitMISPButton"><a class="dropdown-item" href="{{ url_for('task_misp_submit', task_id=task.uuid, seed=seed) }}">
+              {{ render_icon('send') }} {{ t.submit_misp }}</a></li>
+            {% endif %}
+            {% if current_user.role.can('delete_file') and not task.file.deleted %}
+            <li><hr class="dropdown-divider"></li>
+            <li id="deleteButton"><a class="dropdown-item text-danger" href="#" onclick="javascript:analysis.deleteFile($(this).attr('data-url'))"
+                   data-url="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='delete') }}">
+              {{ render_icon('trash') }} {{ t.delete_file }}</a></li>
+            {% endif %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+    </section>
 
-            <!-- Content preview -->
-            <div role="tabpanel" class="tab-pane show active" id="content-preview">
-                <div class="col-md-8">
-                  <h3>Content Preview</h3>
-                </div>
+    <!-- ===================== Progress: running or finished (updated live by analysis.js) ===================== -->
+    {% set ws = task.workers_status %}
+    {% set ws_total = ws | length %}
+    {% set ws_done = ws.values() | selectattr(0) | list | length %}
+    {% set ws_pending = [] %}{% for name, st in ws.items() %}{% if not st[0] %}{% set _ = ws_pending.append(name) %}{% endif %}{% endfor %}
+    <section class="pdr-progress {% if task.workers_done %}is-done{% endif %}" id="analysisProgress" role="status" aria-live="polite"
+             data-text-running="{{ t.progress_running }}" data-text-done="{{ t.progress_done }}">
+      <span class="pdr-progress-icon pdr-progress-icon-running"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span></span>
+      <span class="pdr-progress-icon pdr-progress-icon-done">{{ render_icon('check-circle-fill', size='1.25rem') }}</span>
+      <div class="pdr-progress-body">
+        <div class="pdr-progress-head">
+          <strong id="progressTitle">{{ (t.progress_done if task.workers_done else t.progress_running)
+                                         | replace('{done}', ws_done) | replace('{total}', ws_total) }}</strong>
+          <span class="pdr-progress-count" id="progressCount">{{ ws_done }} / {{ ws_total }}</span>
+        </div>
+        <div class="progress" role="progressbar" aria-label="{{ t.module_results }}" aria-valuemin="0" aria-valuemax="{{ ws_total }}" aria-valuenow="{{ ws_done }}" id="progressBarOuter">
+          <div class="progress-bar" id="progressBar" style="width: {{ (100 if task.workers_done or not ws_total else (ws_done * 100 / ws_total)) | round | int }}%"></div>
+        </div>
+        {# One line, always present (no jump when the analysis ends): what is still running, or that everything is below #}
+        <p class="pdr-progress-pending" id="progressPending">
+          <span id="progressPendingRunning" class="{% if task.workers_done or not ws_pending %}d-none{% endif %}">{{ t.progress_still }}
+            <span id="progressPendingList" class="pdr-mono">{{ ws_pending | join(', ') }}</span></span>
+          <span id="progressPendingDone" class="{% if not (task.workers_done or not ws_pending) %}d-none{% endif %}">{{ t.progress_all_below }}</span>
+        </p>
+      </div>
+    </section>
 
-              <!-- Content preview -->
-              <div class="row">
-                <div class="col-md-12" style="margin-bottom:50px">
-                  <!-- Emails -->
-                  {% if email_preview %}
-                  <p class="lead">The information below are extracted from the email,
-                      the fields shouldn't be trusted as they can have been
-                      tampered with by the sender</p>
-                  <table class="table table-hover table-bordered"
-                         id="emailContent">
-                    <tr>
-                      <th style="width:20%">Date</th>
-                      <td id="email-date">
-                          {{email_preview.date}}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>From</th>
-                      <td id="email-from">
-                          {{ email_preview.sender }}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>To</th>
-                      <td id="email-to">
-                        {% for r in email_preview.recipients %}
-                          {{r}}</br>
-                        {%endfor%}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Subject</th>
-                      <td id="email-subject">
-                          {{email_preview.subject}}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Hops</th>
-                      <td id="email-hops">
-                      {% for received in email_preview.received %}
-                         {{ received }} </br>
-                      {% endfor %}
-                      </td>
-                    </tr>
-                    <tr>
-                        <th>Received SPF</th>
-                      <td id="received-spf">
-                          {{email_preview.received_spf}}
-                      </td>
-                    </tr>
-                    {% if current_user.role.can(action.download_images) %}
-                    <tr id="email-body">
-                      <th>Body</th>
-                      <td>
-                        <div class="row preview-done {% if not task.file.previews|length %} d-none {%endif%}" id="previews_images">
-                          {% include 'previews.html' %}
-                        </div>
-                        <div class="row preview-wait {% if task.file.previews|length %} d-none {%endif%}">
-                          <div class="img-thumbnail small-status-flag status-flag-error">Content preview is not available</div>
-                        </div>
-                      </td>
-                    </tr>
-                    {% endif %}
-                  </table>
+    <!-- ===================== Preview: the important part, full width ===================== -->
+    <section class="pdr-card pdr-tabs-card">
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="nav-item">
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#content-preview" type="button" role="tab"
+                  aria-controls="content-preview" aria-selected="true">{{ render_icon('eye') }} {{ t.tab_preview }}</button>
+        </li>
+        <li role="presentation" class="nav-item {% if not task.observables %}d-none{% endif %}" id="observables_tab">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#observables_list" type="button" role="tab"
+                  aria-controls="observables_list" aria-selected="false">
+            {{ render_icon('link-45deg') }} {{ t.tab_observables }} <span class="pdr-count" id="number_observables">{{ task.observables|length }}</span>
+          </button>
+        </li>
+        <li role="presentation" class="nav-item {% if not task.extracted %}d-none{% endif %}" id="extracted_tab">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#extracted" type="button" role="tab"
+                  aria-controls="extracted" aria-selected="false">
+            {{ render_icon('box-arrow-up') }} {{ t.tab_extracted }} <span class="pdr-count" id="number_extracted">{{ task.extracted|length }}</span>
+          </button>
+        </li>
+      </ul>
 
-                  <!-- Image preview -->
-                  {% elif current_user.role.can(action.download_images) %}
-                  <div class="row preview-done {% if not task.file.previews|length %} d-none {%endif%}" id="previews_images">
-                    {% include 'previews.html' %}
-                  </div>
-                  <div class="row preview-wait {% if task.file.previews|length %} d-none {%endif%}">
-                    <div class="img-thumbnail small-status-flag status-flag-error">Content preview is not available</div>
-                  </div>
-                  {% endif %}
-                  {% if task.file.is_html %}
-                    <div class="row">
-                    {% if 'lookyloo' in task.reports and 'permaurl' in task.reports['lookyloo'].details %}
-                      <a href="{{task.reports['lookyloo'].details['permaurl']}}" target="_blank" rel="noopener noreferrer">See capture on Lookyloo</a>
-                    {% elif 'lookyloo' in task.reports and task.reports['lookyloo'].status == status.MANUAL %}
-                      This document can probably be opened in a browser,
-                      you can submit it to lookyloo and see.
-                      Note that as it is sending the sample to a 3rd party service,
-                      the module needs to be triggered manually.
-                      <a href="{{url_for('manual_trigger_worker', task_id=task.uuid, seed=seed, worker_name='lookyloo')}}">
-                          Click here to do so.
-                      </a>
-                    {% endif %}
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
+      <div class="tab-content pdr-card-body">
+
+        <!-- Preview -->
+        <div role="tabpanel" class="tab-pane show active" id="content-preview">
+          {# The point of this page: get the content without opening the file #}
+          {% if not task.file.deleted %}
+          <div class="pdr-read-here">
+            <div class="pdr-read-here-text">
+              <strong>{{ render_icon('eye') }} {{ t.read_here_title }}</strong>
+              <span>{{ t.read_here_text }}</span>
             </div>
-
-            {% if current_user.role.can(action.see_text_preview) %}
-              {% if task.file.text %}
-              <!-- Text Preview -->
-              <div role="tabpanel" class="tab-pane" id="text-preview-content">
-                <div class="row" style="margin-bottom:30px">
-                  <div class="col-md-8">
-                    <h3>Text preview</h3>
-                  </div>
-                </div>
-
-                <div class="row preview-done {% if not task.file.previews|length %} d-none {%endif%}">
-                  <div>The text content can be huge, only display a part of it.</div>
-                  <div class="col-md-12">
-                    <div class="img-hover">
-                      <a href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt_preview') }}" target="_blank">
-                        <img class="img-thumbnail" width="70%" src="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt_preview') }}">
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                <div class="row preview-wait {% if task.file.previews|length %} d-none {%endif%}">
-                  <div>Creating preview, please wait...</div>
-                </div>
-              </div>
+            <div class="pdr-read-here-actions">
+              <button type="button" class="btn btn-sm btn-primary pdr-fullscreen-open" data-pdr-fullscreen="#previews_images">
+                {{ render_icon('arrows-fullscreen') }} {{ t.full_screen }}</button>
+              {% if current_user.role.can(action.download_images) and task.file.previews %}
+              <a class="btn btn-sm btn-secondary" href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='img') }}">
+                {{ render_icon('images') }} {{ t.dl_pages }}</a>
               {% endif %}
+              {% if current_user.role.can(action.download_text) and task.file.text %}
+              <a class="btn btn-sm btn-secondary" href="{{ url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt') }}">
+                {{ render_icon('file-earmark-text') }} {{ t.dl_text_only }}</a>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+          {% if not task.file.deleted %}
+          {# Shown by analysis.js when the Extractor asks for a password (its module result is only in the detailed view) #}
+          <div id="passwordNeeded" class="d-none">
+            {% call notice('warn', t.locked_title) %}
+              <p class="mb-2">{{ t.locked_text }}</p>
+              <p class="pdr-locked-wrong d-none" id="passwordWrong" role="alert">{{ render_icon('x-circle-fill') }} {{ t.locked_wrong }}</p>
+              {% if current_user.role.can('rescan_file') %}
+              <form class="pdr-locked-form" id="passwordForm" autocomplete="off"
+                    data-url="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='rescan') }}">
+                <label for="topPassword" class="visually-hidden">{{ t.locked_label }}</label>
+                <input class="form-control pdr-mono" id="topPassword" type="text" placeholder="{{ t.locked_label }}" autocomplete="off" spellcheck="false" autocapitalize="off" required>
+                <button type="submit" class="btn btn-primary">{{ render_icon('unlock') }} {{ t.locked_button }}</button>
+              </form>
+              {% endif %}
+              <p class="mb-0 mt-2">{{ t.locked_help | replace('{name}', admin_name) }}</p>
+            {% endcall %}
+          </div>
+          {# Archives: no pages of their own, but files inside #}
+          <div id="hasExtracted" class="d-none">
+            {% call notice('info', t.has_extracted_title) %}
+              {{ t.has_extracted_text }}
+              <div class="mt-2"><button type="button" class="btn btn-sm btn-primary" data-pdr-open-tab="#extracted">{{ render_icon('files') }} {{ t.has_extracted_see }}</button></div>
+            {% endcall %}
+          </div>
+          {% endif %}
+          {% if not task.file.deleted and current_user.role.can(action.download_images) %}
+          {# Shown by analysis.js once it is known that there is no page to show #}
+          {% set text_below = task.file.text and current_user.role.can(action.download_text) %}
+          <div id="noPreview" class="d-none">
+            {% call notice('warn' if text_below else 'error', t.no_preview_has_text_title if text_below else t.no_preview_title) %}
+              {{ (t.no_preview_has_text if text_below else t.no_preview_text) | replace('{name}', admin_name) }}
+              {% if current_user.role.can('notify_cert') %}
+              <div class="mt-2"><button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#notifyModal">
+                {{ render_icon('envelope-exclamation') }} {{ t.alert_admin | replace('{name}', admin_name) }}</button></div>
+              {% endif %}
+            {% endcall %}
+          </div>
+          {% endif %}
+          {% if task.file.is_html %}
+            <div class="mb-3">
+            {% if 'lookyloo' in task.reports and 'permaurl' in task.reports['lookyloo'].details %}
+              <a class="btn btn-secondary pdr-lookyloo" href="{{task.reports['lookyloo'].details['permaurl']}}" target="_blank" rel="noopener noreferrer">
+                {{ lookyloo_logo() }} {{ t.lookyloo_see }}</a>
+            {% elif 'lookyloo' in task.reports and task.reports['lookyloo'].status == status.MANUAL %}
+              {% call notice('info', t.lookyloo_title) %}
+                {{ t.lookyloo_text }}
+                <div class="mt-2"><a class="btn btn-sm btn-secondary pdr-lookyloo" href="{{url_for('manual_trigger_worker', task_id=task.uuid, seed=seed, worker_name='lookyloo')}}">
+                  {{ lookyloo_logo() }} {{ t.lookyloo_run }}</a></div>
+              {% endcall %}
+            {% endif %}
+            </div>
+          {% endif %}
+          {# Filled by analysis.js when the file contains links that can be sent to Lookyloo #}
+          <div id="lookylooLinks" class="pdr-lookyloo-hint d-none">
+            {{ lookyloo_logo() }}
+            <span data-text="{{ t.lookyloo_links }}"></span>
+            <button type="button" class="btn btn-sm btn-secondary" data-pdr-open-tab="#observables_list">{{ render_icon('link-45deg') }} {{ t.lookyloo_links_see }}</button>
+            {{ lookyloo_all(t.lookyloo_links_all) }}
+          </div>
+          {% if email_preview %}
+            {% call notice('warn', t.email_forged_title) %}
+              {{ t.email_forged_text }}
+            {% endcall %}
+            <dl class="pdr-kv" id="emailContent">
+              <dt>{{ t.email_date }}</dt><dd id="email-date">{{ email_preview.date }}</dd>
+              <dt>{{ t.email_from }}</dt><dd id="email-from">{% if email_preview.sender %}{{ copy_inline(email_preview.sender) }}{% else %}<span class="pdr-empty-value">—</span>{% endif %}</dd>
+              <dt>{{ t.email_to }}</dt>
+              <dd id="email-to" class="pdr-mono">
+                {% for r in email_preview.recipients %}<div>{{ copy_inline(r) }}</div>{% else %}<span class="pdr-empty-value">—</span>{% endfor %}
+              </dd>
+              <dt>{{ t.email_subject }}</dt><dd id="email-subject">{% if email_preview.subject %}{{ copy_inline(email_preview.subject, mono=False) }}{% else %}<span class="pdr-empty-value">—</span>{% endif %}</dd>
+              <dt>{{ t.email_hops }}</dt>
+              <dd id="email-hops" class="pdr-mono">
+                {% for received in email_preview.received %}{{ received }}<br>{% else %}<span class="pdr-empty-value">—</span>{% endfor %}
+              </dd>
+              <dt>{{ t.email_spf }}</dt>
+              <dd id="received-spf" class="pdr-mono">{% if email_preview.received_spf %}{{ email_preview.received_spf }}{% else %}<span class="pdr-empty-value">—</span>{% endif %}</dd>
+            </dl>
+            {% if current_user.role.can(action.download_images) %}
+            <h3 class="pdr-subtitle" id="email-body">{{ t.email_body }}</h3>
+            <div class="row preview-done {% if not task.file.previews|length %}d-none{% endif %}" id="previews_images">
+              {% include 'previews.html' %}
+            </div>
+            <div class="preview-wait {% if task.file.previews|length %}d-none{% endif %}">
+              {{ skeleton('previews', 3, t.generating_preview) }}
+            </div>
             {% endif %}
 
-            <!-- Text content -->
-            {% if current_user.role.can('download_text') and task.file.text %}
-            <div role="tabpanel" class="tab-pane" id="text-content">
-              <div class="row" style="margin-bottom:30px">
-                <div class="col-md-8">
-                  <h3>Text content</h3>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-12">
-                  <pre>{{task.file.text}}</pre>
-                </div>
-              </div>
+          {% elif current_user.role.can(action.download_images) %}
+            <div class="row preview-done {% if not task.file.previews|length %}d-none{% endif %}" id="previews_images">
+              {% include 'previews.html' %}
             </div>
-            {% endif %}
-
-            {% if task.file.metadata %}
-            <!-- File metadata -->
-            <div role="tabpanel" class="tab-pane" id="metadata">
-              <div class="row" style="margin-bottom:30px">
-                <div class="col-md-8">
-                  <h3>Metadata</h3>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-12" style="margin-bottom:50px">
-                  <table class="table table-hover table-bordered" >
-                  {% for key, value in task.file.metadata.items() %}
-                    <tr>
-                      <th style="width:30%">{{key}}</th>
-                      <td>{{value}}</td>
-                    </tr>
-                  {% endfor %}
-                  </table>
-                </div>
-              </div>
+            <div class="preview-wait {% if task.file.previews|length %}d-none{% endif %}">
+              {{ skeleton('previews', 3, t.generating_preview) }}
             </div>
-            {% endif %}
+          {% endif %}
 
-            <!-- Observables -->
-            <div role="tabpanel" class="tab-pane" id="observables_list">
-              <div id="observables_content"></div>
-            </div>
+        </div>
 
-            <!-- Extracted tasks -->
-            <div role="tabpanel" class="tab-pane" id="extracted">
-                <div id="extracted_content"></div>
-            </div>
+        <!-- Observables (filled by analysis.js, placeholder until then) -->
+        <div role="tabpanel" class="tab-pane" id="observables_list">
+          <div id="observables_content">{{ skeleton('rows', 6, t.loading_observables) }}</div>
+        </div>
 
-            <!-- Linked tasks -->
-            <div role="tabpanel" class="tab-pane {% if not task.linked_tasks%} d-none {% endif %}" id="history">
-              <div class="row" style="margin-bottom:30px">
-                <div class="col-md-8">
-                  <h3>History</h3>
-                </div>
-              </div>
+        <!-- Extracted files (filled by analysis.js) -->
+        <div role="tabpanel" class="tab-pane" id="extracted">
+          <div id="extracted_content">{{ skeleton('rows', 4, t.loading_extracted) }}</div>
+        </div>
 
-              <div class="row">
-                <table class="table table-hover table-bordered">
-                  <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Status</th>
-                  </tr>
-                  {% for linked_task in task.linked_tasks %}
-                  <tr class="{% if linked_task.uuid == task.uuid %}active{% endif %}" id="linkedTaskRow-{{ linked_task.uuid }}">
-                    <td>
-                      {{ moment(linked_task.save_date).format('L LT [UTC]Z') }}
-                    </td>
-                    <td>
-                      <a href="{{ url_for('api_analysis', task_id=linked_task.uuid) }}">
-                        {{ render_icon(task.file.icon) }}
-                        {{ linked_task.file.client_name }}
-                      </a>
-                    </td>
-                    <td>
-                      {{ display_task_status(task.status, status) }}
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </table>
+      </div>
+    </section>
+
+    <!-- ===================== Text, metadata: what else is known about the content ===================== -->
+    {# The text itself (copy-paste); people who may not get it only see the picture of its beginning. #}
+    {% set can_text = task.file.text and current_user.role.can(action.download_text) %}
+    {% set can_text_picture = task.file.text and not can_text and current_user.role.can(action.see_text_preview) %}
+    {% set has_text = can_text or can_text_picture %}
+    {% set has_meta = task.file.metadata | length > 0 if task.file.metadata else false %}
+    {% set has_history = task.linked_tasks | length > 0 if task.linked_tasks else false %}
+    {% if has_text or has_meta or has_history %}
+    <section class="pdr-card pdr-tabs-card pdr-tabs-more">
+      <ul class="nav nav-tabs" role="tablist">
+        {% if has_text %}
+        <li role="presentation" class="nav-item">
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#text-content" type="button" role="tab"
+                  aria-controls="text-content" aria-selected="true">{{ render_icon('file-earmark-text') }} {{ t.tab_text_preview }}</button>
+        </li>
+        {% endif %}
+        {% if has_meta %}
+        <li role="presentation" class="nav-item">
+          <button class="nav-link{% if not has_text %} active{% endif %}" data-bs-toggle="tab" data-bs-target="#metadata" type="button" role="tab"
+                  aria-controls="metadata" aria-selected="{{ 'true' if not has_text else 'false' }}">{{ render_icon('tags') }} {{ t.tab_metadata }}</button>
+        </li>
+        {% endif %}
+        {% if has_history %}
+        <li role="presentation" class="nav-item">
+          <button class="nav-link{% if not has_text and not has_meta %} active{% endif %}" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab"
+                  aria-controls="history" aria-selected="{{ 'true' if not has_text and not has_meta else 'false' }}">{{ render_icon('clock-history') }} {{ t.tab_history }} <span class="pdr-count">{{ task.linked_tasks | length }}</span></button>
+        </li>
+        {% endif %}
+      </ul>
+
+      <div class="tab-content pdr-card-body">
+        {% if has_text %}
+        <!-- Text -->
+        <div role="tabpanel" class="tab-pane show active" id="text-content">
+          {% if can_text %}
+          <div class="pdr-text-box">
+            <button type="button" class="btn btn-sm btn-secondary pdr-copy-all" data-copy-from="#pdr-text-all"
+                    title="{{ t.text_copy_all }}" aria-label="{{ t.text_copy_all }}">
+              {{ render_icon('copy') }} <span class="pdr-copy-all-word">{{ t.text_copy_all }}</span></button>
+            <pre class="pdr-text" id="pdr-text-all">{{ task.file.text }}</pre>
+            {# While there is more to scroll (ui.js): how much is left, and a click goes further down #}
+            <button type="button" class="pdr-text-next" data-text="{{ t.text_more_lines }}" hidden>{{ render_icon('chevron-down') }} <span></span></button>
+          </div>
+          {% else %}
+          <div class="preview-done {% if not task.file.previews|length %}d-none{% endif %}">
+            {# End of the scroll: "there is more" when the picture was cut (is-cut, set by ui.js), else "end" #}
+            <div class="pdr-text-preview" tabindex="0" role="region" aria-label="{{ t.tab_text_preview }}">
+              {% set txt_preview_url = url_for('api_task_download', task_id=task.uuid, seed=seed, source='txt_preview') %}
+              <a href="{{ txt_preview_url }}" target="_blank" rel="noopener"><img class="pdr-preview-img" alt="{{ t.text_image_alt }}" src="{{ txt_preview_url }}"></a>
+              <div class="pdr-text-end">
+                <span class="pdr-text-end-cut">{{ t.text_more }}</span>
+                <span class="pdr-text-end-full">{{ t.text_end }}</span>
+                <a class="btn btn-sm btn-secondary" href="{{ txt_preview_url }}" target="_blank" rel="noopener">
+                  {{ render_icon('box-arrow-up-right') }} {{ t.open_browser }}</a>
               </div>
             </div>
           </div>
-         </div>
+          <div class="preview-wait {% if task.file.previews|length %}d-none{% endif %}">
+            {{ skeleton('previews', 1, t.generating_text_preview) }}
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {% if has_meta %}
+        <!-- Metadata -->
+        <div role="tabpanel" class="tab-pane {% if not has_text %}show active{% endif %}" id="metadata">
+          <dl class="pdr-kv">
+          {% for key, value in task.file.metadata.items() %}
+            <dt>{{ key }}</dt><dd class="pdr-mono">{{ value }}</dd>
+          {% endfor %}
+          </dl>
+        </div>
+        {% endif %}
+
+        {% if has_history %}
+        <!-- History -->
+        <div role="tabpanel" class="tab-pane {% if not has_text and not has_meta %}show active{% endif %}" id="history">
+          <table class="table table-hover">
+            <thead><tr><th>{{ t.col_date }}</th><th>{{ t.col_name }}</th><th>{{ t.col_status }}</th></tr></thead>
+            <tbody>
+            {% for linked_task in task.linked_tasks %}
+            <tr class="{% if linked_task.uuid == task.uuid %}table-active{% endif %}" id="linkedTaskRow-{{ linked_task.uuid }}">
+              <td>{{ moment(linked_task.save_date).format('L LT [UTC]Z') }}</td>
+              <td><a href="{{ url_for('api_analysis', task_id=linked_task.uuid) }}">
+                {{ render_icon(linked_task.file.icon) }} {{ linked_task.file.client_name }}</a></td>
+              <td>{{ display_task_status(linked_task.status, status) }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endif %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- ===================== Analysis result: verdict, modules, file details ===================== -->
+    <h2 class="pdr-section-title" id="analysis-result-title" tabindex="-1">{{ render_icon('shield-check') }} {{ t.analysis_result }}</h2>
+    <section class="pdr-verdict" aria-labelledby="analysis-result-title">
+      <div class="pdr-verdict-flags" id="taskStatus">
+        {% for s in status %}
+          {% set info = STATUS_INFO.get(s.name, ('neutral', 'question-circle', s.name|capitalize, '')) %}
+          <div class="overall-status-flag status-flag-{{ s.name|lower }} {% if s != task.status %}d-none{% endif %}">
+            {% if s != status.ALERT %}
+              {{ render_icon(status_icons[s], size='3.5rem') }}
+            {% else %}
+              <img src="{{ url_for('static', filename='images/skull.svg') }}" width="56" height="56" alt="">
+            {% endif %}
+            <span class="pdr-verdict-word">{{ t.status.get(s.name, info[2]) }}</span>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="pdr-verdict-main">
+        <div id="taskStatusMessage" class="pdr-verdict-message">
+          <div class="alert alert-overwrite {% if task.status != status.OVERWRITE %}d-none{% endif %}">
+            {{ task_status_messages['overwrite'] | safe }}
+          </div>
+          <div class="alert alert-error {% if task.status != status.ERROR %}d-none{% endif %}">
+            {{ task_status_messages['error'] | safe }}
+          </div>
+          <div class="alert alert-danger {% if task.status != status.ALERT %}d-none{% endif %}">
+            {{ task_status_messages['danger'] | safe }}
+          </div>
+          <div class="alert alert-warning {% if task.status != status.WARN %}d-none{% endif %}">
+            {{ task_status_messages['warning'] | safe }}
+          </div>
+          <div class="alert alert-success {% if task.status != status.CLEAN %}d-none{% endif %}">
+            {{ task_status_messages['success'] | safe }}
+          </div>
+          <div class="alert alert-info {% if task.workers_done %}d-none{% endif %}">
+            {{ task_status_messages['info'] | safe }}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <section class="pdr-card pdr-results" aria-labelledby="results-title">
+          <header class="pdr-card-header">
+            <h2 class="pdr-card-title" id="results-title">{{ render_icon('list-check') }} {{ t.module_results }}</h2>
+            <p class="pdr-card-subtitle">{{ t.module_results_subtitle }}</p>
+          </header>
+          <div class="pdr-card-body">
+          {% if current_user.detailed_view %}
+            {# One box per status, filled live by analysis.js. Empty boxes are hidden by CSS: keep the
+               #workers_results_* divs empty in the HTML (no whitespace) so :empty works. #}
+            {% for key in ['alert', 'warn', 'overwrite', 'error', 'manual', 'unknown', 'clean'] %}
+            <div class="pdr-group pdr-status--{{ STATUS_INFO[key|upper][0] }}">
+              <h3 class="pdr-group-title">{{ render_icon(STATUS_INFO[key|upper][1]) }} {{ t['group_' ~ key] }}</h3>
+              <div id="workers_results_{{ key }}" class="pdr-group-body"></div>
+            </div>
+            {% endfor %}
+            <div hidden id="workers_results_notapplicable"></div>
+            <div hidden id="workers_results_disabled"></div>
+            {# Placeholder while modules run; analysis.js swaps it for a message if all finish without a visible result. #}
+            <div class="pdr-results-empty {% if task.workers_done %}d-none{% endif %}">{{ skeleton('cards', 3, t.waiting_results) }}</div>
+            <p class="pdr-results-none pdr-hint mb-0 {% if not task.workers_done %}d-none{% endif %}">{{ t.no_result }}</p>
+          {% else %}
+            <p>{{ t.simple_view }}</p>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="detailedViewInline"
+                     onchange="toggle_detailed_view()">
+              <label class="form-check-label" for="detailedViewInline">{{ t.show_results }}</label>
+            </div>
+          {% endif %}
+          </div>
+        </section>
+      </div>
+      <div class="col-lg-5">
+        <section class="pdr-card">
+          <header class="pdr-card-header"><h2 class="pdr-card-title">{{ render_icon('file-earmark') }} {{ t.file }}</h2></header>
+          <div class="pdr-card-body">
+            <dl class="pdr-kv">
+              <dt>{{ t.name }}</dt><dd>{{ copy_inline(task.file.original_filename) }}</dd>
+              <dt>{{ t.submitted }}</dt><dd>{{ moment(task.save_date).format('lll') }}</dd>
+              {% if task.file.size is not none %}<dt>{{ t.size }}</dt><dd>{{ sizeof_fmt(task.file.size) }}</dd>{% endif %}
+              {% if task.file.type is not none %}<dt>{{ t.type }}</dt><dd>{{ task.file.info }}</dd>{% endif %}
+              {% if task.file.mime_type is not none %}<dt>{{ t.mime_type }}</dt><dd class="pdr-mono">{{ task.file.mime_type }}</dd>{% endif %}
+              {% if task.file.encoding %}<dt>{{ t.encoding }}</dt><dd class="pdr-mono">{{ task.file.encoding }}</dd>{% endif %}
+              {% if task.parent %}
+              <dt>{{ t.extracted_from }}</dt>
+              <dd>{{ render_icon(task.parent.file.icon) }} {{ task.parent.file.original_filename }} —
+                <a href="{{ url_for('api_analysis', task_id=task.parent.uuid, seed=seed) }}">{{ t.see_its_report }}</a></dd>
+              {% endif %}
+              {% if current_user.is_admin and task.password %}<dt>{{ t.password }}</dt><dd>{{ copy_inline(task.password) }}</dd>{% endif %}
+            </dl>
+            {% if task.file.md5 is not none or task.file.sha1 is not none or task.file.sha256 is not none %}
+            <h3 class="pdr-subtitle">{{ t.hashes }}</h3>
+            <dl class="pdr-kv pdr-hashes">
+              {% if task.file.md5 is not none %}<dt>MD5</dt><dd>{{ full_id(task.file.md5) }}</dd>{% endif %}
+              {% if task.file.sha1 is not none %}<dt>SHA-1</dt><dd>{{ full_id(task.file.sha1) }}</dd>{% endif %}
+              {% if task.file.sha256 is not none %}<dt>SHA-256</dt><dd>{{ full_id(task.file.sha256) }}</dd>{% endif %}
+            </dl>
+            {% endif %}
+          </div>
+        </section>
       </div>
     </div>
   </div>
 
-  <!-- Modal notify -->
+  <!-- Modal: alert the admin team -->
   {% if current_user.role.can('notify_cert') %}
-    <div id="notifyModal" class="modal fade" role="dialog">
+    <div id="notifyModal" class="modal fade" tabindex="-1" aria-labelledby="notifyModalTitle" aria-hidden="true">
       <div class="modal-dialog">
-        <form id="notifyForm" class="form-horizontal" action="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='notify') }}"
+        <form id="notifyForm" action="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='notify') }}"
               onsubmit="return analysis.notify($(this).attr('action'))">
           <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Send message to {{admin_name}}</h4>
-              <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <h4 class="modal-title" id="notifyModalTitle">{{ t.notify_title | replace('{name}', admin_name) }}</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <div class="row">
-                <div class="col-md-4"><span><b>Your email address:</b></span></div>
-                <div class="col-md-8"><input style="width:100%" name="email" type="email" id="email" required/></div>
+              <div class="mb-3">
+                <label class="form-label" for="email">{{ t.notify_email }}</label>
+                <input class="form-control" name="email" type="email" id="email" required>
               </div>
-              <div class="row" style="margin-top:10px">
-                <div class="col-md-4"><span><b>Your message:</b></span></div>
-                <div class="col-md-8"><textarea name="message" required rows="10" style="width:100%" id="message"></textarea></div>
+              <div class="mb-3">
+                <label class="form-label" for="message">{{ t.notify_message }}</label>
+                <textarea class="form-control" name="message" required rows="8" id="message"></textarea>
               </div>
-            </div>
-            <!-- boat fields -->
-            <label class="boatymcboat form-label" for="name">Your Name</label>
-            <input class="boatymcboat" autocomplete="off" type="text" id="name" name="name"
-                   placeholder="Your fav boat name here">
-            <!-- end -->
-            <div class="row">
-              <div class="col-md-1"></div>
-              <div class="col-md-10 d-none alert alert-info" id="notifySuccess">Your message has been correctly sent.</div>
-              <div class="col-md-10 d-none alert alert-danger" id="notifyError">
-                An error has occurred while sending your message:<span id="notifyErrorReason"></span>
+              <!-- boat fields -->
+              <label class="boatymcboat form-label" for="name">Your Name</label>
+              <input class="boatymcboat" autocomplete="off" type="text" id="name" name="name"
+                     placeholder="Your fav boat name here">
+              <!-- end -->
+              <div class="d-none alert alert-success" id="notifySuccess">{{ t.notify_sent }}</div>
+              <div class="d-none alert alert-danger" id="notifyError">
+                {{ t.notify_failed }} <span id="notifyErrorReason"></span>
               </div>
-              <div class="col-md-1"></div>
             </div>
             <div class="modal-footer">
-              <button class="btn btn-secondary" data-bs-dismiss="modal" aria-hidden="true">Cancel</button>
-              <button type="submit" class="btn btn-primary" id="notifySubmit">Send message</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t.cancel }}</button>
+              <button type="submit" class="btn btn-primary" id="notifySubmit">{{ t.notify_send }}</button>
             </div>
           </div>
         </form>
@@ -646,66 +600,48 @@
     </div>
   {% endif %}
 
-  <!-- Modal share -->
+  <!-- Modal: share link -->
   {% if current_user.role.can('share_analysis') %}
-    <div id="shareModal" class="modal fade" role="dialog">
+    <div id="shareModal" class="modal fade" tabindex="-1" aria-labelledby="shareModalTitle" aria-hidden="true">
       <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title">Get a URL to share</h4>
-              <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form id="shareForm" class="form-horizontal"
-                    action="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='share') }}"
-                    onsubmit="return analysis.share($(this).attr('action'))">
-              <div class="row g-3 align-items-center">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="shareModalTitle">{{ t.share_title }}</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="shareForm"
+                  action="{{ url_for('PandoraAPI_api_task_action', task_id=task.uuid, seed=seed, action='share') }}"
+                  onsubmit="return analysis.share($(this).attr('action'))">
+              <div class="row g-2 align-items-end">
                 <div class="col-auto">
-                  <label for="shareDays" class="col-form-label">URL lifetime:</label>
+                  <label for="shareDays" class="form-label">{{ t.share_days }}</label>
+                  <input class="form-control" style="width:120px" aria-describedby="shareDaysHelp"
+                         id="shareDays" name="number" type="number" min="0" value="{{default_share_time}}" required>
                 </div>
-                <div class="col-auto">
-                  <input style="width:100px" class="form-control" aria-describedby="shareDaysHelp"
-                                                                  id="shareDays" name="number" type="number" min="0" value="{{default_share_time}}" required>
-                </div>
-                <div class="col-auto">
-                  <span id="shareDaysHelp" class="form-text">
-                    In day(s), 0 means unlimited.
-                  </span>
+                <div class="col">
+                  <button type="submit" class="btn btn-primary" id="shareBuild">{{ t.share_create }}</button>
                 </div>
               </div>
-              <button type="submit" class="btn btn-secondary" id="shareBuild" style="float: right;">Create a shareable link</button>
-              </form>
+              <div id="shareDaysHelp" class="form-text">{{ t.share_days_help }}</div>
+            </form>
 
-              </br>
-
-              <div class="row">
-                <div class="col d-none alert alert-info" id="shareSuccess">
-                  This analysis will be available <b><span id="sharePeriod"></span></b> with
-                  <a href="" id="shareLink" class="alert-link">this link</a> -
-                  <button type="button" class="btn alert-link" style="padding:0"
-                          title="Copy to clipboard"
-                          onclick="navigator.clipboard.writeText(shareLink).then(
-                                    function() {document.getElementById('copySuccess').classList.remove('d-none')},
-                                    function() {document.getElementById('copyError').classList.remove('d-none')})">
-                      (copy to clipboard {{ render_icon('clipboard-plus', color='black') }})
-                  </button>
-                </div>
-                <div class="col d-none alert alert-danger" id="shareError">
-                  An error has occurred while creating the shareable link:
-                  <span id="shareErrorReason"></span>
-                </div>
-              </div>
-              <div class="col d-none alert alert-success" id="copySuccess">
-                Shareable link successfully copied to clipboard.
-              </div>
-              <div class="col d-none alert alert-danger" id="copyError">
-                Unable to copy the sharing link to the clipboard.
+            <div class="d-none alert alert-success mt-3" id="shareSuccess">
+              {{ t.share_available }} <b><span id="sharePeriod"></span></b>:
+              {# Full link + copy icon; href, text and data-copy are filled by analysis.share() #}
+              <div class="pdr-id-wrap mt-2">
+                <a href="" id="shareLink" class="pdr-mono pdr-full-id" target="_blank" rel="noopener noreferrer"></a>
+                <button type="button" class="pdr-copy" id="shareCopy" data-copy="" title="{{ t.copy_label }}" aria-label="{{ t.copy_label }}">{{ render_icon('copy', size='14') }}</button>
               </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary d-none" data-bs-dismiss="modal" id="closeBuild">Close</button>
+            <div class="d-none alert alert-danger mt-3" id="shareError">
+              {{ t.share_failed }} <span id="shareErrorReason"></span>
             </div>
           </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary d-none" data-bs-dismiss="modal" id="closeBuild">{{ t.close }}</button>
+          </div>
+        </div>
       </div>
     </div>
   {% endif %}

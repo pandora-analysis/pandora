@@ -1,8 +1,8 @@
 {% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_icon %}
+{% from "macros.html" import notice, page_header %}
 
-{% block title %}
-    Pandora - roles
-{% endblock %}
+{% block title %}Roles — Pandora{% endblock %}
 
 {% block scripts %}
   {{ super() }}
@@ -15,37 +15,48 @@
 {% endblock %}
 
 {% block content %}
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th class="text-nowrap">Name</th>
-        {% for key in action.__members__.keys() %}
-        <th class="text-center">{{ key }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
+<div class="container-xl">
+  {% call page_header('Roles', 'shield-lock', 'One row per permission, one column per role. Click a value to switch it; the change is saved at once.',
+                      [('Administration', url_for('api_admin_page')), ('Roles', None)], section='Administration') %}
+    <button class="btn btn-secondary" onclick="pandoraRole.reload()">{{ render_icon('arrow-counterclockwise') }} Reload from the config file</button>
+  {% endcall %}
 
-    <tbody>
-    {% for role in roles %}
-      <tr id="row-{{ role.name }}">
-        <th class="text-nowrap" scope="row" title="{{ role.description }}">{{ role.name.name }}</th>
-        {% for action, perm in role.actions.items() %}
-        <td class="text-center">
-            <span class="badge bg-success {% if not perm %} d-none {% endif %}"
-                  id="true-{{ role.name.name }}-{{ action.name }}" onclick="pandoraRole.update('{{ role.name.name }}', '{{ action.name }}', 0)">
-                TRUE
-            </span>
-            <span class="badge bg-danger{% if perm %} d-none {% endif %}"
-                  id="false-{{ role.name.name }}-{{ action.name }}" onclick="pandoraRole.update('{{ role.name.name }}', '{{ action.name }}', 1)">
-                FALSE
-            </span>
-        </td>
+  {% call notice('info') %}Hover a role name to read its description.{% endcall %}
+
+  <section class="pdr-card">
+    <div class="pdr-card-body">
+      <div class="table-responsive pdr-roles-scroll">
+      {# Ids true-<role>-<action> / false-<role>-<action> and the onclick calls are used by static/js/role.js #}
+      <table class="table table-hover align-middle pdr-table pdr-roles">
+        <thead>
+          <tr>
+            <th scope="col">Permission</th>
+            {% for role in roles %}
+            <th scope="col" class="text-center" title="{{ role.description }}">{{ role.name.name | replace('_', ' ') | capitalize }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+        {% for key in action.__members__.keys() %}
+          <tr>
+            <th scope="row" class="pdr-mono">{{ key }}</th>
+            {% for role in roles %}
+              {% set perm = role.actions[action[key]] %}
+              <td class="text-center">
+                <button type="button" class="pdr-perm pdr-perm--yes {% if not perm %}d-none{% endif %}"
+                        id="true-{{ role.name.name }}-{{ key }}" title="Allowed: click to deny"
+                        onclick="pandoraRole.update('{{ role.name.name }}', '{{ key }}', 0)">{{ render_icon('check-lg') }} Allowed</button>
+                <button type="button" class="pdr-perm pdr-perm--no {% if perm %}d-none{% endif %}"
+                        id="false-{{ role.name.name }}-{{ key }}" title="Denied: click to allow"
+                        onclick="pandoraRole.update('{{ role.name.name }}', '{{ key }}', 1)">{{ render_icon('x-lg') }} Denied</button>
+              </td>
+            {% endfor %}
+          </tr>
         {% endfor %}
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-  <div class="text-center">
-    <button class="btn btn-primary" onclick="pandoraRole.reload()">Reload roles from config file</button>
-  </div>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+</div>
 {% endblock %}

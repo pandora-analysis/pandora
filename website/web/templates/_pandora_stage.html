@@ -1,0 +1,15 @@
+{#- Pandora box animation shown while a file is uploaded (submit page):
+    the box opens and closes, a file falls in, and the kinds of result fly out (Clean / Suspicious / Dangerous).
+    Decorative only (aria-hidden): the text next to it says the same thing. Set `stage_box_id` (unique per page). -#}
+{% from 'bootstrap5/utils.html' import render_icon %}
+<div class="pdr-upload-stage" aria-hidden="true">
+  <span class="pdr-upload-file">{{ render_icon('file-earmark-text-fill', size='2.2rem') }}</span>
+  <span class="pdr-fly pdr-fly--clean" style="--dx:-150px;--dy:-70px;--d:0s">{{ render_icon('shield-fill-check') }}<span>{{ t.fly_clean }}</span></span>
+  <span class="pdr-fly pdr-fly--warn"  style="--dx:0px;--dy:-120px;--d:.8s">{{ render_icon('exclamation-triangle-fill') }}<span>{{ t.fly_warn }}</span></span>
+  <span class="pdr-fly pdr-fly--alert" style="--dx:150px;--dy:-70px;--d:1.6s">{{ render_icon('bug-fill') }}<span>{{ t.fly_alert }}</span></span>
+  <span class="pdr-fly pdr-fly--info"  style="--dx:-90px;--dy:-115px;--d:.4s">{{ render_icon('file-earmark-image') }}</span>
+  <span class="pdr-fly pdr-fly--info"  style="--dx:95px;--dy:-118px;--d:1.2s">{{ render_icon('link-45deg') }}</span>
+  <span class="pdr-fly pdr-fly--info"  style="--dx:-200px;--dy:-10px;--d:2s">{{ render_icon('envelope') }}</span>
+  <span class="pdr-fly pdr-fly--info"  style="--dx:200px;--dy:-12px;--d:2.4s">{{ render_icon('file-earmark-zip') }}</span>
+  {% set class = 'pdr-upload-box' %}{% set box_id = stage_box_id %}{% set box_mode = 'loop' %}{% include "_pandora_box.html" %}
+</div>

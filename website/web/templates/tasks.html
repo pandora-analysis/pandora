@@ -1,50 +1,90 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_icon %}
-{% from "macros.html" import display_task_status %}
+{% from "macros.html" import notice, page_header %}
 
-{% block title %}
-    My tasks
-{% endblock %}
+{% block title %}Recent analyses — Pandora{% endblock %}
+
+{% block body_attrs %}data-pdr-wait="content"{% endblock %}
 
 {% block content %}
-  <table id="TasksTable" class="table table-hover table-responsive" style="width:100%"
-         data-csrf= {{csrf_token()}}"">
-    <thead>
-      <tr>
-        <th>Id</th>
-        <th>Owner</th>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Name</th>
-        <th>SHA256</th>
-        <th></th>
-      </tr>
-    </thead>
-  </table>
-  {% if current_user.is_admin %}
-  <script>
-      function deleteFile(url, uid) {
-          if (! confirm("Are you sure you want to delete this file ? That action is irreversible !")) {
-              return false;
-          }
-          fetch(url, {
-            method: "POST",
-            headers: {
-              "X-CSRF-Token": "{{ csrf_token() }}"
-            }
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success === false) {
-              throw new Error(data.error);
-            }
-            $(`[data-uid=${data.file_id}]`).attr("onclick", "").toggleClass("btn-default btn-danger").html('File deleted');
-          })
-          .catch((error) => {
-            alert("An error has occurred while removing file : " + error);
-          });
-      };
-  </script>
+<div class="container-xl">
+  {% set subtitle = ('All the files submitted to this Pandora instance, newest first.' if current_user.is_admin
+                     else 'The files you submitted, newest first.') ~ ' Open a report to see why a file got its status.' %}
+  {% call page_header('Recent analyses', 'clock-history', subtitle, [('Recent analyses', None)], section='Analyses') %}
+    {% if current_user.role.can('submit_file') %}
+    <a class="btn btn-primary" href="{{ url_for('api_submit_page') }}">{{ render_icon('cloud-arrow-up') }} Submit a file</a>
+    {% endif %}
+  {% endcall %}
+
+  {% if search %}
+    {% call notice('info', 'Filtered list') %}
+      Only analyses matching <code>{{ search }}</code> are shown. <a href="{{ url_for('api_tasks') }}">Show all</a>.
+    {% endcall %}
   {% endif %}
 
+  <section class="pdr-card">
+    <div class="pdr-card-body">
+      {# Columns are defined in static/js/render_tables.js: keep the order of these headers in sync. #}
+      {# Loading indicator for page changes / searches: the animated box (read by render_tables.js) #}
+      <template id="pdr-table-loading">
+        <div class="pdr-table-loading">{% set class = 'pdr-mini-box' %}{% set box_id = 'tablebox' %}{% set box_mode = 'loop' %}{% include "_pandora_box.html" %}<span>Loading…</span></div>
+      </template>
+      <table id="TasksTable" class="table table-hover align-middle pdr-table" style="width:100%"
+             data-csrf="{{ csrf_token() }}">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Name</th>
+            <th>Date</th>
+            <th>SHA-256</th>
+            <th>Owner</th>
+            <th>Id</th>
+            <th><span class="visually-hidden">Actions</span></th>
+          </tr>
+        </thead>
+        {# Placeholder rows, replaced by DataTables as soon as the data arrives #}
+        <tbody class="pdr-skel-rows" aria-busy="true">
+          {% for i in range(6) %}
+          <tr>
+            <td><span class="pdr-skel-pill"></span></td>
+            <td><span class="pdr-skel-line w-80"></span></td>
+            <td><span class="pdr-skel-line w-60"></span></td>
+            <td><span class="pdr-skel-line"></span></td>
+            <td><span class="pdr-skel-line w-40"></span></td>
+            <td><span class="pdr-skel-line w-60"></span></td>
+            <td><span class="pdr-skel-pill"></span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+{% if current_user.is_admin %}
+<script>
+    async function deleteFile(url, uid) {
+        if (!(await pdrConfirm("The file and its previews will be removed from Pandora. The analysis results stay. This cannot be undone.",
+                               {title: "Delete this file?", confirmLabel: "Delete the file", danger: true}))) {
+            return false;
+        }
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "X-CSRF-Token": "{{ csrf_token() }}"
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success === false) {
+            throw new Error(data.error);
+          }
+          $(`[data-uid=${data.file_id}]`).attr("onclick", "").toggleClass("btn-default btn-danger").html('File deleted');
+        })
+        .catch((error) => {
+          pdrAlert("The file could not be deleted: " + error, {title: "Delete failed"});
+        });
+    };
+</script>
+{% endif %}
 {% endblock %}

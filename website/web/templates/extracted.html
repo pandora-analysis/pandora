@@ -1,42 +1,26 @@
 {% from 'bootstrap5/utils.html' import render_icon %}
-{% from "macros.html" import display_task_status %}
-
-<div class="row" style="margin-bottom:30px">
-  <div class="col-md-8">
-    <h3>Extracted</h3>
-  </div>
+{% from "macros.html" import display_task_status, empty_state, full_id %}
+{# Loaded into the "Extracted files" tab by analysis.js. #}
+{% if extracted_tasks %}
+<p class="pdr-hint">Files found inside this one. Each is analysed on its own: open it to see its report.</p>
+<div class="table-responsive">
+<table class="table table-hover align-middle pdr-table" id="extractedTaskRows">
+  <thead><tr><th>Status</th><th>Name</th><th>Size</th><th>SHA-256</th><th>Date</th></tr></thead>
+  <tbody>
+  {% for extracted_task in extracted_tasks %}
+  <tr id="extractedTaskRow-{{ extracted_task['uuid'] }}" data-pdr-row>
+    <td>{{ display_task_status(extracted_task['status'], status) }}</td>
+    <td><a href="{{ url_for('api_analysis', task_id=extracted_task['uuid'], seed=seed) }}">
+      {{ render_icon(extracted_task['file_icon']) }} <span class="pdr-file-name">{{ extracted_task['file_original_name'] }}</span></a></td>
+    <td class="text-nowrap">{{ sizeof_fmt(extracted_task['file_size']) }}</td>
+    <td class="pdr-hash-cell">{{ full_id(extracted_task['file_sha256']) }}</td>
+    {# save_date is "YYYY-MM-DD HH:MM:SS.ffffff+00:00": keep minutes, say it is UTC (moment.js can't run on HTML loaded later) #}
+    <td class="text-nowrap">{{ (extracted_task['save_date'] | string)[:16] }} UTC</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
 </div>
-
-<div class="row">
-  <table class="table table-hover table-bordered" id="extractedTaskRows">
-    <tr>
-      <th>Date</th>
-      <th>Name</th>
-      <th>Size</th>
-      <th>SHA256</th>
-      <th>Status</th>
-    </tr>
-    {% for extracted_task in extracted_tasks %}
-    <tr id="extractedTaskRow-{{ extracted_task['uuid'] }}">
-      <td>
-				{{ extracted_task['save_date'] }}
-      </td>
-      <td>
-        <a href="{{ url_for('api_analysis', task_id=extracted_task['uuid'], seed=seed) }}">
-          {{ render_icon(extracted_task['file_icon']) }}
-          <span>{{ extracted_task['file_original_name'] }}</span>
-        </a>
-      </td>
-      <td>
-        {{ sizeof_fmt(extracted_task['file_size']) }}
-      </td>
-      <td style="word-wrap: break-all;">
-        {{ extracted_task['file_sha256'] }}
-      </td>
-      <td>
-        {{ display_task_status(extracted_task['status'], status) }}
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
-</div>
+{% else %}
+{{ empty_state('No files were extracted.') }}
+{% endif %}

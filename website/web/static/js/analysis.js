@@ -1,28 +1,65 @@
-async function LookylooSubmit(lookyloo_url, url_to_submit) {
-    uuid = await fetch(`${lookyloo_url}/submit`, {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-        body: JSON.stringify({url: url_to_submit, listing: false})
-    })
-    .then(response => response.json())
-    .then(data => {
-        return data;
-    })
-    .catch((error) => {
-        throw new Error(error);
-    });
-    return uuid;
+// Send a link to Lookyloo, only when someone clicks. The captures are remembered, because the list of links is reloaded
+// while the analysis runs.
+const lookylooCaptures = {};
+
+function lookylooShow(sha256) {
+    const button = document.getElementById(`lookyloo_submit-${sha256}`), link = document.getElementById(`lookyloo_link-${sha256}`);
+    if (!button || !link || !lookylooCaptures[sha256]) { return; }
+    button.hidden = true;
+    link.href = lookylooCaptures[sha256];
+    link.hidden = false;
 }
 
-async function lookyloo(lookyloo_url, sha256) {
-  let url_to_submit = document.getElementById(`lookyloo_submit-${sha256}`).dataset.url;
-  let uuid = await LookylooSubmit(lookyloo_url, url_to_submit);
-  document.getElementById(`lookyloo_submit-${sha256}`).style.display = 'none';
-  document.getElementById(`lookyloo_link-${sha256}`).style.display = 'block';
-  document.getElementById(`lookyloo_link-${sha256}`).href = `${lookyloo_url}/tree/${uuid}`;
+async function lookylooSubmit(button) {
+    const base = button.dataset.lookyloo.replace(/\/+$/, ""), sha256 = button.dataset.sha256;
+    button.disabled = true;
+    try {
+        const response = await fetch(`${base}/submit`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({url: button.dataset.url, listing: false})
+        });
+        if (!response.ok) { throw new Error(`Lookyloo answered ${response.status}`); }
+        const uuid = await response.json();
+        if (typeof uuid !== "string") { throw new Error(uuid && uuid.error ? uuid.error : "unexpected answer"); }
+        lookylooCaptures[sha256] = `${base}/tree/${uuid}`;
+        lookylooShow(sha256);
+    } catch (error) {
+        button.disabled = false;
+        pdrAlert(`The link could not be sent to Lookyloo: ${error.message}`, {title: "Lookyloo"});
+    }
 }
+
+// "Open the N links in Lookyloo": the links once each, without the ones Lookyloo refuses (one bad link refuses them all).
+function lookylooFillAll(box) {
+    const buttons = [...box.querySelectorAll("button[data-lookyloo]")], links = new Map();
+    buttons.forEach((b) => {
+        const value = b.dataset.url.trim();
+        try {
+            const url = new URL(value);
+            if (/^https?:$/.test(url.protocol) && /^[\w.-]+\.[\w-]+$/.test(url.hostname) && !/\s/.test(value)) { links.set(url.href, value); }
+        } catch (e) { /* not a valid link */ }
+    });
+    // Emails cut long lines with "=": drop the start of a link that is also there in full ("https://www.exa=")
+    const all = [...links.values()];
+    links.forEach((value, key) => {
+        if (value.endsWith("=") && all.some((other) => other !== value && other.startsWith(value.slice(0, -1)))) { links.delete(key); }
+    });
+    document.querySelectorAll("form[data-lookyloo-all]").forEach((form) => {
+        form.classList.toggle("d-none", links.size < 2);
+        if (!buttons.length) { return; }
+        form.action = buttons[0].dataset.lookyloo.replace(/\/+$/, "") + "/capture";
+        form.elements.urls.value = [...links.values()].join("\n");
+        const label = form.querySelector("[data-text]");
+        label.textContent = label.dataset.text.replace("{n}", links.size);
+    });
+    return links.size;
+}
+
+document.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-lookyloo]");
+    if (button) { lookylooSubmit(button); }
+});
 
 function Analysis(CSRFToken) {
     this.CSRFToken = CSRFToken;
@@ -44,10 +81,9 @@ Analysis.prototype.refreshStatus = function () {
     }
 
     // Refresh status icon and message
-    $("#taskStatusIcon").each(function( index, element ){
-      $(this).addClass("d-none");
-    })
-    $(`.status-flag-${this.task.status.toLowerCase()}`).removeClass("d-none");
+    // Hide every big status flag, then show the current one (scoped to #taskStatus so small flags elsewhere are untouched).
+    $("#taskStatus .overall-status-flag").addClass("d-none");
+    $(`#taskStatus .status-flag-${this.task.status.toLowerCase()}`).removeClass("d-none");
     $("#taskStatusMessage").find(".alert").addClass("d-none");
     if (this.task.status === "OVERWRITE") {
         $("#taskStatusMessage").find(".alert-overwrite").removeClass("d-none");
@@ -64,6 +100,48 @@ Analysis.prototype.refreshStatus = function () {
     }
 };
 
+// Short result at the top of the page. A locked file is never shown as "nothing dangerous": Pandora did not see its content.
+Analysis.prototype.refreshResultLink = function () {
+    const box = document.getElementById("resultLinks");
+    if (!box || !this.task) { return; }
+    const hidden = this.needsPassword && !["WARN", "ALERT", "OVERWRITE"].includes(this.task.status);
+    const shown = hidden ? "LOCKED" : this.task.status;
+    box.querySelectorAll("[data-status]").forEach((b) => { b.classList.toggle("d-none", b.dataset.status !== shown); });
+};
+
+document.addEventListener("click", (event) => {
+    if (!event.target.closest(".pdr-result-link")) { return; }
+    const title = document.getElementById("analysis-result-title"), verdict = document.querySelector(".pdr-verdict");
+    title.focus({preventScroll: true});
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    title.scrollIntoView({behavior: calm ? "auto" : "smooth", block: "start"});
+    verdict.classList.remove("is-pointed");
+    void verdict.offsetWidth;                                           // restart the flash
+    verdict.classList.add("is-pointed");
+});
+
+// Progress panel (#analysisProgress): "running, X of N modules finished" or "finished", from workers_status
+// ({module: [done, status]}) sent by the refresh API. Texts come from data-text-* (page language).
+Analysis.prototype.refreshProgress = function () {
+    const box = document.getElementById("analysisProgress");
+    if (!box || !this.workers_status) { return; }
+    const entries = Object.entries(this.workers_status);
+    const total = entries.length;
+    const done = entries.filter(([, st]) => st[0]).length;
+    const pending = entries.filter(([, st]) => !st[0]).map(([name]) => name);
+    const finished = !!this.workers_done;
+    box.classList.toggle("is-done", finished);
+    const text = (finished ? box.dataset.textDone : box.dataset.textRunning) || "";
+    document.getElementById("progressTitle").textContent = text.replace("{done}", done).replace("{total}", total);
+    document.getElementById("progressCount").textContent = `${done} / ${total}`;
+    document.getElementById("progressBar").style.width = `${(finished || !total) ? 100 : Math.round(done * 100 / total)}%`;
+    document.getElementById("progressBarOuter").setAttribute("aria-valuenow", done);
+    document.getElementById("progressPendingList").textContent = pending.join(", ");
+    const nothingPending = finished || pending.length === 0;
+    document.getElementById("progressPendingRunning").classList.toggle("d-none", nothingPending);
+    document.getElementById("progressPendingDone").classList.toggle("d-none", !nothingPending);
+};
+
 Analysis.prototype.refreshReports = function () {
     $.each(this.task.reports, function (module, report) {
         // Exit now if report was already finished
@@ -74,7 +152,51 @@ Analysis.prototype.refreshReports = function () {
     });
 };
 
+// The message shown instead of the pages. One at a time, the most useful first:
+// locked with a password > files were extracted > no preview.
+Analysis.prototype.refreshNoPreview = function () {
+    const box = document.getElementById("previews_images");
+    const show = (id, yes) => { const e = document.getElementById(id); if (e) { e.classList.toggle("d-none", !yes); } };
+    // The Extractor says if a password is missing: wait for it, so that the message does not change under the reader.
+    const waiting = this.workers_status && this.workers_status.extractor && !this.extractorChecked;
+    const noPages = this.previewChecked && !waiting && !(box && box.querySelector("[data-pdr-pager]"));
+    const locked = !!this.needsPassword;
+    const extracted = noPages && !locked && this.number_extracted > 0;
+    if (extracted) {
+        const title = document.querySelector("#hasExtracted .pdr-notice-title");
+        if (title) {
+            title.dataset.text = title.dataset.text || title.textContent;
+            title.textContent = title.dataset.text.replace("{n}", this.number_extracted);
+        }
+    }
+    this.refreshResultLink();
+    show("passwordNeeded", locked);
+    show("passwordWrong", locked && passwordTried(this.task.uuid));
+    show("hasExtracted", extracted);
+    show("noPreview", noPages && !locked && !extracted);
+};
+
+// Rescanning creates a new report: remember its id (never the password), to say there that the password did not work.
+function passwordTried(uuid, remember) {
+    try {
+        if (remember) { sessionStorage.setItem("pdr-password-tried", uuid); }
+        return sessionStorage.getItem("pdr-password-tried") === uuid;
+    } catch (e) { return false; }
+}
+
+document.addEventListener("submit", (event) => {
+    if (event.target.id !== "passwordForm") { return; }
+    event.preventDefault();
+    analysis.rescan(event.target.dataset.url, document.getElementById("topPassword").value, event.target.querySelector("button"));
+});
+
 Analysis.prototype.refreshTabs = function () {
+    // The preview module did not run at all (disabled for this file)
+    if (this.workers_done && !this.workers_status.preview) {
+        $(".preview-wait").addClass("d-none");
+        this.previewChecked = true;
+        this.refreshNoPreview();
+    }
     if (this.workers_status.preview && this.workers_status.preview[0]) {
         $('.preview-wait').each(function(index, element) {
           $(this).addClass("d-none");
@@ -84,9 +206,10 @@ Analysis.prototype.refreshTabs = function () {
         })
 
         if (this.workers_status.preview[1] == 'NOTAPPLICABLE') {
-            document.getElementById("previews_images").textContent = 'Cannot generate a preview for this file format.'
+            this.previewChecked = true;
+            this.refreshNoPreview();
         }
-        else {
+        else if (document.getElementById("previews_images")) {
             previews_url = `/previews/${this.task.uuid}`
             if (this.seed) {
                 previews_url = `${previews_url}/seed-${this.seed}`
@@ -100,7 +223,15 @@ Analysis.prototype.refreshTabs = function () {
             })
             .then(response => response.text())
             .then(text => {
-              document.getElementById("previews_images").innerHTML=text;
+              // Only replace when the pages changed (it runs every second while modules work), and keep the page shown.
+              const box = document.getElementById("previews_images");
+              if (box.dataset.pdrHtml !== text) {
+                box.innerHTML = text;
+                box.dataset.pdrHtml = text;
+                if (typeof pdrPagerRestore === "function") { pdrPagerRestore(box); }
+              }
+              this.previewChecked = true;
+              this.refreshNoPreview();
             })
         }
     }
@@ -123,7 +254,17 @@ Analysis.prototype.refreshTabs = function () {
        })
        .then(response => response.text())
        .then(text => {
-         document.getElementById("observables_content").innerHTML=text;
+         const box = document.getElementById("observables_content");
+         if (box.dataset.pdrHtml === text) { return; }   // unchanged: keep what the person is doing
+         box.innerHTML = text;
+         box.dataset.pdrHtml = text;
+         Object.keys(lookylooCaptures).forEach(lookylooShow);
+         const hint = document.getElementById("lookylooLinks"), links = lookylooFillAll(box);
+         if (hint) {
+             const label = hint.querySelector("[data-text]");
+             label.textContent = label.dataset.text.replace("{n}", links);
+             hint.classList.toggle("d-none", !links);
+         }
        })
     }
 
@@ -170,6 +311,11 @@ Analysis.prototype.refreshTabs = function () {
         })
         .then(response => response.text())
         .then(text => {
+            if (worker_name === "extractor") {
+                this.needsPassword = text.includes("data-pdr-needs-password");
+                this.extractorChecked = true;
+                this.refreshNoPreview();
+            }
             const workers_results = document.getElementById(`workers_results_${worker_done[1].toLowerCase()}`);
             if (workers_results) {
                 workers_results.insertAdjacentHTML('beforeend', text);
@@ -185,7 +331,15 @@ Analysis.prototype.refreshHTML = function () {
     if (this.workers_done && (!this.task.extracted_tasks || this.task.extracted_tasks.every(function(task) { return task.done }))) {
         clearInterval(this.refresher);
     }
+    // Module results placeholder: once every module is done, replace it with a plain message
+    // (CSS already hides both as soon as one result is visible).
+    if (this.workers_done) {
+        $(".pdr-results-empty").addClass("d-none");
+        $(".pdr-results-none").removeClass("d-none");
+    }
     this.refreshStatus();
+    this.refreshResultLink();
+    this.refreshProgress();
     this.refreshReports();
     this.refreshTabs();
 };
@@ -210,6 +364,11 @@ Analysis.prototype.refresh = function (url) {
     analysis.number_observables = data.number_observables;
     analysis.number_extracted = data.number_extracted;
     analysis.refreshHTML();
+    if (!analysis.firstRefreshDone) {
+      // First state drawn: let the page loader reveal the page (static/js/ui.js)
+      analysis.firstRefreshDone = true;
+      document.dispatchEvent(new Event("pdr:content-ready"));
+    }
   })
   .catch((error) => {
      clearInterval(analysis.refresher);
@@ -218,23 +377,28 @@ Analysis.prototype.refresh = function (url) {
   })
 };
 
-Analysis.prototype.rescan = function (url) {
+// password / button: given by the form at the top; otherwise the field of the Extractor result is used.
+Analysis.prototype.rescan = function (url, password, button) {
+    const value = password === undefined ? $("#password").val() : password;
+    if (button) { button.disabled = true; }
     fetch(url, {
       method: "POST",
       headers: {
         "X-CSRF-Token": this.CSRFToken,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({password: $("#password").val()})
+      body: JSON.stringify({password: value})
     })
     .then(response => response.json())
     .then(data => {
       if (data.success === false) {
         throw new Error(data.error);
       }
+      if (value) { passwordTried(data.taskId || new URL(data.link, location.href).pathname.split("/")[2], true); }
       window.location = new URL(data.link, location.href);
     })
     .catch((error) => {
+      if (button) { button.disabled = false; }
       $("#errorJSInner").text("An error has occurred while trying to rescan file : " + error);
       $("#errorJS").removeClass("d-none");
     })
@@ -285,7 +449,9 @@ Analysis.prototype.share = function (url) {
       if (data.success === false) {
           throw new Error(data.error);
       }
-      $("#shareLink").attr("href", new URL(data.link, location.href));
+      const shareURL = new URL(data.link, location.href).href;
+      $("#shareLink").attr("href", shareURL).text(shareURL);
+      document.getElementById("shareCopy").dataset.copy = shareURL;
       if (data.lifetime > 0) {
           $("#sharePeriod").text(`for ${parseInt(data.lifetime / (3600*24))} day(s)`);
       } else {
@@ -306,8 +472,9 @@ Analysis.prototype.share = function (url) {
     return false;
 };
 
-Analysis.prototype.deleteFile = function (url) {
-    if (! confirm("Are you sure you want to delete this file ? That action is irreversible !")) {
+Analysis.prototype.deleteFile = async function (url) {
+    if (!(await pdrConfirm("The file and its previews will be removed from Pandora. The analysis results stay. This cannot be undone.",
+                           {title: "Delete this file?", confirmLabel: "Delete the file", danger: true}))) {
         return false;
     }
     fetch(url, {
@@ -324,7 +491,7 @@ Analysis.prototype.deleteFile = function (url) {
       window.location.reload();
     })
     .catch((error) => {
-      alert("An error has occurred while removing file : " + error);
+      pdrAlert("The file could not be deleted: " + error, {title: "Delete failed"});
     })
     return false;
 };

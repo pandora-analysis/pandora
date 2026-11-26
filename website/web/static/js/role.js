@@ -22,12 +22,13 @@ Role.prototype.update = function (roleName, permission, value) {
       $(`#false-${roleName}-${permission}`).toggleClass("d-none");
     })
     .catch((error) => {
-      alert("An error has occurred while changing role permission : " + error);
+      pdrAlert("The permission could not be changed: " + error, {title: "Change failed"});
     });
 }
 
-Role.prototype.reload = function () {
-    if (!confirm("All the roles will be removed and re-created, are you sure that your config file is correctly formatted ?")) {
+Role.prototype.reload = async function () {
+    if (!(await pdrConfirm("All roles will be deleted and re-created from config/roles.yml. Changes made on this page will be lost. Check that the file is correctly formatted first.",
+                           {title: "Reload the roles?", confirmLabel: "Reload the roles", danger: true}))) {
         return false;
     }
     fetch(this.reloadURL, {
@@ -44,6 +45,6 @@ Role.prototype.reload = function () {
       window.location.reload();
     })
     .catch((error) => {
-      alert("An error has occurred while reloading roles from config file : " + error);
+      pdrAlert("The roles could not be reloaded: " + error, {title: "Reload failed"});
     });
 }

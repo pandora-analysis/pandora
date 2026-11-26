@@ -1,37 +1,216 @@
+{#
+  Shared UI building blocks. Styles: static/css/theme.css ("Components").
+  Rule: a status is always shown with an icon AND a word, never with a colour alone.
+#}
+
+{#- One table for every status: CSS kind, icon (Bootstrap Icons), label, explanation shown on hover. -#}
+{% set STATUS_INFO = {
+  'ALERT':         ('alert',     'x-octagon-fill',          'Alert',          'Consider this as malicious.'),
+  'WARN':          ('warn',      'exclamation-triangle-fill','Warning',       'Consider this as suspicious, act accordingly.'),
+  'CLEAN':         ('clean',     'check-circle-fill',       'Clean',          'Consider it as clean, but check if any other module flags it as dangerous.'),
+  'OKAY':          ('clean',     'check-circle-fill',       'Okay',           'Consider it as clean.'),
+  'ERROR':         ('error',     'bug-fill',                'Error',          'Something went wrong in this module: see the details.'),
+  'OVERWRITE':     ('overwrite', 'person-fill-lock',        'Overwritten',    "Can't say, overwritten by an admin."),
+  'RUNNING':       ('running',   'arrow-repeat',            'Running',        'The module is running.'),
+  'WAITING':       ('waiting',   'hourglass-split',         'Waiting',        'The module has not started yet.'),
+  'MANUAL':        ('neutral',   'hand-index',              'Manual',         'The module needs to be run manually.'),
+  'UNKNOWN':       ('neutral',   'question-circle',         'Unknown',        'The module cannot decide.'),
+  'NOTAPPLICABLE': ('neutral',   'dash-circle',             'Not applicable', 'The module does not apply to this kind of file.'),
+  'DISABLED':      ('neutral',   'slash-circle',            'Disabled',       'The module is disabled.'),
+  'DEACTIVATE':    ('neutral',   'slash-circle',            'Deactivated',    'The module is deactivated.'),
+  'DELETED':       ('neutral',   'trash',                   'Deleted',        'The sample was deleted.'),
+} %}
+
+{#- Status of a module / observable (small pill with icon + word). Signature unchanged. -#}
 {% macro display_status_badge(entry_status, status) %}
-{% if entry_status == status.OVERWRITE %}
-<span class="badge bg-secondary" title="Can't say, overwritten by admin.">
-{% elif entry_status == status.ALERT %}
-<span class="badge bg-danger" title="Consider this as malicious">
-{% elif entry_status == status.WARN %}
-<span class="badge bg-warning" title="Consider this as suspicious, act accordingly">
-{% elif entry_status == status.CLEAN %}
-<span class="badge bg-success" title="Consider it as clean, but check if any other module flag it as dangerous">
-{% elif entry_status == status.ERROR %}
-<span class="badge bg-dark" title="Something went wrong.">
-{% elif entry_status in [status.DISABLED, status.NOTAPPLICABLE] %}
-<span class="badge bg-secondary" title="Unable to determine the legitimacy">
+{% from 'bootstrap5/utils.html' import render_icon %}
+{% set info = STATUS_INFO.get(entry_status.name, ('neutral', 'question-circle', entry_status.name|capitalize, '')) %}
+<span class="pdr-badge pdr-status--{{ info[0] }}" title="{{ info[3] }}">{{ render_icon(info[1], size='0.95em') }}<span>{{ info[2] }}</span></span>
+{% endmacro %}
+
+{#- Status of a whole task (used in lists). Same markup as the Python-rendered one in the tasks table,
+    so both look identical; the word is added by CSS (.small-status-flag::after). Signature unchanged. -#}
+{% macro display_task_status(task_status, status) %}
+{% from 'bootstrap5/utils.html' import render_icon %}
+{% set info = STATUS_INFO.get(task_status.name, ('neutral', 'question-circle', task_status.name|capitalize, '')) %}
+<span class="img-thumbnail small-status-flag status-flag-{{ task_status.name.lower() }}" title="{{ info[3] }}">
+{% if task_status == status.ALERT %}
+  <img src="{{ url_for('static', filename='images/skull.svg') }}" width="15" height="15" alt="">
+{% else %}
+  {{ render_icon(info[1]) }}
 {% endif %}
-  {{ entry_status.name|lower }}
 </span>
 {% endmacro %}
 
+{#- A titled section. Usage: {% call card('Title', id='x', subtitle='...') %} body {% endcall %} -#}
+{% macro card(title, id=None, subtitle=None, class='') %}
+<section class="pdr-card {{ class }}"{% if id %} id="{{ id }}"{% endif %}>
+  {% if title %}
+  <header class="pdr-card-header">
+    <h3 class="pdr-card-title">{{ title }}</h3>
+    {% if subtitle %}<p class="pdr-card-subtitle">{{ subtitle }}</p>{% endif %}
+  </header>
+  {% endif %}
+  <div class="pdr-card-body">{{ caller() }}</div>
+</section>
+{% endmacro %}
 
-{% macro display_task_status(task_status, status) %}
+{#- Facts as label/value rows. items: list of (label, value) or (label, value, mono). Empty values show an explicit dash. -#}
+{% macro key_values(items) %}
+<dl class="pdr-kv">
+  {% for item in items %}
+  <dt>{{ item[0] }}</dt>
+  <dd{% if item|length > 2 and item[2] %} class="pdr-mono"{% endif %}>
+    {%- if item[1] is none or item[1] == '' %}<span class="pdr-empty-value">—</span>{% else %}{{ item[1] }}{% endif -%}
+  </dd>
+  {% endfor %}
+</dl>
+{% endmacro %}
+
+{#- A message box. kind: info | success | warn | error. Usage: {% call notice('error', 'Title') %} details {% endcall %} -#}
+{% macro notice(kind='info', title=None) %}
 {% from 'bootstrap5/utils.html' import render_icon %}
-<span class="img-thumbnail small-status-flag status-flag-{{ task_status.name.lower() }}">
-{% if task_status == status.OVERWRITE %}
-  {{ render_icon('question-octagon') }}
-{% elif task_status == status.ERROR %}
-  {{ render_icon('exclamation-octagon') }}
-{% elif task_status == status.ALERT %}
-  <img src="{{ url_for('static', filename='images/skull.svg') }}" width = "15" height = "15">
-{% elif task_status == status.WARN %}
-{{ render_icon('exclamation-triangle') }}
-{% elif task_status == status.CLEAN %}
-{{ render_icon('check-circle') }}
-{% else %}
-  {{ render_icon('question') }}
+{% set icons = {'info': 'info-circle-fill', 'success': 'check-circle-fill', 'warn': 'exclamation-triangle-fill', 'error': 'x-octagon-fill'} %}
+<div class="pdr-notice pdr-notice--{{ kind }}" role="{{ 'alert' if kind in ['warn', 'error'] else 'status' }}">
+  <span class="pdr-notice-icon">{{ render_icon(icons.get(kind, 'info-circle-fill')) }}</span>
+  <div>
+    {% if title %}<strong class="pdr-notice-title">{{ title }}</strong>{% endif %}
+    <div>{{ caller() }}</div>
+  </div>
+</div>
+{% endmacro %}
+
+{#- Nothing to show: say it plainly instead of leaving a blank area. -#}
+{% macro empty_state(text, hint=None) %}
+<div class="pdr-empty">
+  <p class="mb-0">{{ text }}</p>
+  {% if hint %}<p class="pdr-empty-hint mb-0">{{ hint }}</p>{% endif %}
+</div>
+{% endmacro %}
+
+{#- One module's result on the analysis page. The root id MUST be the worker name: analysis.js checks it
+    to avoid loading the same result twice. Usage: {% call module_result(...) %} extra {% endcall %} or without call. -#}
+{% macro module_result(worker_name, worker_meta, report, status) %}
+<article class="pdr-module-result" id="{{ worker_name }}">
+  <header class="pdr-module-result-head">
+    <h4 class="pdr-module-result-name">{{ worker_meta.name }}</h4>
+    {{ display_status_badge(report.status, status) }}
+  </header>
+  {% if worker_meta.description %}<p class="pdr-module-result-desc">{{ worker_meta.description }}</p>{% endif %}
+  {% if caller is defined %}{{ caller() }}{% endif %}
+</article>
+{% endmacro %}
+
+{#- A module's details (dict). Lists and dicts become lists; http(s) values become links. -#}
+{% macro report_details(details) %}
+{% if details %}
+<dl class="pdr-kv pdr-details">
+  {% for key, value in details.items() %}
+  <dt>{{ key | replace('_', ' ') }}</dt>
+  <dd>
+    {% if value is string %}
+      {% if value.startswith('http://') or value.startswith('https://') %}
+        <a href="{{ value }}" target="_blank" rel="noopener noreferrer" class="pdr-mono">{{ value }}</a>
+      {% else %}<span class="pdr-mono">{{ value }}</span>{% endif %}
+    {% elif value is mapping %}
+      <ul class="pdr-list">{% for k, v in value.items() %}<li><span class="pdr-mono">{{ k }}</span>: {{ v }}</li>{% endfor %}</ul>
+    {% elif value is sequence %}
+      <ul class="pdr-list">{% for v in value %}<li class="pdr-mono">{{ v }}</li>{% else %}<li class="pdr-empty-value">—</li>{% endfor %}</ul>
+    {% else %}
+      <span class="pdr-mono">{{ value }}</span>
+    {% endif %}
+  </dd>
+  {% endfor %}
+</dl>
 {% endif %}
-</span>
+{% endmacro %}
+
+{#- Loading placeholder: grey shapes of what is coming. kind: 'cards' (module results), 'previews', 'rows'. -#}
+{% macro skeleton(kind='cards', count=3, caption=None) %}
+{% from 'bootstrap5/utils.html' import render_icon %}
+<div class="pdr-skeleton" aria-busy="true" aria-live="polite">
+  {% if caption %}<p class="pdr-skel-caption">{{ render_icon('hourglass-split') }} {{ caption }}</p>{% endif %}
+  {% if kind == 'previews' %}
+    <div class="row g-3">{% for i in range(count) %}<div class="col-6 col-md-4"><span class="pdr-skel-block"></span></div>{% endfor %}</div>
+  {% elif kind == 'rows' %}
+    {% for i in range(count) %}<span class="pdr-skel-line {{ ['', 'w-80', 'w-60'][i % 3] }}"></span>{% endfor %}
+  {% else %}
+    {% for i in range(count) %}
+    <div class="pdr-skel-card">
+      <div class="pdr-skel-head"><span class="pdr-skel-line w-40"></span><span class="pdr-skel-pill"></span></div>
+      <span class="pdr-skel-line w-80"></span>
+    </div>
+    {% endfor %}
+  {% endif %}
+</div>
+{% endmacro %}
+
+{#- Copy button for a value (hash, id, observable…). Handled by static/js/ui.js. -#}
+{% macro copy_button(value) %}
+{% from 'bootstrap5/utils.html' import render_icon %}
+<button type="button" class="pdr-copy" data-copy="{{ value }}" title="Copy" aria-label="Copy {{ value }}">{{ render_icon('copy', size='14') }}</button>
+{% endmacro %}
+
+{#- A long identifier shown in full (wrapped) with its copy button. -#}
+{% macro full_id(value) %}
+<div class="pdr-id-wrap"><span class="pdr-mono pdr-full-id">{{ value }}</span>{{ copy_button(value) }}</div>
+{% endmacro %}
+
+{#- A short value (name, IP, email address…) inline, followed by its copy icon. -#}
+{% macro copy_inline(value, mono=True) %}
+<span class="pdr-copy-inline"><span{% if mono %} class="pdr-mono"{% endif %}>{{ value }}</span>{{ copy_button(value) }}</span>
+{% endmacro %}
+
+{#- Shared page header with Pandora's identity + breadcrumb trail.
+    crumbs: list of (label, url or None) after "Home"; the last one is the current page.
+    Usage: {% call page_header('Roles', 'shield-lock', 'subtitle', [('Administration', url_for('api_admin_page')), ('Roles', None)]) %}
+             optional action buttons {% endcall %}   — or without call when there are no actions. -#}
+{% macro page_header(title, icon, subtitle=None, crumbs=[], section=None, centered=False) %}
+{% from 'bootstrap5/utils.html' import render_icon %}
+<nav class="pdr-breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="{{ url_for('api_root') }}">{{ render_icon('house-door', size='0.95em') }} Home</a></li>
+    {% for label, url in crumbs %}
+      {% if url and not loop.last %}<li><a href="{{ url }}">{{ label }}</a></li>
+      {% else %}<li aria-current="page">{{ label }}</li>{% endif %}
+    {% endfor %}
+  </ol>
+</nav>
+<header class="pdr-page-header{% if centered %} is-centered{% endif %}">
+  {# No logo here: it is already in the menu bar. #}
+  <div class="pdr-page-header-text">
+    <p class="pdr-page-header-kicker">Pandora · {{ section or title }}</p>
+    <h1 class="pdr-page-header-title">{{ render_icon(icon) }} {{ title }}</h1>
+    {% if subtitle %}<p class="pdr-page-header-subtitle">{{ subtitle }}</p>{% endif %}
+  </div>
+  {% if caller is defined %}<div class="pdr-page-header-actions">{{ caller() }}</div>{% endif %}
+</header>
+{% endmacro %}
+
+{#- The eyes of the Lookyloo logo (black drawing: inverted on dark backgrounds by theme.css). -#}
+{% macro lookyloo_logo() %}<img class="pdr-lookyloo-logo" src="{{ url_for('static', filename='images/lookyloo.png') }}" alt="" width="30" height="15"
+  integrity="{{ get_sri('static/images', 'lookyloo.png') }}" crossorigin="anonymous">{% endmacro %}
+
+{#- All the links of the file in Lookyloo's "multiple captures" page (new tab, on click only). analysis.js fills the links
+    and shows the button. Same settings as a single capture: not listed, JavaScript on, Lookyloo's default browser. -#}
+{% macro lookyloo_all(label) %}
+<form class="d-none" data-lookyloo-all method="post" target="_blank" rel="noopener noreferrer">
+  <input type="hidden" name="urls" value="">
+  <input type="hidden" name="multipleCaptures" value="1">
+  <input type="hidden" name="visibility" value="unlisted">
+  <input type="hidden" name="java_script_enabled" value="1">
+  <input type="hidden" name="user_agent" value=""><input type="hidden" name="os" value=""><input type="hidden" name="browser" value="">
+  <button type="submit" class="btn btn-sm btn-primary pdr-lookyloo">{{ lookyloo_logo() }} <span data-text="{{ label }}"></span></button>
+</form>
+{% endmacro %}
+
+{#- Search a value in the captures Lookyloo already has (its search form, new tab). Nothing is captured. -#}
+{% macro lookyloo_search(lookyloo_url, observable) %}
+{% set fields = {'url': 'url', 'uri': 'url', 'link': 'url', 'hostname': 'url', 'domain': 'url', 'ip-dst': 'ip', 'ip-src': 'ip', 'ip': 'ip', 'sha512': 'ressource'} %}
+{% if lookyloo_url and observable.observable_type in fields %}
+<form class="pdr-lookyloo-search" method="post" action="{{ lookyloo_url.rstrip('/') }}/search" target="_blank" rel="noopener noreferrer">
+  <input type="hidden" name="{{ fields[observable.observable_type] }}" value="{{ observable.value }}">
+  <button type="submit" class="btn btn-sm btn-secondary mt-1 pdr-lookyloo">{{ lookyloo_logo() }} Search in Lookyloo</button>
+</form>
+{% endif %}
 {% endmacro %}

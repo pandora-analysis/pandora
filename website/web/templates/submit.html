@@ -1,4 +1,11 @@
 {% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_icon %}
+{% from "macros.html" import notice %}
+{% from "_i18n.html" import I18N %}
+{# Text: English from _i18n.html, overlaid by `ui_text` when a translated wrapper (submit_fr.html) extends this page. #}
+{% set t = I18N['en'].copy() %}{% if ui_text is defined %}{% set _ = t.update(ui_text) %}{% endif %}
+
+{% block title %}{{ t.submit_page_title }}{% endblock %}
 
 {% block styles %}
   {{ super() }}
@@ -8,111 +15,151 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="mb-3">
-    {% if show_project_page %}
-    <center>
-      <h4>Pandora opens the box, so you don't have to!</h4>
-    </center>
-    {% endif %}
-  </div>
-  <div class="mb-3">
-    {% if special_disclaimer %}
-    <center>
-    <div class="alert alert-danger" role="alert"><strong>Be extra careful, please.</strong><br/>
-      {{special_disclaimer}}
-    </div>
-    </center>
-    {% endif %}
-  </div>
+{# Modules that will actually run (same filter as the module list below) #}
+{% set active_workers = workers.values() | selectattr('meta.replicas', 'gt', 0) | list %}
 
+<div class="container pdr-submit">
 
-  <div class="md-3" onclick="toggle_password()">
-    <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" role="switch" value="" id="checkPassword">
-      <label class="form-check-label" for="checkPassword">
-        The file is password protected
-      </label>
+  {# ---------- Identity ---------- #}
+  <section class="pdr-hero">
+    {# Animated box (plays once when the page is shown, see theme.css "Pandora box animation") #}
+    {% set class = 'pdr-hero-icon pdr-box-animated' %}{% set box_id = 'herobox' %}{% set box_mode = 'once' %}{% include "_pandora_box.html" %}
+    <div>
+      <p class="pdr-hero-kicker">{{ t.kicker }}</p>
+      <h1 class="pdr-hero-title">{{ t.hero_title }}</h1>
+      <p class="pdr-hero-text">{{ t.hero_text | replace('{n}', active_workers | length) }}</p>
     </div>
-  </div>
-  <div class="row g-3 align-items-center d-none" id="enable-password">
-    <div class="col-auto">
-      <label for="encryption-password" class="col-form-label">Password</label>
-    </div>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="encryption-password" placeholder="String to use to decrypt the submission">
-     </div>
-  </div>
-  </br>
+  </section>
 
-  <div class="md-3" id="dropzone">
-    <div class="dz-message" data-dz-message>
-      <span><h2>Upload file, document, email or other</h2></span>
-    </div>
-  </div>
-  <div id="previews"></div>
-
-  {% if current_user.detailed_view %}
-  <div class="md-3">
-    <button class="btn btn-primary" onclick="$('#workers-selection').toggleClass('d-none');">Advanced</button>
-  </div>
+  {# ---------- Messages ---------- #}
+  {% if error %}
+    {% call notice('error', t.previous_failed) %}{{ error }}{% endcall %}
+  {% endif %}
+  {% if special_disclaimer %}
+    {% call notice('warn', t.be_careful) %}{{ special_disclaimer }}{% endcall %}
   {% endif %}
 
-  <div class="md-3 d-none" id="workers-selection">
-      <table class="table table-striped table-sm">
-        <thead>
-          <tr>
-            <th scope="col">Module</th>
-            <th scope="col">Description</th>
-            <th scope="col">Enable?</th>
-          </tr>
-        </thead>
-        <tbody>
+  {# ---------- Upload ---------- #}
+  <section class="pdr-card" aria-labelledby="upload-title">
+    <header class="pdr-card-header">
+      <h2 class="pdr-card-title" id="upload-title">{{ t.submit_title }}</h2>
+      <p class="pdr-card-subtitle">{{ t.max_size | replace('{n}', max_file_size) }}</p>
+    </header>
+    <div class="pdr-card-body">
+
+      <div id="dropzone" class="pdr-dropzone">
+        <div class="dz-message" data-dz-message>
+          <span class="pdr-drop-icon">{{ render_icon('cloud-arrow-up-fill', size='3rem') }}</span>
+          <span class="pdr-drop-title">{{ t.drop_title }}</span>
+          <span class="pdr-drop-types">
+            <span>{{ render_icon('file-earmark-text') }} {{ t.type_documents }}</span>
+            <span>{{ render_icon('file-earmark-pdf') }} {{ t.type_pdf }}</span>
+            <span>{{ render_icon('envelope') }} {{ t.type_emails }}</span>
+            <span>{{ render_icon('file-earmark-zip') }} {{ t.type_archives }}</span>
+            <span>{{ render_icon('file-earmark-image') }} {{ t.type_images }}</span>
+            <span>{{ render_icon('file-earmark-binary') }} {{ t.type_executables }}</span>
+          </span>
+        </div>
+      </div>
+      <div id="previews"></div>
+
+      {# Options: the ids and names below are read by submit.js and the upload code: keep them. #}
+      <div class="pdr-options">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="checkPassword"
+                 onchange="toggle_password()" aria-controls="enable-password">
+          <label class="form-check-label" for="checkPassword">
+            {{ render_icon('key') }} {{ t.password_switch }}
+          </label>
+        </div>
+        <div class="pdr-password d-none" id="enable-password">
+          <label for="encryption-password" class="form-label">{{ t.password }}</label>
+          <input type="text" class="form-control pdr-mono" id="encryption-password" autocomplete="off"
+                 placeholder="{{ t.password_placeholder }}">
+          {% set zip_passwords = workers.get('extractor', {}).get('settings', {}).get('zip_passwords') or [] %}
+          {% if zip_passwords %}
+          <div class="form-text">{{ t.zip_passwords | replace('{n}', zip_passwords | length) }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ---------- Modules (detailed view only) ---------- #}
+  {% if current_user.detailed_view %}
+  <details class="pdr-card pdr-modules">
+    <summary class="pdr-card-header">
+      <span class="pdr-card-title">{{ render_icon('sliders') }} {{ t.modules_title }}</span>
+      <span class="pdr-card-subtitle">{{ t.modules_subtitle | replace('{n}', active_workers | length) }}</span>
+    </summary>
+    <div class="pdr-card-body">
+      <div id="workers-selection" class="pdr-module-grid">
         {% for worker_name, worker_config in workers.items() %}
           {% if worker_config.meta.replicas > 0 %}
-          <tr>
-            <td>{{ worker_config.meta.name }}</td>
-            <td>{{ worker_config.meta.description }}</td>
-            <td><input type="checkbox" name="{{ worker_name }}"
-                {% if worker_config.settings.required or worker_config.settings.run_by_default %}checked{%endif%}
-                {% if worker_config.settings.required %}disabled{%endif%}
-                />
-            </td>
-          </tr>
+          <div class="form-check form-switch pdr-module">
+            <input class="form-check-input" type="checkbox" role="switch" name="{{ worker_name }}" id="worker-{{ worker_name }}"
+                   {% if worker_config.settings.required or worker_config.settings.run_by_default %}checked{% endif %}
+                   {% if worker_config.settings.required %}disabled{% endif %}>
+            <label class="form-check-label" for="worker-{{ worker_name }}">
+              <strong>{{ worker_config.meta.name }}</strong>
+              {% if worker_config.settings.required %}<span class="pdr-module-tag">{{ t.always_on }}</span>{% endif %}
+              <span class="pdr-module-desc">{{ worker_config.meta.description }}</span>
+            </label>
+          </div>
           {% endif %}
         {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-  <div class="md-3" style="font-size:12px">
-    <center>
-      <div class="alert alert-light" role="alert">
-        <strong>DISCLAIMER</strong><br/>
-        {{generic_disclaimer | safe}}
       </div>
-    </center>
-  </div>
+    </div>
+  </details>
+  {% else %}
+    {# Keep the selector used by submit.js: no module list means nothing is disabled. #}
+    <div id="workers-selection" class="d-none"></div>
+  {% endif %}
+
+  {# ---------- How it works ---------- #}
+  <ol class="pdr-steps" aria-label="{{ t.how_it_works }}">
+    <li>
+      <span class="pdr-step-icon">{{ render_icon('cloud-arrow-up', size='1.6rem') }}</span>
+      <div><strong>{{ t.step1_title }}</strong><span>{{ t.step1_text }}</span></div>
+    </li>
+    <li>
+      <span class="pdr-step-icon">{{ render_icon('box-seam', size='1.6rem') }}</span>
+      <div><strong>{{ t.step2_title }}</strong><span>{{ t.step2_text | replace('{n}', active_workers | length) }}</span></div>
+    </li>
+    <li>
+      <span class="pdr-step-icon">{{ render_icon('shield-check', size='1.6rem') }}</span>
+      <div><strong>{{ t.step3_title }}</strong><span>{{ t.step3_text }}</span></div>
+    </li>
+  </ol>
+
+  {# ---------- Disclaimer ---------- #}
+  <details class="pdr-disclaimer">
+    <summary>{{ render_icon('info-circle') }} {{ t.disclaimer }}</summary>
+    <div>{{ generic_disclaimer | safe }}</div>
+  </details>
 </div>
 
-
-<!-- HTML heavily inspired by http://blueimp.github.io/jQuery-File-Upload/ -->
-<div class="table table-striped" class="files" id="previews">
-
-  <div id="template" class="file-row">
-    <!-- This is used as the file preview template -->
-    <div>
-        <div class="dz-filename"><p class="name" data-dz-name></p></div>
-        <div class="dz-error-message"><strong class="error text-danger" data-dz-errormessage></strong></div>
+<!-- Upload preview template, read by Dropzone (data-dz-* attributes) -->
+<div class="d-none">
+  <div id="template" class="pdr-upload">
+    {# Upload stage: the file drops into the Pandora box, the box opens and the kinds of result fly out.
+       Decorative only (aria-hidden); the words and the percentage below say the same thing. #}
+    {% set stage_box_id = 'uploadbox' %}{% include "_pandora_stage.html" %}
+    <div class="pdr-upload-head">
+      {{ render_icon('file-earmark') }}
+      <span class="pdr-upload-name pdr-mono" data-dz-name></span>
+      <span class="pdr-upload-size" data-dz-size></span>
     </div>
-    <div>
-        <p class="size" data-dz-size></p>
-        <div class="progress active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Uploading file">
-          <div class="progress-bar bg-info" style="width:0%;" data-dz-uploadprogress></div>
-        </div>
+    <p class="pdr-upload-phase" aria-live="polite">
+      <span class="pdr-phase-sending">{{ t.upload_sending }} <strong data-pdr-percent>0%</strong></span>
+      <span class="pdr-phase-sent">{{ render_icon('box-seam') }} {{ t.upload_sent }}</span>
+      <span class="pdr-phase-failed">{{ render_icon('x-octagon-fill') }} {{ t.upload_failed }}</span>
+    </p>
+    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="{{ t.upload_sending }}">
+      <div class="progress-bar" style="width:0%;" data-dz-uploadprogress></div>
     </div>
+    <div class="dz-error-message"><strong class="text-danger" data-dz-errormessage></strong></div>
   </div>
-
 </div>
 
 {% endblock %}
@@ -129,7 +176,7 @@
   // Get the template HTML and remove it from the document.
   var previewNode = document.querySelector("#template");
   previewNode.id = "";
-  var previewTemplate = previewNode.parentNode.innerHTML;
+  var previewTemplate = previewNode.outerHTML;
   previewNode.parentNode.removeChild(previewNode);
   $("div#dropzone").dropzone({
     url: "{{ url_for('PandoraAPI_api_submit') }}",
@@ -139,6 +186,20 @@
     // maxFiles: 1,
     previewTemplate: previewTemplate,
     previewsContainer: "#previews", // Define the container to display the previews
+    init: function() {
+      // Once a file is chosen, the drop zone gives its place to the upload stage (box animation).
+      this.on("addedfile", function() { $("div#dropzone").hide(); });
+    },
+    uploadprogress: function(file, progress) {
+      // Bar width (as Dropzone does by default) + the percentage in words, readable without the bar.
+      var pct = Math.round(progress);
+      var el = file.previewElement;
+      if (!el) { return; }
+      el.querySelector("[data-dz-uploadprogress]").style.width = pct + "%";
+      el.querySelector(".progress").setAttribute("aria-valuenow", pct);
+      el.querySelector("[data-pdr-percent]").textContent = pct + "%";
+      if (pct >= 100) { el.classList.add("pdr-upload--sent"); }
+    },
     sending: function(file, xhr, formData) {
       formData.append("workersDisabled", getDisabledWorkers());
       formData.append("password", getPassword());

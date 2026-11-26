@@ -1,182 +1,33 @@
-{% extends "base.html" %}
-
-{% block styles %}
-  {{ super() }}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/dropzone.css') }}" type="text/css"
-        integrity="{{get_sri('static/css/lib', 'dropzone.css')}}"
-        crossorigin="anonymous">
-{% endblock %}
-
-{% block content %}
-<div class="container">
-  <div class="mb-3">
-    {% if show_project_page %}
-    <center>
-      <h4>Pandora ouvre la boite comme ca vous n'avez pas à le faire!</h4>
-    </center>
-    {% endif %}
-  </div>
-  <div class="mb-3">
-    {% if special_disclaimer %}
-    <center>
-    <div class="alert alert-danger" role="alert"><strong>Be extra careful, please.</strong><br/>
-      {{special_disclaimer}}
-    </div>
-    </center>
-    {% endif %}
-  </div>
-
-
-  <div class="md-3" onclick="toggle_password()">
-    <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" role="switch" value="" id="checkPassword">
-      <label class="form-check-label" for="checkPassword">
-        Le ficher est protégé par un mot de passe
-      </label>
-    </div>
-  </div>
-  <div class="row g-3 align-items-center d-none" id="enable-password">
-    <div class="col-auto">
-      <label for="encryption-password" class="col-form-label">mot de passe</label>
-    </div>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="encryption-password" placeholder="String to use to decrypt the submission">
-     </div>
-  </div>
-  </br>
-
-  <div class="md-3" id="dropzone">
-    <div class="dz-message" data-dz-message>
-      <span><h2>Téléversez un fichier, document, email, ou autre.</h2></span>
-    </div>
-  </div>
-  <div id="previews"></div>
-
-  {% if current_user.detailed_view %}
-  <div class="md-3">
-    <button class="btn btn-primary" onclick="$('#workers-selection').toggleClass('d-none');">Advanced</button>
-  </div>
-  {% endif %}
-
-  <div class="md-3 d-none" id="workers-selection">
-      <table class="table table-striped table-sm">
-        <thead>
-          <tr>
-            <th scope="col">Module</th>
-            <th scope="col">Description</th>
-            <th scope="col">Enable?</th>
-          </tr>
-        </thead>
-        <tbody>
-        {% for worker_name, worker_config in workers.items() %}
-          {% if worker_config.meta.replicas > 0 %}
-          <tr>
-            <td>{{ worker_config.meta.name }}</td>
-            <td>{{ worker_config.meta.description }}</td>
-            <td><input type="checkbox" name="{{ worker_name }}"
-                {% if worker_config.settings.required or worker_config.settings.run_by_default %}checked{%endif%}
-                {% if worker_config.settings.required %}disabled{%endif%}
-                />
-            </td>
-          </tr>
-          {% endif %}
-        {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-  <div class="md-3" style="font-size:12px">
-    <center>
-      <div class="alert alert-light" role="alert">
-        <strong>DISCLAIMER</strong><br/>
-        {{generic_disclaimer | safe}}
-      </div>
-    </center>
-  </div>
-</div>
-
-
-<!-- HTML heavily inspired by http://blueimp.github.io/jQuery-File-Upload/ -->
-<div class="table table-striped" class="files" id="previews">
-
-  <div id="template" class="file-row">
-    <!-- This is used as the file preview template -->
-    <div>
-        <div class="dz-filename"><p class="name" data-dz-name></p></div>
-        <div class="dz-error-message"><strong class="error text-danger" data-dz-errormessage></strong></div>
-    </div>
-    <div>
-        <p class="size" data-dz-size></p>
-        <div class="progress active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Uploading file">
-          <div class="progress-bar bg-info" style="width:0%;" data-dz-uploadprogress></div>
-        </div>
-    </div>
-  </div>
-
-</div>
-
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
-<script src="{{ url_for('static', filename='js/lib/dropzone-min.js') }}"
-        integrity="{{get_sri('static/js/lib', 'dropzone-min.js')}}"
-        crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/submit.js') }}"
-        integrity="{{get_sri('static/js', 'submit.js')}}"
-        crossorigin="anonymous"></script>
-<script type="text/javascript">
-  // Get the template HTML and remove it from the document.
-  var previewNode = document.querySelector("#template");
-  previewNode.id = "";
-  var previewTemplate = previewNode.parentNode.innerHTML;
-  previewNode.parentNode.removeChild(previewNode);
-  $("div#dropzone").dropzone({
-    url: "{{ url_for('PandoraAPI_api_submit') }}",
-    headers: {"X-CSRF-Token": "{{ csrf_token() }}"},
-    paramName: "file",
-    maxFilesize: {{ max_file_size }}, // MB
-    // maxFiles: 1,
-    previewTemplate: previewTemplate,
-    previewsContainer: "#previews", // Define the container to display the previews
-    sending: function(file, xhr, formData) {
-      formData.append("workersDisabled", getDisabledWorkers());
-      formData.append("password", getPassword());
-    },
-    success: function(file, answer){
-      window.setTimeout(function(){
-        window.location = `/analysis/${answer.taskId}`;
-      }, 100);
-    },
-    error: function(file, message){
-      if (file.previewElement) {
-        file.previewElement.classList.add("dz-error");
-        if (typeof message !== "string" && message.error) {
-          message = message.error;
-        }
-        for (let node of file.previewElement.querySelectorAll(
-          "[data-dz-errormessage]"
-        )) {
-          node.textContent = message;
-        }
-      }
-      $("div#dropzone").hide();
-      window.setTimeout(function(){
-        window.location = `/submit`;
-      }, 2000);
-    },
-  });
-</script>
-
-<script>
-function toggle_password() {
-  var checkBox = document.getElementById("checkPassword");
-  var text = document.getElementById("enable-password");
-  if (checkBox.checked == true){
-    text.classList.remove("d-none");
-  } else {
-     text.classList.add("d-none");
-  }
-}
-</script>
-{% endblock %}
+{#- French version of the upload page: same layout as submit.html (only the text differs).
+    Keys and English reference: _i18n.html. CI codespell skips this file (French words). -#}
+{% set ui_lang = "fr" %}
+{% set ui_text = {
+    'status': {'ALERT': 'Alerte', 'WARN': 'Avertissement', 'CLEAN': 'Sain', 'OKAY': 'OK', 'ERROR': 'Erreur', 'OVERWRITE': 'Forcé',
+               'RUNNING': 'En cours', 'WAITING': 'En attente', 'MANUAL': 'Manuel', 'UNKNOWN': 'Inconnu', 'NOTAPPLICABLE': 'Non applicable',
+               'DISABLED': 'Désactivé', 'DEACTIVATE': 'Désactivé', 'DELETED': 'Supprimé'},
+    'home': 'Accueil', 'recent': 'Analyses récentes', 'copy_label': 'Copier', 'close': 'Fermer', 'cancel': 'Annuler',
+    'submit_page_title': 'Soumettre un fichier — Pandora',
+    'kicker': "Plateforme d'analyse Pandora",
+    'hero_title': "Pandora ouvre la boîte, pour que vous n'ayez pas à le faire !",
+    'hero_text': "Déposez un fichier suspect : Pandora l'ouvre pour vous, le passe dans {n} modules d'analyse et vous dit s'il est sain, suspect ou malveillant.",
+    'previous_failed': "L'envoi précédent a échoué",
+    'be_careful': 'Soyez particulièrement prudent.',
+    'how_it_works': 'Comment ça marche',
+    'step1_title': '1. Déposez', 'step1_text': 'Un fichier, un document, un e-mail ou une archive.',
+    'step2_title': '2. Pandora ouvre la boîte', 'step2_text': "{n} modules l'analysent, en extraient le contenu et en font un aperçu.",
+    'step3_title': '3. Lisez le verdict', 'step3_text': 'Sain, avertissement ou alerte, avec la raison donnée par chaque module.',
+    'submit_title': 'Soumettre un fichier', 'max_size': 'Taille maximale : {n} Mo',
+    'drop_title': 'Déposez un fichier ici, ou cliquez pour en choisir un',
+    'fly_clean': 'Sain', 'fly_warn': 'Suspect', 'fly_alert': 'Dangereux',
+    'upload_sending': 'Envoi du fichier à Pandora…',
+    'upload_sent': "Fichier reçu : Pandora ouvre la boîte et lance l'analyse…",
+    'upload_failed': "L'envoi a échoué.",
+    'type_documents': 'Documents', 'type_pdf': 'PDF', 'type_emails': 'E-mails', 'type_archives': 'Archives',
+    'type_images': 'Images', 'type_executables': 'Exécutables',
+    'password_switch': 'Le fichier est protégé par un mot de passe', 'password': 'Mot de passe',
+    'password_placeholder': "Mot de passe pour ouvrir l'archive ou le document",
+    'zip_passwords': "Pour les archives ZIP, Pandora essaie déjà {n} mots de passe courants définis par l'administrateur.",
+    'modules_title': "Modules d'analyse", 'modules_subtitle': "{n} disponibles. Décochez un module pour ne pas l'utiliser sur ce fichier.",
+    'always_on': 'toujours actif', 'disclaimer': 'Avertissement légal'
+} %}
+{% extends "submit.html" %}
