@@ -376,6 +376,62 @@ div.dt-container .dt-info { color: var(--pdr-text-muted); }
 .pdr-upload .progress { height: .5rem; }
 .pdr-upload .progress-bar { background: var(--pdr-primary); }
 
+/* Upload stage: the file falls into the Pandora box (loop mode, opens and closes), and the kinds of result
+   Pandora looks for fly out of it. Decorative: the phase text and the percentage carry the information. */
+.pdr-upload-stage { position: relative; height: 250px; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
+.pdr-upload-box { width: 140px; height: 140px; position: relative; z-index: 1; }
+.pdr-upload-box .pdr-box-layer { display: none; }   /* the badges flying out replace the layers */
+.pdr-upload-file {
+  position: absolute; left: 50%; top: 0; margin-left: -1.1rem; z-index: 2; color: var(--pdr-primary);
+  animation: pdr-file-drop 2.4s cubic-bezier(.5, 0, .75, 0) infinite;
+}
+@keyframes pdr-file-drop {
+  0%   { transform: translateY(-20px) rotate(-12deg); opacity: 0; }
+  15%  { opacity: 1; }
+  45%  { transform: translateY(130px) rotate(6deg) scale(.7); opacity: 1; }
+  55%, 100% { transform: translateY(150px) scale(.3); opacity: 0; }
+}
+.pdr-fly {
+  position: absolute; left: 50%; bottom: 70px; z-index: 0;
+  display: inline-flex; align-items: center; gap: .3rem; padding: .25rem .6rem;
+  transform: translate(-50%, 0) scale(.3); opacity: 0;
+  border-radius: 999px; font-size: .85rem; font-weight: 600; white-space: nowrap;
+  background: var(--pdr-surface); border: 1px solid var(--pdr-border); color: var(--pdr-text-muted);
+  box-shadow: 0 4px 14px rgba(35, 49, 58, .12);
+  animation: pdr-fly-out 3.2s cubic-bezier(.2, .8, .3, 1) var(--d, 0s) infinite;
+}
+.pdr-fly svg { width: 1.1em; height: 1.1em; }
+.pdr-fly--clean { color: #fff; background: var(--pdr-status-clean); border-color: transparent; }
+.pdr-fly--warn  { color: var(--pdr-status-warn-text); background: var(--pdr-status-warn); border-color: transparent; }
+.pdr-fly--alert { color: #fff; background: var(--pdr-status-alert); border-color: transparent; }
+.pdr-fly--info  { padding: .45rem; color: var(--pdr-primary); }
+.pdr-fly--info svg { width: 1.4em; height: 1.4em; }
+@keyframes pdr-fly-out {
+  0%   { transform: translate(-50%, 20px) scale(.3); opacity: 0; }
+  15%  { opacity: 1; }
+  45%  { transform: translate(calc(-50% + var(--dx) * var(--sx, 1)), calc(var(--dy) * var(--sy, 1))) scale(1); opacity: 1; }
+  75%  { transform: translate(calc(-50% + var(--dx) * var(--sx, 1)), calc(calc(var(--dy) * var(--sy, 1)) - 12px)) scale(1); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx) * var(--sx, 1)), calc(calc(var(--dy) * var(--sy, 1)) - 24px)) scale(.9); opacity: 0; }
+}
+.pdr-upload-phase { margin: .25rem 0 .5rem; text-align: center; font-weight: 600; }
+.pdr-upload-phase strong { font-variant-numeric: tabular-nums; color: var(--pdr-primary); }
+.pdr-phase-sent, .pdr-phase-failed { display: none; }
+.pdr-upload--sent .pdr-phase-sending { display: none; }
+.pdr-upload--sent .pdr-phase-sent { display: inline-flex; align-items: center; gap: .4rem; color: var(--pdr-status-clean); }
+.pdr-upload--sent .pdr-upload-file { display: none; }
+.pdr-upload.dz-error .pdr-phase-sending, .pdr-upload.dz-error .pdr-phase-sent { display: none; }
+.pdr-upload.dz-error .pdr-phase-failed { display: inline-flex; align-items: center; gap: .4rem; color: var(--pdr-status-alert); }
+.pdr-upload.dz-error .pdr-upload-stage { display: none; }
+@media (max-width: 576px) {
+  .pdr-upload-stage { height: 210px; }
+  .pdr-fly { --sx: .6; --sy: .7; font-size: .75rem; }
+  .pdr-fly--info:nth-of-type(n+7) { display: none; }   /* the two outermost icons */
+}
+@media (prefers-reduced-motion: reduce) {
+  .pdr-upload-file { display: none; }
+  .pdr-fly { animation: none; opacity: 1; transform: translate(calc(-50% + var(--dx) * var(--sx, 1)), calc(var(--dy) * var(--sy, 1))) scale(1); }
+}
+
 .pdr-options { border-top: 1px solid var(--pdr-border); padding-top: 1rem; }
 .pdr-password { margin-top: .75rem; max-width: 32rem; }
 

@@ -142,12 +142,20 @@
 <!-- Upload preview template, read by Dropzone (data-dz-* attributes) -->
 <div class="d-none">
   <div id="template" class="pdr-upload">
+    {# Upload stage: the file drops into the Pandora box, the box opens and the kinds of result fly out.
+       Decorative only (aria-hidden); the words and the percentage below say the same thing. #}
+    {% set stage_box_id = 'uploadbox' %}{% include "_pandora_stage.html" %}
     <div class="pdr-upload-head">
       {{ render_icon('file-earmark') }}
       <span class="pdr-upload-name pdr-mono" data-dz-name></span>
       <span class="pdr-upload-size" data-dz-size></span>
     </div>
-    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Uploading file">
+    <p class="pdr-upload-phase" aria-live="polite">
+      <span class="pdr-phase-sending">{{ t.upload_sending }} <strong data-pdr-percent>0%</strong></span>
+      <span class="pdr-phase-sent">{{ render_icon('box-seam') }} {{ t.upload_sent }}</span>
+      <span class="pdr-phase-failed">{{ render_icon('x-octagon-fill') }} {{ t.upload_failed }}</span>
+    </p>
+    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="{{ t.upload_sending }}">
       <div class="progress-bar" style="width:0%;" data-dz-uploadprogress></div>
     </div>
     <div class="dz-error-message"><strong class="text-danger" data-dz-errormessage></strong></div>
@@ -178,6 +186,20 @@
     // maxFiles: 1,
     previewTemplate: previewTemplate,
     previewsContainer: "#previews", // Define the container to display the previews
+    init: function() {
+      // Once a file is chosen, the drop zone gives its place to the upload stage (box animation).
+      this.on("addedfile", function() { $("div#dropzone").hide(); });
+    },
+    uploadprogress: function(file, progress) {
+      // Bar width (as Dropzone does by default) + the percentage in words, readable without the bar.
+      var pct = Math.round(progress);
+      var el = file.previewElement;
+      if (!el) { return; }
+      el.querySelector("[data-dz-uploadprogress]").style.width = pct + "%";
+      el.querySelector(".progress").setAttribute("aria-valuenow", pct);
+      el.querySelector("[data-pdr-percent]").textContent = pct + "%";
+      if (pct >= 100) { el.classList.add("pdr-upload--sent"); }
+    },
     sending: function(file, xhr, formData) {
       formData.append("workersDisabled", getDisabledWorkers());
       formData.append("password", getPassword());
