@@ -4,7 +4,10 @@
 
 # Pandora
 
-<img src="https://pandora.circl.lu/static/images/logo.svg" width="250" height="250">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="website/web/static/images/pandora-logo-new-dark.svg">
+  <img src="website/web/static/images/pandora-logo-new.svg" alt="Pandora, analysis framework" width="460">
+</picture>
 
 Pandora is an analysis framework to discover if a file is suspicious and conveniently show the results.
 
